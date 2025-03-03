@@ -1,0 +1,293 @@
+:root {
+  /* --green: #0b7c21; */
+  --green: #4E7839;
+  --light-yellow: #fbf4a4;
+  --honey: #FFB300;
+  --brown: #6B4226;
+  --dark-purple: #301934;
+  --light-green: #9DC183;
+  --light-peach: #fae9d8;
+  --light-orange: rgb(247, 216, 160);
+  /* --dark-green: #06402B; */
+  --bright-blue: rgb(40, 203, 215);
+  --dark-green: #334F26;
+  --light-gray: #c5cbc2;
+  --dark-gray: #212D40;
+  --gray: #d1d1d1; 
+  --yellow: #FFCC00;
+  --background: white;
+  --font-color-1: var(--honey);
+  --font-color-2: white;
+  /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
+  --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
+  --padding-top: 75px;
+  --height-header: clamp(1rem, 10vw, 6rem);
+  --size-body: calc(100vh - var(--height-header) - 4px);
+  /* --size-body: 100vh; */
+  --default-font-size: clamp(0.9rem, 1.9vw, 1.1rem);
+  --shadow: 0px 4px 8px rgba(0, 0, 0, 0.7);
+  --title-font: 'BungeeOutline';
+  --default-font: 'RopaSans';
+}
+
+#root {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: black;
+  color: white;
+  font-family: var(--default-font);
+  font-size: var(--default-font-size);
+  box-sizing: border-box;
+
+}
+
+.no-scroll {
+  overflow-y: hidden;
+}
+
+div.star-ratings{
+  display: flex;  
+}
+
+@font-face {
+  font-family: 'BungeeInline';
+  src: url('/fonts/BungeeInline-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BungeeOutline';
+  src: url('/fonts/BungeeOutline-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Codystar';
+  src: url('/fonts/Codystar-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Codystar';
+  src: url('/fonts/Codystar-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'FrancoisOne';
+  src: url('/fonts/FrancoisOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Mogra';
+  src: url('/fonts/Mogra-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Nosifer';
+  src: url('/fonts/Nosifer-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'RobotoCondensed';
+  src: url('/fonts/RobotoCondensed-Italic-VariableFont_wght.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'RobotoCondensed';
+  src: url('/fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'RopaSans';
+  src: url('/fonts/RopaSans-Italic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'RopaSans';
+  src: url('/fonts/RopaSans-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('/fonts/Rubik-Italic-VariableFont_wght.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1 {
+  font-family: var(--title-font), sans-serif;
+}
+
+h1 {
+  color: white;
+}
+
+h2, h3 {
+  color: var(--honey);
+}
+
+h1 {
+  font-size: clamp(1.7rem, 4vw, 2rem);
+}
+
+h2 {
+  font-size: clamp(1.3rem, 2vw, 1.9rem);
+  font-family: var(--default-font)
+}
+
+h3 {
+  font-size: clamp(1.2rem, 1.8vw, 1.8rem);
+  font-family: var(--default-font)
+}
+
+p, label, i, li, a, span, option, select, input, textarea {
+  font-size: var(--default-font-size);
+  color: var(--font-color-2);
+}
+
+label {
+  font-family: 'Mogra';
+}
+
+span {
+  display: block;
+}
+
+div {
+  position: relative;
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo:hover {
+    animation: logo-spin infinite 10s linear;
+  }
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes pauseShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDiagonal {
+  from {
+    transform: translateY(-100%) translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes pop {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1);
+      color: var(--green);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
