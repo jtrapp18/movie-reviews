@@ -140,43 +140,22 @@ function deleteJSONFromDb(dbKey, Id) {
   .catch(e => console.error(e));
 }
 
-function getNearbyZipcodes(zipcode, radius) {
+function getMovieInfo(searchQuery=null) {
+
+  const queryText = !searchQuery ? `?query=${query}` : ""
 
   // Make the API call to your Lambda (via API Gateway)
-  return fetch(`/api/zipcodes?zip=${zipcode}&radius=${radius}`)
-    .then(res => {
-      console.log(res)
-      if (!res.ok) {
-        console.error(`Error fetching zipcodes! Status: ${res.status}`);
-      }
-      if (res.status === 204) {
-        return null
-      }
-      return res.json();
-    })
-    .catch(err => {
-      console.error('Request failed', err);
-    });
-}
-
-function getBeekeepingNews(searchQuery) {
-
-  const query = !searchQuery ? "beekeeping OR honeybee OR apiary" : searchQuery
-
-  // Make the API call to your Lambda (via API Gateway)
-  return fetch(`/api/beekeeping_news?query=${query}`)
-    .then(res => {
-      if (!res.ok) {
-        console.error(`Error fetching articles! Status: ${res.status}`);
-      }
-      if (res.status === 204) {
-        return null
-      }
-      return res.json();
-    })
-    .catch(err => {
-      console.error('Request failed', err);
-    });
+  return fetch(`/api/get_movie_info${queryText}`)
+  .then(res => {
+    if (!res.ok) {
+      console.error(`Error fetching movies! Status: ${res.status}`);
+      return null;
+    }
+    return res.json();
+  })
+  .catch(err => {
+    console.error('Request failed', err);
+  });
 }
 
 //****************************************************************************************************
@@ -252,5 +231,5 @@ const scrollToTop = () => {
 };
 
 export {userLogout, getJSON, getJSONById, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
-  getNearbyZipcodes, getBeekeepingNews, snakeToCamel, camelToProperCase, 
+  getMovieInfo, snakeToCamel, camelToProperCase, 
   formattedTime, scrollToTop};

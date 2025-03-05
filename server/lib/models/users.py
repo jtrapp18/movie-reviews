@@ -18,14 +18,9 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False, unique=True)
     zipcode = db.Column(db.String, nullable=False)
 
-    hives = db.relationship('Hive', back_populates='user', cascade='all, delete-orphan')
-    events = db.relationship('Event', back_populates='user', cascade='all, delete-orphan')
-    signups = db.relationship('Signup', back_populates='user', cascade='all, delete-orphan')
-    forums = db.relationship('Forum', back_populates='user', cascade='all, delete-orphan')
-    messages = db.relationship('Message', back_populates='user', cascade='all, delete-orphan')
-    replies = db.relationship('Reply', back_populates='user', cascade='all, delete-orphan')
+    # hives = db.relationship('Hive', back_populates='user', cascade='all, delete-orphan')
 
-    serialize_rules = ('-hives', '-events', '-signups', '-forums', '-messages', '-replies')
+    serialize_rules = ('-hives')
     
     @hybrid_property
     def password_hash(self):

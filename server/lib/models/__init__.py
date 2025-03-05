@@ -1,4 +1,5 @@
 from .users import User
-from .signup import Signup
+from .movies import Movie
+from .reviews import Review
 
-__all__ = ["User", "Signup"]
+__all__ = ["User", "Movie", "Review"]
