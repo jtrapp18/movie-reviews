@@ -27,15 +27,6 @@ function App() {
       });
   }, []);
 
-  // Fetching general graph data (available to everyone)
-  useEffect(() => {
-    console.log('logging graphs...')
-    getJSON("graph_data")
-      .then((data) => {
-        setGraphData(snakeToCamel(data));
-      });
-  }, []);
-
   return (
     <>
       <Header/>

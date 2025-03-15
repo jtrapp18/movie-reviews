@@ -9,7 +9,7 @@ const SearchContainer = styled.div`
     padding: 1vh 0 1vh 0;
     position: relative;
     justify-content: center;
-    margin: 0;
+    margin: 5%;
 
     div {
         width: 500px;
@@ -44,7 +44,7 @@ const SearchContainer = styled.div`
     }
 `
 
-const SearchBar = ({pullFromSearch}) => {
+const SearchBar = ({enterSearch}) => {
 
     const [searchInput, setSearchInput] = useState('');
     
@@ -52,15 +52,15 @@ const SearchBar = ({pullFromSearch}) => {
         setSearchInput(event.target.value);
     }
 
-    const handleClearSearch = (event) => {
+    const handleClearSearch = () => {
         setSearchInput('');
-        pullFromSearch('');
+        enterSearch('');
     }
 
-    const handleKeyPress = (event) => {
+    const handeKeyDown = (event) => {
         // Check if "Enter" key is pressed
         if (event.key === 'Enter') {
-            pullFromSearch(searchInput);
+            enterSearch(searchInput);
         }
     };
 
@@ -71,11 +71,12 @@ const SearchBar = ({pullFromSearch}) => {
                     value={searchInput}
                     type="text"
                     id="search"
-                    placeholder="Search articles..."
+                    placeholder="Search movies..."
                     onChange={handleChangeSearch}
-                    onKeyDown={handleKeyPress}
+                    onKeyDown={handeKeyDown}
                 />
                 <span onClick={handleClearSearch}>✖</span>
+                <span onClick={()=>enterSearch(searchInput)}>ENTER</span>
             </div>
         </SearchContainer>
     );

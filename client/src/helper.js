@@ -31,7 +31,7 @@ function getJSON(dbKey) {
       if (res.status === 204) {
         return null
       }
-      return res.json();
+      return snakeToCamel(res.json());
     })
     .catch(err => {
       console.error('Request failed', err);
@@ -140,22 +140,34 @@ function deleteJSONFromDb(dbKey, Id) {
   .catch(e => console.error(e));
 }
 
-function getMovieInfo(searchQuery=null) {
+async function getMovieInfo(searchQuery = null) {
+  const queryText = searchQuery ? `?query=${searchQuery}` : "";
+  const imgUrl = "https://image.tmdb.org/t/p/w1280"
 
-  const queryText = !searchQuery ? `?query=${query}` : ""
+  try {
+    const res = await fetch(`/api/pull_movie_info${queryText}`);
 
-  // Make the API call to your Lambda (via API Gateway)
-  return fetch(`/api/get_movie_info${queryText}`)
-  .then(res => {
     if (!res.ok) {
       console.error(`Error fetching movies! Status: ${res.status}`);
       return null;
     }
-    return res.json();
-  })
-  .catch(err => {
+
+    const data = await res.json();
+    const camelData = snakeToCamel(data.results)
+    const movieInfo = camelData.map(m => ({
+      originalLanguage: m.originalLanguage,
+      originalTitle: m.originalTitle,
+      overview: m.overview,
+      title: m.title,
+      releaseDate: m.releaseDate,
+      posterPath: `${imgUrl}${m.posterPath}`,
+      backdropPath: `${imgUrl}${m.backdropPath}`
+    }));
+    return movieInfo;
+  } catch (err) {
     console.error('Request failed', err);
-  });
+    return null;
+  }
 }
 
 //****************************************************************************************************
@@ -231,5 +243,4 @@ const scrollToTop = () => {
 };
 
 export {userLogout, getJSON, getJSONById, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
-  getMovieInfo, snakeToCamel, camelToProperCase, 
-  formattedTime, scrollToTop};
+  getMovieInfo, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};

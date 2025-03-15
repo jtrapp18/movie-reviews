@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper'
+import Movies from '../components/Movies';
 
 const StyledContainer = styled.div`
   height: var(--size-body);
@@ -50,10 +51,7 @@ function Home() {
         <MotionWrapper index={2}>
           <h3>Where Beekeepers work together to build healthier hives</h3>
         </MotionWrapper>
-        <img
-            src="/images/bee_analysis.jpeg" // Provide the relative or absolute path to the image
-            alt="First slide"
-        />
+        <Movies />
     </StyledContainer>
   );
 }

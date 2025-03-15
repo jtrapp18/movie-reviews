@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-import joblib
 import requests
 import uuid
-import pandas as pd
 from datetime import date
 from datetime import datetime
 # from flask_migrate import Migrate
@@ -234,6 +232,8 @@ class PullMovieInfo(Resource):
         else:
             # No search term provided, fetch popular movies
             url = f"{base_url}/movie/popular?api_key={API_KEY}"
+
+        print(url)
 
         response = requests.get(url)
 

@@ -175,157 +175,54 @@ const Button = styled.button`
   }
 `
 
-const HexagonButton = styled.button`
-  position: relative;
-  width: ${props => props.isMobile ? '80px' : '100px'}; // Shrinks size on mobile
-  height: ${props => props.isMobile ? '46px' : '58px'}; // Adjust height proportionally
-  border: none;
-  cursor: pointer;
-  outline: none;
-  font-size: ${props => props.isMobile ? '12px' : '16px'}; // Smaller font on mobile
-  text-align: center;
-  line-height: ${props => props.isMobile ? '46px' : '58px'}; // Adjust line-height proportionally
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-right: 1px solid black;
-  border-left: 1px solid black;
-  background-color:  ${props=> props.isActive ? 'var(--yellow)' : 'var(--honey)'};
-  margin: ${props => props.isMobile ? '15px 0' : '30px 0'};
-
-  &:hover {
-    font-weight: bold;
-  }
-  
-  &:before,
-  &:after {
-    content: '';
-    position: absolute;
-    width: 0;
-    border-left: ${props => props.isMobile ? '40px' : '50px'} solid transparent; // Shrinks the triangle size
-    border-right: ${props => props.isMobile ? '40px' : '50px'} solid transparent;
-  }
-
-  &:before {
-    top: calc(-1 * ${props => props.isMobile ? '23px' : '29px'} + 1px); /* Slight overlap */
-    border-bottom: ${props => props.isMobile ? '23px' : '29px'} solid ${props => props.isActive ? 'var(--yellow)' : 'var(--honey)'};
-  }
-
-  &:after {
-    bottom: calc(-1 * ${props => props.isMobile ? '23px' : '29px'} + 1px); /* Slight overlap */
-    border-top: ${props => props.isMobile ? '23px' : '29px'} solid ${props => props.isActive ? 'var(--yellow)' : 'var(--honey)'};
-  }
-`;
-
-const HexButtonContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  flex-wrap: wrap;
-  padding: 20px 0;
-`
-
 const StyledCard = styled.article`
-    width: 100%;
-    max-width: clamp(300px, 100%, 600px);
-    padding: 10px;
-    margin-bottom: 10px;
-    
-    border: ${props => props.active ? '1px solid white' : 'none'};
-
-    .current-round {
-      position: absolute;
-      right: 0;
-      top: -3%;
-    }
-
-    .bottom-container {
-        padding-top: 2%;
-        border-top: 3px double var(--honey);
-        justify-content: space-between;
-        display: flex;
-
-        span {
-          color: gray;
-        }
-    }
-
-    .main-container {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        cursor: pointer;
-
-        &:hover {
-            background: var(--dark-gray);
-            border-radius: 5px;
-        }
-
-        .info-section {
-            // min-width: 40%;
-            width: fit-content;
-            white-space: nowrap;
-            div {
-                display: flex;
-                align-items: center;
-
-                p {
-                    margin: 2%;
-                    color: var(--yellow);
-                }
-            }
-        }
-        
-        section {
-            display: flex;
-            flex-direction: column;
-            padding: 2%;
-            justify-content: center;
-
-            h3 {
-                font-size: clamp(1.2rem, 1.8vw, 1.8rem);
-            }
-            
-            span {
-                color: var(--honey);
-            }
-
-            img {
-                width: 60%;
-            }
-        }
-    }
-`
-
-const PlotContainer = styled.div`
-  display: grid;
-  height: 400px;
+  position: relative;
+  width: 100%;
+  height: 500px;
   max-height: 90vh;
-  background: white;
   cursor: pointer;
-  border: 3px solid var(--honey);
-  margin: 1%;
 
-  p {
+  h2 {
+    position: absolute;
+    top: 1%;
+    left: 0;
     color: black;
+    z-index: 1000;
   }
 
-  h3 {
-    text-align: center;
-    text-decoration: underline;
-    font-weight: bold;
-    color: black;
-    font-size: 1.5rem;
+  img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
   }
 
-  .gtitle {
-    text-decoration: underline;
-    font-weight: bold;
-    color: white;
-    font-size: var(--default-size);
+  .movie-details {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    padding: 3%;
+    align-items: start;
+
+    .movie-metadata {
+      padding: 0;
+      align-items: start;
+
+      p {
+        margin: 0;
+      }
+    }
   }
-`;
+
+  &:hover .movie-details {
+    opacity: 1;
+    background: rgba(0, 0, 0, .7);
+  }
+`
 
 const StyledContainer = styled.div`
     width: 1000px;
@@ -348,50 +245,6 @@ const StyledContainer = styled.div`
     }
 `
 
-const StyledAnalysis = styled(StyledContainer)`
-    display: grid;
-    h2, span {
-      text-align: center;
-    }
-
-    span {
-      color: var(--honey);
-    }
-
-    .graph-container {
-        display: grid;
-        height: auto;
-        text-align: center;
-        width: 90vw;
-        place-content: center;
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-
-        @media (max-width: 768px) {  /* Mobile screens */
-          grid-template-columns: repeat(auto-fit, minmax(90vw, 1fr)); /* Adjust grid items to take up 90% of the viewport width on mobile */
-        }
-    }
-`
-
-const GraphSectionHeader = styled.div`
-  width: 100%;
-  align-items: center;
-  place-items: center;
-  display: grid;
-
-  hr {
-    border: 1px solid var(--honey);
-    padding: 0;
-    color: white;
-    width: 90%;
-  }
-
-  h3 {
-    color: var(--honey);
-    text-align: center;
-    margin: 0;
-  }
-`;
-
 const Tag = styled.div`
   background: gray;
   border-radius: 5px;
@@ -401,6 +254,5 @@ const Tag = styled.div`
 `
 
 export { StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
-  StyledSubmit, StyledDeleted, CardContainer, BorderGlow, Button, 
-  HexagonButton, HexButtonContainer, StyledCard, StyledContainer, StyledAnalysis, PlotContainer, 
-  GraphSectionHeader, Tag }
+  StyledSubmit, StyledDeleted, CardContainer, BorderGlow, Button, Tag,
+  StyledCard, StyledContainer }
