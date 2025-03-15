@@ -20,46 +20,28 @@ function userLogout() {
     .catch(e => console.error(e));
   }
 
-function getJSON(dbKey) {
+  async function getJSON(dbKey, Id=null) {
+    const endpoint = Id ? `/api/${dbKey}/${Id}` : `/api/${dbKey}`;
 
-  // Make the API call to your Lambda (via API Gateway)
-  return fetch(`/api/${dbKey}`)
-    .then(res => {
+    try {
+      const res = await fetch(endpoint);
+  
       if (!res.ok) {
         console.error(`Error fetching ${dbKey} information! Status: ${res.status}`);
+        return null;  // Return null on error
       }
-      if (res.status === 204) {
-        return null
-      }
-      return snakeToCamel(res.json());
-    })
-    .catch(err => {
-      console.error('Request failed', err);
-    });
-}
-
-  function getJSONById(dbKey, Id) {
-    console.log(`Fetching data for ${dbKey}/${Id}`);  // Debugging log
-    return fetch(`/api/${dbKey}/${Id}`)
-      .then((res) => {
-        console.log('Response Status:', res.status);  // Log status
-        console.log('Response Body:', res);  // Log full response
-        if (!res.ok) {
-          console.error(`Error fetching order! Status: ${res.status}`);
-          return null;
-        }
   
-        return res.json();  // Parse the response as JSON
-      })
-      .then((data) => {
-        console.log('Parsed Data:', data);  // Log parsed data to see what it looks like
-        return data;  // Return the parsed data
-      })
-      .catch((err) => {
-        console.error('Request failed:', err);  // Log any errors
-        return null;
-      });
-  }
+      const data = await res.json();
+  
+      // Ensure 'results' exists before attempting to transform it
+      const camelData = snakeToCamel(data);
+      
+      return camelData;
+    } catch (err) {
+      console.error('Request failed', err);
+      return null;  // Return null if an error occurs
+    }
+  }  
 
   function postJSONToDb(dbKey, jsonObj) {
     const snake_object = camelToSnake(jsonObj);
@@ -160,8 +142,8 @@ async function getMovieInfo(searchQuery = null) {
       overview: m.overview,
       title: m.title,
       releaseDate: m.releaseDate,
-      posterPath: `${imgUrl}${m.posterPath}`,
-      backdropPath: `${imgUrl}${m.backdropPath}`
+      coverPhoto: `${imgUrl}${m.posterPath}`,
+      // backdropPath: `${imgUrl}${m.backdropPath}`
     }));
     return movieInfo;
   } catch (err) {
@@ -242,5 +224,5 @@ const scrollToTop = () => {
   });
 };
 
-export {userLogout, getJSON, getJSONById, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
+export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
   getMovieInfo, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};

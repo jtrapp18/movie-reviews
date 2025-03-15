@@ -8,12 +8,14 @@ class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
 
     id = Column(Integer, primary_key=True)
-    movie_id = Column(Integer, nullable=False)  # Foreign key if needed
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
     rating = Column(Integer, nullable=False)  # Assuming a scale of 1-10
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
 
-    # serialize_rules = ('-movie',)
+    movie = db.relationship('Movie', back_populates='reviews')
+
+    serialize_rules = ('-movie.reviews',)
 
     def __repr__(self):
         return f'<Review {self.id}, Movie ID: {self.movie_id}, Rating: {self.rating}>'

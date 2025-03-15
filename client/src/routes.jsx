@@ -5,6 +5,8 @@ import About from "./pages/About";
 import AccountDetails from "./pages/AccountDetails";
 import ErrorPage from "./pages/ErrorPage";
 import Login from './pages/Login';
+import SearchMovies from './pages/SearchMovies';
+import MovieReview from './pages/MovieReview';
 
 const routes = [
   {
@@ -27,6 +29,14 @@ const routes = [
       {
         path: "account_details",
         element: <AccountDetails />,
+      },
+      {
+        path: "search_movies",
+        element: <SearchMovies />,
+      },
+      {
+        path: "movies/:id",
+        element: <MovieReview />,
       }
     ],
   },

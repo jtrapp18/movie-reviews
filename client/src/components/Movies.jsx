@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { getMovieInfo } from '../helper';
 import SearchBar from './SearchBar';
 import { CardContainer } from '../MiscStyling';
 import MovieCard from '../cards/MovieCard';
@@ -8,23 +6,7 @@ import MotionWrapper from '../styles/MotionWrapper'
 
 const StyledContainer = styled.div``
 
-function Movies() {
-    const [showMovies, setShowMovies] = useState([]);
-
-    useEffect(() => {
-        const fetchMovies = async () => {
-          const movies = await getMovieInfo(); // Wait for the JSON
-          setShowMovies(movies); // Set state with actual JSON
-          console.log(movies); // Logs actual JSON, not a Promise
-        };
-      
-        fetchMovies();
-      }, []);
-
-    const enterSearch = (text) => {
-        const movies = getMovieInfo(text)
-        setShowMovies(movies)
-    }
+function Movies({ showMovies, enterSearch }) {
 
     return (
         <StyledContainer>
@@ -38,7 +20,7 @@ function Movies() {
                         index={index}
                     >
                         <MovieCard
-                            {...movie}
+                            movie={movie}
                         />
                     </MotionWrapper>
                 )}

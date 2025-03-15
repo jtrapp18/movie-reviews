@@ -141,39 +141,11 @@ const MobileNavBar = () => {
           About
         </StyledNavLink>
         <StyledNavLink
-          to="/news"
+          to="/search_movies"
           className="nav-link"
           onClick={handleClick}
         >
-          News
-        </StyledNavLink>
-        <StyledNavLink
-          to="/events"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Events
-        </StyledNavLink>
-        <StyledNavLink
-          to="/hive_map"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Map
-        </StyledNavLink>
-        <StyledNavLink
-          to="/analysis"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Analysis
-        </StyledNavLink>
-        <StyledNavLink
-          to="/forums"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Forum
+          Search Movies
         </StyledNavLink>
         <StyledNavLink
           to="/account_details"
@@ -181,13 +153,6 @@ const MobileNavBar = () => {
           onClick={handleClick}
         >
           Account Details
-        </StyledNavLink>
-        <StyledNavLink
-          to="/hives"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Manage Hives
         </StyledNavLink>
         <StyledNavLink
           to="/login"

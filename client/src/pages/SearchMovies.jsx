@@ -1,11 +1,11 @@
-import { getJSON, getMovieInfo } from '../helper';
+import { getMovieInfo } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper'
 import Movies from '../components/Movies';
-import { useOutletContext } from 'react-router-dom';
 
 const StyledContainer = styled.div`
+  height: var(--size-body);
   padding: 0;
   margin: 0;
   width: 100vw;
@@ -14,22 +14,23 @@ const StyledContainer = styled.div`
   align-items: center;
 `;
 
-function Home() {
-  const { movies } = useOutletContext();
-  
-  const [showMovies, setShowMovies] = useState([]); // Set initial state to movies from context
+function SearchMovies() {
+  const [showMovies, setShowMovies] = useState([]);
 
   useEffect(() => {
-    setShowMovies(movies); // Update showMovies when movies from context change
-  }, [movies]);
+      const fetchMovies = async () => {
+        const movies = await getMovieInfo(); // Wait for the JSON
+        setShowMovies(movies); // Set state with actual JSON
+        console.log(movies); // Logs actual JSON, not a Promise
+      };
+    
+      fetchMovies();
+    }, []);
 
   const enterSearch = (text) => {
-    // Filter movies based on the search text
-    const filteredMovies = movies.filter((movie) =>
-      movie.title.toLowerCase().includes(text.toLowerCase())
-    );
-    setShowMovies(filteredMovies); // Set filtered movies
-  };
+      const movies = getMovieInfo(text)
+      setShowMovies(movies)
+  }
 
   return (
     <StyledContainer>
@@ -37,7 +38,7 @@ function Home() {
           <h1>Movies</h1>
         </MotionWrapper>
         <MotionWrapper index={2}>
-          <h3>Click movie to view review</h3>
+          <h3>Click any movie card to add a new review</h3>
         </MotionWrapper>
         <Movies
           showMovies={showMovies}
@@ -47,4 +48,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default SearchMovies;

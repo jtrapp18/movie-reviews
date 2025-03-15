@@ -1,15 +1,32 @@
-import { useState, useEffect } from 'react';
-import { getMovieInfo } from '../helper';
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { StyledCard } from '../MiscStyling';
+import useCrudStateDB from "../hooks/useCrudStateDB";
 
-function MovieCard({ originalLanguage, originalTitle, overview, 
-    title, releaseDate, posterPath, backdropPath }) {
+function MovieCard({ movie }) {
+
+    const { originalLanguage, originalTitle, overview, 
+        title, releaseDate, coverPhoto } = movie;
+
+    const navigate = useNavigate();
+    const { setMovies } = useOutletContext();
+
+    const handleClick = async () => {  // Mark handleClick as async
+        if (!movie.id) {
+            const { addItem } = useCrudStateDB(setMovies, "movies");
+            const newId = await addItem(movie); // Use await correctly
+    
+            navigate(`/movies/${newId}`);
+        }
+        else {
+            navigate(`/movies/${movie.id}`);
+        }
+    };
 
     return (
-        <StyledCard>
+        <StyledCard onClick={handleClick}>
             <h2>{title}</h2>
             <img
-                src={posterPath}
+                src={coverPhoto}
                 alt={`${title} poster`}
             />
 

@@ -11,22 +11,39 @@ import { StyledMain } from './MiscStyling';
 function App() {
 
   const { isMobile } = useContext(WindowWidthContext);
-  const { user, setUser } = useContext(UserContext);
-
-  console.log('reloading app page...')
+  const [movies, setMovies] = useState([]);
 
   // Auto-login
   useEffect(() => {
     console.log('logging check session...')
-    getJSON("check_session")
-      .then((user) => {
-        const userTransformed = snakeToCamel(user);
-        if (JSON.stringify(userTransformed) !== JSON.stringify(user)) {
-          setUser(userTransformed);
-        }
-      });
+    const fetchUser = async () => {
+      const user = await getJSON('check_session'); // Wait for the JSON
+      if (JSON.stringify(user) !== JSON.stringify(user)) {
+        setUser(user);
+      }
+    };
+  
+    fetchUser();
   }, []);
 
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const movies = await getJSON('movies'); // Wait for the JSON
+        if (movies) {  // Ensure movies is not null or undefined
+          console.log('all', movies);
+          setMovies(movies); // Set state with actual JSON
+        } else {
+          console.error("No movies data available.");
+        }
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+  
+    fetchMovies();
+  }, []);
+  
   return (
     <>
       <Header/>
@@ -34,6 +51,8 @@ function App() {
           <Suspense fallback={<Loading />}>
             <Outlet
                 context={{
+                  movies,
+                  setMovies
                 }}
               />
           </Suspense>

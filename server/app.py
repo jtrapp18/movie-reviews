@@ -147,6 +147,28 @@ class Movies(Resource):
     def get(self):
         movies = [movie.to_dict() for movie in Movie.query.all()]
         return movies, 200
+    
+    def post(self):
+        data = request.get_json()
+        
+        try:
+            new_movie = Movie(
+                original_language=data.get('original_language'),
+                original_title=data.get('original_title'),
+                overview=data.get('overview'),
+                title=data.get('title'),
+                release_date=data.get('release_date'),
+                cover_photo=data.get('cover_photo')
+            )
+
+            db.session.add(new_movie)
+            db.session.commit()
+            
+            return new_movie.to_dict(), 201
+        
+        except Exception as e:
+            db.session.rollback()
+            return {"error": str(e)}, 400
 
 class MovieById(Resource):
     def get(self, movie_id):

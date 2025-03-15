@@ -8,12 +8,17 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
       addNestedToKeyInState, updateNestedKeyInState, deleteNestedKeyInState} = 
     useCrudState(setState, optionalFunc, addFunc);
 
-    const addItem = (item) => {
-      postJSONToDb(dbKey, item)
-      .then(json => {
-        const jsonTransformed = snakeToCamel(json);
-        addToState(jsonTransformed);
-      })
+    const addItem = async (item) => {
+      try {
+        const json = await postJSONToDb(dbKey, item); // Wait for the response
+        const jsonTransformed = snakeToCamel(json); // Transform the response
+        addToState(jsonTransformed); // Add the transformed item to state
+    
+        const newId = jsonTransformed.id; // Extract the new ID
+        return newId; // Return the new ID
+      } catch (error) {
+        console.error('Error adding item:', error);
+      }
     };
     
     const updateItem = (item, itemId) => {
