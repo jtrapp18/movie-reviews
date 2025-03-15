@@ -6,6 +6,7 @@ const SearchContainer = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
+    max-width: 90vw;
     padding: 1vh 0 1vh 0;
     position: relative;
     justify-content: center;

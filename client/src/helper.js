@@ -122,12 +122,13 @@ function deleteJSONFromDb(dbKey, Id) {
   .catch(e => console.error(e));
 }
 
-async function getMovieInfo(searchQuery = null) {
-  const queryText = searchQuery ? `?query=${searchQuery}` : "";
+async function getMovieInfo(searchQuery=null) {
+  const queryText = searchQuery ? `?search=${searchQuery}` : "";
   const imgUrl = "https://image.tmdb.org/t/p/w1280"
+  const url = `/api/pull_movie_info${queryText}`;
 
   try {
-    const res = await fetch(`/api/pull_movie_info${queryText}`);
+    const res = await fetch(url);
 
     if (!res.ok) {
       console.error(`Error fetching movies! Status: ${res.status}`);

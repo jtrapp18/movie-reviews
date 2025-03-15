@@ -17,19 +17,17 @@ const StyledContainer = styled.div`
 function SearchMovies() {
   const [showMovies, setShowMovies] = useState([]);
 
-  useEffect(() => {
-      const fetchMovies = async () => {
-        const movies = await getMovieInfo(); // Wait for the JSON
-        setShowMovies(movies); // Set state with actual JSON
-        console.log(movies); // Logs actual JSON, not a Promise
-      };
-    
+  const fetchMovies = async (text=null) => {
+    const movies = await getMovieInfo(text); // Wait for the JSON
+    setShowMovies(movies); // Set state with actual JSON
+  };
+
+  useEffect(() => {    
       fetchMovies();
     }, []);
 
   const enterSearch = (text) => {
-      const movies = getMovieInfo(text)
-      setShowMovies(movies)
+    fetchMovies(text);
   }
 
   return (
