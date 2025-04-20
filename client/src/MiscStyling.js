@@ -177,7 +177,8 @@ const Button = styled.button`
 
 const StyledCard = styled.article`
   position: relative;
-  width: 100%;
+  // width: 100%;
+  width: 200px;
   height: 500px;
   max-height: 90vh;
   cursor: pointer;

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import {useOutletContext} from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import ReactQuill from "react-quill"; // Import ReactQuill
+import 'react-quill/dist/quill.snow.css';  // Quill's default theme
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
+import Stars from "../components/Stars"
 import FormSubmit from "../components/FormSubmit";
 import useCrudStateDB from "../hooks/useCrudStateDB";
 
@@ -22,16 +25,14 @@ const ReviewForm = ({ initObj }) => {
         reviewText: initObj.reviewText || "",
       }
     : {
-        rating: "",
+        rating: 0,
         reviewText: "",
       };
 
-      const submitToDB = initObj
-      ? (body) =>
-          updateKey("reviews", initObj.id, body, movieId)
-      : (body) =>
-          addToKey("reviews", body, movieId)
-   
+  const submitToDB = initObj
+    ? (body) => updateKey("reviews", initObj.id, body, movieId)
+    : (body) => addToKey("reviews", body, movieId);
+
   const validationSchema = Yup.object({
     rating: Yup.number()
       .required("Rating is required.")
@@ -58,35 +59,46 @@ const ReviewForm = ({ initObj }) => {
     },
   });
 
+  const handleQuillChange = (value) => {
+    formik.setFieldValue("reviewText", value); // Update the formik value for reviewText
+  };
+
+  const updateRating = (rating) => {
+    formik.setFieldValue("rating", rating);
+  };
+
+
   return (
     <div>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
           <div>
-            <label htmlFor="rating">Rating (1-10):</label>
-            <input
-              type="number"
-              id="rating"
-              name="rating"
-              min="1"
-              max="10"
-              value={formik.values.rating}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
+          <Stars rating={formik.values.rating} handleStarClick={updateRating} />
             {formik.touched.rating && formik.errors.rating && (
               <Error>{formik.errors.rating}</Error>
             )}
           </div>
           <div>
             <label htmlFor="reviewText">Review:</label>
-            <textarea
+            {/* Quill Editor for reviewText */}
+            <ReactQuill
               id="reviewText"
               name="reviewText"
               value={formik.values.reviewText}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              onChange={handleQuillChange}
+              modules={{
+                toolbar: [
+                  [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                  [{ 'align': [] }],
+                  ['bold', 'italic', 'underline', 'strike'],
+                  ['blockquote', 'code-block'],
+                  ['link', 'image'],
+                  [{ 'color': [] }, { 'background': [] }],
+                  ['clean']
+                ]
+              }}
             />
             {formik.touched.reviewText && formik.errors.reviewText && (
               <Error>{formik.errors.reviewText}</Error>

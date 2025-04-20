@@ -14,7 +14,7 @@ class Movie(db.Model, SerializerMixin):
     release_date = Column(Date, nullable=False)
     cover_photo = Column(String(500), nullable=False)  # URL to cover image
 
-    reviews = db.relationship('Review', back_populates='movie', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', back_populates='movie', cascade='all')
 
     serialize_rules = ('-reviews.movie',)
 

@@ -3,17 +3,19 @@ from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from lib.config import db
+from .tags import review_tags
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
 
     id = Column(Integer, primary_key=True)
-    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=False)
+    movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=True)
     rating = Column(Integer, nullable=False)  # Assuming a scale of 1-10
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
 
     movie = db.relationship('Movie', back_populates='reviews')
+    tags = db.relationship('Tag', secondary=review_tags, back_populates='reviews')
 
     serialize_rules = ('-movie.reviews',)
 
@@ -45,3 +47,8 @@ class Review(db.Model, SerializerMixin):
         elif not isinstance(value, (datetime, date)):
             raise ValueError("Invalid date format. Must be a string or date object.")
         return value
+
+    @property
+    def short_text(self):
+        """Returns the first 100 characters of the review text (with ellipsis if truncated)."""
+        return self.review_text[:100] + "..." if len(self.review_text) > 100 else self.review_text

@@ -11,7 +11,7 @@ from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
-from lib.models import User, Movie, Review
+from lib.models import User, Movie, Review, Tag
 
 @app.route('/')
 def index():
