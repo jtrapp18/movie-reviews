@@ -254,7 +254,8 @@ class Articles(Resource):
             articles = articles.filter(
                 db.or_(
                     Review.title.contains(search_query),
-                    Review.review_text.contains(search_query)
+                    Review.review_text.contains(search_query),
+                    Review.tags.any(Tag.name.contains(search_query))
                 )
             )
         
@@ -280,6 +281,23 @@ class Articles(Resource):
         )
         
         db.session.add(article)
+        db.session.flush()  # Flush to get the article ID
+        
+        # Handle tags if provided
+        if data.get('tags'):
+            for tag_data in data['tags']:
+                tag_name = tag_data.get('name', '').strip().lower()
+                if tag_name:
+                    # Find or create tag
+                    tag = Tag.query.filter_by(name=tag_name).first()
+                    if not tag:
+                        tag = Tag(name=tag_name)
+                        db.session.add(tag)
+                        db.session.flush()
+                    
+                    # Associate tag with article
+                    article.tags.append(tag)
+        
         db.session.commit()
         
         return article.to_dict(), 201
@@ -310,6 +328,29 @@ class ArticleById(Resource):
         db.session.delete(article)
         db.session.commit()
         return {}, 204
+
+class Tags(Resource):
+    def get(self):
+        tags = Tag.query.all()
+        return [tag.to_dict() for tag in tags], 200
+
+    def post(self):
+        data = request.get_json()
+        
+        if not data.get('name'):
+            return {'error': 'Tag name is required'}, 400
+        
+        # Check if tag already exists
+        existing_tag = Tag.query.filter_by(name=data['name'].strip().lower()).first()
+        if existing_tag:
+            return existing_tag.to_dict(), 200
+        
+        # Create new tag
+        new_tag = Tag(name=data['name'].strip().lower())
+        db.session.add(new_tag)
+        db.session.commit()
+        
+        return new_tag.to_dict(), 201
     
 class PullMovieInfo(Resource):
     def get(self):
@@ -487,6 +528,7 @@ api.add_resource(Reviews, '/api/reviews')
 api.add_resource(ReviewById, '/api/reviews/<int:review_id>')
 api.add_resource(Articles, '/api/articles')
 api.add_resource(ArticleById, '/api/articles/<int:article_id>')
+api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DocumentUpload, '/api/upload_document')
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')

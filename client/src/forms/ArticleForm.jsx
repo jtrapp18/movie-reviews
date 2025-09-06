@@ -9,6 +9,7 @@ import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
 import FormSubmit from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
+import TagInput from "../components/TagInput";
 import useCrudStateDB from "../hooks/useCrudStateDB";
 
 const ArticleForm = ({ initObj }) => {
@@ -21,6 +22,7 @@ const ArticleForm = ({ initObj }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [replaceText, setReplaceText] = useState(false);
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
+  const [tags, setTags] = useState(initObj?.tags || []);
   const { setMovies } = useOutletContext();
   const { addToKey, updateKey } = useCrudStateDB(setMovies, "articles");
 
@@ -71,6 +73,7 @@ const ArticleForm = ({ initObj }) => {
           content_type: 'article',
           movie_id: null, // Articles don't have movie_id
           rating: null,   // Articles don't have ratings
+          tags: tags,     // Include tags
         };
 
         // If a file is selected, set placeholder text
@@ -226,6 +229,16 @@ const ArticleForm = ({ initObj }) => {
             existingDocument={initObj?.has_document}
             onFileSelect={handleFileSelect}
           />
+
+          <div>
+            <label htmlFor="tags">Tags</label>
+            <TagInput
+              tags={tags}
+              onTagsChange={setTags}
+              placeholder="Add tags to categorize your article..."
+              maxTags={8}
+            />
+          </div>
           
           <div style={{ marginTop: '30px', marginBottom: '20px' }}>
             <Button type="submit">{initObj ? "Update Article" : "Create Article"}</Button>

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { StyledCard } from '../MiscStyling';
 import styled from 'styled-components';
+import Tag from '../components/Tag';
 
 const TagContainer = styled.div`
   position: absolute;
@@ -12,7 +13,7 @@ const TagContainer = styled.div`
   gap: 4px;
 `;
 
-const Tag = styled.span`
+const TagSpan = styled.span`
   background-color: rgba(0, 123, 255, 0.8);
   color: white;
   padding: 2px 6px;
@@ -148,10 +149,18 @@ function ArticleCard({ article }) {
       {article.tags && article.tags.length > 0 && (
         <TagContainer>
           {article.tags.slice(0, 3).map((tag, index) => (
-            <Tag key={index}>{tag.name}</Tag>
+            <Tag 
+              key={tag.id || index}
+              backgroundColor={tag.backgroundColor || '#007bff'}
+              textColor={tag.textColor || '#ffffff'}
+            >
+              {tag.name}
+            </Tag>
           ))}
           {article.tags.length > 3 && (
-            <Tag>+{article.tags.length - 3}</Tag>
+            <Tag backgroundColor="#6c757d" textColor="#ffffff">
+              +{article.tags.length - 3}
+            </Tag>
           )}
         </TagContainer>
       )}
