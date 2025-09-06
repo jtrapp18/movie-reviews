@@ -244,6 +244,72 @@ class ReviewById(Resource):
         db.session.delete(review)
         db.session.commit()
         return {}, 204
+
+class Articles(Resource):
+    def get(self):
+        search_query = request.args.get('search', '')
+        articles = Review.query.filter_by(content_type='article')
+        
+        if search_query:
+            articles = articles.filter(
+                db.or_(
+                    Review.title.contains(search_query),
+                    Review.review_text.contains(search_query)
+                )
+            )
+        
+        return [article.to_dict() for article in articles.all()], 200
+
+    def post(self):
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data.get('title'):
+            return {'error': 'Article title is required'}, 400
+        if not data.get('review_text'):
+            return {'error': 'Article content is required'}, 400
+        
+        # Create new article
+        article = Review(
+            title=data.get('title'),
+            review_text=data.get('review_text'),
+            content_type='article',
+            movie_id=None,  # Articles don't have movie_id
+            rating=None,    # Articles don't have ratings
+            date_added=date.today()
+        )
+        
+        db.session.add(article)
+        db.session.commit()
+        
+        return article.to_dict(), 201
+
+class ArticleById(Resource):
+    def get(self, article_id):
+        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        if not article:
+            return {'error': 'Article not found'}, 404
+        return article.to_dict(), 200
+
+    def patch(self, article_id):
+        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        if not article:
+            return {'error': 'Article not found'}, 404
+        data = request.get_json()
+        
+        for attr in data:
+            setattr(article, attr, data.get(attr))
+
+        db.session.commit()
+        return article.to_dict(), 200
+
+    def delete(self, article_id):
+        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        if not article:
+            return {'error': 'Article not found'}, 404
+        db.session.delete(article)
+        db.session.commit()
+        return {}, 204
     
 class PullMovieInfo(Resource):
     def get(self):
@@ -419,6 +485,8 @@ api.add_resource(Movies, '/api/movies')
 api.add_resource(MovieById, '/api/movies/<int:movie_id>')
 api.add_resource(Reviews, '/api/reviews')
 api.add_resource(ReviewById, '/api/reviews/<int:review_id>')
+api.add_resource(Articles, '/api/articles')
+api.add_resource(ArticleById, '/api/articles/<int:article_id>')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DocumentUpload, '/api/upload_document')
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')

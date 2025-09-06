@@ -38,12 +38,16 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
       deleteFromState(itemId)
     };
     
-    const addToKey = (arrayKey, body, itemId=null) => {
-      postJSONToDb(arrayKey, body)
-      .then(json => {
+    const addToKey = async (arrayKey, body, itemId=null) => {
+      try {
+        const json = await postJSONToDb(arrayKey, body);
         const jsonTransformed = snakeToCamel(json);
-        addToKeyInState(arrayKey, jsonTransformed, itemId); 
-      });
+        addToKeyInState(arrayKey, jsonTransformed, itemId);
+        return jsonTransformed; // Return the created item
+      } catch (error) {
+        console.error('Error adding item to key:', error);
+        throw error;
+      }
     };
 
     const updateKey = (arrayKey, arrayId, body, itemId=null) => {

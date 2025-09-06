@@ -1,0 +1,213 @@
+import { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import MotionWrapper from '../styles/MotionWrapper';
+import ArticleCard from '../cards/ArticleCard';
+import { CardContainer } from '../MiscStyling';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
+const StyledContainer = styled.div`
+  height: var(--size-body);
+  padding: 0;
+  margin: 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const SearchContainer = styled.div`
+  height: 45px;
+  width: 100%;
+  padding: 1vh 0 1vh 0;
+  margin: 5% auto;
+  text-align: center;
+
+  div {
+    width: min(500px, 90vw);
+    height: 45px;
+    position: relative;
+    display: inline-block;
+    margin: 0 auto;
+  }
+
+  input {
+    width: 100%;
+    border-radius: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    color: black;
+
+    &:hover {
+      background: var(--yellow);
+    }
+  }
+`;
+
+function Articles() {
+  const [articles, setArticles] = useState([]);
+  const [filteredArticles, setFilteredArticles] = useState([]);
+
+  // Slick carousel settings
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    centerMode: false,
+    variableWidth: true,
+    adaptiveHeight: false,
+    arrows: true,
+  };
+
+  const fetchArticles = async (searchText = null) => {
+    try {
+      let url = '/api/articles';
+      if (searchText) {
+        url += `?search=${encodeURIComponent(searchText)}`;
+      }
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      setArticles(data);
+      setFilteredArticles(data);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+      setArticles([]);
+      setFilteredArticles([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const handleSearch = (searchText) => {
+    if (!searchText.trim()) {
+      setFilteredArticles(articles);
+    } else {
+      const filtered = articles.filter(article => 
+        article.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+        article.review_text?.toLowerCase().includes(searchText.toLowerCase()) ||
+        article.tags?.some(tag => tag.name.toLowerCase().includes(searchText.toLowerCase()))
+      );
+      setFilteredArticles(filtered);
+    }
+  };
+
+  // Handle null or undefined articles
+  if (!filteredArticles || !Array.isArray(filteredArticles)) {
+    return (
+      <StyledContainer>
+        <MotionWrapper index={1}>
+          <h1>Articles</h1>
+        </MotionWrapper>
+        <MotionWrapper index={2}>
+          <h3>Loading articles...</h3>
+        </MotionWrapper>
+      </StyledContainer>
+    );
+  }
+
+  return (
+    <StyledContainer>
+      <MotionWrapper index={1}>
+        <h1>Articles</h1>
+      </MotionWrapper>
+      <MotionWrapper index={2}>
+        <h3>Browse theme-based articles and essays</h3>
+      </MotionWrapper>
+      
+      <CardContainer>
+        <MotionWrapper index={0}>
+          <SearchContainer>
+            <div>
+              <input 
+                type="text"
+                placeholder="Search articles by title, content, or tags..."
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </div>
+          </SearchContainer>
+        </MotionWrapper>
+
+        {/* Articles Carousel */}
+        <div style={{ width: '100%', margin: '0 auto', height: '300px', overflow: 'hidden' }}>
+          <style>
+            {`
+              .slick-slide > div {
+                margin: 0 6px;
+              }
+              
+              /* Arrow styles */
+              .slick-prev,
+              .slick-next {
+                z-index: 10;
+                width: 40px;
+                height: 40px;
+                background-color: rgba(255, 255, 255, 0.9);
+                border: 2px solid #333;
+                border-radius: 50%;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+              }
+              
+              .slick-prev {
+                left: 10px;
+              }
+              
+              .slick-next {
+                right: 10px;
+              }
+              
+              .slick-prev:hover,
+              .slick-next:hover {
+                background-color: #007bff !important;
+                border-color: #007bff;
+                box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+                transition: all 0.2s ease;
+              }
+              
+              .slick-prev:before,
+              .slick-next:before {
+                font-size: 18px;
+                color: #333;
+                font-weight: bold;
+              }
+              
+              .slick-prev:hover:before,
+              .slick-next:hover:before {
+                color: white;
+              }
+              
+              .slick-disabled {
+                opacity: 0.3;
+              }
+            `}
+          </style>
+          <Slider {...settings}>
+            {filteredArticles.map((article, index) => (
+              <MotionWrapper key={article.id} index={index}>
+                <div style={{ 
+                  margin: '0',
+                  width: '200px',
+                  height: '100%',
+                  flexShrink: 0
+                }}>
+                  <ArticleCard article={article} />
+                </div>
+              </MotionWrapper>
+            ))}
+          </Slider>
+        </div>
+      </CardContainer>
+    </StyledContainer>
+  );
+}
+
+export default Articles;

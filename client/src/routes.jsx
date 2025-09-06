@@ -7,6 +7,9 @@ import ErrorPage from "./pages/ErrorPage";
 import Login from './pages/Login';
 import SearchMovies from './pages/SearchMovies';
 import MovieReview from './pages/MovieReview';
+import Articles from './pages/Articles';
+import Article from './pages/Article';
+import NewArticle from './pages/NewArticle';
 
 const routes = [
   {
@@ -37,6 +40,18 @@ const routes = [
       {
         path: "movies/:id",
         element: <MovieReview />,
+      },
+      {
+        path: "articles",
+        element: <Articles />,
+      },
+      {
+        path: "articles/:id",
+        element: <Article />,
+      },
+      {
+        path: "articles/new",
+        element: <NewArticle />,
       }
     ],
   },

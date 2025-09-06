@@ -8,6 +8,10 @@ const UploadContainer = styled.div`
   border-radius: 8px;
   text-align: center;
   background-color: #f9f9f9;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   
   &.drag-over {
     border-color: #007bff;
@@ -35,10 +39,14 @@ const UploadButton = styled.button`
 
 const FileInfo = styled.div`
   margin-top: 10px;
-  padding: 10px;
+  padding: 8px 12px;
   background-color: #e8f5e8;
   border-radius: 4px;
   border: 1px solid #4caf50;
+  font-size: 14px;
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 const ErrorMessage = styled.div`
@@ -51,9 +59,9 @@ const ErrorMessage = styled.div`
 `;
 
 const DocumentActions = styled.div`
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
 `;
 

@@ -10,9 +10,11 @@ class Review(db.Model, SerializerMixin):
 
     id = Column(Integer, primary_key=True)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=True)
-    rating = Column(Integer, nullable=False)  # Assuming a scale of 1-10
+    rating = Column(Integer, nullable=True)  # Optional for theme-based articles
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
+    content_type = Column(String(20), default='review', nullable=False)  # 'review' or 'article'
+    title = Column(String(200), nullable=True)  # Optional title for articles
     # Document-related fields
     has_document = Column(Boolean, default=False, nullable=True)
     document_filename = Column(String(255), nullable=True)
@@ -29,9 +31,10 @@ class Review(db.Model, SerializerMixin):
 
     @validates('rating')
     def validate_rating(self, key, value):
-        """Validates that the rating is between 1 and 10."""
-        if not isinstance(value, int) or value < 1 or value > 10:
-            raise ValueError("Rating must be an integer between 1 and 10.")
+        """Validates that the rating is between 1 and 10, or None for articles."""
+        if value is not None:
+            if not isinstance(value, int) or value < 1 or value > 10:
+                raise ValueError("Rating must be an integer between 1 and 10, or None for articles.")
         return value
 
     @validates('review_text')
@@ -40,6 +43,13 @@ class Review(db.Model, SerializerMixin):
         if not value or not value.strip():
             raise ValueError("Review text cannot be empty.")
         return value.strip()
+
+    @validates('content_type')
+    def validate_content_type(self, key, value):
+        """Validates that content_type is either 'review' or 'article'."""
+        if value not in ['review', 'article']:
+            raise ValueError("Content type must be either 'review' or 'article'.")
+        return value
 
     @validates('date_added')
     def validate_date_added(self, key, value):

@@ -26,6 +26,13 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
       >
         Search Movies
       </StyledNavLink>
+      <StyledNavLink
+        to="/articles"
+        className="nav-link"
+        onClick={handleClick}
+      >
+        Articles
+      </StyledNavLink>
       <StyledAccountIcon
         className="nav-link"
         onMouseOver={()=>setIsMenuOpen(true)}

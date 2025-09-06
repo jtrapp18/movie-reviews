@@ -50,7 +50,9 @@ const StyledForm = styled.form`
   width: 600px;
   max-width: 75vw;
   padding: 2%;
-  overflow-y: auto;
+  overflow-y: visible;
+  display: flex;
+  flex-direction: column;
 
   h1 {
     padding: 5px;
