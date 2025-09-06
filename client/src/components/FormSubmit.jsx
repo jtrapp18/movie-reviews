@@ -137,6 +137,7 @@ const FormSubmit = ({ label, formValues, setIsEditing, reviewId }) => {
               documentUrl={`/api/view_document/${reviewId}`}
               documentType={formValues.documentType}
               filename={formValues.documentFilename}
+              hasDocument={formValues.hasDocument}
             />
           </div>
         )}

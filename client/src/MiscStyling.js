@@ -179,7 +179,7 @@ const StyledCard = styled.article`
   position: relative;
   // width: 100%;
   width: 200px;
-  height: 500px;
+  height: 280px;
   max-height: 90vh;
   cursor: pointer;
 

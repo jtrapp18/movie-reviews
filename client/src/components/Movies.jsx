@@ -4,9 +4,27 @@ import { CardContainer } from '../MiscStyling';
 import MovieCard from '../cards/MovieCard';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
-import 'bootstrap/dist/css/bootstrap.min.css';  // Import Bootstrap CSS
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 function Movies({ showMovies, enterSearch }) {
+  // Slick carousel settings
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    centerMode: false,
+    variableWidth: true,
+    adaptiveHeight: false,
+    arrows: true,
+  };
+
   // Handle null or undefined showMovies
   if (!showMovies || !Array.isArray(showMovies)) {
     return (
@@ -22,60 +40,33 @@ function Movies({ showMovies, enterSearch }) {
 
   return (
     <CardContainer>
-      <SearchBar enterSearch={enterSearch} />
+      <MotionWrapper index={0}>
+        <SearchBar enterSearch={enterSearch} />
+      </MotionWrapper>
 
-      {/* Bootstrap Carousel */}
-      <div id="movieCarousel" className="carousel slide" data-bs-ride="carousel">
-        {/* Carousel Inner */}
-        <div className="carousel-inner">
-          {/* Wrap each set of 5 cards in a carousel-item */}
-          <div className="carousel-item active">
-            <div className="d-flex">
-              {showMovies.slice(0, 5).map((movie, index) => (
-                <MotionWrapper key={movie.title} index={index}>
-                  <div className="mx-2">
-                    <MovieCard movie={movie} />
-                  </div>
-                </MotionWrapper>
-              ))}
-            </div>
-          </div>
-
-          {/* Next Slide */}
-          <div className="carousel-item">
-            <div className="d-flex">
-              {showMovies.slice(5, 10).map((movie, index) => (
-                <MotionWrapper key={movie.title} index={index}>
-                  <div className="mx-2">
-                    <MovieCard movie={movie} />
-                  </div>
-                </MotionWrapper>
-              ))}
-            </div>
-          </div>
-
-          {/* Add more items here if needed */}
-        </div>
-
-        {/* Carousel controls (next and prev buttons) */}
-        <button
-          className="carousel-control-prev"
-          type="button"
-          data-bs-target="#movieCarousel"
-          data-bs-slide="prev"
-        >
-          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span className="visually-hidden">Previous</span>
-        </button>
-        <button
-          className="carousel-control-next"
-          type="button"
-          data-bs-target="#movieCarousel"
-          data-bs-slide="next"
-        >
-          <span className="carousel-control-next-icon" aria-hidden="true"></span>
-          <span className="visually-hidden">Next</span>
-        </button>
+      {/* React Slick Carousel - UNCOMMENTED */}
+      <div style={{ width: '100%', margin: '0 auto', height: '300px', overflow: 'hidden' }}>
+        <style>
+          {`
+            .slick-slide > div {
+              margin: 0 6px;
+            }
+          `}
+        </style>
+        <Slider {...settings}>
+          {showMovies.map((movie, index) => (
+            <MotionWrapper key={movie.title} index={index}>
+              <div style={{ 
+                margin: '0',
+                width: '200px',
+                height: '100%',
+                flexShrink: 0
+              }}>
+                <MovieCard movie={movie} />
+              </div>
+            </MotionWrapper>
+          ))}
+        </Slider>
       </div>
     </CardContainer>
   );

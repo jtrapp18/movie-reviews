@@ -3,26 +3,17 @@ import styled from "styled-components";
 
 const SearchContainer = styled.div`
     height: 45px;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 90vw;
+    width: min(500px, 90vw);
     padding: 1vh 0 1vh 0;
-    position: relative;
-    justify-content: center;
-    margin: 5%;
+    margin: 5% auto;
 
     div {
-        width: 500px;
-        max-width: 80%;
+        width: 100%;
         height: 45px;
+        position: relative;
     }
 
     input {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
         width: 100%;
         border-radius: 20px;
         font-size: 16px;
@@ -38,10 +29,28 @@ const SearchContainer = styled.div`
     span {
         position: absolute;
         right: 5%;
-        bottom: 50%;
-        transform: translateY(50%);
+        top: 50%;
+        transform: translateY(-50%);
         color: black;
         cursor: pointer;
+    }
+
+    .search-button {
+        position: absolute;
+        right: 15%;
+        top: 50%;
+        transform: translateY(-50%);
+        color: black;
+        cursor: pointer;
+        background: var(--yellow);
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-weight: bold;
+        border: 1px solid #ccc;
+        
+        &:hover {
+            background: var(--dark-yellow);
+        }
     }
 `
 
@@ -77,7 +86,7 @@ const SearchBar = ({enterSearch}) => {
                     onKeyDown={handeKeyDown}
                 />
                 <span onClick={handleClearSearch}>✖</span>
-                <span onClick={()=>enterSearch(searchInput)}>ENTER</span>
+                <span className="search-button" onClick={()=>enterSearch(searchInput)}>ENTER</span>
             </div>
         </SearchContainer>
     );

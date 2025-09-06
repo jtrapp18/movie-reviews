@@ -116,7 +116,7 @@ const ErrorMessage = styled.div`
   padding: 20px;
 `;
 
-const DocumentViewer = ({ documentUrl, documentType, filename }) => {
+const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [wordContent, setWordContent] = useState('');
@@ -125,6 +125,13 @@ const DocumentViewer = ({ documentUrl, documentType, filename }) => {
   console.log('DocumentViewer - documentUrl:', documentUrl);
   console.log('DocumentViewer - documentType:', documentType);
   console.log('DocumentViewer - filename:', filename);
+  console.log('DocumentViewer - hasDocument:', hasDocument);
+
+  // If no document is attached, don't render anything
+  if (!hasDocument || !documentUrl || !documentType) {
+    console.log('DocumentViewer - no document attached, not rendering');
+    return null;
+  }
 
   useEffect(() => {
     console.log('DocumentViewer useEffect - documentUrl:', documentUrl, 'documentType:', documentType);
