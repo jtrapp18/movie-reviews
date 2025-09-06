@@ -183,11 +183,11 @@ const ReviewForm = ({ initObj }) => {
     // Clear any validation errors
     formik.setFieldTouched("reviewText", false);
     
-    // Update the initObj with document information
+    // Update the initObj with document information (using camelCase)
     if (initObj && result.review) {
-      initObj.has_document = result.review.has_document;
-      initObj.document_filename = result.review.document_filename;
-      initObj.document_type = result.review.document_type;
+      initObj.hasDocument = result.review.has_document;
+      initObj.documentFilename = result.review.document_filename;
+      initObj.documentType = result.review.document_type;
     }
     
     // Refresh the movies data to show updated review
