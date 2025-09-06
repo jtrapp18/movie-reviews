@@ -17,7 +17,7 @@ const ArticleForm = ({ initObj }) => {
   const isNewArticle = !id && (!initObj || !initObj.id);
   const [isEditing, setIsEditing] = useState(isNewArticle);
   const [submitError, setSubmitError] = useState(null);
-  const [hasDocument, setHasDocument] = useState(initObj?.has_document || false);
+  const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || initObj?.has_document || false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [replaceText, setReplaceText] = useState(false);
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
@@ -96,7 +96,6 @@ const ArticleForm = ({ initObj }) => {
           };
           
           // Store the created article data for new articles
-          console.log('Setting createdArticle to:', articleData);
           setCreatedArticle(articleData);
           
           // Update the initObj reference if it exists (for existing articles)
@@ -168,23 +167,16 @@ const ArticleForm = ({ initObj }) => {
   };
 
   const handleFileSelect = (file, replaceTextOption) => {
-    console.log('handleFileSelect called with file:', file);
     setSelectedFile(file);
     setReplaceText(replaceTextOption);
     
     if (file) {
-      console.log('Setting hasDocument to true');
       setHasDocument(true);
     } else {
-      console.log('Setting hasDocument to false');
       setHasDocument(false);
     }
   };
 
-  // Debug logging
-  console.log('ArticleForm render - hasDocument:', hasDocument, 'selectedFile:', selectedFile);
-  console.log('ArticleForm render - createdArticle:', createdArticle);
-  console.log('ArticleForm render - reviewId will be:', createdArticle?.id || initObj?.id);
 
   return (
     <div>
@@ -244,9 +236,9 @@ const ArticleForm = ({ initObj }) => {
           label={"Article Details"}
           formValues={{
             ...formik.values,
-            hasDocument: hasDocument,
-            documentFilename: selectedFile?.name || null,
-            documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : null
+            hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
+            documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
+            documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)
           }}
           setIsEditing={setIsEditing}
           reviewId={createdArticle?.id || initObj?.id}

@@ -78,11 +78,15 @@ function Article() {
     const fetchArticle = async () => {
       try {
         setLoading(true);
+        console.log('Fetching article with ID:', id);
         const data = await getJSON(`articles/${id}`);
+        console.log('Article data received:', data);
         if (data.error) {
           setError(data.error);
         } else {
-          setArticle(snakeToCamel(data));
+          const transformedData = snakeToCamel(data);
+          console.log('Transformed article data:', transformedData);
+          setArticle(transformedData);
         }
       } catch (err) {
         setError('Failed to load article');

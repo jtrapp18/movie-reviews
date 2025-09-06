@@ -93,8 +93,6 @@ const DocumentIndicator = styled.div`
 function ArticleCard({ article }) {
   const navigate = useNavigate();
 
-  // Debug logging to see what data we're receiving
-  console.log('ArticleCard - article data:', article);
 
   const handleClick = () => {
     navigate(`/articles/${article.id}`);
