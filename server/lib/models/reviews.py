@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from lib.config import db
@@ -13,6 +13,11 @@ class Review(db.Model, SerializerMixin):
     rating = Column(Integer, nullable=False)  # Assuming a scale of 1-10
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
+    # Document-related fields
+    has_document = Column(Boolean, default=False, nullable=True)
+    document_filename = Column(String(255), nullable=True)
+    document_path = Column(String(500), nullable=True)
+    document_type = Column(String(10), nullable=True)  # 'pdf', 'docx', etc.
 
     movie = db.relationship('Movie', back_populates='reviews')
     tags = db.relationship('Tag', secondary=review_tags, back_populates='reviews')

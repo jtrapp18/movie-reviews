@@ -6,12 +6,17 @@ import uuid
 from datetime import date
 from datetime import datetime
 # from flask_migrate import Migrate
-from flask import request, session
+from flask import request, session, send_file, jsonify
 from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
 from lib.models import User, Movie, Review, Tag
+from lib.utils.document_processor import DocumentProcessor
+from flask_cors import CORS
+
+# Enable CORS for all routes
+CORS(app)
 
 @app.route('/')
 def index():
@@ -263,6 +268,146 @@ class PullMovieInfo(Resource):
             return response.json()
         else:
             return {'error': f'Failed to fetch movies. Status {response.status_code}: {response.text}'}, response.status_code
+
+class DocumentUpload(Resource):
+    """Handle document uploads for reviews."""
+    
+    def post(self):
+        """Upload and process a document for a review."""
+        try:
+            # Check if file is present
+            if 'document' not in request.files:
+                return {'error': 'No document file provided'}, 400
+            
+            file = request.files['document']
+            if file.filename == '':
+                return {'error': 'No file selected'}, 400
+            
+            # Get review_id from form data
+            review_id = request.form.get('review_id')
+            if not review_id:
+                return {'error': 'Review ID is required'}, 400
+            
+            # Find the review
+            review = Review.query.get(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+            
+            # Set up upload folder
+            upload_folder = os.path.join(app.root_path, 'uploads', 'documents')
+            os.makedirs(upload_folder, exist_ok=True)
+            
+            # Process the document
+            result = DocumentProcessor.process_uploaded_document(file, upload_folder)
+            
+            if not result['success']:
+                return {'error': result['error']}, 400
+            
+            # Update review with document information
+            review.has_document = True
+            review.document_filename = result['filename']
+            review.document_path = result['file_path']
+            review.document_type = result['file_type']
+            
+            # Note: We no longer extract text - documents are rendered directly in the browser
+            # The review_text field can contain user-written content or remain empty
+            
+            db.session.commit()
+            
+            return {
+                'message': 'Document uploaded successfully',
+                'review': review.to_dict(),
+                'document_info': {
+                    'filename': result['filename'],
+                    'file_type': result['file_type'],
+                    'extracted_text_length': len(result['extracted_text'])
+                }
+            }, 200
+            
+        except Exception as e:
+            return {'error': f'Upload failed: {str(e)}'}, 500
+
+class DocumentDownload(Resource):
+    """Handle document downloads."""
+    
+    def get(self, review_id):
+        """Download the document associated with a review."""
+        try:
+            review = Review.query.get(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+            
+            if not review.has_document or not review.document_path:
+                return {'error': 'No document associated with this review'}, 404
+            
+            if not os.path.exists(review.document_path):
+                return {'error': 'Document file not found'}, 404
+            
+            return send_file(
+                review.document_path,
+                as_attachment=True,
+                download_name=review.document_filename
+            )
+            
+        except Exception as e:
+            return {'error': f'Download failed: {str(e)}'}, 500
+
+class DocumentView(Resource):
+    """Handle document viewing (inline display)."""
+    
+    def get(self, review_id):
+        """View the document associated with a review inline."""
+        try:
+            review = Review.query.get(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+            
+            if not review.has_document or not review.document_path:
+                return {'error': 'No document associated with this review'}, 404
+            
+            if not os.path.exists(review.document_path):
+                return {'error': 'Document file not found'}, 404
+            
+            return send_file(
+                review.document_path,
+                as_attachment=False,  # This allows inline viewing
+                mimetype='application/pdf' if review.document_type == 'pdf' else 'application/octet-stream'
+            )
+            
+        except Exception as e:
+            return {'error': f'View failed: {str(e)}'}, 500
+
+class DocumentPreview(Resource):
+    """Get document preview without downloading."""
+    
+    def get(self, review_id):
+        """Get a preview of the document content."""
+        try:
+            review = Review.query.get(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+            
+            if not review.has_document or not review.document_path:
+                return {'error': 'No document associated with this review'}, 404
+            
+            if not os.path.exists(review.document_path):
+                return {'error': 'Document file not found'}, 404
+            
+            # Get preview text
+            preview = DocumentProcessor.get_document_preview(
+                review.document_path, 
+                review.document_type
+            )
+            
+            return {
+                'preview': preview,
+                'filename': review.document_filename,
+                'file_type': review.document_type,
+                'has_document': review.has_document
+            }, 200
+            
+        except Exception as e:
+            return {'error': f'Preview failed: {str(e)}'}, 500
         
 api.add_resource(ClearSession, '/api/clear', endpoint='clear')
 api.add_resource(AccountSignup, '/api/account_signup', endpoint='account_signup')
@@ -275,6 +420,10 @@ api.add_resource(MovieById, '/api/movies/<int:movie_id>')
 api.add_resource(Reviews, '/api/reviews')
 api.add_resource(ReviewById, '/api/reviews/<int:review_id>')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
+api.add_resource(DocumentUpload, '/api/upload_document')
+api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
+api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
+api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

@@ -7,6 +7,19 @@ import MotionWrapper from '../styles/MotionWrapper';
 import 'bootstrap/dist/css/bootstrap.min.css';  // Import Bootstrap CSS
 
 function Movies({ showMovies, enterSearch }) {
+  // Handle null or undefined showMovies
+  if (!showMovies || !Array.isArray(showMovies)) {
+    return (
+      <CardContainer>
+        <SearchBar enterSearch={enterSearch} />
+        <div className="text-center p-4">
+          <h3>Loading movies...</h3>
+          <p>Please wait while we fetch the latest movies.</p>
+        </div>
+      </CardContainer>
+    );
+  }
+
   return (
     <CardContainer>
       <SearchBar enterSearch={enterSearch} />

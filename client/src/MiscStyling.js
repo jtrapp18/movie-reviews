@@ -101,10 +101,10 @@ const StyledSubmit = styled.div`
 
   div {
     display: flex;
+    flex-direction: column;
     border-bottom: 2px dotted gray;
-    justify-content: space-between;
-    margin: 10px 5px 0px 5px;
-    padding: 20px 5px 0px 5px;
+    margin: 10px 5px 15px 5px;
+    padding: 20px 5px 10px 5px;
   }
 `
 
