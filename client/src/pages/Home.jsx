@@ -1,9 +1,9 @@
 import { getJSON, getMovieInfo } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import MotionWrapper from '../styles/MotionWrapper'
 import Movies from '../components/Movies';
 import Articles from '../components/Articles';
+import Section from '../components/Section';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
@@ -13,7 +13,11 @@ const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  min-height: 100vh;
 `;
+
+
 
 function Home() {
   const { movies } = useOutletContext();
@@ -64,27 +68,29 @@ function Home() {
 
   return (
     <StyledContainer>
-        <MotionWrapper index={1}>
-          <h1>Movies</h1>
-        </MotionWrapper>
-        <MotionWrapper index={2}>
-          <h3>Click movie to view review</h3>
-        </MotionWrapper>
+      <Section
+        title="Movies"
+        subtitle="Click movie to view review"
+        searchPlaceholder="Search movies..."
+        onSearch={enterSearch}
+      >
         <Movies
           showMovies={showMovies}
           enterSearch={enterSearch}
         />
-        
-        <MotionWrapper index={3}>
-          <h1>Articles</h1>
-        </MotionWrapper>
-        <MotionWrapper index={4}>
-          <h3>Browse theme-based articles and essays</h3>
-        </MotionWrapper>
+      </Section>
+      
+      <Section
+        title="Articles"
+        subtitle="Browse theme-based articles and essays"
+        searchPlaceholder="Search articles by title, content, or tags..."
+        onSearch={enterArticleSearch}
+      >
         <Articles
           showArticles={showArticles}
           enterSearch={enterArticleSearch}
         />
+      </Section>
     </StyledContainer>
   );
 }

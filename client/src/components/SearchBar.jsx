@@ -2,13 +2,15 @@ import { useState } from 'react';
 import styled from "styled-components";
 
 const SearchContainer = styled.div`
-    height: 45px;
+    max-height: 100px;
     width: min(500px, 90vw);
-    margin: 5% auto;
+    margin: 2% auto;
+    display: flex;
+    align-items: center;
 
     div {
         width: 100%;
-        height: 45px;
+        height: 100%;
         position: relative;
     }
 
@@ -57,7 +59,7 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     };
 
     return (
-        <SearchContainer >
+        <SearchContainer className="search-bar">
             <div>
                 <input 
                     value={searchInput}

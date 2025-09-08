@@ -134,18 +134,18 @@ const MobileNavBar = () => {
           Home
         </StyledNavLink>
         <StyledNavLink
-          to="/about"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          About
-        </StyledNavLink>
-        <StyledNavLink
           to="/search_movies"
           className="nav-link"
           onClick={handleClick}
         >
           Search Movies
+        </StyledNavLink>
+        <StyledNavLink
+          to="/about"
+          className="nav-link"
+          onClick={handleClick}
+        >
+          About
         </StyledNavLink>
         <StyledNavLink
           to="/account_details"

@@ -1,36 +1,44 @@
 import React from 'react';
 import styled from 'styled-components';
+import MotionWrapper from '../styles/MotionWrapper';
+import SearchBar from './SearchBar';
 
-const StyledSection = styled.div`
-  margin-bottom: 2.5rem;
-  
-  h2 {
-    color: var(--cinema-gold);
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    margin-bottom: 1.25rem;
-    border-bottom: 2px solid var(--cinema-gold);
-    padding-bottom: 0.625rem;
-  }
-  
-  h3 {
-    color: var(--cinema-silver);
-    font-size: clamp(1.1rem, 3vw, 1.3rem);
-    margin: 1.25rem 0 0.625rem 0;
-  }
-  
-  p {
-    margin-bottom: 0.9375rem;
-    font-size: clamp(1rem, 2.5vw, 1.1rem);
-    line-height: 1.6;
-  }
+const SectionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 20px;
 `;
 
-const Section = ({ title, children, className }) => {
+const Section = ({ 
+  title, 
+  subtitle, 
+  searchPlaceholder, 
+  onSearch, 
+  showSearch = true,
+  children 
+}) => {
   return (
-    <StyledSection className={className}>
-      {title && <h2>{title}</h2>}
+    <SectionContainer>
+      <MotionWrapper index={1}>
+        <h1>{title}</h1>
+      </MotionWrapper>
+      {subtitle && (
+        <MotionWrapper index={2}>
+          <h3>{subtitle}</h3>
+        </MotionWrapper>
+      )}
+      {showSearch && (
+        <MotionWrapper index={3}>
+          <SearchBar 
+            enterSearch={onSearch} 
+            placeholder={searchPlaceholder}
+          />
+        </MotionWrapper>
+      )}
       {children}
-    </StyledSection>
+    </SectionContainer>
   );
 };
 

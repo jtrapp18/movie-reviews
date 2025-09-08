@@ -33,7 +33,7 @@ function SearchMovies() {
   return (
     <StyledContainer>
         <MotionWrapper index={1}>
-          <h1>Movies</h1>
+          <h1>Search Movies</h1>
         </MotionWrapper>
         <MotionWrapper index={2}>
           <h3>Click any movie card to add a new review</h3>

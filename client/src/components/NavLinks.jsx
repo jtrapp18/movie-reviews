@@ -13,11 +13,11 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
   return (
     <>
       <StyledNavLink
-        to="/about"
+        to="/"
         className="nav-link"
         onClick={handleClick}
       >
-        About
+        Home
       </StyledNavLink>
       <StyledNavLink
         to="/search_movies"
@@ -27,11 +27,11 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
         Search Movies
       </StyledNavLink>
       <StyledNavLink
-        to="/"
+        to="/about"
         className="nav-link"
         onClick={handleClick}
       >
-        Articles
+        About
       </StyledNavLink>
       <StyledAccountIcon
         className="nav-link"

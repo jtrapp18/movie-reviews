@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
-import Section from '../components/Section';
+import AboutSection from '../components/AboutSection';
 import List from '../components/List';
 
 const aboutContent = yaml.load(aboutContentYaml);
@@ -82,7 +82,7 @@ function About() {
         <div className="subtitle">{aboutContent.header.subtitle}</div>
       </Header>
 
-      <Section title="About James">
+      <AboutSection title="About James">
         <p>{aboutContent.aboutJames.personalStory}</p>
         
         <p>{aboutContent.aboutJames.intro}</p>
@@ -100,9 +100,9 @@ function About() {
 
         <h3>Specialties</h3>
         <List items={aboutContent.aboutJames.specialties} />
-      </Section>
+      </AboutSection>
 
-      <Section title="About This Website">
+      <AboutSection title="About This Website">
         <p>{aboutContent.aboutWebsite.intro}</p>
         
         {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
@@ -111,9 +111,9 @@ function About() {
             <p>{type.description}</p>
           </ContentType>
         ))}
-      </Section>
+      </AboutSection>
 
-      <Section title="Get in Touch">
+      <AboutSection title="Get in Touch">
         <p>{aboutContent.contact.intro}</p>
         
         {aboutContent.contact.methods.map((method, index) => (
@@ -122,7 +122,7 @@ function About() {
             <span className="value">{method.value}</span>
           </ContactMethod>
         ))}
-      </Section>
+      </AboutSection>
     </AboutContainer>
   );
 }

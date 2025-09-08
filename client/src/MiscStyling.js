@@ -38,6 +38,7 @@ const StyledMain = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 
   /* Background image */
   background-image: ${(props) => props.isMobile ? 'none' : `url('/images/grid_left.png')`};
@@ -136,7 +137,7 @@ const StyledDeleted = styled.div`
 const CardContainer = styled.div`
   width: 100%;
   display: grid;
-  gap: 10px;
+  gap: 5px;
   max-width: 100vw;
   justify-items: center;
 
@@ -168,12 +169,32 @@ const BorderGlow = styled.span`
 const Button = styled.button`
   color: black;
   background: var(--cinema-gold);
-  min-width: 100px;
+  border: 2px solid var(--cinema-gold);
+  border-radius: 25px;
+  padding: 12px 24px;
+  min-width: 120px;
   height: fit-content;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background: var(--cinema-gold-dark);
-    font-weight: bold;
+    border-color: var(--cinema-gold-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--cinema-gold), 0.3);
   }
 `
 
@@ -187,10 +208,24 @@ const StyledCard = styled.article`
 
   h2 {
     position: absolute;
-    top: 1%;
-    left: 0;
-    color: black;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    color: white;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-weight: bold;
     z-index: 1000;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover h2 {
+    opacity: 0;
   }
 
   img {
@@ -210,6 +245,8 @@ const StyledCard = styled.article`
     opacity: 0;
     padding: 3%;
     align-items: start;
+    font-size: clamp(0.7rem, 2vw, 0.9rem);
+    line-height: 1.3;
 
     .movie-metadata {
       padding: 0;
@@ -217,7 +254,13 @@ const StyledCard = styled.article`
 
       p {
         margin: 0;
+        font-size: clamp(0.65rem, 1.8vw, 0.8rem);
       }
+    }
+
+    p {
+      font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+      line-height: 1.2;
     }
   }
 
