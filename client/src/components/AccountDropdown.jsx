@@ -13,7 +13,7 @@ const LinkContainer = styled.div`
   width: 20%;
   text-decoration: none;
   text-align: right;
-  background: var(--yellow);
+  background: var(--cinema-gold);
   border: 1px solid black;
   border-bottom: 3px double black;
   display: flex;
@@ -60,9 +60,9 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &:hover {
-    color: var(--honey);
-    background: black;
-    border: 1px solid var(--honey);
+    color: var(--cinema-gold-dark);
+    background: var(--cinema-black);
+    border: 1px solid var(--cinema-gold);
   }
 `
 
@@ -97,13 +97,6 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
           onClick={handleClick}
         >
           Account Details
-        </StyledNavLink>
-        <StyledNavLink
-          to="/hives"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Manage Hives
         </StyledNavLink>
         <StyledNavLink
             to="/login"

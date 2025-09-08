@@ -17,11 +17,11 @@ const StyledNavigation = css`
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;
-    color: var(--honey);
+    color: var(--cinema-gold);
   }
 
   &:hover {
-    color: var(--yellow);
+    color: var(--cinema-gold);
   }
 `;
 
@@ -62,13 +62,13 @@ const StyledForm = styled.form`
 
   input, textarea, select, option {
     width: 100%;
-    background: var(--yellow);
+    background: var(--cinema-gold);
     color: black;
     padding: 5px;
   }
 
   textarea:hover, input:hover, select:hover {
-    background: var(--honey);
+    background: var(--cinema-gold-dark);
   }
 
   div:not(:last-child) {
@@ -98,7 +98,7 @@ const StyledSubmit = styled.div`
   }
 
   p {
-    color: var(--yellow);
+    color: var(--cinema-gold);
   }
 
   div {
@@ -167,12 +167,12 @@ const BorderGlow = styled.span`
 
 const Button = styled.button`
   color: black;
-  background: var(--yellow);
+  background: var(--cinema-gold);
   min-width: 100px;
   height: fit-content;
 
   &:hover {
-    background: var(--honey);
+    background: var(--cinema-gold-dark);
     font-weight: bold;
   }
 `

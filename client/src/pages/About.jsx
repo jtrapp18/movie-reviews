@@ -1,67 +1,129 @@
+import React from 'react';
 import styled from 'styled-components';
-import { BorderGlow } from '../MiscStyling';
+import yaml from 'js-yaml';
+import aboutContentYaml from '../data/aboutContent.yaml?raw';
+import Section from '../components/Section';
+import List from '../components/List';
 
-const StyledContainer = styled.div`
-  width: 100%;
+const aboutContent = yaml.load(aboutContentYaml);
 
-  margin: 0;
-  padding: 20px;
-  width: 800px;
-  max-width: 95vw;
-  height: var(--size-body);
-  position: relative;
-
-  /* Background image */
-  background-image: url('/images/connected_hives.jpg');
-  background-size: 100% auto;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  h1 {
-    text-align: center;
-    font-size: clamp(2.3rem, 10vw, 6rem);
-    color: var(--honey);
-    font-weight: bold;
-    width: 100%;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  h3 {
-    font-size: clamp(1rem, 1.8vw, 1.8rem);
-    text-align: center;
-    color: var(--yellow);
-  }
-
-  p {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  strong {
-    color: var(--honey);
-  }
-
+const AboutContainer = styled.div`
+  max-width: min(800px, 90vw);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
+  color: white;
+  line-height: 1.6;
 `;
+
+const Header = styled.div`
+  text-align: center;
+  margin-bottom: clamp(2.5rem, 6vw, 3.125rem);
+  
+  h1 {
+    color: var(--cinema-gold);
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin-bottom: 0.625rem;
+  }
+  
+  .subtitle {
+    color: var(--cinema-silver);
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    font-style: italic;
+  }
+`;
+
+const ContentType = styled.div`
+  background: var(--cinema-gray);
+  padding: clamp(1rem, 3vw, 1.25rem);
+  margin: clamp(0.75rem, 2vw, 0.9375rem) 0;
+  border-radius: 0.5rem;
+  border-left: 4px solid var(--cinema-gold);
+  
+  h4 {
+    color: var(--cinema-gold);
+    margin: 0 0 0.625rem 0;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+  }
+  
+  p {
+    margin: 0;
+    color: var(--cinema-silver);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+`;
+
+const ContactMethod = styled.div`
+  display: flex;
+  align-items: center;
+  margin: clamp(0.5rem, 1.5vw, 0.625rem) 0;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  
+  .type {
+    color: var(--cinema-gold);
+    font-weight: bold;
+    min-width: clamp(4rem, 10vw, 5rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+  
+  .value {
+    color: var(--cinema-silver);
+    margin-left: clamp(0.75rem, 2vw, 0.9375rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+  }
+`;
+
 
 function About() {
   return (
-      <StyledContainer>
-        <BorderGlow>
-          <h1>Hive Link</h1>
-          <h3>Collaboration is the Heart of the Hive.</h3>
-          <p>
-            One of the first lessons I learned as a beekeeper is that getting bees is easy, but keeping bees is another story…
-          </p>
-          <p>
-            Honey bees are sensitive to a variety of factors, and as such, recordkeeping is critical to understanding the patterns and needs of the hive.
-          </p>
-          <p>
-            Hive Link was created for beekeepers to manage hive data, connect fellow beekeepers, and learn from our bees together. If we can create a network of beekeepers and pool our records together, we will be able to better assess impacts on honey production and hive health, and use these findings to cultivate happier and healthier hives.
-          </p>
-          <p>
-            After all, if there is one lesson we can take away from our honeybees, it's that <strong>we are stronger together.</strong>
-          </p>
-        </BorderGlow>
-      </StyledContainer>
+    <AboutContainer>
+      <Header>
+        <h1>{aboutContent.header.title}</h1>
+        <div className="subtitle">{aboutContent.header.subtitle}</div>
+      </Header>
+
+      <Section title="About James">
+        <p>{aboutContent.aboutJames.personalStory}</p>
+        
+        <p>{aboutContent.aboutJames.intro}</p>
+        
+        <h3>Favorite Directors</h3>
+        <List items={aboutContent.aboutJames.favoriteDirectors} />
+
+        <h3>Preferred Genres</h3>
+        <List items={aboutContent.aboutJames.preferredGenres} />
+
+        <h3>Favorite Film Eras</h3>
+        <List items={aboutContent.aboutJames.favoriteEras} />
+
+        <p>{aboutContent.aboutJames.philosophy}</p>
+
+        <h3>Specialties</h3>
+        <List items={aboutContent.aboutJames.specialties} />
+      </Section>
+
+      <Section title="About This Website">
+        <p>{aboutContent.aboutWebsite.intro}</p>
+        
+        {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
+          <ContentType key={index}>
+            <h4>{type.title}</h4>
+            <p>{type.description}</p>
+          </ContentType>
+        ))}
+      </Section>
+
+      <Section title="Get in Touch">
+        <p>{aboutContent.contact.intro}</p>
+        
+        {aboutContent.contact.methods.map((method, index) => (
+          <ContactMethod key={index}>
+            <span className="type">{method.type}:</span>
+            <span className="value">{method.value}</span>
+          </ContactMethod>
+        ))}
+      </Section>
+    </AboutContainer>
   );
 }
 

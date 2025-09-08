@@ -1,0 +1,75 @@
+{
+  "header": {
+    "title": "About James Trapp",
+    "subtitle": "Film Analysis & Critical Reviews"
+  },
+  "aboutJames": {
+    "intro": "James Trapp is a passionate film critic and analyst with a deep love for cinema that spans [X years] of dedicated study and appreciation. His approach to film criticism combines [academic analysis/personal reflection/technical expertise] with an accessible writing style that makes complex cinematic concepts engaging for all readers.",
+    "favoriteDirectors": [
+      "Alfred Hitchcock",
+      "Martin Scorsese", 
+      "Akira Kurosawa",
+      "[Add more directors]"
+    ],
+    "preferredGenres": [
+      "Film noir",
+      "Psychological thrillers",
+      "International cinema",
+      "[Add more genres]"
+    ],
+    "favoriteEras": [
+      "Classic Hollywood",
+      "New Hollywood", 
+      "Contemporary independent cinema",
+      "[Add more eras]"
+    ],
+    "philosophy": "James's reviews go beyond simple plot summaries, delving into thematic analysis, cinematographic techniques, and the cultural impact of films. He believes that great cinema has the power to [inspire/educate/challenge/entertain] audiences, and his writing reflects this philosophy.",
+    "specialties": [
+      "Thematic analysis",
+      "Cinematographic techniques",
+      "Cultural impact studies",
+      "[Add more specialties]"
+    ]
+  },
+  "aboutWebsite": {
+    "intro": "This site serves as James's personal collection of film reviews, critical essays, and thematic analysis. Here, you'll find:",
+    "contentTypes": [
+      {
+        "title": "Individual Film Reviews",
+        "description": "Detailed analysis of specific movies, examining everything from narrative structure to visual storytelling"
+      },
+      {
+        "title": "Thematic Essays", 
+        "description": "Explorations of recurring themes across multiple films, directors, or genres"
+      },
+      {
+        "title": "Director Spotlights",
+        "description": "In-depth looks at the work and style of particular filmmakers"
+      },
+      {
+        "title": "Genre Studies",
+        "description": "Analysis of how different genres evolve and what makes them compelling"
+      }
+    ],
+    "uniqueFeatures": [
+      "Personal perspective and authentic voice",
+      "Focus on thematic analysis and technical elements", 
+      "Regular updates with new content",
+      "Interactive features like search and tagging",
+      "[Add more unique features]"
+    ]
+  },
+  "contact": {
+    "intro": "James welcomes feedback, discussion, and recommendations from fellow film enthusiasts.",
+    "methods": [
+      {
+        "type": "Email",
+        "value": "[james@example.com]"
+      }
+    ]
+  },
+  "footer": {
+    "developed": "This website was developed in 2025",
+    "author": "All reviews and analysis by James Trapp"
+  }
+}

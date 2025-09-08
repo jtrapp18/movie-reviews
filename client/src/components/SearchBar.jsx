@@ -21,7 +21,7 @@ const SearchContainer = styled.div`
         color: black;
 
         &:hover {
-            background: var(--yellow);
+            background: var(--cinema-gold);
         }
     }
 

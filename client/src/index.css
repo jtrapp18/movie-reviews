@@ -1,22 +1,31 @@
 :root {
-  /* --green: #0b7c21; */
+  /* Movie-themed colors - Updated 2025 */
+  --cinema-gold: #FFD700;
+  --cinema-gold-dark: #B8860B;
+  --cinema-red: #DC143C;
+  --cinema-red-dark: #B22222;
+  --cinema-silver: #C0C0C0;
+  --cinema-black: #1a1a1a;
+  --cinema-gray: #2d2d2d;
+  --cinema-light-gray: #4a4a4a;
+  
+  /* Legacy colors (keeping for compatibility) */
   --green: #4E7839;
   --light-yellow: #fbf4a4;
-  --honey: #FFB300;
+  --honey: var(--cinema-gold);
   --brown: #6B4226;
   --dark-purple: #301934;
   --light-green: #9DC183;
   --light-peach: #fae9d8;
   --light-orange: rgb(247, 216, 160);
-  /* --dark-green: #06402B; */
   --bright-blue: rgb(40, 203, 215);
   --dark-green: #334F26;
   --light-gray: #c5cbc2;
   --dark-gray: #212D40;
   --gray: #d1d1d1; 
-  --yellow: #FFCC00;
-  --background: white;
-  --font-color-1: var(--honey);
+  --yellow: var(--cinema-gold);
+  --background: var(--cinema-black);
+  --font-color-1: var(--cinema-gold);
   --font-color-2: white;
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
@@ -33,7 +42,7 @@
 #root {
   overflow-x: hidden;
   overflow-y: auto;
-  background: black;
+  background: var(--cinema-black);
   color: white;
   font-family: var(--default-font);
   font-size: var(--default-font-size);
@@ -151,11 +160,11 @@ h1 {
 }
 
 h1 {
-  color: white;
+  color: var(--cinema-gold);
 }
 
 h2, h3 {
-  color: var(--honey);
+  color: var(--cinema-gold);
 }
 
 h1 {
