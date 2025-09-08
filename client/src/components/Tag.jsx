@@ -6,15 +6,15 @@ const TagContainer = styled.div`
   align-items: center;
   background-color: ${props => props.backgroundColor || '#007bff'};
   color: ${props => props.textColor || '#ffffff'};
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: ${props => props.size === 'small' ? '2px 6px' : '4px 12px'};
+  border-radius: ${props => props.size === 'small' ? '12px' : '20px'};
+  font-size: ${props => props.size === 'small' ? '0.7rem' : '0.85rem'};
   font-weight: 500;
   margin: 2px;
   cursor: ${props => props.clickable ? 'pointer' : 'default'};
   transition: all 0.2s ease;
   border: 1px solid ${props => props.borderColor || 'transparent'};
-  height: 28px;
+  height: ${props => props.size === 'small' ? '20px' : '28px'};
   line-height: 1;
   white-space: nowrap;
 
@@ -45,6 +45,7 @@ const Tag = ({
   clickable = false, 
   onRemove, 
   onClick,
+  size = 'normal',
   ...props 
 }) => {
   const handleClick = (e) => {
@@ -67,6 +68,7 @@ const Tag = ({
       borderColor={borderColor}
       clickable={clickable}
       onClick={handleClick}
+      size={size}
       {...props}
     >
       {children}

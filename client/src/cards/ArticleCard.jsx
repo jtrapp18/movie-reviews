@@ -10,7 +10,9 @@ const TagContainer = styled.div`
   right: 10px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 6px;
 `;
 
 const TagSpan = styled.span`
@@ -159,12 +161,13 @@ function ArticleCard({ article }) {
               key={tag.id || index}
               backgroundColor={tag.backgroundColor || '#007bff'}
               textColor={tag.textColor || '#ffffff'}
+              size="small"
             >
               {tag.name}
             </Tag>
           ))}
           {article.tags.length > 3 && (
-            <Tag backgroundColor="#6c757d" textColor="#ffffff">
+            <Tag backgroundColor="#6c757d" textColor="#ffffff" size="small">
               +{article.tags.length - 3}
             </Tag>
           )}
