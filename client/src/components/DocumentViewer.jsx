@@ -6,10 +6,6 @@ const ViewerContainer = styled.div`
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   background-color: white;
 `;
 
@@ -53,17 +49,15 @@ const ControlButton = styled.button`
   }
 `;
 
-const PageInfo = styled.span`
-  color: #666;
-  font-size: 14px;
-`;
-
 const ViewerContent = styled.div`
   background-color: white;
   min-height: 400px;
   position: relative;
-  overflow: auto;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
 `;
+
 
 
 const WordContent = styled.div`
@@ -196,15 +190,13 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     document.body.removeChild(link);
   };
 
+
   console.log('DocumentViewer render - loading:', loading, 'error:', error, 'documentType:', documentType);
 
   if (loading) {
     console.log('DocumentViewer - rendering loading state');
     return (
       <ViewerContainer>
-        <ViewerHeader>
-          <ViewerTitle>Loading Document...</ViewerTitle>
-        </ViewerHeader>
         <ViewerContent>
           <LoadingMessage>Loading document, please wait...</LoadingMessage>
         </ViewerContent>
@@ -215,9 +207,6 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
   if (error) {
     return (
       <ViewerContainer>
-        <ViewerHeader>
-          <ViewerTitle>Document Error</ViewerTitle>
-        </ViewerHeader>
         <ViewerContent>
           <ErrorMessage>{error}</ErrorMessage>
         </ViewerContent>
@@ -227,28 +216,21 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
 
   return (
     <ViewerContainer>
-      <ViewerHeader>
-        <ViewerTitle>
-          {filename || 'Document Viewer'}
-        </ViewerTitle>
-        <ViewerControls>
-          <ControlButton onClick={downloadDocument}>
-            Download
-          </ControlButton>
-        </ViewerControls>
-      </ViewerHeader>
-      
       <ViewerContent>
         {documentType === 'pdf' ? (
           <iframe
             src={documentUrl}
             width="100%"
-            height="600px"
-            style={{ border: 'none' }}
+            height="100%"
+            style={{
+              border: 'none',
+              minHeight: '800px',
+              display: 'block'
+            }}
             title={filename || 'PDF Document'}
           />
         ) : (
-          <WordContent 
+          <WordContent
             dangerouslySetInnerHTML={{ __html: wordContent }}
           />
         )}
