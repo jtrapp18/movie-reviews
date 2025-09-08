@@ -6,7 +6,7 @@ import Movies from '../components/Movies';
 
 const StyledContainer = styled.div`
   height: var(--size-body);
-  padding: 0;
+  padding-top: 20px;
   margin: 0;
   width: 100vw;
   display: flex;

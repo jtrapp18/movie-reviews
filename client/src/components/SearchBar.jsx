@@ -34,23 +34,6 @@ const SearchContainer = styled.div`
         cursor: pointer;
     }
 
-    .search-button {
-        position: absolute;
-        right: 15%;
-        top: 50%;
-        transform: translateY(-50%);
-        color: black;
-        cursor: pointer;
-        background: var(--yellow);
-        padding: 5px 15px;
-        border-radius: 15px;
-        font-weight: bold;
-        border: 1px solid #ccc;
-        
-        &:hover {
-            background: var(--dark-yellow);
-        }
-    }
 `
 
 const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
@@ -85,7 +68,6 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
                     onKeyDown={handeKeyDown}
                 />
                 <span onClick={handleClearSearch}>✖</span>
-                <span className="search-button" onClick={()=>enterSearch(searchInput)}>ENTER</span>
             </div>
         </SearchContainer>
     );

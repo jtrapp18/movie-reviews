@@ -17,13 +17,6 @@ const StyledHeadRoom = styled(Headroom)`
       color: var(--honey);
     }
 
-    #honeycomb {
-      height: 100%;
-      position: absolute;
-      right: 0;
-      top: 0;
-      z-index: 0;
-    }  
   }
 `
 
@@ -36,6 +29,23 @@ const StyledHeader = styled.div`
   background: white;
   padding: 1% 5%;
   align-items: end;
+  position: relative;
+`
+
+const VintagePhotoRoll = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--height-header);
+  background-image: url('/images/vintage-photo-roll.jpg');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.4;
+  filter: blur(1px);
+  z-index: 0;
 `
 
 const Header = () => {
@@ -45,15 +55,10 @@ const Header = () => {
     return (
         <StyledHeadRoom>
           <StyledHeader>
+            <VintagePhotoRoll />
             <Logo />
             {isMobile ? <MobileNavBar /> : <NavBar />}
           </StyledHeader>
-            {!isMobile &&
-              <img 
-              id='honeycomb'
-              src='images/honeycomb_side.png'
-            />          
-            }
             {user && !isMobile && <span id='logged-in'>{`Logged in as ${user.username}`}</span>}
         </StyledHeadRoom>
     );
