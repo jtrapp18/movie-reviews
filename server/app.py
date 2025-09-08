@@ -22,6 +22,17 @@ CORS(app)
 def index():
     return app.send_static_file('index.html')
 
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    """Serve uploaded files."""
+    uploads_dir = os.path.join(app.root_path, 'uploads')
+    file_path = os.path.join(uploads_dir, filename)
+    
+    if os.path.exists(file_path):
+        return send_file(file_path)
+    else:
+        return jsonify({'error': 'File not found'}), 404
+
 # @app.before_request
 # def check_if_logged_in():
 #     app.logger.debug(f"Request endpoint: {request.endpoint}")
@@ -465,14 +476,23 @@ class DocumentView(Resource):
     def get(self, review_id):
         """View the document associated with a review inline."""
         try:
+            print(f"DEBUG DocumentView - Looking for review_id: {review_id}")
             review = Review.query.get(review_id)
             if not review:
+                print(f"DEBUG DocumentView - Review {review_id} not found")
                 return {'error': 'Review not found'}, 404
             
+            print(f"DEBUG DocumentView - Found review: {review.title}")
+            print(f"DEBUG DocumentView - has_document: {review.has_document}")
+            print(f"DEBUG DocumentView - document_path: {review.document_path}")
+            
             if not review.has_document or not review.document_path:
+                print(f"DEBUG DocumentView - No document associated with review {review_id}")
                 return {'error': 'No document associated with this review'}, 404
             
+            print(f"DEBUG DocumentView - Checking if file exists: {review.document_path}")
             if not os.path.exists(review.document_path):
+                print(f"DEBUG DocumentView - File not found at: {review.document_path}")
                 return {'error': 'Document file not found'}, 404
             
             return send_file(

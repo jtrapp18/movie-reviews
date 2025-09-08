@@ -15,6 +15,7 @@ class Review(db.Model, SerializerMixin):
     date_added = Column(Date, default=date.today, nullable=False)
     content_type = Column(String(20), default='review', nullable=False)  # 'review' or 'article'
     title = Column(String(200), nullable=True)  # Optional title for articles
+    description = Column(Text, nullable=True)  # Short description for articles
     # Document-related fields
     has_document = Column(Boolean, default=False, nullable=True)
     document_filename = Column(String(255), nullable=True)
@@ -24,7 +25,7 @@ class Review(db.Model, SerializerMixin):
     movie = db.relationship('Movie', back_populates='reviews')
     tags = db.relationship('Tag', secondary=review_tags, back_populates='reviews')
 
-    serialize_rules = ('-movie.reviews',)
+    serialize_rules = ('-movie.reviews', '-tags.reviews')
 
     def __repr__(self):
         return f'<Review {self.id}, Movie ID: {self.movie_id}, Rating: {self.rating}>'
@@ -39,10 +40,15 @@ class Review(db.Model, SerializerMixin):
 
     @validates('review_text')
     def validate_review_text(self, key, value):
-        """Ensures the review text is not empty."""
+        """Ensures the review text is not empty for movie reviews."""
+        # Allow empty review_text for articles (they can have documents instead)
         if not value or not value.strip():
-            raise ValueError("Review text cannot be empty.")
-        return value.strip()
+            if hasattr(self, 'content_type') and self.content_type == 'article':
+                return ""
+            # Only require text for movie reviews
+            if hasattr(self, 'content_type') and self.content_type == 'review':
+                raise ValueError("Review text cannot be empty.")
+        return value.strip() if value else ""
 
     @validates('content_type')
     def validate_content_type(self, key, value):

@@ -86,6 +86,9 @@ function Article() {
         } else {
           const transformedData = snakeToCamel(data);
           console.log('Transformed article data:', transformedData);
+          console.log('hasDocument:', transformedData.hasDocument);
+          console.log('documentFilename:', transformedData.documentFilename);
+          console.log('documentType:', transformedData.documentType);
           setArticle(transformedData);
         }
       } catch (err) {

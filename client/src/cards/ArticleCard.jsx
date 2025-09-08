@@ -16,84 +16,84 @@ const TagContainer = styled.div`
 const TagSpan = styled.span`
   background-color: rgba(0, 123, 255, 0.8);
   color: white;
-  padding: 2px 6px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: bold;
+  padding: 1px 4px;
+  border-radius: 8px;
+  font-size: 8px;
+  font-weight: 500;
 `;
 
 const ArticleTitle = styled.h2`
   position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  color: white;
-  background-color: rgba(0, 0, 0, 0.9);
-  padding: 8px 10px;
-  border-radius: 6px;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  color: #2c3e50;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 10px 12px;
+  border-radius: 8px;
   z-index: 1000;
-  font-size: 16px;
-  font-weight: bold;
-  line-height: 1.2;
-  max-height: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  max-height: 60px;
   overflow: hidden;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 `;
 
 const ArticleContent = styled.div`
   position: absolute;
-  top: 50px;
-  left: 10px;
-  right: 10px;
-  bottom: 60px;
-  color: black;
+  top: 80px;
+  left: 12px;
+  right: 12px;
+  bottom: 80px;
+  color: #34495e;
   background-color: rgba(255, 255, 255, 0.9);
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  line-height: 1.3;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 8;
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 `;
 
 const ArticleDate = styled.div`
   position: absolute;
   bottom: 50px;
-  left: 10px;
-  right: 10px;
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 4px 8px;
+  left: 12px;
+  right: 12px;
+  color: #7f8c8d;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 6px 10px;
   border-radius: 4px;
-  font-size: 10px;
-  font-style: italic;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 9px;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 `;
 
 const DocumentIndicator = styled.div`
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(0, 123, 255, 0.9);
+  top: 12px;
+  right: 12px;
+  background-color: rgba(52, 152, 219, 0.9);
   color: white;
-  padding: 4px 6px;
-  border-radius: 12px;
-  font-size: 10px;
-  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 600;
   z-index: 1001;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 `;
 
 function ArticleCard({ article }) {
   const navigate = useNavigate();
-
 
   const handleClick = () => {
     navigate(`/articles/${article.id}`);
@@ -118,11 +118,23 @@ function ArticleCard({ article }) {
     }
   };
 
+
   return (
     <StyledCard onClick={handleClick} style={{ 
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      border: '1px solid #ddd',
-      borderRadius: '8px'
+      background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+      border: '1px solid #e9ecef',
+      borderRadius: '12px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+      transition: 'all 0.3s ease',
+      cursor: 'pointer'
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.transform = 'translateY(-2px)';
+      e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.12)';
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.transform = 'translateY(0)';
+      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
     }}>
       <ArticleTitle>{article.title || 'Untitled Article'}</ArticleTitle>
       
@@ -133,13 +145,7 @@ function ArticleCard({ article }) {
       )}
       
       <ArticleContent>
-        {article.review_text ? 
-          (article.review_text.length > 100 ? 
-            article.review_text.substring(0, 100) + '...' : 
-            article.review_text
-          ) : 
-          'No content available'
-        }
+        {article.description || 'No description available'}
       </ArticleContent>
       
       <ArticleDate>
