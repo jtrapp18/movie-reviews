@@ -11,9 +11,9 @@ const MotionArticle = styled(motion.div)`
 const MotionWrapper = ({ index, children }) => {
   return (
     <MotionArticle
-      initial={{ opacity: 0, y: 20 }} // Starts slightly lower and transparent
+      initial={{ opacity: 0, y: 10 }} // Reduced from 20 to 10
       animate={{ opacity: 1, y: 0 }} // Moves up and fades in
-      transition={{ delay: index * 0.2, duration: 0.5 }} // Stagger effect
+      transition={{ delay: index * 0.1, duration: 0.3 }} // Reduced delay and duration
     >
       {children}
     </MotionArticle>

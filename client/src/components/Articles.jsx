@@ -63,7 +63,10 @@ function Articles({ showArticles, enterSearch }) {
   if (!showArticles || !Array.isArray(showArticles)) {
     return (
       <CardContainer>
-        <SearchBar enterSearch={enterSearch} />
+        <SearchBar 
+          enterSearch={enterSearch} 
+          placeholder="Search articles by title, content, or tags..."
+        />
         <div className="text-center p-4">
           <h3>Loading articles...</h3>
           <p>Please wait while we fetch the latest articles.</p>
@@ -80,7 +83,10 @@ function Articles({ showArticles, enterSearch }) {
     <CardContainer>
       <AddButtonContainer>
         <MotionWrapper index={0}>
-          <SearchBar enterSearch={enterSearch} />
+          <SearchBar 
+            enterSearch={enterSearch} 
+            placeholder="Search articles by title, content, or tags..."
+          />
         </MotionWrapper>
         <AddNewButton onClick={handleAddNew}>
           + Add New Article

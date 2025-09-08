@@ -4,7 +4,6 @@ import styled from "styled-components";
 const SearchContainer = styled.div`
     height: 45px;
     width: min(500px, 90vw);
-    padding: 1vh 0 1vh 0;
     margin: 5% auto;
 
     div {
@@ -54,8 +53,8 @@ const SearchContainer = styled.div`
     }
 `
 
-const SearchBar = ({enterSearch}) => {
-
+const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
+    console.log('SearchBar rendered with placeholder:', placeholder);
     const [searchInput, setSearchInput] = useState('');
     
     const handleChangeSearch = (event) => {
@@ -81,7 +80,7 @@ const SearchBar = ({enterSearch}) => {
                     value={searchInput}
                     type="text"
                     id="search"
-                    placeholder="Search movies..."
+                    placeholder={placeholder}
                     onChange={handleChangeSearch}
                     onKeyDown={handeKeyDown}
                 />

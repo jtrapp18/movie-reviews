@@ -25,7 +25,7 @@ function Logo() {
           to="/"
           className="home"
         >
-          <img src={`images/bee_logo.png`} alt="home"/>
+          <img src={`images/home-icon.png`} alt="home"/>
         </NavLink>
       </LogoContainer>
   );

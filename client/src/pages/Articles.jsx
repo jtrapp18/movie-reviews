@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
 import ArticleCard from '../cards/ArticleCard';
+import SearchBar from '../components/SearchBar';
 import { CardContainer } from '../MiscStyling';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
@@ -17,38 +18,11 @@ const StyledContainer = styled.div`
   align-items: center;
 `;
 
-const SearchContainer = styled.div`
-  height: 45px;
-  width: 100%;
-  padding: 1vh 0 1vh 0;
-  margin: 5% auto;
-  text-align: center;
-
-  div {
-    width: min(500px, 90vw);
-    height: 45px;
-    position: relative;
-    display: inline-block;
-    margin: 0 auto;
-  }
-
-  input {
-    width: 100%;
-    border-radius: 20px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    padding: 10px 15px;
-    color: black;
-
-    &:hover {
-      background: var(--yellow);
-    }
-  }
-`;
 
 function Articles() {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Slick carousel settings
   const settings = {
@@ -68,6 +42,7 @@ function Articles() {
 
   const fetchArticles = async (searchText = null) => {
     try {
+      setIsSearching(true);
       let url = '/api/articles';
       if (searchText) {
         url += `?search=${encodeURIComponent(searchText)}`;
@@ -81,6 +56,8 @@ function Articles() {
       console.error('Error fetching articles:', error);
       setArticles([]);
       setFilteredArticles([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -88,16 +65,12 @@ function Articles() {
     fetchArticles();
   }, []);
 
-  const handleSearch = (searchText) => {
+  const handleSearch = async (searchText) => {
     if (!searchText.trim()) {
       setFilteredArticles(articles);
     } else {
-      const filtered = articles.filter(article => 
-        article.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        article.review_text?.toLowerCase().includes(searchText.toLowerCase()) ||
-        article.tags?.some(tag => tag.name.toLowerCase().includes(searchText.toLowerCase()))
-      );
-      setFilteredArticles(filtered);
+      // Use backend search which includes tags
+      await fetchArticles(searchText);
     }
   };
 
@@ -126,15 +99,11 @@ function Articles() {
       
       <CardContainer>
         <MotionWrapper index={0}>
-          <SearchContainer>
-            <div>
-              <input 
-                type="text"
-                placeholder="Search articles by title, content, or tags..."
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </div>
-          </SearchContainer>
+          <SearchBar 
+            key="articles-search"
+            enterSearch={handleSearch}
+            placeholder={isSearching ? "Searching..." : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."}
+          />
         </MotionWrapper>
 
         {/* Articles Carousel */}

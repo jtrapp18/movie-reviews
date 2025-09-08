@@ -8,14 +8,12 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
   padding: 0;
-  margin: 0;
+  margin-top: 20px;
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
 `;
-
 
 function Home() {
   const { movies } = useOutletContext();
