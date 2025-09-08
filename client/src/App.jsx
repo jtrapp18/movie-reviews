@@ -45,20 +45,20 @@ function App() {
   }, []);
   
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header/>
-        <StyledMain isMobile={isMobile}>
-          <Suspense fallback={<Loading />}>
-            <Outlet
-                context={{
-                  movies,
-                  setMovies
-                }}
-              />
-          </Suspense>
-        </StyledMain>
+      <StyledMain isMobile={isMobile}>
+        <Suspense fallback={<Loading />}>
+          <Outlet
+              context={{
+                movies,
+                setMovies
+              }}
+            />
+        </Suspense>
+      </StyledMain>
       <Footer />
-    </>
+    </div>
   );
 }
 

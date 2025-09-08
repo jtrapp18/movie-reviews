@@ -34,11 +34,12 @@ const StyledLink = styled(Link)`
 `
 
 const StyledMain = styled.main`
-  min-height: var(--size-body);
+  min-height: calc(100vh - var(--height-header) - 4px);
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  flex: 1;
 
   /* Background image */
   background-image: ${(props) => props.isMobile ? 'none' : `url('/images/grid_left.png')`};

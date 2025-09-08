@@ -4,10 +4,10 @@ import styled from 'styled-components';
 const StyledFooter = styled.footer`
     display: flex;
     flex-direction: column;
-    position: relative;
     align-items: center;
     background: black;
     padding: 10px 0 0 0;
+    margin-top: auto;
 
     section {
         color: white;

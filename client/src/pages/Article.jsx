@@ -5,7 +5,7 @@ import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
 
 const StyledContainer = styled.div`
-  height: var(--size-body);
+  min-height: calc(100vh - var(--height-header) - 4px);
   padding: 20px;
   margin: 0;
   width: 100vw;
