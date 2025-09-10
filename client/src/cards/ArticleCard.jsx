@@ -4,6 +4,7 @@ import Tag from '../components/Tag';
 
 const ArticleCardContainer = styled.article`
   position: relative;
+  padding: 5%;
   width: 200px;
   height: 280px;
   background: white;
@@ -20,36 +21,27 @@ const ArticleCardContainer = styled.article`
 `;
 
 const ArticleTitle = styled.h2`
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
+  height: 30%;
   color: var(--cinema-black);
-  background: none;
-  padding: 0;
-  font-size: 15px;
-  font-weight: 600;
   line-height: 1.3;
-  z-index: 1000;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-weight: bold;
+  // text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  transition: opacity 0.3s ease;
 `;
 
 const ArticleContent = styled.div`
-  position: absolute;
-  top: 60px;
-  left: 12px;
-  right: 12px;
-  bottom: 60px;
+  height: 53%;
   color: var(--cinema-black);
-  font-size: 11px;
+  font-size: clamp(0.7rem, 2vw, 0.9rem);
   line-height: 1.4;
   overflow: hidden;
 `;
 
 const ArticleDate = styled.div`
-  position: absolute;
-  bottom: 30px;
-  left: 12px;
-  right: 12px;
+  height: 2%;
   color: var(--cinema-black);
   font-size: 9px;
   font-weight: 500;
@@ -57,13 +49,9 @@ const ArticleDate = styled.div`
 `;
 
 const TagContainer = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
+  height: 10%;
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
 `;
 
 
@@ -117,10 +105,6 @@ function ArticleCard({ article }) {
         {article.description || 'No description available'}
       </ArticleContent>
       
-      <ArticleDate>
-        {formatDate(article.dateAdded)}
-      </ArticleDate>
-      
       {article.tags && article.tags.length > 0 && (
         <TagContainer>
           {article.tags.slice(0, 3).map((tag, index) => (
@@ -140,6 +124,11 @@ function ArticleCard({ article }) {
           )}
         </TagContainer>
       )}
+
+      <ArticleDate>
+        {formatDate(article.dateAdded)}
+      </ArticleDate>
+
     </ArticleCardContainer>
   );
 }

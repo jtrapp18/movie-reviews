@@ -11,7 +11,7 @@ const AddButtonContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin-bottom: 20px;
+  margin: 2% auto 20px auto;
   flex-wrap: wrap;
 `;
 
@@ -41,12 +41,6 @@ function Articles({ showArticles, enterSearch }) {
 
   return (
     <CardContainer>
-      <AddButtonContainer>
-        <Button onClick={handleAddNew}>
-          + Add New Article
-        </Button>
-      </AddButtonContainer>
-
       <Carousel settings={{
         infinite: showArticles.length > 1, // Only enable infinite scroll if more than 1 item
         autoplay: showArticles.length > 1, // Only autoplay if more than 1 item
@@ -67,6 +61,12 @@ function Articles({ showArticles, enterSearch }) {
           );
         })}
       </Carousel>
+      
+      <AddButtonContainer>
+        <Button onClick={handleAddNew}>
+          + Add New Article
+        </Button>
+      </AddButtonContainer>
     </CardContainer>
   );
 }

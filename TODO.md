@@ -22,8 +22,8 @@
 13. [ ] **Review search functionality** - Comprehensive review of search across titles, tags, and descriptions
 14. [✅] **Fix duplicate articles bug** - Articles with same title/ID appearing multiple times in search results (Fixed: Slick carousel was creating clones for single items)
 15. [✅] **DRY up duplicate code** - Created shared components: PageContainer (Completed: Consolidated duplicate styling, removed over-engineered components)
-16. [ ] **Fix articles carousel autoplay** - Articles carousel not auto-scrolling despite correct settings (6 articles, autoplay enabled)
-17. [ ] **Fix add article button visibility** - Add article button not showing on articles page
+16. [✅] **Fix articles carousel autoplay** - Articles carousel not auto-scrolling despite correct settings (6 articles, autoplay enabled) (Fixed: Working now)
+17. [✅] **Fix add article button visibility** - Add article button not showing on articles page (Fixed: Moved button after carousel, fixed overflow issue)
 
 ## Status Legend
 - [ ] Pending

@@ -8,7 +8,7 @@ const CarouselContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   height: 300px;
-  overflow: visible;
+  overflow: hidden;
 `;
 
 const CarouselStyles = styled.div`
