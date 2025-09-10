@@ -7,7 +7,7 @@ import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
-import FormSubmit from "../components/FormSubmit";
+import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import useCrudStateDB from "../hooks/useCrudStateDB";
@@ -245,10 +245,10 @@ const ArticleForm = ({ initObj }) => {
           </div>
         </StyledForm>
       ) : (
-        <FormSubmit
-          label={"Article Details"}
+        <ContentDisplay
           formValues={{
             ...formik.values,
+            ...initObj, // Include all the original article data
             hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
             documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
             documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)

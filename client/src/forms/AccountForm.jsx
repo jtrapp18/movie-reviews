@@ -5,7 +5,7 @@ import { UserContext } from "../context/userProvider";
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../MiscStyling";
 import useCrudStateDB from '../hooks/useCrudStateDB';
-import FormSubmit from '../components/FormSubmit';
+import ContentDisplay from '../components/FormSubmit';
 import { IMaskInput } from 'react-imask';
 import { postJSONToDb, snakeToCamel } from "../helper";
 

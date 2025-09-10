@@ -8,7 +8,7 @@ import 'react-quill/dist/quill.snow.css';  // Quill's default theme
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
 import Stars from "../components/Stars"
-import FormSubmit from "../components/FormSubmit";
+import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import useCrudStateDB from "../hooks/useCrudStateDB";
 
@@ -277,8 +277,7 @@ const ReviewForm = ({ initObj }) => {
           <Button type="submit">{initObj ? "Update" : "Submit"}</Button>
         </StyledForm>
       ) : (
-        <FormSubmit
-          label={"Review Details"}
+        <ContentDisplay
           formValues={{
             ...formik.values,
             hasDocument: initObj?.hasDocument || false,

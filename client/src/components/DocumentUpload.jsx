@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FaFileUpload, FaFileAlt, FaPaperclip, FaCheck, FaLightbulb, FaEye, FaDownload, FaTimes } from 'react-icons/fa';
+import { Button } from '../MiscStyling';
 
 const UploadContainer = styled.div`
   margin: 20px 0;
   padding: 20px;
-  border: 2px dashed #ccc;
+  border: 2px dashed var(--cinema-gold);
+  background-color: var(--cinema-gray);
   border-radius: 8px;
   text-align: center;
-  background-color: #f9f9f9;
+  color: var(--cinema-gold);
   min-height: 120px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   
   &.drag-over {
-    border-color: #007bff;
-    background-color: #e3f2fd;
+    border-color: var(--cinema-gold-dark);
+    background-color: var(--cinema-black);
   }
 `;
 
@@ -23,39 +26,25 @@ const FileInput = styled.input`
   display: none;
 `;
 
-const UploadButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
 const FileInfo = styled.div`
   margin-top: 10px;
   padding: 8px 12px;
-  background-color: #e8f5e8;
+  opacity: 0.8;
   border-radius: 4px;
-  border: 1px solid #4caf50;
-  font-size: 14px;
+  border: 1px solid var(--cinema-gold);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
+  color: var(--cinema-gold);
 `;
 
 const ErrorMessage = styled.div`
   margin-top: 10px;
   padding: 10px;
-  background-color: #ffebee;
+  background-color: rgba(244, 67, 54, 0.1);
   border-radius: 4px;
   border: 1px solid #f44336;
-  color: #c62828;
+  color: #f44336;
 `;
 
 const DocumentActions = styled.div`
@@ -63,28 +52,6 @@ const DocumentActions = styled.div`
   display: flex;
   gap: 8px;
   justify-content: center;
-`;
-
-const ActionButton = styled.button`
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  
-  &:hover {
-    background-color: #545b62;
-  }
-  
-  &.primary {
-    background-color: #28a745;
-    
-    &:hover {
-      background-color: #1e7e34;
-    }
-  }
 `;
 
 const CheckboxContainer = styled.div`
@@ -202,22 +169,22 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
 
   return (
     <UploadContainer
-      className={isDragOver ? 'drag-over' : ''}
+      className={isDragOver ? 'drag-over upload-container' : 'upload-container'}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <h4>📄 Document Upload</h4>
+      <h4><FaFileUpload /> Document Upload</h4>
       <p>Upload a PDF or Word document to attach to your review</p>
       
       {existingDocument && (
         <FileInfo>
-          <strong>📎 Attached Document:</strong> {existingDocument.document_filename}
+          <strong><FaPaperclip /> Attached Document:</strong> {existingDocument.document_filename}
           <br />
           <small>Type: {existingDocument.document_type?.toUpperCase()}</small>
           <DocumentActions>
-            <ActionButton onClick={handlePreview}>Preview</ActionButton>
-            <ActionButton onClick={handleDownload}>Download</ActionButton>
+            <Button onClick={handlePreview}><FaEye /> Preview</Button>
+            <Button onClick={handleDownload}><FaDownload /> Download</Button>
           </DocumentActions>
         </FileInfo>
       )}
@@ -231,29 +198,29 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
             onChange={handleFileInputChange}
           />
           <label htmlFor="document-upload">
-            <UploadButton as="span">
-              Choose File
-            </UploadButton>
+            <Button as="span">
+              <FaFileAlt /> Choose File
+            </Button>
           </label>
           
           <p>or drag and drop your file here</p>
           
           {selectedFile && (
-            <FileInfo>
-              <strong>Selected File:</strong> {selectedFile.name}
+            <FileInfo className="selected-file">
+              <strong><FaFileAlt /> Selected File:</strong> {selectedFile.name}
               <br />
               <small>Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</small>
               <br />
-              <small style={{color: '#28a745'}}>✓ File will be uploaded when you submit the review</small>
+              <small style={{color: '#28a745'}}><FaCheck /> File will be uploaded when you submit the review</small>
               <DocumentActions>
-                <ActionButton onClick={clearFile}>Remove File</ActionButton>
+                <Button onClick={clearFile}><FaTimes /> Remove File</Button>
               </DocumentActions>
             </FileInfo>
           )}
           
           <CheckboxContainer>
-            <small style={{color: '#666'}}>
-              💡 Document will be displayed in a viewer below the review
+            <small style={{color: 'var(--cinema-gold)'}}>
+              <FaLightbulb /> Document will be displayed in a viewer below the review
             </small>
           </CheckboxContainer>
         </>

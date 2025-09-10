@@ -1,146 +1,123 @@
 import { StyledSubmit, Button } from '../MiscStyling'
-import { camelToProperCase } from '../helper'
-import styled from 'styled-components'
 import DocumentViewer from './DocumentViewer'
+import styled from 'styled-components'
 
-const DocumentInfo = styled.div`
-  margin: 10px 0;
-  padding: 15px;
-  background-color: #e8f5e8;
-  border: 1px solid #4caf50;
-  border-radius: 8px;
+const ContentHeader = styled.div`
+  text-align: center;
+  margin-bottom: 30px;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+`;
+
+const ContentTitle = styled.h1`
+  margin: 0 0 10px 0;
+  color: var(--cinema-gold);
+  font-size: 2rem;
+`;
+
+const ContentMeta = styled.div`
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 20px;
+`;
+
+const PublishDate = styled.span`
+  color: #666;
+`;
+
+const Rating = styled.span`
+  color: var(--cinema-gold);
+  font-weight: bold;
+`;
+
+const TagsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+
+const Tag = styled.span`
+  background-color: var(--cinema-gold);
+  color: var(--cinema-black);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+`;
+
+
+const ContentText = styled.div`
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: var(--font-color-2);
   
-  h4 {
-    margin: 0 0 10px 0;
-    color: #2e7d32;
-  }
-  
-  .document-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-  }
-  
-  .action-button {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    
-    &:hover {
-      background-color: #545b62;
-    }
-    
-    &.primary {
-      background-color: #28a745;
-      
-      &:hover {
-        background-color: #1e7e34;
-      }
-    }
+  p {
+    margin: 10px 0;
   }
 `;
 
-const FormSubmit = ({ label, formValues, setIsEditing, reviewId }) => {
-
-  const formatPhoneNumber = (phoneNumber) => {
-    // Format phone number as (XXX) XXX-XXXX
-    return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-  };
-
-  const handleDownload = () => {
-    if (reviewId) {
-      window.open(`/api/download_document/${reviewId}`, '_blank');
-    }
-  };
-
-  const handlePreview = async () => {
-    if (!reviewId) return;
-    
-    try {
-      const response = await fetch(`/api/document_preview/${reviewId}`);
-      const result = await response.json();
-      
-      if (response.ok) {
-        // Show preview in a modal or new window
-        const previewWindow = window.open('', '_blank', 'width=800,height=600');
-        previewWindow.document.write(`
-          <html>
-            <head><title>Document Preview</title></head>
-            <body>
-              <h2>Document Preview: ${result.filename}</h2>
-              <div style="white-space: pre-wrap; font-family: Arial, sans-serif; padding: 20px;">
-                ${result.preview}
-              </div>
-            </body>
-          </html>
-        `);
-      } else {
-        alert(result.error || 'Preview failed');
-      }
-    } catch (err) {
-      alert('Failed to load preview');
-    }
-  };
+const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
+  const isReview = formValues.contentType === 'review';
+  const hasRating = isReview && formValues.rating && formValues.rating > 0;
+  const hasContent = (formValues.reviewText || formValues.review_text) && (formValues.reviewText || formValues.review_text).trim();
+  const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
 
   return (
     <StyledSubmit>
-        <h1>{label}</h1>
-        {Object.entries(formValues).map(([key, value]) => {
-          // Skip document-related fields as they'll be shown separately
-          if (['hasDocument', 'documentFilename', 'documentType'].includes(key)) {
-            return null;
-          }
-          
-          return (
-            <div key={key}>
-                <label>{camelToProperCase(key)}:</label>
-                <p>
-                  {key === 'phoneNumber' 
-                    ? formatPhoneNumber(value) 
-                    : typeof value === "boolean" 
-                    ? value.toString() 
-                    : value}
-                </p>
-            </div>
-          );
-        })}
+      <ContentHeader>
+        <ContentTitle>{formValues.title}</ContentTitle>
         
-        {/* Debug info */}
-        
-        {/* Document Viewer */}
-        {formValues.hasDocument && formValues.documentFilename && reviewId && (
-          <DocumentViewer
-            documentUrl={`/api/view_document/${reviewId}`}
-            documentType={formValues.documentType}
-            filename={formValues.documentFilename}
-            hasDocument={formValues.hasDocument}
-          />
+        <ContentMeta>
+          {(formValues.dateAdded || formValues.date_added) && (
+            <PublishDate>Published on {new Date(formValues.dateAdded || formValues.date_added).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</PublishDate>
+          )}
+          {hasRating && (
+            <Rating>Rating: {formValues.rating}/10</Rating>
+          )}
+        </ContentMeta>
+
+        {(formValues.tags || formValues.tag) && (formValues.tags || formValues.tag).length > 0 && (
+          <TagsContainer className="tags-container">
+            {(formValues.tags || formValues.tag).map((tag, index) => (
+              <Tag key={index}>
+                {typeof tag === 'string' ? tag : tag.name}
+              </Tag>
+            ))}
+          </TagsContainer>
         )}
-        
-        {/* Show debug info if document viewer not showing */}
-        {!formValues.hasDocument && (
-          <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', border: '1px solid #ccc' }}>
-            <h4>Debug Info:</h4>
-            <p>hasDocument: {String(formValues.hasDocument)}</p>
-            <p>documentFilename: {formValues.documentFilename || 'null'}</p>
-            <p>documentType: {formValues.documentType || 'null'}</p>
-            <p>reviewId: {reviewId || 'null'}</p>
-          </div>
-        )}
-        
-        <br />
-        <Button 
-            type="button" 
-            onClick={() => setIsEditing(true)}
-        >
-            Edit
-        </Button>
+      </ContentHeader>
+
+      {hasContent && (
+        <ContentText>
+          <p>{formValues.reviewText || formValues.review_text}</p>
+        </ContentText>
+      )}
+
+      {hasDocument && (
+        <DocumentViewer
+          documentUrl={`/api/view_document/${reviewId}`}
+          documentType={formValues.documentType}
+          filename={formValues.documentFilename}
+          hasDocument={formValues.hasDocument}
+        />
+      )}
+
+      <Button 
+        type="button" 
+        onClick={() => setIsEditing(true)}
+      >
+        Edit
+      </Button>
     </StyledSubmit>
   );
 };
 
-export default FormSubmit;
+export default ContentDisplay;

@@ -103,12 +103,10 @@ const StyledSubmit = styled.div`
     color: var(--cinema-gold);
   }
 
-  div {
+  > div {
     display: flex;
     flex-direction: column;
     border-bottom: 2px dotted gray;
-    margin: 10px 5px 15px 5px;
-    padding: 20px 5px 10px 5px;
   }
 `
 
@@ -171,8 +169,8 @@ const Button = styled.button`
   color: black;
   background: var(--cinema-gold);
   border: 2px solid var(--cinema-gold);
-  border-radius: 25px;
-  padding: 12px 24px;
+  border-radius: 20px;
+  padding: 12px;
   min-width: 120px;
   height: fit-content;
   font-size: 1rem;
