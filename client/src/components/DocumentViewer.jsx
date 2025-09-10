@@ -143,22 +143,20 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     <iframe
       src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
       width="100%"
-      height="800px"
-      scrolling="auto"
       style={{
         display: 'block',
         backgroundColor: 'var(--cinema-black)',
         width: '100%',
         maxWidth: '100%',
         borderRadius: '8px',
-        marginBottom: '10px'
+        marginBottom: '10px',
+        minHeight: '750px',
       }}
       title={filename || 'PDF Document'}
     />
   ) : (
     <div style={{ 
       borderRadius: '8px', 
-      maxHeight: '800px', 
       overflow: 'auto',
       marginBottom: '10px'
     }}>

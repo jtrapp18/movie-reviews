@@ -424,6 +424,32 @@ class PullMovieInfo(Resource):
         else:
             return {'error': f'Failed to fetch movies. Status {response.status_code}: {response.text}'}, response.status_code
 
+class DiscoverMovies(Resource):
+    def get(self):
+        genre_id = request.args.get("genre_id")
+        search_query = request.args.get("search", "").strip()
+        page = request.args.get("page", 1)
+
+        API_KEY = os.getenv("MOVIE_API_KEY")
+        base_url = "https://api.themoviedb.org/3"
+
+        if search_query:
+            # Use search endpoint with genre filter
+            encoded_query = quote_plus(search_query)
+            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&with_genres={genre_id}&language=en-US&page={page}"
+        else:
+            # Use discover endpoint for popular movies in this genre
+            url = f"{base_url}/discover/movie?api_key={API_KEY}&with_genres={genre_id}&language=en-US&page={page}&sort_by=popularity.desc"
+
+        print(f"DiscoverMovies - {url}")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {'error': f'Failed to fetch movies. Status {response.status_code}: {response.text}'}, response.status_code
+
 class DocumentUpload(Resource):
     """Handle document uploads for reviews."""
     
@@ -587,6 +613,7 @@ api.add_resource(Articles, '/api/articles')
 api.add_resource(ArticleById, '/api/articles/<int:article_id>')
 api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
+api.add_resource(DiscoverMovies, '/api/discover_movies')
 api.add_resource(DocumentUpload, '/api/upload_document')
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
 api.add_resource(DocumentView, '/api/view_document/<int:review_id>')

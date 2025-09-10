@@ -153,6 +153,44 @@ async function getMovieInfo(searchQuery=null) {
   }
 }
 
+async function getMoviesByGenre(genreId, searchQuery=null) {
+  const params = new URLSearchParams();
+  params.append('genre_id', genreId);
+  if (searchQuery) {
+    params.append('search', searchQuery);
+  }
+  
+  const imgUrl = "https://image.tmdb.org/t/p/w1280"
+  const url = `/api/discover_movies?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      console.error(`Error fetching movies for genre ${genreId}! Status: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    const camelData = snakeToCamel(data.results || [])
+    const movieInfo = camelData.map(m => ({
+      id: m.id,
+      originalLanguage: m.originalLanguage,
+      originalTitle: m.originalTitle,
+      overview: m.overview,
+      title: m.title,
+      releaseDate: m.releaseDate,
+      coverPhoto: `${imgUrl}${m.posterPath}`,
+      voteAverage: m.voteAverage,
+      genreIds: m.genreIds
+    }));
+    return movieInfo;
+  } catch (err) {
+    console.error('Request failed for genre', genreId, err);
+    return [];
+  }
+}
+
 //****************************************************************************************************
 // Conversion between cases
 
@@ -226,4 +264,4 @@ const scrollToTop = () => {
 };
 
 export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
-  getMovieInfo, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};
+  getMovieInfo, getMoviesByGenre, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};
