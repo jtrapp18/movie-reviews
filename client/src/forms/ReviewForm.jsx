@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -22,6 +22,7 @@ const StarsContainer = styled.div`
 
 const ReviewForm = ({ initObj }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(!initObj);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
@@ -363,9 +364,20 @@ const ReviewForm = ({ initObj }) => {
             }}
           />
           
-          <Button type="submit">
-            {initObj ? "Update" : "Submit"}
-          </Button>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
+            <Button type="button" onClick={() => {
+              if (initObj) {
+                // If editing existing review, just exit edit mode
+                setIsEditing(false);
+              } else {
+                // If creating new review, navigate back
+                navigate(-1);
+              }
+            }}>Cancel</Button>
+            <Button type="submit">
+              {initObj ? "Save Changes" : "Submit Review"}
+            </Button>
+          </div>
         </StyledForm>
       ) : (
         <ContentDisplay

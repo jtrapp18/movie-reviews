@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -14,6 +14,7 @@ import { patchJSONToDb, postJSONToDb, snakeToCamel } from "../helper";
 
 const ArticleForm = ({ initObj }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   // Check if we're creating a new article (no id and no existing article data)
   const isNewArticle = !id && (!initObj || !initObj.id);
   const [isEditing, setIsEditing] = useState(isNewArticle);
@@ -294,7 +295,16 @@ const ArticleForm = ({ initObj }) => {
             />
           </div>
           
-          <div style={{ marginTop: '30px', marginBottom: '20px' }}>
+          <div style={{ marginTop: '30px', marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <Button type="button" onClick={() => {
+              if (initObj) {
+                // If editing existing article, just exit edit mode
+                setIsEditing(false);
+              } else {
+                // If creating new article, navigate back
+                navigate(-1);
+              }
+            }}>Cancel</Button>
             <Button type="submit">{initObj ? "Save Changes" : "Create Article"}</Button>
           </div>
         </StyledForm>
