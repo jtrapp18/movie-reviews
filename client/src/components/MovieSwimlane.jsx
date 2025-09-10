@@ -18,7 +18,7 @@ const SwimlaneHeader = styled.h3`
 const MoviesContainer = styled.div`
   display: flex;
   overflow-x: auto;
-  padding: 0 20px;
+  padding: 0 20px 0 0;
   gap: 15px;
   scrollbar-width: thin;
   scrollbar-color: var(--cinema-gold) transparent;

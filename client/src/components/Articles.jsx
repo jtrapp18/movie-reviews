@@ -36,6 +36,9 @@ function Articles({ showArticles, enterSearch }) {
     navigate('/articles/new');
   };
 
+  console.log('Articles count:', showArticles.length, 'Autoplay enabled:', showArticles.length > 1);
+  console.log('AddButtonContainer should be visible');
+
   return (
     <CardContainer>
       <AddButtonContainer>

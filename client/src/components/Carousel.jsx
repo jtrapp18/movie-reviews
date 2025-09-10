@@ -8,7 +8,7 @@ const CarouselContainer = styled.div`
   width: 100%;
   margin: 0 auto;
   height: 300px;
-  overflow: hidden;
+  overflow: visible;
 `;
 
 const CarouselStyles = styled.div`
@@ -16,48 +16,34 @@ const CarouselStyles = styled.div`
     margin: 0 6px;
   }
   
-  /* Arrow styles */
+  /* Hide arrows */
   .slick-prev,
   .slick-next {
-    z-index: 10;
-    width: 40px;
-    height: 40px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 2px solid #333;
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    display: none;
   }
   
-  .slick-prev {
-    left: 10px;
+  /* Dots styling */
+  .slick-dots {
+    width: 100vw;
   }
   
-  .slick-next {
-    right: 10px;
+  .slick-dots li {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    margin: 0 5px;
+    padding: 0;
+    cursor: pointer;
   }
   
-  .slick-prev:hover,
-  .slick-next:hover {
-    background-color: var(--cinema-gold);
-    border-color: var(--cinema-gold);
-    box-shadow: 0 4px 12px rgba(var(--cinema-gold), 0.3);
-    transition: all 0.2s ease;
+  .slick-dots li button:before {
+    color: var(--cinema-gold);
+    opacity: 0.5;
   }
   
-  .slick-prev:before,
-  .slick-next:before {
-    font-size: 18px;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  .slick-prev:hover:before,
-  .slick-next:hover:before {
-    color: white;
-  }
-  
-  .slick-disabled {
-    opacity: 0.3;
+  .slick-dots li.slick-active button:before {
+    opacity: 1;
+    color: var(--cinema-gold);
   }
 `;
 
@@ -74,10 +60,12 @@ const Carousel = ({ children, settings = {} }) => {
     centerMode: false,
     variableWidth: true,
     adaptiveHeight: false,
-    arrows: true,
+    arrows: false,
   };
 
   const finalSettings = { ...defaultSettings, ...settings };
+  
+  console.log('Carousel settings:', finalSettings);
 
   return (
     <CarouselContainer>

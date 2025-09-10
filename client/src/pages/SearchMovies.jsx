@@ -1,19 +1,21 @@
-import { getMoviesByGenre } from '../helper';
+import { getMoviesByGenre, getMovieInfo } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper'
 import SearchBar from '../components/SearchBar';
 import MovieSwimlane from '../components/MovieSwimlane';
+import SearchResultsGrid from '../components/SearchResultsGrid';
 import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
-  height: var(--size-body);
-  padding-top: 20px;
+  min-height: 100%;
+  padding: 20px 0 40px 0;
   margin: 0;
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
 `;
 
 // Define genres we want to show
@@ -29,14 +31,16 @@ const GENRES = [
 function SearchMovies() {
   const navigate = useNavigate();
   const [genreData, setGenreData] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchMode, setIsSearchMode] = useState(false);
 
-  const fetchAllGenres = async (searchText = null) => {
+  const fetchAllGenres = async () => {
     setLoading(true);
     try {
       const promises = GENRES.map(async (genre) => {
-        const movies = await getMoviesByGenre(genre.id, searchText);
+        const movies = await getMoviesByGenre(genre.id);
         return {
           ...genre,
           movies: movies
@@ -55,13 +59,32 @@ function SearchMovies() {
     }
   };
 
+  const fetchSearchResults = async (searchText) => {
+    setLoading(true);
+    try {
+      const movies = await getMovieInfo(searchText);
+      setSearchResults(movies || []);
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {    
     fetchAllGenres();
   }, []);
 
   const enterSearch = (text) => {
     setSearchQuery(text);
-    fetchAllGenres(text);
+    if (text && text.trim()) {
+      setIsSearchMode(true);
+      fetchSearchResults(text);
+    } else {
+      setIsSearchMode(false);
+      setSearchResults([]);
+    }
   }
 
   const handleMovieClick = (movie) => {
@@ -80,7 +103,7 @@ function SearchMovies() {
         <MotionWrapper index={3}>
           <SearchBar 
             enterSearch={enterSearch} 
-            placeholder={searchQuery ? "Searching..." : "Search movies by title..."} 
+            placeholder={loading ? "Searching..." : "Search movies by title..."} 
           />
         </MotionWrapper>
         
@@ -88,7 +111,15 @@ function SearchMovies() {
           <MotionWrapper index={4}>
             <h3>Loading movies...</h3>
           </MotionWrapper>
-        ) : genreData.length > 0 ? (
+        ) : isSearchMode ? (
+          <MotionWrapper index={4}>
+            <SearchResultsGrid
+              searchQuery={searchQuery}
+              movies={searchResults}
+              onMovieClick={handleMovieClick}
+            />
+          </MotionWrapper>
+        ) : (
           genreData.map((genre, index) => (
             <MotionWrapper key={genre.id} index={index + 4}>
               <MovieSwimlane
@@ -98,10 +129,6 @@ function SearchMovies() {
               />
             </MotionWrapper>
           ))
-        ) : (
-          <MotionWrapper index={4}>
-            <h3>No movies found. Try a different search term.</h3>
-          </MotionWrapper>
         )}
     </StyledContainer>
   );
