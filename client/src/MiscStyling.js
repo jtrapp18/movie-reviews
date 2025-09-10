@@ -203,7 +203,6 @@ const Button = styled.button.attrs(props => ({
 
 const StyledCard = styled.article`
   position: relative;
-  // width: 100%;
   width: 200px;
   height: 280px;
   max-height: 90vh;

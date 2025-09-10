@@ -36,15 +36,10 @@ function Articles({ showArticles, enterSearch }) {
     navigate('/articles/new');
   };
 
-  console.log('Articles count:', showArticles.length, 'Autoplay enabled:', showArticles.length > 1);
-  console.log('AddButtonContainer should be visible');
 
   return (
     <CardContainer>
-      <Carousel settings={{
-        infinite: showArticles.length > 1, // Only enable infinite scroll if more than 1 item
-        autoplay: showArticles.length > 1, // Only autoplay if more than 1 item
-      }}>
+      <Carousel>
         {showArticles.map((article, index) => {
           console.log(`🎬 RENDERING article ${index}: ID=${article.id}, Title="${article.title}"`);
           return (

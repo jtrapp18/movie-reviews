@@ -64,8 +64,6 @@ const Carousel = ({ children, settings = {} }) => {
   };
 
   const finalSettings = { ...defaultSettings, ...settings };
-  
-  console.log('Carousel settings:', finalSettings);
 
   return (
     <CarouselContainer>
