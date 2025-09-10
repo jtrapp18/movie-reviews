@@ -19,6 +19,27 @@ const AddButtonContainer = styled.div`
 function Articles({ showArticles, enterSearch }) {
   const navigate = useNavigate();
 
+  console.log('📰 Articles component RENDERED');
+  console.log('📰 Articles component received showArticles:', showArticles);
+  console.log('📰 Articles component received enterSearch:', typeof enterSearch);
+  console.log('📰 Articles component props changed - showArticles reference:', showArticles);
+  console.log('📰 Articles component props changed - enterSearch reference:', enterSearch);
+  console.log('📰 showArticles length:', showArticles?.length);
+  if (showArticles) {
+    console.log('📰 Article IDs in showArticles:', showArticles.map(a => a.id));
+    console.log('📰 Article titles in showArticles:', showArticles.map(a => a.title));
+    
+    // Check for duplicates
+    const ids = showArticles.map(a => a.id);
+    const uniqueIds = [...new Set(ids)];
+    if (ids.length !== uniqueIds.length) {
+      console.warn('⚠️ DUPLICATE IDs IN showArticles!');
+      console.warn('Total articles:', ids.length);
+      console.warn('Unique IDs:', uniqueIds.length);
+      console.warn('Duplicate IDs:', ids.filter((id, index) => ids.indexOf(id) !== index));
+    }
+  }
+
   // Handle null or undefined showArticles
   if (!showArticles || !Array.isArray(showArticles)) {
     return (
@@ -43,19 +64,25 @@ function Articles({ showArticles, enterSearch }) {
         </Button>
       </AddButtonContainer>
 
-      <Carousel>
-        {showArticles.map((article, index) => (
-          <MotionWrapper key={article.id} index={index}>
-            <div style={{ 
-              margin: '0',
-              width: '200px',
-              height: '100%',
-              flexShrink: 0
-            }}>
-              <ArticleCard article={article} />
-            </div>
-          </MotionWrapper>
-        ))}
+      <Carousel settings={{
+        infinite: showArticles.length > 1, // Only enable infinite scroll if more than 1 item
+        autoplay: showArticles.length > 1, // Only autoplay if more than 1 item
+      }}>
+        {showArticles.map((article, index) => {
+          console.log(`🎬 RENDERING article ${index}: ID=${article.id}, Title="${article.title}"`);
+          return (
+            <MotionWrapper key={article.id} index={index}>
+              <div style={{ 
+                margin: '0',
+                width: '200px',
+                height: '100%',
+                flexShrink: 0
+              }}>
+                <ArticleCard article={article} />
+              </div>
+            </MotionWrapper>
+          );
+        })}
       </Carousel>
     </CardContainer>
   );

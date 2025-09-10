@@ -259,9 +259,12 @@ class ReviewById(Resource):
 class Articles(Resource):
     def get(self):
         search_query = request.args.get('search', '')
+        print(f"🔍 Articles API called with search query: '{search_query}'")
+        
         articles = Review.query.filter_by(content_type='article')
         
         if search_query:
+            print(f"🔍 Applying search filter for: '{search_query}'")
             articles = articles.filter(
                 db.or_(
                     Review.title.contains(search_query),
@@ -270,7 +273,27 @@ class Articles(Resource):
                 )
             )
         
-        return [article.to_dict() for article in articles.all()], 200
+        articles_list = articles.all()
+        print(f"📊 Found {len(articles_list)} articles")
+        
+        # Log article details to check for duplicates
+        article_data = []
+        for article in articles_list:
+            article_dict = article.to_dict()
+            article_data.append(article_dict)
+            print(f"📝 Article ID: {article_dict.get('id')}, Title: {article_dict.get('title')}")
+        
+        # Check for duplicate IDs in the result
+        article_ids = [article.get('id') for article in article_data]
+        unique_ids = list(set(article_ids))
+        if len(article_ids) != len(unique_ids):
+            print(f"⚠️ DUPLICATE IDs DETECTED IN BACKEND!")
+            print(f"Total articles: {len(article_ids)}")
+            print(f"Unique IDs: {len(unique_ids)}")
+            duplicate_ids = [id for id in article_ids if article_ids.count(id) > 1]
+            print(f"Duplicate IDs: {duplicate_ids}")
+        
+        return article_data, 200
 
     def post(self):
         data = request.get_json()

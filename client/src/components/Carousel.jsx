@@ -62,6 +62,9 @@ const CarouselStyles = styled.div`
 `;
 
 const Carousel = ({ children, settings = {} }) => {
+  console.log('🎠 Carousel rendering with children:', children);
+  console.log('🎠 Children count:', React.Children.count(children));
+  
   const defaultSettings = {
     dots: true,
     infinite: true,

@@ -10,7 +10,6 @@ function Movies({ showMovies, enterSearch }) {
   if (!showMovies || !Array.isArray(showMovies)) {
     return (
       <CardContainer>
-        <SearchBar enterSearch={enterSearch} />
         <div className="text-center p-4">
           <h3>Loading movies...</h3>
           <p>Please wait while we fetch the latest movies.</p>

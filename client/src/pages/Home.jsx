@@ -56,12 +56,22 @@ function Home() {
   };
 
   const enterArticleSearch = (text) => {
+    console.log('🏠 Home page article search called with:', text);
+    console.log('🏠 Total articles available:', articles.length);
+    console.log('🏠 Article IDs:', articles.map(a => a.id));
+    console.log('🏠 Article titles:', articles.map(a => a.title));
+    
     // Filter articles based on the search text
     const filteredArticles = articles.filter((article) =>
       article.title?.toLowerCase().includes(text.toLowerCase()) ||
       article.review_text?.toLowerCase().includes(text.toLowerCase()) ||
       article.tags?.some(tag => tag.name.toLowerCase().includes(text.toLowerCase()))
     );
+    
+    console.log('🏠 Filtered articles count:', filteredArticles.length);
+    console.log('🏠 Filtered article IDs:', filteredArticles.map(a => a.id));
+    console.log('🏠 Filtered article titles:', filteredArticles.map(a => a.title));
+    
     setShowArticles(filteredArticles);
   };
 

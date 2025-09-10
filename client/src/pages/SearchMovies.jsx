@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper'
 import Movies from '../components/Movies';
+import SearchBar from '../components/SearchBar';
 
 const StyledContainer = styled.div`
   height: var(--size-body);
@@ -37,6 +38,9 @@ function SearchMovies() {
         </MotionWrapper>
         <MotionWrapper index={2}>
           <h3>Click any movie card to add a new review</h3>
+        </MotionWrapper>
+        <MotionWrapper index={3}>
+          <SearchBar enterSearch={enterSearch} placeholder="Search movies by title..." />
         </MotionWrapper>
         <Movies
           showMovies={showMovies}
