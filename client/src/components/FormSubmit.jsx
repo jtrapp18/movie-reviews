@@ -110,36 +110,15 @@ const FormSubmit = ({ label, formValues, setIsEditing, reviewId }) => {
         })}
         
         {/* Debug info */}
-        {(() => {
-          console.log('DEBUG FormSubmit - formValues:', formValues);
-          console.log('DEBUG FormSubmit - reviewId:', reviewId);
-          console.log('DEBUG FormSubmit - hasDocument:', formValues.hasDocument);
-          console.log('DEBUG FormSubmit - documentFilename:', formValues.documentFilename);
-          console.log('DEBUG FormSubmit - documentType:', formValues.documentType);
-          return null;
-        })()}
         
         {/* Document Viewer */}
         {formValues.hasDocument && formValues.documentFilename && reviewId && (
-          <div style={{ marginTop: '30px', marginBottom: '20px' }}>
-            <h3 style={{ marginBottom: '10px', fontSize: '18px', color: '#333' }}>
-              📄 Attached Document: {formValues.documentFilename}
-            </h3>
-            <p style={{ 
-              marginBottom: '15px', 
-              fontSize: '12px', 
-              color: '#666', 
-              fontStyle: 'italic' 
-            }}>
-              Debug: About to render DocumentViewer with URL: /api/view_document/{reviewId}
-            </p>
-            <DocumentViewer
-              documentUrl={`/api/view_document/${reviewId}`}
-              documentType={formValues.documentType}
-              filename={formValues.documentFilename}
-              hasDocument={formValues.hasDocument}
-            />
-          </div>
+          <DocumentViewer
+            documentUrl={`/api/view_document/${reviewId}`}
+            documentType={formValues.documentType}
+            filename={formValues.documentFilename}
+            hasDocument={formValues.hasDocument}
+          />
         )}
         
         {/* Show debug info if document viewer not showing */}

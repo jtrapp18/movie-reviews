@@ -2,16 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import ArticleForm from '../forms/ArticleForm';
 import { useNavigate } from 'react-router-dom';
-
-const StyledContainer = styled.div`
-  min-height: var(--size-body);
-  padding: 20px;
-  margin: 0;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+import PageContainer from '../components/PageContainer';
 
 const ArticleHeader = styled.div`
   text-align: center;
@@ -51,7 +42,7 @@ function NewArticle() {
   };
 
   return (
-    <StyledContainer>
+    <PageContainer>
       <BackButton onClick={handleBack}>
         ← Back to Articles
       </BackButton>
@@ -61,7 +52,7 @@ function NewArticle() {
       </ArticleHeader>
 
       <ArticleForm initObj={newArticle} />
-    </StyledContainer>
+    </PageContainer>
   );
 }
 

@@ -17,6 +17,7 @@
 8. [ ] **Add functionality to upload or seed multiple articles from the UI** - Enable bulk article management
 9. [ ] **Test login functionality** - Verify authentication is working properly
 10. [✅] **Fix duplicate articles bug** - Articles with same title/ID appearing multiple times in search results (Fixed: Slick carousel was creating clones for single items)
+11. [✅] **DRY up duplicate code** - Created shared components: PageContainer (Completed: Consolidated duplicate styling, removed over-engineered components)
 
 ## Status Legend
 - [ ] Pending

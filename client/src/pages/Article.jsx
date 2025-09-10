@@ -3,16 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
-
-const StyledContainer = styled.div`
-  min-height: calc(100vh - var(--height-header) - 4px);
-  padding: 20px;
-  margin: 0;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
+import PageContainer from '../components/PageContainer';
 
 const ArticleHeader = styled.div`
   text-align: center;
@@ -78,17 +69,11 @@ function Article() {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        console.log('Fetching article with ID:', id);
         const data = await getJSON(`articles/${id}`);
-        console.log('Article data received:', data);
         if (data.error) {
           setError(data.error);
         } else {
           const transformedData = snakeToCamel(data);
-          console.log('Transformed article data:', transformedData);
-          console.log('hasDocument:', transformedData.hasDocument);
-          console.log('documentFilename:', transformedData.documentFilename);
-          console.log('documentType:', transformedData.documentType);
           setArticle(transformedData);
         }
       } catch (err) {
@@ -115,30 +100,30 @@ function Article() {
 
   if (loading) {
     return (
-      <StyledContainer>
+      <PageContainer>
         <LoadingMessage>Loading article...</LoadingMessage>
-      </StyledContainer>
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <StyledContainer>
+      <PageContainer>
         <ErrorMessage>{error}</ErrorMessage>
-      </StyledContainer>
+      </PageContainer>
     );
   }
 
   if (!article) {
     return (
-      <StyledContainer>
+      <PageContainer>
         <ErrorMessage>Article not found</ErrorMessage>
-      </StyledContainer>
+      </PageContainer>
     );
   }
 
   return (
-    <StyledContainer>
+    <PageContainer>
       <ArticleHeader>
         <ArticleTitle>{article.title || 'Untitled Article'}</ArticleTitle>
         <ArticleMeta>
@@ -155,7 +140,7 @@ function Article() {
       </ArticleHeader>
 
       <ArticleForm initObj={article} />
-    </StyledContainer>
+    </PageContainer>
   );
 }
 

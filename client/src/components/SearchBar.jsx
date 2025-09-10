@@ -39,8 +39,6 @@ const SearchContainer = styled.div`
 `
 
 const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
-    console.log('SearchBar rendered with placeholder:', placeholder);
-    console.log('SearchBar enterSearch function:', typeof enterSearch);
     const [searchInput, setSearchInput] = useState('');
     
     const handleChangeSearch = (event) => {
@@ -53,17 +51,9 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     }
 
     const handleKeyDown = (event) => {
-        console.log('🔍 Key pressed:', event.key);
         // Check if "Enter" key is pressed
         if (event.key === 'Enter') {
-            console.log('🔍 Enter pressed, calling enterSearch with:', searchInput);
-            console.log('🔍 enterSearch function:', enterSearch);
-            try {
-                enterSearch(searchInput);
-                console.log('🔍 enterSearch called successfully');
-            } catch (error) {
-                console.error('🔍 Error calling enterSearch:', error);
-            }
+            enterSearch(searchInput);
         }
     };
 

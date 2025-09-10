@@ -1,22 +1,12 @@
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
 import ArticleCard from '../cards/ArticleCard';
 import SearchBar from '../components/SearchBar';
+import PageContainer from '../components/PageContainer';
 import { CardContainer } from '../MiscStyling';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
-const StyledContainer = styled.div`
-  height: var(--size-body);
-  padding: 0;
-  margin: 0;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 
 function Articles() {
@@ -48,27 +38,8 @@ function Articles() {
         url += `?search=${encodeURIComponent(searchText)}`;
       }
       
-      console.log('🔍 Fetching articles with URL:', url);
       const response = await fetch(url);
       const data = await response.json();
-      
-      console.log('📊 Raw API response:', data);
-      console.log('📊 Number of articles returned:', data.length);
-      
-      // Log article IDs and titles to check for duplicates
-      const articleIds = data.map(article => article.id);
-      const articleTitles = data.map(article => article.title);
-      console.log('🆔 Article IDs:', articleIds);
-      console.log('📝 Article titles:', articleTitles);
-      
-      // Check for duplicate IDs
-      const uniqueIds = [...new Set(articleIds)];
-      if (articleIds.length !== uniqueIds.length) {
-        console.warn('⚠️ DUPLICATE IDs FOUND!');
-        console.warn('Total articles:', articleIds.length);
-        console.warn('Unique IDs:', uniqueIds.length);
-        console.warn('Duplicate IDs:', articleIds.filter((id, index) => articleIds.indexOf(id) !== index));
-      }
       
       setArticles(data);
       setFilteredArticles(data);
@@ -86,12 +57,9 @@ function Articles() {
   }, []);
 
   const handleSearch = async (searchText) => {
-    console.log('🔍 handleSearch called with:', searchText);
     if (!searchText.trim()) {
-      console.log('🔍 Empty search, showing all articles');
       setFilteredArticles(articles);
     } else {
-      console.log('🔍 Non-empty search, calling fetchArticles');
       // Use backend search which includes tags
       await fetchArticles(searchText);
     }
@@ -100,19 +68,19 @@ function Articles() {
   // Handle null or undefined articles
   if (!filteredArticles || !Array.isArray(filteredArticles)) {
     return (
-      <StyledContainer>
+      <PageContainer fullHeight>
         <MotionWrapper index={1}>
           <h1>Articles</h1>
         </MotionWrapper>
         <MotionWrapper index={2}>
           <h3>Loading articles...</h3>
         </MotionWrapper>
-      </StyledContainer>
+      </PageContainer>
     );
   }
 
   return (
-    <StyledContainer>
+    <PageContainer fullHeight>
       <MotionWrapper index={1}>
         <h1>Articles</h1>
       </MotionWrapper>
@@ -183,25 +151,22 @@ function Articles() {
             `}
           </style>
           <Slider {...settings}>
-            {filteredArticles.map((article, index) => {
-              console.log(`🎬 Rendering article ${index}: ID=${article.id}, Title="${article.title}"`);
-              return (
-                <MotionWrapper key={article.id} index={index}>
-                  <div style={{ 
-                    margin: '0',
-                    width: '200px',
-                    height: '100%',
-                    flexShrink: 0
-                  }}>
-                    <ArticleCard article={article} />
-                  </div>
-                </MotionWrapper>
-              );
-            })}
+            {filteredArticles.map((article, index) => (
+              <MotionWrapper key={article.id} index={index}>
+                <div style={{ 
+                  margin: '0',
+                  width: '200px',
+                  height: '100%',
+                  flexShrink: 0
+                }}>
+                  <ArticleCard article={article} />
+                </div>
+              </MotionWrapper>
+            ))}
           </Slider>
         </div>
       </CardContainer>
-    </StyledContainer>
+    </PageContainer>
   );
 }
 

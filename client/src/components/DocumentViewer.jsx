@@ -2,61 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
 
-const ViewerContainer = styled.div`
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  background-color: white;
-`;
-
-const ViewerHeader = styled.div`
-  background-color: #f8f9fa;
-  padding: 15px 20px;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const ViewerTitle = styled.h3`
-  margin: 0;
-  color: #333;
-  font-size: 18px;
-`;
-
-const ViewerControls = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-`;
-
-const ControlButton = styled.button`
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  
-  &:hover {
-    background-color: #0056b3;
-  }
-  
-  &:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-  }
-`;
-
-const ViewerContent = styled.div`
-  background-color: white;
-  min-height: 400px;
-  position: relative;
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-`;
 
 
 
@@ -181,61 +126,39 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
   };
 
 
-  const downloadDocument = () => {
-    const link = document.createElement('a');
-    link.href = documentUrl;
-    link.download = filename || 'document';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
 
   console.log('DocumentViewer render - loading:', loading, 'error:', error, 'documentType:', documentType);
 
   if (loading) {
     console.log('DocumentViewer - rendering loading state');
-    return (
-      <ViewerContainer>
-        <ViewerContent>
-          <LoadingMessage>Loading document, please wait...</LoadingMessage>
-        </ViewerContent>
-      </ViewerContainer>
-    );
+    return <LoadingMessage>Loading document, please wait...</LoadingMessage>;
   }
 
   if (error) {
-    return (
-      <ViewerContainer>
-        <ViewerContent>
-          <ErrorMessage>{error}</ErrorMessage>
-        </ViewerContent>
-      </ViewerContainer>
-    );
+    return <ErrorMessage>{error}</ErrorMessage>;
   }
 
-  return (
-    <ViewerContainer>
-      <ViewerContent>
-        {documentType === 'pdf' ? (
-          <iframe
-            src={documentUrl}
-            width="100%"
-            height="100%"
-            style={{
-              border: 'none',
-              minHeight: '800px',
-              display: 'block'
-            }}
-            title={filename || 'PDF Document'}
-          />
-        ) : (
-          <WordContent
-            dangerouslySetInnerHTML={{ __html: wordContent }}
-          />
-        )}
-      </ViewerContent>
-    </ViewerContainer>
+  return documentType === 'pdf' ? (
+    <iframe
+      src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
+      width="100%"
+      height="1200px"
+      scrolling="no"
+      style={{
+        border: 'none',
+        display: 'block',
+        backgroundColor: 'var(--cinema-black)',
+        width: '100%',
+        maxWidth: '100%',
+        overflow: 'hidden'
+      }}
+      title={filename || 'PDF Document'}
+    />
+  ) : (
+    <WordContent
+      dangerouslySetInnerHTML={{ __html: wordContent }}
+    />
   );
 };
 
