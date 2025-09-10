@@ -5,21 +5,30 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill"; // Import ReactQuill
 import 'react-quill/dist/quill.snow.css';  // Quill's default theme
+import styled from 'styled-components';
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
 import Stars from "../components/Stars"
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
+import TagInput from "../components/TagInput";
 import useCrudStateDB from "../hooks/useCrudStateDB";
+
+const StarsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+`;
 
 const ReviewForm = ({ initObj }) => {
   const { id } = useParams();
   const [isEditing, setIsEditing] = useState(!initObj);
   const [submitError, setSubmitError] = useState(null);
-  const [hasDocument, setHasDocument] = useState(initObj?.has_document || false);
+  const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [replaceText, setReplaceText] = useState(false);
-  const [contentType, setContentType] = useState(initObj?.content_type || 'review');
+  const [contentType, setContentType] = useState(initObj?.contentType || 'review');
+  const [tags, setTags] = useState(initObj?.tags || []);
   const { setMovies } = useOutletContext();
   const { addToKey, updateKey } = useCrudStateDB(setMovies, "movies");
   const movieId = parseInt(id);
@@ -29,7 +38,7 @@ const ReviewForm = ({ initObj }) => {
         rating: initObj.rating || "",
         reviewText: initObj.reviewText || "",
         title: initObj.title || "",
-        contentType: initObj.content_type || 'review',
+        contentType: initObj.contentType || 'review',
       }
     : {
         rating: 0,
@@ -45,10 +54,15 @@ const ReviewForm = ({ initObj }) => {
   const submitToDBAsync = async (body) => {
     // Transform camelCase to snake_case for the API
     const snakeBody = {
+      title: body.title,
       rating: body.rating,
       review_text: body.reviewText,
-      movie_id: body.movieId
+      movie_id: body.movieId,
+      tags: tags.map(tag => ({
+        name: typeof tag === 'string' ? tag : tag.name
+      }))
     };
+    
 
     if (initObj) {
       // For updates, we need to make the API call directly
@@ -88,6 +102,10 @@ const ReviewForm = ({ initObj }) => {
   };
 
   const validationSchema = Yup.object({
+    title: Yup.string()
+      .required("Review title is required")
+      .min(3, "Title must be at least 3 characters")
+      .max(100, "Title must be less than 100 characters"),
     rating: Yup.number()
       .required("Rating is required.")
       .min(1, "Rating must be at least 1.")
@@ -104,11 +122,35 @@ const ReviewForm = ({ initObj }) => {
       }),
   });
 
+  // Function to clean up rich text content
+  const cleanRichText = (html) => {
+    if (!html) return '';
+    
+    // Remove empty paragraphs with just line breaks and whitespace
+    const cleaned = html
+      .replace(/<p><br><\/p>/gi, '') // Remove empty paragraphs
+      .replace(/<p><br\/><\/p>/gi, '') // Remove empty paragraphs with self-closing br
+      .replace(/<p>\s*<\/p>/gi, '') // Remove paragraphs with only whitespace
+      .replace(/<p>&nbsp;<\/p>/gi, '') // Remove paragraphs with non-breaking spaces
+      .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '') // Remove paragraphs with whitespace and nbsp
+      .trim();
+    
+    // If only empty tags remain, return empty string
+    if (cleaned === '' || cleaned === '<p></p>' || cleaned === '<br>' || cleaned === '<p> </p>') {
+      return '';
+    }
+    
+    return cleaned;
+  };
+
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
       try {
+        // Clean up the rich text content
+        const cleanedReviewText = cleanRichText(values.reviewText);
+        
         // First, create or update the review
         const body = {
           ...Object.fromEntries(
@@ -117,9 +159,12 @@ const ReviewForm = ({ initObj }) => {
           movieId: movieId,
         };
 
-        // If there's a selected file but no review text, provide a placeholder
-        if (selectedFile && (!body.reviewText || body.reviewText.trim() === '')) {
-          body.reviewText = 'Document attached - see document viewer below for content.';
+        // Use cleaned review text
+        body.reviewText = cleanedReviewText;
+
+        // If there's a selected file but no review text, send empty string
+        if (selectedFile && (!cleanedReviewText || cleanedReviewText.trim() === '')) {
+          body.reviewText = '';
         }
 
         console.log('Submitting review with body:', body);
@@ -197,8 +242,8 @@ const ReviewForm = ({ initObj }) => {
     
     // Refresh the movies data to show updated review
     if (setMovies) {
-      // You might want to add a refresh function here
-      window.location.reload(); // Simple refresh for now
+      // TODO: Add proper refresh function instead of full page reload
+      // window.location.reload(); // Removed - causes unwanted page refresh
     }
   };
 
@@ -229,10 +274,29 @@ const ReviewForm = ({ initObj }) => {
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
-          <div>
-          <Stars rating={formik.values.rating} handleStarClick={updateRating} />
+          
+          {/* Rating Stars */}
+          <StarsContainer>
+            <Stars rating={formik.values.rating} handleStarClick={updateRating} />
             {formik.touched.rating && formik.errors.rating && (
               <Error>{formik.errors.rating}</Error>
+            )}
+          </StarsContainer>
+          
+          {/* Title Input */}
+          <div>
+            <label htmlFor="title">Review Title:</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formik.values.title}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter a title for your review..."
+            />
+            {formik.touched.title && formik.errors.title && (
+              <Error>{formik.errors.title}</Error>
             )}
           </div>
           <div>
@@ -263,18 +327,45 @@ const ReviewForm = ({ initObj }) => {
               <Error>{formik.errors.reviewText}</Error>
             )}
           </div>
+          
+          {/* Tags Input */}
+          <div>
+            <label htmlFor="tags">Tags (optional):</label>
+            <TagInput
+              tags={tags}
+              onTagsChange={setTags}
+              placeholder="Add tags to categorize your review..."
+            />
+          </div>
+          
           {submitError && <Error>{submitError}</Error>}
           
-          {/* Document Upload Component */}
+          {/* Display validation errors */}
+          {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
+          {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
+          {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
+          
+          {/* Document Upload Component - only show if we have a reviewId or are creating new */}
           <DocumentUpload
-            reviewId={initObj?.id}
+            reviewId={initObj?.id || (initObj === null ? 'new' : null)}
             onUploadSuccess={handleDocumentUploadSuccess}
             onUploadError={handleDocumentUploadError}
             onFileSelect={handleFileSelect}
             existingDocument={hasDocument ? initObj : null}
+            onRemoveDocument={() => {
+              // Just update local state - persistence will happen on form submit
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
           />
           
-          <Button type="submit">{initObj ? "Update" : "Submit"}</Button>
+          <Button type="submit">
+            {initObj ? "Update" : "Submit"}
+          </Button>
         </StyledForm>
       ) : (
         <ContentDisplay
@@ -282,7 +373,9 @@ const ReviewForm = ({ initObj }) => {
             ...formik.values,
             hasDocument: initObj?.hasDocument || false,
             documentFilename: initObj?.documentFilename || null,
-            documentType: initObj?.documentType || null
+            documentType: initObj?.documentType || null,
+            dateAdded: initObj?.dateAdded || null,
+            tags: tags
           }}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}

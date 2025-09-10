@@ -221,6 +221,7 @@ class Reviews(Resource):
     def post(self):
         data = request.get_json()
         new_review = Review(
+            title=data.get('title'),
             rating=data.get('rating'),
             review_text=data.get('review_text'),
             movie_id=data.get('movie_id')
@@ -242,6 +243,26 @@ class ReviewById(Resource):
             return {'error': 'Review not found'}, 404
         data = request.get_json()
         
+        # Handle tags separately since it's a relationship
+        if 'tags' in data:
+            tags_data = data.pop('tags')  # Remove tags from data
+            # Clear existing tags
+            review.tags.clear()
+            # Add new tags
+            for tag_data in tags_data:
+                if isinstance(tag_data, dict) and 'name' in tag_data:
+                    # Find or create tag
+                    tag = Tag.query.filter_by(name=tag_data['name'].lower().strip()).first()
+                    if not tag:
+                        tag = Tag(name=tag_data['name'].lower().strip())
+                        db.session.add(tag)
+                    review.tags.append(tag)
+        
+        # Handle movie separately since it's a relationship
+        if 'movie' in data:
+            data.pop('movie')  # Remove movie from data - relationship handled by movie_id
+        
+        # Handle other attributes normally
         for attr in data:
             setattr(review, attr, data.get(attr))
 
@@ -326,6 +347,22 @@ class ArticleById(Resource):
             return {'error': 'Article not found'}, 404
         data = request.get_json()
         
+        # Handle tags separately since it's a relationship
+        if 'tags' in data:
+            tags_data = data.pop('tags')  # Remove tags from data
+            # Clear existing tags
+            article.tags.clear()
+            # Add new tags
+            for tag_data in tags_data:
+                if isinstance(tag_data, dict) and 'name' in tag_data:
+                    # Find or create tag
+                    tag = Tag.query.filter_by(name=tag_data['name'].lower().strip()).first()
+                    if not tag:
+                        tag = Tag(name=tag_data['name'].lower().strip())
+                        db.session.add(tag)
+                    article.tags.append(tag)
+        
+        # Handle other attributes normally
         for attr in data:
             setattr(article, attr, data.get(attr))
 

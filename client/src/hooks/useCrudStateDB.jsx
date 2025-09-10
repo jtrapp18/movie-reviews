@@ -51,10 +51,11 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
     };
 
     const updateKey = (arrayKey, arrayId, body, itemId=null) => {
-      patchJSONToDb(arrayKey, arrayId, body)
+      return patchJSONToDb(arrayKey, arrayId, body)
       .then(json => {
         const jsonTransformed = snakeToCamel(json);
         updateKeyInState(arrayKey, jsonTransformed, itemId);
+        return jsonTransformed; // Return the transformed data
       });
     };
 

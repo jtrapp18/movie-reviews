@@ -3,15 +3,25 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer } from '../MiscStyling';
 import MovieCard from '../cards/MovieCard';
-import { getJSON } from '../helper';
+import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
 
 const MovieContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
-  margin-bottom: 30px;
+  margin-top: 30px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: 1px solid var(--cinema-gold);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+  zoom: 0.5;
+
+  &:hover {
+    zoom: 1;
+  }
 `;
 
 function MovieReview() {
@@ -22,7 +32,7 @@ function MovieReview() {
   useEffect(() => {
     const fetchMovie = async () => {
       const movie = await getJSON('movies', movieId);
-      setMovie(movie);
+      setMovie(snakeToCamel(movie));
     };
     
     fetchMovie();

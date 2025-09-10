@@ -27,9 +27,8 @@ const TagContainer = styled.div`
 
   .tag-remove {
     margin-left: 6px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    opacity: 0.7;
+    color: ${props => props.textColor || 'white'};
+    cursor: pointer;
     
     &:hover {
       opacity: 1;

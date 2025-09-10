@@ -45,9 +45,10 @@ class Review(db.Model, SerializerMixin):
         if not value or not value.strip():
             if hasattr(self, 'content_type') and self.content_type == 'article':
                 return ""
-            # Only require text for movie reviews
+            # Only require text for movie reviews if no document is attached
             if hasattr(self, 'content_type') and self.content_type == 'review':
-                raise ValueError("Review text cannot be empty.")
+                if not getattr(self, 'has_document', False):
+                    raise ValueError("Review text cannot be empty.")
         return value.strip() if value else ""
 
     @validates('content_type')

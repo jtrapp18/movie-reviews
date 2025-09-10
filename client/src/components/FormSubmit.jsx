@@ -1,5 +1,6 @@
 import { StyledSubmit, Button } from '../MiscStyling'
 import DocumentViewer from './DocumentViewer'
+import Stars from './Stars'
 import styled from 'styled-components'
 
 const ContentHeader = styled.div`
@@ -31,6 +32,12 @@ const Rating = styled.span`
   font-weight: bold;
 `;
 
+const StarsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+`;
+
 const TagsContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -60,16 +67,31 @@ const ContentText = styled.div`
   }
 `;
 
-const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
+const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
   const isReview = formValues.contentType === 'review';
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
   const hasContent = (formValues.reviewText || formValues.review_text) && (formValues.reviewText || formValues.review_text).trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
 
+  // Function to strip HTML tags and render as plain text
+  const stripHtml = (html) => {
+    if (!html) return '';
+    // Create a temporary div to parse HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return temp.textContent || temp.innerText || '';
+  };
+
   return (
     <StyledSubmit>
       <ContentHeader>
         <ContentTitle>{formValues.title}</ContentTitle>
+        
+        {hasRating && (
+          <StarsContainer>
+            <Stars rating={formValues.rating} />
+          </StarsContainer>
+        )}
         
         <ContentMeta>
           {(formValues.dateAdded || formValues.date_added) && (
@@ -78,9 +100,6 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
               month: 'long', 
               day: 'numeric' 
             })}</PublishDate>
-          )}
-          {hasRating && (
-            <Rating>Rating: {formValues.rating}/10</Rating>
           )}
         </ContentMeta>
 
@@ -97,17 +116,19 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
 
       {hasContent && (
         <ContentText>
-          <p>{formValues.reviewText || formValues.review_text}</p>
+          <p>{stripHtml(formValues.reviewText || formValues.review_text)}</p>
         </ContentText>
       )}
 
       {hasDocument && (
-        <DocumentViewer
-          documentUrl={`/api/view_document/${reviewId}`}
-          documentType={formValues.documentType}
-          filename={formValues.documentFilename}
-          hasDocument={formValues.hasDocument}
-        />
+        <div>
+          <DocumentViewer
+            documentUrl={`/api/view_document/${reviewId}`}
+            documentType={formValues.documentType}
+            filename={formValues.documentFilename}
+            hasDocument={formValues.hasDocument}
+          />
+        </div>
       )}
 
       <Button 

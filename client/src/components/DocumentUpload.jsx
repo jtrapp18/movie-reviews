@@ -15,6 +15,7 @@ const UploadContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  align-items: center;
   
   &.drag-over {
     border-color: var(--cinema-gold-dark);
@@ -62,11 +63,14 @@ const CheckboxContainer = styled.div`
   gap: 8px;
 `;
 
-const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocument, onFileSelect }) => {
+const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocument, onFileSelect, onRemoveDocument }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState(null);
   const [replaceText, setReplaceText] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showSelectedFilePreview, setShowSelectedFilePreview] = useState(false);
+  const [selectedFilePreviewUrl, setSelectedFilePreviewUrl] = useState(null);
 
   const allowedTypes = ['.pdf', '.docx', '.doc'];
   const maxFileSize = 10 * 1024 * 1024; // 10MB
@@ -128,38 +132,35 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
     }
   };
 
-  const handlePreview = async () => {
-    if (!reviewId) return;
+  const handlePreview = () => {
+    setShowPreview(!showPreview);
+  };
+
+  const handlePreviewSelectedFile = () => {
+    if (!selectedFile) return;
     
-    try {
-      const response = await fetch(`/api/document_preview/${reviewId}`);
-      const result = await response.json();
-      
-      if (response.ok) {
-        // Show preview in a modal or new window
-        const previewWindow = window.open('', '_blank', 'width=800,height=600');
-        previewWindow.document.write(`
-          <html>
-            <head><title>Document Preview</title></head>
-            <body>
-              <h2>Document Preview: ${result.filename}</h2>
-              <div style="white-space: pre-wrap; font-family: Arial, sans-serif; padding: 20px;">
-                ${result.preview}
-              </div>
-            </body>
-          </html>
-        `);
-      } else {
-        setError(result.error || 'Preview failed');
-      }
-    } catch (err) {
-      setError('Failed to load preview');
+    const fileExtension = '.' + selectedFile.name.split('.').pop().toLowerCase();
+    
+    if (fileExtension === '.pdf') {
+      // For PDFs, create an object URL for preview
+      const url = URL.createObjectURL(selectedFile);
+      setSelectedFilePreviewUrl(url);
+      setShowSelectedFilePreview(!showSelectedFilePreview);
+    } else {
+      // For Word documents, show a message
+      alert('Preview for Word documents will be available after upload.');
     }
   };
 
   const clearFile = () => {
+    // Clean up object URL if it exists
+    if (selectedFilePreviewUrl) {
+      URL.revokeObjectURL(selectedFilePreviewUrl);
+      setSelectedFilePreviewUrl(null);
+    }
     setSelectedFile(null);
     setError(null);
+    setShowSelectedFilePreview(false);
     
     // Notify parent component that file was cleared
     if (onFileSelect) {
@@ -177,19 +178,49 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
       <h4><FaFileUpload /> Document Upload</h4>
       <p>Upload a PDF or Word document to attach to your review</p>
       
-      {existingDocument && (
+      {existingDocument && !selectedFile && (
         <FileInfo>
-          <strong><FaPaperclip /> Attached Document:</strong> {existingDocument.document_filename}
-          <br />
-          <small>Type: {existingDocument.document_type?.toUpperCase()}</small>
+          <strong><FaPaperclip /> Attached Document:</strong> {existingDocument.documentFilename}
           <DocumentActions>
             <Button onClick={handlePreview}><FaEye /> Preview</Button>
             <Button onClick={handleDownload}><FaDownload /> Download</Button>
+            {onRemoveDocument && (
+              <Button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onRemoveDocument();
+                }}
+              >
+                <FaTimes /> Remove Document
+              </Button>
+            )}
           </DocumentActions>
         </FileInfo>
       )}
       
-      {!existingDocument && (
+      {showPreview && existingDocument && !selectedFile && (
+        <div style={{ 
+          marginTop: '10px', 
+          border: '1px solid var(--cinema-gold)', 
+          borderRadius: '8px',
+          overflow: 'hidden'
+        }}>
+          <iframe
+            src={`/api/view_document/${reviewId}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
+            width="100%"
+            height="300px"
+            style={{
+              border: 'none',
+              display: 'block',
+              backgroundColor: 'var(--cinema-black)'
+            }}
+            title="Document Preview"
+          />
+        </div>
+      )}
+      
+      {(!existingDocument || selectedFile) && (
         <>
           <FileInput
             type="file"
@@ -197,11 +228,9 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
             accept=".pdf,.docx,.doc"
             onChange={handleFileInputChange}
           />
-          <label htmlFor="document-upload">
-            <Button as="span">
-              <FaFileAlt /> Choose File
-            </Button>
-          </label>
+          <Button onClick={() => document.getElementById('document-upload').click()}>
+            <FaFileAlt /> Choose File
+          </Button>
           
           <p>or drag and drop your file here</p>
           
@@ -213,9 +242,31 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
               <br />
               <small style={{color: '#28a745'}}><FaCheck /> File will be uploaded when you submit the review</small>
               <DocumentActions>
+                <Button onClick={handlePreviewSelectedFile}><FaEye /> Preview</Button>
                 <Button onClick={clearFile}><FaTimes /> Remove File</Button>
               </DocumentActions>
             </FileInfo>
+          )}
+          
+          {showSelectedFilePreview && selectedFile && selectedFilePreviewUrl && (
+            <div style={{ 
+              marginTop: '10px', 
+              border: '1px solid var(--cinema-gold)', 
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}>
+              <iframe
+                src={selectedFilePreviewUrl}
+                width="100%"
+                height="300px"
+                style={{
+                  border: 'none',
+                  display: 'block',
+                  backgroundColor: 'var(--cinema-black)'
+                }}
+                title="Selected File Preview"
+              />
+            </div>
           )}
           
           <CheckboxContainer>

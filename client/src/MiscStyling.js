@@ -73,7 +73,7 @@ const StyledForm = styled.form`
     background: var(--cinema-gold-dark);
   }
 
-  div:not(:last-child) {
+  div {
     margin-bottom: 12px;
   }
 
@@ -165,12 +165,16 @@ const BorderGlow = styled.span`
   animation: fadeIn 0.8s ease-in-out forwards;
 `
 
-const Button = styled.button`
+const Button = styled.button.attrs(props => ({
+  type: props.type || 'button'
+}))`
+  width: fit-content;
+  margin: 5px;
   color: black;
   background: var(--cinema-gold);
   border: 2px solid var(--cinema-gold);
   border-radius: 20px;
-  padding: 12px;
+  padding: 10px;
   min-width: 120px;
   height: fit-content;
   font-size: 1rem;

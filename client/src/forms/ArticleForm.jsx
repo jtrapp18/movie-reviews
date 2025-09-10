@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
@@ -10,13 +10,28 @@ import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
-import useCrudStateDB from "../hooks/useCrudStateDB";
+import { patchJSONToDb, postJSONToDb, snakeToCamel } from "../helper";
 
 const ArticleForm = ({ initObj }) => {
   const { id } = useParams();
   // Check if we're creating a new article (no id and no existing article data)
   const isNewArticle = !id && (!initObj || !initObj.id);
   const [isEditing, setIsEditing] = useState(isNewArticle);
+
+  // Suppress ReactQuill findDOMNode warning
+  useEffect(() => {
+    const originalWarn = console.warn;
+    console.warn = (message, ...args) => {
+      if (typeof message === 'string' && message.includes('findDOMNode')) {
+        return; // Suppress this specific warning
+      }
+      originalWarn(message, ...args);
+    };
+    
+    return () => {
+      console.warn = originalWarn;
+    };
+  }, []);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || initObj?.has_document || false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -24,7 +39,6 @@ const ArticleForm = ({ initObj }) => {
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
   const [tags, setTags] = useState(initObj?.tags || []);
   const { setMovies } = useOutletContext();
-  const { addToKey, updateKey } = useCrudStateDB(setMovies, "articles");
 
   const initialValues = initObj
     ? {
@@ -38,9 +52,17 @@ const ArticleForm = ({ initObj }) => {
         contentType: 'article',
       };
 
-  const submitToDB = (initObj && initObj.id)
-    ? (body) => updateKey("articles", initObj.id, body)
-    : (body) => addToKey("articles", body);
+  const submitToDB = async (body) => {
+    if (initObj && initObj.id) {
+      // Update existing article
+      const response = await patchJSONToDb("articles", initObj.id, body);
+      return snakeToCamel(response);
+    } else {
+      // Create new article
+      const response = await postJSONToDb("articles", body);
+      return snakeToCamel(response);
+    }
+  };
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -59,6 +81,27 @@ const ArticleForm = ({ initObj }) => {
       }),
   });
 
+  // Function to clean up rich text content
+  const cleanRichText = (html) => {
+    if (!html) return '';
+    
+    // Remove empty paragraphs with just line breaks and whitespace
+    const cleaned = html
+      .replace(/<p><br><\/p>/gi, '') // Remove empty paragraphs
+      .replace(/<p><br\/><\/p>/gi, '') // Remove empty paragraphs with self-closing br
+      .replace(/<p>\s*<\/p>/gi, '') // Remove paragraphs with only whitespace
+      .replace(/<p>&nbsp;<\/p>/gi, '') // Remove paragraphs with non-breaking spaces
+      .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '') // Remove paragraphs with whitespace and nbsp
+      .trim();
+    
+    // If only empty tags remain, return empty string
+    if (cleaned === '' || cleaned === '<p></p>' || cleaned === '<br>' || cleaned === '<p> </p>') {
+      return '';
+    }
+    
+    return cleaned;
+  };
+
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -66,19 +109,22 @@ const ArticleForm = ({ initObj }) => {
       try {
         setSubmitError(null);
         
+        // Clean up the rich text content
+        const cleanedReviewText = cleanRichText(values.reviewText);
+        
         // Prepare the body for article submission
         const body = {
           title: values.title,
-          review_text: values.reviewText,
+          review_text: cleanedReviewText,
           content_type: 'article',
           movie_id: null, // Articles don't have movie_id
           rating: null,   // Articles don't have ratings
           tags: tags,     // Include tags
         };
 
-        // If a file is selected, set placeholder text
-        if (selectedFile && !values.reviewText.trim()) {
-          body.review_text = 'Document attached - see document viewer below for content.';
+        // If a file is selected, send empty string
+        if (selectedFile && (!cleanedReviewText || cleanedReviewText.trim() === '')) {
+          body.review_text = '';
         }
         
         const result = await submitToDB(body);
@@ -103,7 +149,15 @@ const ArticleForm = ({ initObj }) => {
           
           // Update the initObj reference if it exists (for existing articles)
           if (initObj !== null) {
-            Object.assign(initObj, articleData);
+            // Preserve existing document data if not in response
+            const updatedData = {
+              ...articleData,
+              hasDocument: result.has_document !== undefined ? result.has_document : initObj.hasDocument,
+              documentFilename: result.document_filename || initObj.documentFilename,
+              documentType: result.document_type || initObj.documentType,
+              documentUrl: initObj.documentUrl // Preserve the document URL
+            };
+            Object.assign(initObj, updatedData);
           }
         }
 
@@ -241,7 +295,7 @@ const ArticleForm = ({ initObj }) => {
           </div>
           
           <div style={{ marginTop: '30px', marginBottom: '20px' }}>
-            <Button type="submit">{initObj ? "Update Article" : "Create Article"}</Button>
+            <Button type="submit">{initObj ? "Save Changes" : "Create Article"}</Button>
           </div>
         </StyledForm>
       ) : (
