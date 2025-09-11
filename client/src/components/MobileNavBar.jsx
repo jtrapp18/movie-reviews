@@ -1,11 +1,14 @@
 import styled from "styled-components";
 import { useState, useRef, useEffect, useContext } from "react";
-import { StyledNavLink } from "../MiscStyling";
+import { StyledNavLink, StyledLink } from "../MiscStyling";
 import { scrollToTop } from "../helper";
 import { UserContext } from '../context/userProvider';
 import { AdminContext } from '../context/adminProvider';
 import { userLogout } from "../helper";
 
+const StyledMobileMenu = styled(StyledLink)`
+  color: var(--cinema-gold-dark);
+`
 const StyledMobileLink = styled(StyledNavLink)`
   color: var(--cinema-gold-dark);
 
@@ -158,20 +161,12 @@ const MobileNavBar = () => {
         </StyledMobileLink>
         {isAdmin && (
           <>
-            <StyledMobileLink
-              to="/account_details"
-              className="nav-link"
-              onClick={handleClick}
-            >
-              Account Details
-            </StyledMobileLink>
-            <StyledMobileLink
-              to="/"
+            <StyledMobileMenu
               className="nav-link"
               onClick={handleAdminLogout}
             >
               Logout Admin
-            </StyledMobileLink>
+            </StyledMobileMenu>
           </>
         )}
       </LinkContainer>

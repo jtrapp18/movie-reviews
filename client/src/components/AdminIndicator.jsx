@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import { AdminContext } from '../context/adminProvider';
+import { FaCrown, FaTimes } from 'react-icons/fa';
 import styled from 'styled-components';
 
 const AdminBadge = styled.div`
   position: fixed;
-  top: 20px;
-  right: 20px;
+  bottom: 10px;
+  left: 10px;
   background: var(--cinema-gold);
   color: var(--cinema-black);
   padding: 8px 16px;
@@ -19,8 +20,10 @@ const AdminBadge = styled.div`
   gap: 8px;
 `;
 
-const AdminIcon = styled.span`
+const AdminIcon = styled.div`
   font-size: 1.2rem;
+  display: flex;
+  align-items: center;
 `;
 
 function AdminIndicator() {
@@ -30,7 +33,9 @@ function AdminIndicator() {
 
   return (
     <AdminBadge>
-      <AdminIcon>👑</AdminIcon>
+      <AdminIcon>
+        <FaCrown />
+      </AdminIcon>
       Admin Mode
       <button 
         onClick={logoutAdmin}
@@ -40,11 +45,13 @@ function AdminIndicator() {
           color: 'var(--cinema-black)',
           cursor: 'pointer',
           fontSize: '1rem',
-          marginLeft: '8px'
+          marginLeft: '8px',
+          display: 'flex',
+          alignItems: 'center'
         }}
         title="Logout Admin"
       >
-        ✕
+        <FaTimes />
       </button>
     </AdminBadge>
   );

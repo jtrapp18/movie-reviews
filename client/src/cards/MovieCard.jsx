@@ -1,6 +1,7 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { StyledCard } from '../MiscStyling';
 import useCrudStateDB from "../hooks/useCrudStateDB";
+import { useAdmin } from '../hooks/useAdmin';
 
 function MovieCard({ movie }) {
 
@@ -9,6 +10,7 @@ function MovieCard({ movie }) {
 
     const navigate = useNavigate();
     const { setMovies } = useOutletContext();
+    const { isAdmin } = useAdmin();
 
     const handleClick = async () => {  // Mark handleClick as async
         console.log('MovieCard handleClick called with movie:', movie);
@@ -16,7 +18,14 @@ function MovieCard({ movie }) {
         console.log('!movie.id:', !movie.id);
         
         if (!movie.id) {
-            console.log('External movie - showing confirmation dialog');
+            // External movie - check if admin
+            if (!isAdmin) {
+                console.log('Non-admin user clicked external movie - showing no reviews message');
+                alert(`No reviews available for "${title}".`);
+                return;
+            }
+            
+            console.log('Admin user - showing confirmation dialog');
             const confirmed = window.confirm(`Do you want to add a review for "${title}"?`);
             if (confirmed) {
                 console.log('User confirmed - creating new movie');

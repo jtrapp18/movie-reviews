@@ -7,19 +7,6 @@ import styled from 'styled-components';
 import Logo from './Logo';
 import {UserContext} from '../context/userProvider'
 
-const StyledHeadRoom = styled(Headroom)`
-
-  .headroom {
-    #logged-in {
-      position: absolute;
-      right: 10vw;
-      top: 0;
-      color: var(--honey);
-    }
-
-  }
-`
-
 const StyledHeader = styled.div`
   width: 100%;
   height: var(--height-header);
@@ -53,14 +40,13 @@ const Header = () => {
   const { user } = useContext(UserContext);
     
     return (
-        <StyledHeadRoom>
+        <Headroom>
           <StyledHeader>
             <VintagePhotoRoll />
             <Logo />
             {isMobile ? <MobileNavBar /> : <NavBar />}
           </StyledHeader>
-            {user && !isMobile && <span id='logged-in'>{`Logged in as ${user.username}`}</span>}
-        </StyledHeadRoom>
+        </Headroom>
     );
 }
 

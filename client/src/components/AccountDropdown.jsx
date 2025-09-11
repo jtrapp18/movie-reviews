@@ -100,14 +100,7 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
         className={isMenuOpen ? "open" : "closed"}
       >
         <StyledNavLink
-          to="/account_details"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Account Details
-        </StyledNavLink>
-        <StyledNavLink
-            to="/"
+            as="button"
             className="nav-link"
             onClick={handleAdminLogout}
         >
