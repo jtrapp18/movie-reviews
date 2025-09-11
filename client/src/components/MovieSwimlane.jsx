@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
+import { getMovieRatings } from '../helper';
 
 const SwimlaneContainer = styled.div`
   margin-bottom: 40px;
@@ -54,6 +55,16 @@ const EmptyMessage = styled.div`
 `;
 
 const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
+  const [ratingsMap, setRatingsMap] = useState({});
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      const ratings = await getMovieRatings(movies);
+      setRatingsMap(ratings);
+    };
+    fetchRatings();
+  }, [movies]);
+
   if (!movies || movies.length === 0) {
     return null; // Don't render empty swimlanes
   }
@@ -62,14 +73,35 @@ const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
     <SwimlaneContainer>
       <SwimlaneHeader>{genre.name}</SwimlaneHeader>
       <MoviesContainer>
-        {movies.map((movie) => (
-          <MovieCardWrapper key={movie.id}>
-            <MovieCard
-              movie={movie}
-              onClick={() => onMovieClick(movie)}
-            />
-          </MovieCardWrapper>
-        ))}
+        {movies.map((movie) => {
+          // Get rating for this movie
+          let rating = null;
+          let movieWithCorrectId = movie;
+          
+          if (movie.externalId) {
+            // External movie - look up by external ID
+            const movieData = ratingsMap[movie.externalId];
+            rating = movieData?.rating || null;
+            const localId = movieData?.local_id;
+            if (localId) {
+              movieWithCorrectId = { ...movie, id: localId };
+            }
+          } else {
+            // Local movie - look up by local ID
+            const localData = ratingsMap[movie.id];
+            rating = localData?.rating || null;
+          }
+          
+          return (
+            <MovieCardWrapper key={movie.externalId || movie.id}>
+              <MovieCard
+                movie={movieWithCorrectId}
+                rating={rating}
+                onClick={() => onMovieClick(movie)}
+              />
+            </MovieCardWrapper>
+          );
+        })}
       </MoviesContainer>
     </SwimlaneContainer>
   );

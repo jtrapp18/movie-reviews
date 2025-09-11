@@ -2,8 +2,9 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { StyledCard } from '../MiscStyling';
 import useCrudStateDB from "../hooks/useCrudStateDB";
 import { useAdmin } from '../hooks/useAdmin';
+import StarRatingOverlay from '../components/StarRatingOverlay';
 
-function MovieCard({ movie }) {
+function MovieCard({ movie, rating = null }) {
 
     const { originalLanguage, originalTitle, overview, 
         title, releaseDate, coverPhoto } = movie;
@@ -15,41 +16,47 @@ function MovieCard({ movie }) {
     const handleClick = async () => {  // Mark handleClick as async
         console.log('MovieCard handleClick called with movie:', movie);
         console.log('movie.id:', movie.id);
-        console.log('!movie.id:', !movie.id);
+        console.log('rating:', rating);
         
-        if (!movie.id) {
-            // External movie - check if admin
-            if (!isAdmin) {
-                console.log('Non-admin user clicked external movie - showing no reviews message');
-                alert(`No reviews available for "${title}".`);
-                return;
-            }
-            
-            console.log('Admin user - showing confirmation dialog');
-            const confirmed = window.confirm(`Do you want to add a review for "${title}"?`);
-            if (confirmed) {
-                console.log('User confirmed - creating new movie');
-                const { addItem } = useCrudStateDB(setMovies, "movies");
-                const newId = await addItem(movie); // Use await correctly
-                console.log('Created movie with newId:', newId);
-                navigate(`/movies/${newId}`);
-            } else {
-                console.log('User cancelled - not creating movie');
-            }
-        }
-        else {
-            console.log('Navigating to existing movie with id:', movie.id);
+        // If we have a rating, this movie exists locally - navigate to it
+        if (rating) {
+            console.log('Movie has local rating - navigating to existing review');
             navigate(`/movies/${movie.id}`);
+            return;
+        }
+        
+        // External movie without local review - check if admin
+        if (!isAdmin) {
+            console.log('Non-admin user clicked external movie - showing no reviews message');
+            alert(`No reviews available for "${title}".`);
+            return;
+        }
+        
+        console.log('Admin user - showing confirmation dialog');
+        const confirmed = window.confirm(`Do you want to add a review for "${title}"?`);
+        if (confirmed) {
+            console.log('User confirmed - creating new movie');
+            const { addItem } = useCrudStateDB(setMovies, "movies");
+            // Add externalId to the movie data for backend
+            const movieData = {
+                ...movie,
+            };
+            const newId = await addItem(movieData); // Use await correctly
+            console.log('Created movie with newId:', newId);
+            navigate(`/movies/${newId}`);
+        } else {
+            console.log('User cancelled - not creating movie');
         }
     };
 
     return (
         <StyledCard onClick={handleClick}>
-            <h2>{title}</h2>
             <img
                 src={coverPhoto}
                 alt={`${title} poster`}
             />
+            {rating && <StarRatingOverlay rating={rating} />}
+            <h2>{title}</h2>
 
             <div className='movie-details'>
                 <div className='movie-metadata'>

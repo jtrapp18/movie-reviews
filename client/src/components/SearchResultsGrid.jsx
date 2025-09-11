@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
+import { getMovieRatings } from '../helper';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -38,12 +39,40 @@ const MovieCardWrapper = styled.div`
 `;
 
 const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
+  const [ratingsMap, setRatingsMap] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (!movies || movies.length === 0) {
+        setLoading(false);
+        return;
+      }
+      
+      const ratings = await getMovieRatings(movies);
+      setRatingsMap(ratings);
+      setLoading(false);
+    };
+    
+    fetchRatings();
+  }, [movies]);
+
   if (!movies || movies.length === 0) {
     return (
       <GridContainer>
         <GridHeader>
           <GridTitle>No Results Found</GridTitle>
           <ResultsCount>Try a different search term</ResultsCount>
+        </GridHeader>
+      </GridContainer>
+    );
+  }
+
+  if (loading) {
+    return (
+      <GridContainer>
+        <GridHeader>
+          <GridTitle>Loading...</GridTitle>
         </GridHeader>
       </GridContainer>
     );
@@ -57,14 +86,27 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
       </GridHeader>
       
       <MoviesGrid>
-        {movies.map((movie) => (
-          <MovieCardWrapper key={movie.id}>
-            <MovieCard
-              movie={movie}
-              onClick={() => onMovieClick(movie)}
-            />
-          </MovieCardWrapper>
-        ))}
+        {movies.map((movie) => {
+          const movieData = ratingsMap[movie.externalId];
+          const rating = movieData?.rating || null;
+          const localId = movieData?.local_id;
+          
+          // If we have a local ID, use it for navigation
+          // Otherwise, keep the external ID for creating new movies
+          const movieWithCorrectId = localId 
+            ? { ...movie, id: localId }
+            : movie;
+          
+          return (
+            <MovieCardWrapper key={movie.externalId || movie.id}>
+              <MovieCard
+                movie={movieWithCorrectId}
+                rating={rating}
+                onClick={() => onMovieClick(movie)}
+              />
+            </MovieCardWrapper>
+          );
+        })}
       </MoviesGrid>
     </GridContainer>
   );

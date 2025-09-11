@@ -24,6 +24,7 @@
 15. [✅] **DRY up duplicate code** - Created shared components: PageContainer (Completed: Consolidated duplicate styling, removed over-engineered components)
 16. [✅] **Fix articles carousel autoplay** - Articles carousel not auto-scrolling despite correct settings (6 articles, autoplay enabled) (Fixed: Working now)
 17. [✅] **Fix add article button visibility** - Add article button not showing on articles page (Fixed: Moved button after carousel, fixed overflow issue)
+18. [ ] **Fix intermittent file upload errors** - File uploads for reviews sometimes fail, doesn't happen every time (Bug reported)
 
 ## Status Legend
 - [ ] Pending

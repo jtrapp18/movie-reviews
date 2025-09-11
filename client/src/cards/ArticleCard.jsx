@@ -92,7 +92,6 @@ function ArticleCard({ article }) {
   };
 
   const formatDate = (dateString) => {
-    console.log('Article date field:', dateString, 'Type:', typeof dateString);
     if (!dateString) return 'No date';
     
     try {

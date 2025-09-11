@@ -138,6 +138,7 @@ async function getMovieInfo(searchQuery=null) {
     const data = await res.json();
     const camelData = snakeToCamel(data.results)
     const movieInfo = camelData.map(m => ({
+      externalId: m.id,
       originalLanguage: m.originalLanguage,
       originalTitle: m.originalTitle,
       overview: m.overview,
@@ -175,6 +176,7 @@ async function getMoviesByGenre(genreId, searchQuery=null) {
     const data = await res.json();
     const camelData = snakeToCamel(data.results || [])
     const movieInfo = camelData.map(m => ({
+      externalId: m.id, // Also store as externalId for clarity
       originalLanguage: m.originalLanguage,
       originalTitle: m.originalTitle,
       overview: m.overview,
@@ -263,5 +265,116 @@ const scrollToTop = () => {
   });
 };
 
+async function getLocalMovieRatings() {
+  try {
+    const res = await fetch('/api/movies');
+    if (!res.ok) {
+      console.error(`Error fetching local movies! Status: ${res.status}`);
+      return {};
+    }
+    
+    const movies = await res.json();
+    const ratingsMap = {};
+    
+    movies.forEach(movie => {
+      if (movie.reviews && movie.reviews.length > 0) {
+        // Get the first review's rating (assuming one review per movie)
+        const rating = movie.reviews[0].rating;
+        if (rating && rating > 0) {
+          // Always store by local ID
+          ratingsMap[movie.id] = {
+            rating: rating,
+            localId: movie.id
+          };
+          
+          // Also store by external ID if it exists (for search results)
+          if (movie.externalId) {
+            ratingsMap[movie.externalId] = {
+              rating: rating,
+              localId: movie.id
+            };
+          }
+        }
+      }
+    });
+    
+    return ratingsMap;
+  } catch (err) {
+    console.error('Error fetching local movie ratings:', err);
+    return {};
+  }
+}
+
+async function getMovieRatingsByExternalIds(externalIds) {
+  try {
+    const res = await fetch('/api/movie-ratings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ external_ids: externalIds })
+    });
+    
+    if (!res.ok) {
+      console.error(`Error fetching movie ratings! Status: ${res.status}`);
+      return {};
+    }
+    
+    const ratingsMap = await res.json();
+    return ratingsMap;
+  } catch (err) {
+    console.error('Error fetching movie ratings by external IDs:', err);
+    return {};
+  }
+}
+
+async function getIdFromExternalId(externalId) {
+  try {
+    const res = await fetch('/api/movies');
+    if (!res.ok) {
+      console.error(`Error fetching local movies! Status: ${res.status}`);
+      return null;
+    }
+    
+    const movies = await res.json();
+    const movie = movies.find(m => m.external_id === externalId);
+    return movie ? movie.id : null;
+  } catch (err) {
+    console.error('Error fetching local movie by external ID:', err);
+    return null;
+  }
+}
+
+// Helper function to get ratings for a list of movies (handles both local and external)
+async function getMovieRatings(movies) {
+  if (!movies || movies.length === 0) return {};
+  
+  // Separate local and external movies
+  const localMovies = movies.filter(movie => !movie.externalId);
+  const externalMovies = movies.filter(movie => movie.externalId);
+  
+  const ratingsMap = {};
+  
+  // Get ratings for local movies
+  if (localMovies.length > 0) {
+    const localRatings = await getLocalMovieRatings();
+    localMovies.forEach(movie => {
+      const localData = localRatings[movie.id];
+      if (localData) {
+        ratingsMap[movie.id] = localData;
+      }
+    });
+  }
+  
+  // Get ratings for external movies
+  if (externalMovies.length > 0) {
+    const externalIds = externalMovies.map(movie => movie.externalId);
+    const externalRatings = await getMovieRatingsByExternalIds(externalIds);
+    Object.assign(ratingsMap, externalRatings);
+  }
+  
+  return ratingsMap;
+}
+
 export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
-  getMovieInfo, getMoviesByGenre, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};
+  getMovieInfo, getMoviesByGenre, getLocalMovieRatings, getMovieRatingsByExternalIds, getMovieRatings, getIdFromExternalId, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};

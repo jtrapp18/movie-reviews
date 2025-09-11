@@ -451,6 +451,40 @@ class DiscoverMovies(Resource):
         else:
             return {'error': f'Failed to fetch movies. Status {response.status_code}: {response.text}'}, response.status_code
 
+class MovieRatings(Resource):
+    """Get ratings for movies by external IDs."""
+    
+    def post(self):
+        """Get local movie ratings for a list of external IDs."""
+        try:
+            data = request.get_json()
+            external_ids = data.get('external_ids', [])
+            
+            if not external_ids:
+                return {}, 200
+            
+            # Single efficient query to get movies with ratings
+            movies_with_ratings = db.session.query(
+                Movie.id, 
+                Movie.external_id, 
+                Review.rating
+            ).join(Review).filter(
+                Movie.external_id.in_(external_ids)
+            ).all()
+            
+            # Build response mapping external_id -> {local_id, rating}
+            ratings_map = {}
+            for movie in movies_with_ratings:
+                ratings_map[movie.external_id] = {
+                    'local_id': movie.id,
+                    'rating': movie.rating
+                }
+            
+            return ratings_map, 200
+            
+        except Exception as e:
+            return {'error': f'Failed to fetch ratings: {str(e)}'}, 500
+
 class DocumentUpload(Resource):
     """Handle document uploads for reviews."""
     
@@ -615,6 +649,7 @@ api.add_resource(ArticleById, '/api/articles/<int:article_id>')
 api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DiscoverMovies, '/api/discover_movies')
+api.add_resource(MovieRatings, '/api/movie-ratings')
 api.add_resource(DocumentUpload, '/api/upload_document')
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
 api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
