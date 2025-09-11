@@ -228,6 +228,23 @@ class Reviews(Resource):
             movie_id=data.get('movie_id')
         )
         db.session.add(new_review)
+        db.session.flush()  # Flush to get the review ID
+        
+        # Handle tags if provided
+        if data.get('tags'):
+            for tag_data in data['tags']:
+                tag_name = tag_data.get('name', '').strip().lower()
+                if tag_name:
+                    # Find or create tag
+                    tag = Tag.query.filter_by(name=tag_name).first()
+                    if not tag:
+                        tag = Tag(name=tag_name)
+                        db.session.add(tag)
+                        db.session.flush()
+                    
+                    # Associate tag with review
+                    new_review.tags.append(tag)
+        
         db.session.commit()
         return new_review.to_dict(), 201
 

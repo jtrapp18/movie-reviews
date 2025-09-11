@@ -45,8 +45,14 @@ class Review(db.Model, SerializerMixin):
         if not value or not value.strip():
             if hasattr(self, 'content_type') and self.content_type == 'article':
                 return ""
-            # Only require text for movie reviews if no document is attached
+            # For movie reviews, allow empty text if this is being updated with a document
+            # Check if this is a PATCH request by looking at the request context
+            from flask import request
             if hasattr(self, 'content_type') and self.content_type == 'review':
+                # Allow empty text for PATCH requests (document uploads)
+                if request.method == 'PATCH':
+                    return ""
+                # Only require text for POST requests (new reviews)
                 if not getattr(self, 'has_document', False):
                     raise ValueError("Review text cannot be empty.")
         return value.strip() if value else ""

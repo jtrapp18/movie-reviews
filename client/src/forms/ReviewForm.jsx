@@ -64,6 +64,9 @@ const ReviewForm = ({ initObj }) => {
       }))
     };
     
+    console.log('Tags being sent:', tags);
+    console.log('SnakeBody tags:', snakeBody.tags);
+    
 
     if (initObj) {
       // For updates, we need to make the API call directly
@@ -77,7 +80,7 @@ const ReviewForm = ({ initObj }) => {
       
       if (response.ok) {
         const result = await response.json();
-        updateKey("reviews", initObj.id, result, movieId);
+        // Don't update state here - let the document upload complete first
         return result;
       } else {
         throw new Error('Failed to update review');
@@ -94,7 +97,7 @@ const ReviewForm = ({ initObj }) => {
       
       if (response.ok) {
         const result = await response.json();
-        addToKey("reviews", result, movieId);
+        // Don't update state here - let the document upload complete first
         return result;
       } else {
         throw new Error('Failed to create review');
@@ -191,11 +194,28 @@ const ReviewForm = ({ initObj }) => {
             if (uploadResponse.ok) {
               const uploadResult = await uploadResponse.json();
               console.log('Upload successful:', uploadResult);
+              console.log('ReviewResult (from initial creation):', reviewResult);
+              console.log('UploadResult.review (from document upload):', uploadResult.review);
               handleDocumentUploadSuccess(uploadResult);
+              
+              // Now update the frontend state with the complete review data
+              // Use uploadResult.review which contains the complete review with document info
+              if (initObj) {
+                updateKey("reviews", initObj.id, uploadResult.review, movieId);
+              } else {
+                addToKey("reviews", uploadResult.review, movieId);
+              }
             } else {
               const errorData = await uploadResponse.json();
               console.error('Upload failed:', errorData);
               handleDocumentUploadError(errorData.error || 'Upload failed');
+              
+              // Update state even if upload failed (review was created)
+              if (initObj) {
+                updateKey("reviews", initObj.id, reviewResult, movieId);
+              } else {
+                addToKey("reviews", reviewResult, movieId);
+              }
             }
           } catch (error) {
             console.error('Upload error:', error);
@@ -204,6 +224,13 @@ const ReviewForm = ({ initObj }) => {
         } else if (selectedFile) {
           console.log('No review ID available for document upload');
           handleDocumentUploadError('Review was created but document upload failed - no review ID');
+        } else {
+          // No file to upload, just update the state
+          if (initObj) {
+            updateKey("reviews", initObj.id, reviewResult, movieId);
+          } else {
+            addToKey("reviews", reviewResult, movieId);
+          }
         }
 
         setIsEditing(false);

@@ -36,16 +36,11 @@ function Movies({ showMovies, enterSearch }) {
           let rating = null;
           let movieWithCorrectId = movie;
           
-          console.log(`Movie ${index}:`, movie.title, 'ID:', movie.id, 'ExternalID:', movie.externalId);
-          console.log('RatingsMap keys:', Object.keys(ratingsMap));
-          console.log('Looking for rating with movie.id:', movie.id);
-          
           if (movie.externalId) {
             // External movie - look up by external ID
             const movieData = ratingsMap[movie.externalId];
             rating = movieData?.rating || null;
             const localId = movieData?.local_id;
-            console.log('External movie data:', movieData);
             if (localId) {
               movieWithCorrectId = { ...movie, id: localId };
             }
@@ -53,10 +48,7 @@ function Movies({ showMovies, enterSearch }) {
             // Local movie - look up by local ID
             const localData = ratingsMap[movie.id];
             rating = localData?.rating || null;
-            console.log('Local movie data:', localData);
           }
-          
-          console.log('Final rating:', rating);
           
           return (
             <MotionWrapper key={movie.title} index={index}>
