@@ -14,6 +14,7 @@
 7. [ ] **Add tagging functionality to review page** - Implement a tagging system for reviews
 8. [ ] **Possibly merge review and articles components** - Consider consolidating similar functionality
 9. [ ] **Add swimlanes for articles based on tags** - Create swimlanes for articles organized by tags (similar to movie genre swimlanes)
+10. [ ] **Reformat document reader pages** - Improve the visual presentation and layout of document viewing/reading pages
 
 ### 🛠️ Functionality & Tools
 10. [ ] **Remove PDF tools from viewer** - Clean up unnecessary PDF-related features
