@@ -164,6 +164,7 @@ const MobileNavBar = () => {
             <StyledMobileMenu
               className="nav-link"
               onClick={handleAdminLogout}
+              as="button"
             >
               Logout Admin
             </StyledMobileMenu>

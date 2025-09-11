@@ -13,6 +13,7 @@ import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import useCrudStateDB from "../hooks/useCrudStateDB";
+import { snakeToCamel } from "../helper";
 
 const StarsContainer = styled.div`
   display: flex;
@@ -199,11 +200,12 @@ const ReviewForm = ({ initObj }) => {
               handleDocumentUploadSuccess(uploadResult);
               
               // Now update the frontend state with the complete review data
-              // Use uploadResult.review which contains the complete review with document info
+              // Transform uploadResult.review from snake_case to camelCase
+              const transformedReview = snakeToCamel(uploadResult.review);
               if (initObj) {
-                updateKey("reviews", initObj.id, uploadResult.review, movieId);
+                updateKey("reviews", initObj.id, transformedReview, movieId);
               } else {
-                addToKey("reviews", uploadResult.review, movieId);
+                addToKey("reviews", transformedReview, movieId);
               }
             } else {
               const errorData = await uploadResponse.json();

@@ -281,8 +281,17 @@ const ArticleForm = ({ initObj }) => {
             reviewId={initObj?.id}
             onUploadSuccess={handleDocumentUploadSuccess}
             onUploadError={handleDocumentUploadError}
-            existingDocument={initObj?.has_document}
+            existingDocument={hasDocument ? initObj : null}
             onFileSelect={handleFileSelect}
+            onRemoveDocument={() => {
+              // Just update local state - persistence will happen on form submit
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
           />
 
           <div>
