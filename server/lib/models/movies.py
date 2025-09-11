@@ -7,6 +7,7 @@ class Movie(db.Model, SerializerMixin):
     __tablename__ = 'movies'
 
     id = Column(Integer, primary_key=True)
+    external_id = Column(Integer, nullable=True, unique=True)  # TheMovieDB ID
     original_language = Column(String(10), nullable=False)
     original_title = Column(String(255), nullable=False)
     overview = Column(Text, nullable=False)

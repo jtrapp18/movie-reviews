@@ -169,6 +169,7 @@ class Movies(Resource):
         
         try:
             new_movie = Movie(
+                external_id=data.get('external_id'),
                 original_language=data.get('original_language'),
                 original_title=data.get('original_title'),
                 overview=data.get('overview'),
