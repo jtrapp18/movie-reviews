@@ -35,7 +35,14 @@ else:
     )
 
 app.config['SECRET_KEY'] = b'\x8a\xe7F\xc2)\\\x1cV\xa0\x8a\x94\xf5i-\xe5\x1a>0~\x19\xb1{\x99\xbe'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_PUBLIC_URL')
+# Debug environment variables
+print(f"DATABASE_PUBLIC_URL: {os.getenv('DATABASE_PUBLIC_URL')}")
+print(f"DATABASE_URL: {os.getenv('DATABASE_URL')}")
+
+database_uri = os.getenv('DATABASE_PUBLIC_URL') or os.getenv('DATABASE_URL')
+print(f"Using database URI: {database_uri}")
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 

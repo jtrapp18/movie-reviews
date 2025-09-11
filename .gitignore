@@ -67,3 +67,6 @@ package-lock.json
 
 # environment data
 .env
+
+# Build artifacts
+client/dist/
