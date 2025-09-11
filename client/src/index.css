@@ -188,7 +188,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/images/camera.jpg');
+  /* background-image: url('/images/camera.jpg'); */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -227,6 +227,39 @@ h3 {
 p, label, i, li, a, span, option, select, input, textarea {
   font-size: var(--default-font-size);
   color: var(--font-color-2);
+}
+
+/* Button reset to ensure styled-components take precedence */
+button {
+  font-size: var(--default-font-size);
+  color: var(--font-color-2);
+  /* Reset browser defaults that might interfere */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Input reset to ensure styled-components take precedence */
+input, textarea, select {
+  font-size: var(--default-font-size);
+  color: var(--font-color-2);
+  /* Reset browser defaults that might interfere */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  outline: none;
+  box-sizing: border-box;
 }
 
 label {

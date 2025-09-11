@@ -26,22 +26,50 @@ const MovieContainer = styled.div`
 
 function MovieReview() {
   const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { id } = useParams();
   const movieId = parseInt(id);
 
   useEffect(() => {
     const fetchMovie = async () => {
-      const movie = await getJSON('movies', movieId);
-      setMovie(snakeToCamel(movie));
+      try {
+        setLoading(true);
+        const movieData = await getJSON('movies', movieId);
+        setMovie(snakeToCamel(movieData));
+      } catch (err) {
+        console.error('Error fetching movie:', err);
+        setError('Failed to load movie details');
+      } finally {
+        setLoading(false);
+      }
     };
     
-    fetchMovie();
+    if (movieId) {
+      fetchMovie();
+    }
   }, [movieId]);
+
+  if (loading) {
+    return (
+      <StyledContainer>
+        <h1>Loading movie details...</h1>
+      </StyledContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <StyledContainer>
+        <h1>Error: {error}</h1>
+      </StyledContainer>
+    );
+  }
 
   if (!movie) {
     return (
       <StyledContainer>
-        <h1>Loading...</h1>
+        <h1>Movie not found</h1>
       </StyledContainer>
     );
   }

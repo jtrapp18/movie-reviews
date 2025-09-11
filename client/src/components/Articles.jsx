@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
 import Carousel from './Carousel';
 import { useNavigate } from 'react-router-dom';
+import { useAdmin } from '../hooks/useAdmin';
 
 const AddButtonContainer = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const AddButtonContainer = styled.div`
 
 function Articles({ showArticles, enterSearch }) {
   const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
 
 
   // Handle null or undefined showArticles
@@ -57,11 +59,13 @@ function Articles({ showArticles, enterSearch }) {
         })}
       </Carousel>
       
-      <AddButtonContainer>
-        <Button onClick={handleAddNew}>
-          + Add New Article
-        </Button>
-      </AddButtonContainer>
+      {isAdmin && (
+        <AddButtonContainer>
+          <Button onClick={handleAddNew}>
+            + Add New Article
+          </Button>
+        </AddButtonContainer>
+      )}
     </CardContainer>
   );
 }

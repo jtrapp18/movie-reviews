@@ -76,7 +76,8 @@ const Footer = () => {
                     <p>Exploring cinema through critical analysis and thematic essays</p>
                     <p>
                         <a href="/#/about">About the Author</a> • 
-                        <a href="/contact">Contact</a>
+                        <a href="/contact">Contact</a> • 
+                        <a href="/#/admin" style={{ opacity: 0.3, fontSize: '0.8em' }}>Admin</a>
                     </p>
                     <p id='data-caveat'>© 2025 James Trapp</p>
                 </div>

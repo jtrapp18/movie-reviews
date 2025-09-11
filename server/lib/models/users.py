@@ -18,9 +18,9 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False, unique=True)
     zipcode = db.Column(db.String, nullable=False)
 
-    # hives = db.relationship('Hive', back_populates='user', cascade='all, delete-orphan')
+    # No relationships defined yet
 
-    serialize_rules = ('-hives')
+    serialize_rules = ('-_password_hash',)
     
     @hybrid_property
     def password_hash(self):

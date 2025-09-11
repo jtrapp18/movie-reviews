@@ -44,7 +44,7 @@ const StyledMain = styled.main`
   flex: 1;
 
   /* Background image */
-  background-image: ${(props) => props.isMobile ? 'none' : `url('/images/grid_left.png')`};
+  // background-image: ${(props) => props.isMobile ? 'none' : `url('/images/grid_left.png')`};
   background-size: auto 40vh;
   background-position: top left;
   background-repeat: no-repeat;
@@ -65,10 +65,19 @@ const StyledForm = styled.form`
   }
 
   input, textarea, select, option {
+    /* Reset browser defaults */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    /* Styled form inputs */
     width: 100%;
     background: var(--cinema-gold);
     color: black;
     padding: 5px;
+    border: 1px solid var(--cinema-gold-dark);
+    border-radius: 4px;
+    box-sizing: border-box;
   }
 
   textarea:hover, input:hover, select:hover {
@@ -170,11 +179,17 @@ const BorderGlow = styled.span`
 const Button = styled.button.attrs(props => ({
   type: props.type || 'button'
 }))`
+  /* Reset browser defaults */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* Button styling */
   width: fit-content;
   margin: 5px;
-  color: black;
+  color: var(--cinema-black);
   background: var(--cinema-gold);
-  border: 2px solid var(--cinema-gold);
+  border: 2px solid var(--cinema-gold-dark);
   border-radius: 20px;
   padding: 10px;
   min-width: 120px;
@@ -200,6 +215,11 @@ const Button = styled.button.attrs(props => ({
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(var(--cinema-gold), 0.3);
+  }
+
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
   }
 `
 

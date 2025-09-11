@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Tag from './Tag';
+import {Button} from '../MiscStyling';
 
 const TagInputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 12px;
-  border: 2px dashed #ddd;
+  border: 2px solid var(--cinema-gold-dark);
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: var(--cinema-gray);
 `;
 
 const InputRow = styled.div`
@@ -33,30 +34,18 @@ const Input = styled.input`
   padding: 4px 8px;
   min-width: 120px;
   flex: 1;
+  color: var(--cinema-black);
 
   &::placeholder {
-    color: #999;
+    color: var(--cinema-gray);
   }
 `;
 
-const AddButton = styled.button`
-  background-color: #28a745;
-  color: white;
+const AddButton = styled(Button)`
   border: none;
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.8rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #218838;
-  }
-
-  &:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
-  }
 `;
 
 const TagInput = ({ 
@@ -132,7 +121,7 @@ const TagInput = ({
         )}
         
         {tags.length >= maxTags && (
-          <span style={{ color: '#666', fontSize: '0.8rem' }}>
+          <span>
             Maximum {maxTags} tags reached
           </span>
         )}

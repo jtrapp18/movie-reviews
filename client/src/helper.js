@@ -153,6 +153,7 @@ async function getMovieInfo(searchQuery=null) {
   }
 }
 
+
 async function getMoviesByGenre(genreId, searchQuery=null) {
   const params = new URLSearchParams();
   params.append('genre_id', genreId);
@@ -174,7 +175,6 @@ async function getMoviesByGenre(genreId, searchQuery=null) {
     const data = await res.json();
     const camelData = snakeToCamel(data.results || [])
     const movieInfo = camelData.map(m => ({
-      id: m.id,
       originalLanguage: m.originalLanguage,
       originalTitle: m.originalTitle,
       overview: m.overview,

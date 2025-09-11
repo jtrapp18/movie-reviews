@@ -10,6 +10,7 @@ import MovieReview from './pages/MovieReview';
 import Articles from './pages/Articles';
 import Article from './pages/Article';
 import NewArticle from './pages/NewArticle';
+import Admin from './pages/Admin';
 
 const routes = [
   {
@@ -48,6 +49,10 @@ const routes = [
       {
         path: "articles/new",
         element: <NewArticle />,
+      },
+      {
+        path: "admin",
+        element: <Admin />,
       }
     ],
   },

@@ -88,7 +88,7 @@ function SearchMovies() {
   }
 
   const handleMovieClick = (movie) => {
-    // Navigate to movie review page
+    // Navigate to movie review page - MovieReview will handle creating the movie if needed
     navigate(`/movies/${movie.id}`);
   };
 

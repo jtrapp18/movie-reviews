@@ -5,6 +5,13 @@ import { scrollToTop } from "../helper";
 import { UserContext } from '../context/userProvider';
 import { userLogout } from "../helper";
 
+const StyledMobileLink = styled(StyledNavLink)`
+  color: var(--cinema-gold-dark);
+
+  &.active {
+    color: var(--cinema-gold);
+  }
+`
 const StyledDiv = styled.div`
     height: var(--height-header);
     position: relative;
@@ -126,41 +133,41 @@ const MobileNavBar = () => {
       <LinkContainer 
         className={isMenuOpen ? "open" : "closed"}
       >
-        <StyledNavLink
+        <StyledMobileLink
           to="/"
           className="nav-link"
           onClick={handleClick}
         >
           Home
-        </StyledNavLink>
-        <StyledNavLink
+        </StyledMobileLink>
+        <StyledMobileLink
           to="/search_movies"
           className="nav-link"
           onClick={handleClick}
         >
           Search Movies
-        </StyledNavLink>
-        <StyledNavLink
+        </StyledMobileLink>
+        <StyledMobileLink
           to="/about"
           className="nav-link"
           onClick={handleClick}
         >
           About
-        </StyledNavLink>
-        <StyledNavLink
+        </StyledMobileLink>
+        <StyledMobileLink
           to="/account_details"
           className="nav-link"
           onClick={handleClick}
         >
           Account Details
-        </StyledNavLink>
-        <StyledNavLink
+        </StyledMobileLink>
+        <StyledMobileLink
           to="/login"
           className="nav-link"
           onClick={handleAccountToggle}
           >
             {user ? 'Logout' : 'Login'}
-        </StyledNavLink>
+        </StyledMobileLink>
       </LinkContainer>
       <HamburgerButton 
         className={isMenuOpen ? "open" : ""} 

@@ -1,6 +1,7 @@
 import { StyledSubmit, Button } from '../MiscStyling'
 import DocumentViewer from './DocumentViewer'
 import Stars from './Stars'
+import { useAdmin } from '../hooks/useAdmin'
 import styled from 'styled-components'
 
 const ContentHeader = styled.div`
@@ -68,6 +69,7 @@ const ContentText = styled.div`
 `;
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
+  const { isAdmin } = useAdmin();
   const isReview = formValues.contentType === 'review';
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
   const hasContent = (formValues.reviewText || formValues.review_text) && (formValues.reviewText || formValues.review_text).trim();
@@ -131,12 +133,14 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
         </div>
       )}
 
-      <Button 
-        type="button" 
-        onClick={() => setIsEditing(true)}
-      >
-        Edit
-      </Button>
+      {isAdmin && (
+        <Button 
+          type="button" 
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </Button>
+      )}
     </StyledSubmit>
   );
 };

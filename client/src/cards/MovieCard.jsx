@@ -11,13 +11,19 @@ function MovieCard({ movie }) {
     const { setMovies } = useOutletContext();
 
     const handleClick = async () => {  // Mark handleClick as async
+        console.log('MovieCard handleClick called with movie:', movie);
+        console.log('movie.id:', movie.id);
+        console.log('!movie.id:', !movie.id);
+        
         if (!movie.id) {
+            console.log('Creating new movie - movie has no id');
             const { addItem } = useCrudStateDB(setMovies, "movies");
             const newId = await addItem(movie); // Use await correctly
-    
+            console.log('Created movie with newId:', newId);
             navigate(`/movies/${newId}`);
         }
         else {
+            console.log('Navigating to existing movie with id:', movie.id);
             navigate(`/movies/${movie.id}`);
         }
     };
