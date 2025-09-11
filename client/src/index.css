@@ -1,3 +1,28 @@
+/* Global CSS Reset (replacing Bootstrap) */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
 :root {
   /* Movie-themed colors - Updated 2025 */
   --cinema-gold: #FFD700;
@@ -43,7 +68,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--cinema-black);
-  color: white;
+  /* color: white; */
   font-family: var(--default-font);
   font-size: var(--default-font-size);
   box-sizing: border-box;
@@ -181,7 +206,8 @@ h1 {
 }
 
 h2, h3 {
-  color: var(--cinema-gold);
+  /* color: var(--cinema-gold); */
+  color: white;
 }
 
 h1 {

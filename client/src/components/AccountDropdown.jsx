@@ -42,6 +42,7 @@ const LinkContainer = styled.div`
 
 const StyledNavLink = styled(NavLink)`
   text-decoration: none;
+  color: black;
   position: relative;
   cursor: pointer;
   padding: 10px;

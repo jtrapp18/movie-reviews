@@ -9,6 +9,7 @@ const StyledMenuItem = css`
   cursor: pointer;
   display: flex;
   align-items: center;
+  color: var(--cinema-black);
 `;
 
 const StyledNavigation = css`
@@ -17,7 +18,8 @@ const StyledNavigation = css`
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;
-    color: var(--cinema-gold);
+    color: black;
+    font-weight: bold;
   }
 
   &:hover {
