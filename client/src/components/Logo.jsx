@@ -25,7 +25,7 @@ function Logo() {
           to="/"
           className="home"
         >
-          <img src={`images/home-icon.png`} alt="home"/>
+          <img src={`images/clapperboard.png`} alt="clapperboard"/>
         </NavLink>
       </LogoContainer>
   );

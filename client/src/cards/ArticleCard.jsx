@@ -4,11 +4,14 @@ import Tag from '../components/Tag';
 
 const ArticleCardContainer = styled.article`
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   padding: 5%;
   width: 200px;
   height: 280px;
   background: white;
-  border: 1px solid #e9ecef;
+  border: px solid #e9ecef;
   border-radius: 0px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   cursor: pointer;
@@ -21,37 +24,51 @@ const ArticleCardContainer = styled.article`
 `;
 
 const ArticleTitle = styled.h2`
-  height: 30%;
+  height: 50%;
   color: var(--cinema-black);
+  // background: var(--cinema-gold-dark);
   line-height: 1.3;
-  border-radius: 0.5rem;
-  text-align: center;
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  font-size: clamp(1rem, 2.8vw, 1.5rem);
   font-weight: bold;
+  border-bottom: 3px double black;
+  margin-bottom: 8px;
   // text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
   transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
 `;
 
 const ArticleContent = styled.div`
-  height: 53%;
+  height: 23%;
   color: var(--cinema-black);
   font-size: clamp(0.7rem, 2vw, 0.9rem);
   line-height: 1.4;
   overflow: hidden;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-end;
 `;
 
 const ArticleDate = styled.div`
-  height: 2%;
-  color: var(--cinema-black);
+  position: absolute;
+  top: 1%;
+  right: 1%;
+  color: var(--cinema-gray);
   font-size: 9px;
   font-weight: 500;
   text-align: center;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 `;
 
 const TagContainer = styled.div`
   height: 10%;
   display: flex;
   flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-end;
 `;
 
 
@@ -97,6 +114,11 @@ function ArticleCard({ article }) {
 
   return (
     <ArticleCardContainer onClick={handleClick}>
+
+      <ArticleDate>
+        {formatDate(article.dateAdded)}
+      </ArticleDate>  
+      
       <ArticleTitle>
         {article.title || 'Untitled Article'}
       </ArticleTitle>
@@ -124,10 +146,6 @@ function ArticleCard({ article }) {
           )}
         </TagContainer>
       )}
-
-      <ArticleDate>
-        {formatDate(article.dateAdded)}
-      </ArticleDate>
 
     </ArticleCardContainer>
   );
