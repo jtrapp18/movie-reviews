@@ -16,11 +16,17 @@ function MovieCard({ movie }) {
         console.log('!movie.id:', !movie.id);
         
         if (!movie.id) {
-            console.log('Creating new movie - movie has no id');
-            const { addItem } = useCrudStateDB(setMovies, "movies");
-            const newId = await addItem(movie); // Use await correctly
-            console.log('Created movie with newId:', newId);
-            navigate(`/movies/${newId}`);
+            console.log('External movie - showing confirmation dialog');
+            const confirmed = window.confirm(`Do you want to add a review for "${title}"?`);
+            if (confirmed) {
+                console.log('User confirmed - creating new movie');
+                const { addItem } = useCrudStateDB(setMovies, "movies");
+                const newId = await addItem(movie); // Use await correctly
+                console.log('Created movie with newId:', newId);
+                navigate(`/movies/${newId}`);
+            } else {
+                console.log('User cancelled - not creating movie');
+            }
         }
         else {
             console.log('Navigating to existing movie with id:', movie.id);

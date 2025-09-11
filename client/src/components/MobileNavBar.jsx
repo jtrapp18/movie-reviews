@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { StyledNavLink } from "../MiscStyling";
 import { scrollToTop } from "../helper";
 import { UserContext } from '../context/userProvider';
+import { AdminContext } from '../context/adminProvider';
 import { userLogout } from "../helper";
 
 const StyledMobileLink = styled(StyledNavLink)`
@@ -105,6 +106,7 @@ const HamburgerButton = styled.button`
 // MobileNavBar Component
 const MobileNavBar = () => {
   const { user, setUser } = useContext(UserContext);
+  const { isAdmin, logoutAdmin } = useContext(AdminContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cardRef = useRef(null); // Create a reference to the card element
 
@@ -117,9 +119,9 @@ const MobileNavBar = () => {
     setIsMenuOpen(false); // Close menu after navigation
   };
 
-  const handleAccountToggle = () => {
-    if (user) {
-      userLogout();
+  const handleAdminLogout = () => {
+    if (isAdmin) {
+      logoutAdmin();
       setUser(null);
       setIsMenuOpen(false);
     }
@@ -154,20 +156,24 @@ const MobileNavBar = () => {
         >
           About
         </StyledMobileLink>
-        <StyledMobileLink
-          to="/account_details"
-          className="nav-link"
-          onClick={handleClick}
-        >
-          Account Details
-        </StyledMobileLink>
-        <StyledMobileLink
-          to="/login"
-          className="nav-link"
-          onClick={handleAccountToggle}
-          >
-            {user ? 'Logout' : 'Login'}
-        </StyledMobileLink>
+        {isAdmin && (
+          <>
+            <StyledMobileLink
+              to="/account_details"
+              className="nav-link"
+              onClick={handleClick}
+            >
+              Account Details
+            </StyledMobileLink>
+            <StyledMobileLink
+              to="/"
+              className="nav-link"
+              onClick={handleAdminLogout}
+            >
+              Logout Admin
+            </StyledMobileLink>
+          </>
+        )}
       </LinkContainer>
       <HamburgerButton 
         className={isMenuOpen ? "open" : ""} 
