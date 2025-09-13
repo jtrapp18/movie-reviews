@@ -58,24 +58,16 @@ const Tag = styled.span`
   font-weight: 500;
 `;
 
-
-const ContentText = styled.div`
-  line-height: 1.6;
-  margin-bottom: 20px;
-  color: var(--font-color-2);
-  
-  p {
-    margin: 10px 0;
-  }
-`;
-
 const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
   const { isAdmin } = useAdmin();
   const isReview = formValues.contentType === 'review';
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
   const hasContent = formValues.reviewText && formValues.reviewText.trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
-
+  
+  // Check if document is a Word document
+  const isWordDocument = hasDocument && formValues.documentType && 
+    (formValues.documentType.toLowerCase() === 'docx' || formValues.documentType.toLowerCase() === 'doc');
 
   return (
     <StyledSubmit>
@@ -109,13 +101,24 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
         )}
       </ContentHeader>
 
-      {hasContent && (
-        <ContentText className="content-text">
+      {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
+      {isWordDocument ? (
+        <div className="document-viewer">
+          <DocumentViewer
+            documentUrl={`/api/view_document/${reviewId}`}
+            documentType={formValues.documentType}
+            filename={formValues.documentFilename}
+            hasDocument={formValues.hasDocument}
+          />
+        </div>
+      ) : (
+        hasContent && (
           <RichTextDisplay content={formValues.reviewText} />
-        </ContentText>
+        )
       )}
 
-      {hasDocument && (
+      {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
+      {hasDocument && !isWordDocument && !hasContent && formValues.documentType && formValues.documentType.toLowerCase() === 'pdf' && (
         <div className="document-viewer">
           <DocumentViewer
             documentUrl={`/api/view_document/${reviewId}`}
