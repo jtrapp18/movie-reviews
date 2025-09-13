@@ -737,11 +737,20 @@ class ExtractText(Resource):
             if not result['success']:
                 return {'error': f'Text extraction failed: {result.get("error", "Unknown error")}'}, 400
             
+            # Extract HTML with full formatting preservation
+            file_type = result['file_type']
+            temp_path = result['file_path']
+            raw_text = result['extracted_text']
+            
+            # Use the new HTML extraction method
+            html_text = DocumentProcessor.extract_html_from_document(temp_path, file_type, clean_text=True, remove_title=True)
+            
             return {
-                'text': result['extracted_text'],
+                'text': html_text,  # Return HTML formatted text
+                'raw_text': raw_text,  # Also include raw text for reference
                 'filename': result['filename'],
                 'file_type': result['file_type'],
-                'text_length': len(result['extracted_text'])
+                'text_length': len(html_text)
             }, 200
             
         except Exception as e:

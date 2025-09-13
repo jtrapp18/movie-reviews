@@ -354,6 +354,8 @@ const ReviewForm = ({ initObj }) => {
             const values = {
               ...formik.values,
               ...reviewData, // Include all review data
+              // Ensure we only use reviewText (camelCase) for consistency
+              reviewText: formik.values.reviewText || reviewData?.reviewText || reviewData?.review_text || '',
               hasDocument: reviewData?.hasDocument || false,
               documentFilename: reviewData?.documentFilename || null,
               documentType: reviewData?.documentType || null,

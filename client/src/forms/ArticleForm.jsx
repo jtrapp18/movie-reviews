@@ -318,6 +318,8 @@ const ArticleForm = ({ initObj }) => {
             const values = {
               ...formik.values,
               ...initObj, // Include all the original article data
+              // Ensure we only use reviewText (camelCase) for consistency
+              reviewText: formik.values.reviewText || initObj?.reviewText || initObj?.review_text || '',
               hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
               documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
               documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)

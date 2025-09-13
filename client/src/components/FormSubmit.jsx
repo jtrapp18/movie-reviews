@@ -2,6 +2,7 @@ import { StyledSubmit, Button } from '../MiscStyling'
 import DocumentViewer from './DocumentViewer'
 import Stars from './Stars'
 import { useAdmin } from '../hooks/useAdmin'
+import RichTextDisplay from './RichTextDisplay'
 import styled from 'styled-components'
 
 const ContentHeader = styled.div`
@@ -72,17 +73,9 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
   const { isAdmin } = useAdmin();
   const isReview = formValues.contentType === 'review';
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
-  const hasContent = (formValues.reviewText || formValues.review_text) && (formValues.reviewText || formValues.review_text).trim();
+  const hasContent = formValues.reviewText && formValues.reviewText.trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
 
-  // Function to strip HTML tags and render as plain text
-  const stripHtml = (html) => {
-    if (!html) return '';
-    // Create a temporary div to parse HTML
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    return temp.textContent || temp.innerText || '';
-  };
 
   return (
     <StyledSubmit>
@@ -118,7 +111,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
 
       {hasContent && (
         <ContentText>
-          <p>{stripHtml(formValues.reviewText || formValues.review_text)}</p>
+          <RichTextDisplay content={formValues.reviewText} />
         </ContentText>
       )}
 
