@@ -15,7 +15,7 @@ import SubmitButton from "../components/SubmitButton";
 import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
 import { extractTextFromFile } from "../utils/textExtraction";
 import useCrudStateDB from "../hooks/useCrudStateDB";
-import { snakeToCamel } from "../helper";
+import { snakeToCamel, invalidateRatingsCache } from "../helper";
 
 const StarsContainer = styled.div`
   display: flex;
@@ -119,8 +119,10 @@ const ReviewForm = ({ initObj }) => {
             Object.assign(initObj, camelCaseResult);
           } else {
             addToKey("reviews", camelCaseResult, movieId);
-            setUpdatedReview(camelCaseResult);
           }
+          
+          // Invalidate ratings cache since ratings may have changed
+          invalidateRatingsCache();
           
           // Switch to non-editing mode to show the saved review
           setIsEditing(false);

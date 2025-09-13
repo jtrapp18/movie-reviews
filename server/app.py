@@ -502,6 +502,54 @@ class MovieRatings(Resource):
         except Exception as e:
             return {'error': f'Failed to fetch ratings: {str(e)}'}, 500
 
+class MovieRatingsBulk(Resource):
+    """Get ratings for movies by both local and external IDs efficiently."""
+    
+    def post(self):
+        """Get local movie ratings for a list of movie IDs (both local and external)."""
+        try:
+            data = request.get_json()
+            local_ids = data.get('local_ids', [])
+            external_ids = data.get('external_ids', [])
+            
+            ratings_map = {}
+            
+            # Handle local movies - direct ID lookup
+            if local_ids:
+                local_movies_with_ratings = db.session.query(
+                    Movie.id, 
+                    Review.rating
+                ).join(Review).filter(
+                    Movie.id.in_(local_ids)
+                ).all()
+                
+                for movie in local_movies_with_ratings:
+                    ratings_map[movie.id] = {
+                        'local_id': movie.id,
+                        'rating': movie.rating
+                    }
+            
+            # Handle external movies - external ID to local ID lookup
+            if external_ids:
+                external_movies_with_ratings = db.session.query(
+                    Movie.id, 
+                    Movie.external_id, 
+                    Review.rating
+                ).join(Review).filter(
+                    Movie.external_id.in_(external_ids)
+                ).all()
+                
+                for movie in external_movies_with_ratings:
+                    ratings_map[movie.external_id] = {
+                        'local_id': movie.id,
+                        'rating': movie.rating
+                    }
+            
+            return ratings_map, 200
+            
+        except Exception as e:
+            return {'error': f'Failed to fetch bulk ratings: {str(e)}'}, 500
+
 class ReviewWithDocument(Resource):
     """Handle review creation with optional document upload in one request."""
     
@@ -873,6 +921,7 @@ api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DiscoverMovies, '/api/discover_movies')
 api.add_resource(MovieRatings, '/api/movie-ratings')
+api.add_resource(MovieRatingsBulk, '/api/movie-ratings-bulk')
 api.add_resource(DocumentUpload, '/api/upload_document')
 api.add_resource(ExtractText, '/api/extract_text')
 api.add_resource(ReviewWithDocument, '/api/reviews_with_document')

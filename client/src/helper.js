@@ -345,36 +345,95 @@ async function getIdFromExternalId(externalId) {
   }
 }
 
-// Helper function to get ratings for a list of movies (handles both local and external)
+// Cache for ratings to avoid repeated API calls
+const ratingsCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Generate cache key from movie list
+function generateCacheKey(movies) {
+  return movies.map(m => `${m.id || 'null'}-${m.externalId || 'null'}`).sort().join('|');
+}
+
+// Check if cache entry is still valid
+function isCacheValid(timestamp) {
+  return Date.now() - timestamp < CACHE_DURATION;
+}
+
+// Invalidate ratings cache (call when ratings are updated)
+function invalidateRatingsCache() {
+  ratingsCache.clear();
+  console.log('Ratings cache invalidated');
+}
+
+// Optimized function to get ratings for a list of movies (handles both local and external)
 async function getMovieRatings(movies) {
   if (!movies || movies.length === 0) return {};
+  
+  // Check cache first
+  const cacheKey = generateCacheKey(movies);
+  const cached = ratingsCache.get(cacheKey);
+  if (cached && isCacheValid(cached.timestamp)) {
+    console.log('Using cached ratings for', movies.length, 'movies');
+    return cached.data;
+  }
   
   // Separate local and external movies
   const localMovies = movies.filter(movie => !movie.externalId);
   const externalMovies = movies.filter(movie => movie.externalId);
   
-  const ratingsMap = {};
+  let ratingsMap = {};
   
-  // Get ratings for local movies
-  if (localMovies.length > 0) {
-    const localRatings = await getLocalMovieRatings();
-    localMovies.forEach(movie => {
-      const localData = localRatings[movie.id];
-      if (localData) {
-        ratingsMap[movie.id] = localData;
-      }
-    });
-  }
-  
-  // Get ratings for external movies
-  if (externalMovies.length > 0) {
+  // Use the new bulk endpoint if we have both types of movies
+  if (localMovies.length > 0 && externalMovies.length > 0) {
+    const localIds = localMovies.map(movie => movie.id);
     const externalIds = externalMovies.map(movie => movie.externalId);
-    const externalRatings = await getMovieRatingsByExternalIds(externalIds);
-    Object.assign(ratingsMap, externalRatings);
+    ratingsMap = await getMovieRatingsBulk(localIds, externalIds);
+  } else if (localMovies.length > 0) {
+    // Only local movies - use optimized approach
+    const localIds = localMovies.map(movie => movie.id);
+    ratingsMap = await getMovieRatingsBulk(localIds, []);
+  } else if (externalMovies.length > 0) {
+    // Only external movies - use existing optimized endpoint
+    const externalIds = externalMovies.map(movie => movie.externalId);
+    ratingsMap = await getMovieRatingsByExternalIds(externalIds);
   }
   
+  // Cache the results
+  ratingsCache.set(cacheKey, {
+    data: ratingsMap,
+    timestamp: Date.now()
+  });
+  
+  console.log('Fetched fresh ratings for', movies.length, 'movies');
   return ratingsMap;
 }
 
+// New function to use the bulk ratings endpoint
+async function getMovieRatingsBulk(localIds, externalIds) {
+  try {
+    const res = await fetch('/api/movie-ratings-bulk', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        local_ids: localIds,
+        external_ids: externalIds 
+      })
+    });
+    
+    if (!res.ok) {
+      console.error(`Error fetching bulk movie ratings! Status: ${res.status}`);
+      return {};
+    }
+    
+    const ratingsMap = await res.json();
+    return ratingsMap;
+  } catch (err) {
+    console.error('Error fetching bulk movie ratings:', err);
+    return {};
+  }
+}
+
 export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
-  getMovieInfo, getMoviesByGenre, getLocalMovieRatings, getMovieRatingsByExternalIds, getMovieRatings, getIdFromExternalId, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};
+  getMovieInfo, getMoviesByGenre, getLocalMovieRatings, getMovieRatingsByExternalIds, getMovieRatings, getMovieRatingsBulk, invalidateRatingsCache, getIdFromExternalId, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};
