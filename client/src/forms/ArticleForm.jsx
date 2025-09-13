@@ -3,8 +3,7 @@ import { useOutletContext, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import ReactQuill from "react-quill";
-import 'react-quill/dist/quill.snow.css';
+import RichTextEditor from "../components/RichTextEditor";
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
@@ -23,20 +22,6 @@ const ArticleForm = ({ initObj }) => {
   const [isEditing, setIsEditing] = useState(isNewArticle);
   const isEdit = !!initObj; // True if we have an existing article to edit
 
-  // Suppress ReactQuill findDOMNode warning
-  useEffect(() => {
-    const originalWarn = console.warn;
-    console.warn = (message, ...args) => {
-      if (typeof message === 'string' && message.includes('findDOMNode')) {
-        return; // Suppress this specific warning
-      }
-      originalWarn(message, ...args);
-    };
-    
-    return () => {
-      console.warn = originalWarn;
-    };
-  }, []);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || initObj?.has_document || false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -321,22 +306,16 @@ const ArticleForm = ({ initObj }) => {
             )}
           </div>
 
-          <div>
-            <label htmlFor="reviewText">
-              Article Content: {hasDocument && <span style={{color: '#28a745', fontSize: '0.9em'}}>(Document uploaded - content optional)</span>}
-            </label>
-            <ReactQuill
-              theme="snow"
-              value={formik.values.reviewText}
-              onChange={(value) => formik.setFieldValue("reviewText", value)}
-              onBlur={() => formik.setFieldTouched("reviewText", true)}
-              placeholder={hasDocument ? "Optional: Add additional content here..." : "Write your article content here..."}
-              style={{ backgroundColor: 'white', color: 'black' }}
-            />
-            {formik.touched.reviewText && formik.errors.reviewText && (
-              <Error>{formik.errors.reviewText}</Error>
-            )}
-          </div>
+          <RichTextEditor
+            value={formik.values.reviewText}
+            onChange={(value) => formik.setFieldValue("reviewText", value)}
+            onBlur={() => formik.setFieldTouched("reviewText", true)}
+            placeholder={hasDocument ? "Optional: Add additional content here..." : "Write your article content here..."}
+            hasDocument={hasDocument}
+            label="Article Content"
+            error={formik.errors.reviewText}
+            touched={formik.touched.reviewText}
+          />
 
           <div>
             <label htmlFor="tags">Tags</label>

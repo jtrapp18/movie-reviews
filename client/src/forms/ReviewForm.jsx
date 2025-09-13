@@ -3,8 +3,7 @@ import { useOutletContext, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import ReactQuill from "react-quill"; // Import ReactQuill
-import 'react-quill/dist/quill.snow.css';  // Quill's default theme
+import RichTextEditor from "../components/RichTextEditor";
 import styled from 'styled-components';
 import { StyledForm, Button } from "../MiscStyling";
 import Error from "../styles/Error";
@@ -59,58 +58,6 @@ const ReviewForm = ({ initObj }) => {
     ? (body) => updateKey("reviews", initObj.id, body, movieId)
     : (body) => addToKey("reviews", body, movieId);
 
-  const submitToDBAsync = async (body) => {
-    // Transform camelCase to snake_case for the API
-    const snakeBody = {
-      title: body.title,
-      rating: body.rating,
-      review_text: body.reviewText,
-      movie_id: body.movieId,
-      tags: tags.map(tag => ({
-        name: typeof tag === 'string' ? tag : tag.name
-      }))
-    };
-    
-    console.log('Tags being sent:', tags);
-    console.log('SnakeBody tags:', snakeBody.tags);
-    
-
-    if (initObj) {
-      // For updates, we need to make the API call directly
-      const response = await fetch(`/api/reviews/${initObj.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(snakeBody),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        // Don't update state here - let the document upload complete first
-        return result;
-      } else {
-        throw new Error('Failed to update review');
-      }
-    } else {
-      // For new reviews, make the API call directly
-      const response = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(snakeBody),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        // Don't update state here - let the document upload complete first
-        return result;
-      } else {
-        throw new Error('Failed to create review');
-      }
-    }
-  };
 
   const validationSchema = Yup.object({
     title: Yup.string()
@@ -165,22 +112,29 @@ const ReviewForm = ({ initObj }) => {
       try {
         // Clean up the rich text content
         const cleanedReviewText = cleanRichText(values.reviewText);
+        console.log('DEBUG - Original reviewText:', values.reviewText);
+        console.log('DEBUG - Cleaned reviewText:', cleanedReviewText);
         
-        // Prepare the body for review submission
-        const body = {
+        // Prepare the form data for submission
+        const formData = {
           title: values.title,
           rating: values.rating,
-          review_text: cleanedReviewText,
-          movie_id: movieId,
+          reviewText: cleanedReviewText,
+          movieId: movieId,
           tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
         };
         
-        // Submit the review first
-        const result = await submitToDBAsync(body);
+        console.log('DEBUG - Final formData being sent:', formData);
         
-        if (result && result.id) {
+        // Submit the review using the same approach as ArticleForm
+        const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id, false);
+        
+        if (result.success) {
+          console.log('ReviewForm - API response result:', result.result);
+          console.log('ReviewForm - Tags in response:', result.result?.tags);
+          
           // Convert snake_case to camelCase
-          const camelCaseResult = snakeToCamel(result);
+          const camelCaseResult = snakeToCamel(result.result);
           
           // Update the movies context with the new/updated review
           if (isEdit) {
@@ -192,41 +146,12 @@ const ReviewForm = ({ initObj }) => {
             addToKey("reviews", camelCaseResult, movieId);
             setUpdatedReview(camelCaseResult);
           }
+          
+          // Switch to non-editing mode to show the saved review
+          setIsEditing(false);
+        } else {
+          throw new Error(result.error || 'Failed to submit review');
         }
-        
-        // Handle document upload if file is selected
-        if (selectedFile && result && result.id) {
-          try {
-            const formData = new FormData();
-            formData.append('document', selectedFile);
-            formData.append('review_id', result.id);
-            formData.append('replace_text', replaceText);
-            
-            const uploadResponse = await fetch('/api/upload_document', {
-              method: 'POST',
-              body: formData,
-            });
-            
-            if (uploadResponse.ok) {
-              const uploadResult = await uploadResponse.json();
-              console.log('Upload successful:', uploadResult);
-              handleDocumentUploadSuccess(uploadResult);
-            } else {
-              const errorData = await uploadResponse.json();
-              console.error('Upload failed:', errorData);
-              handleDocumentUploadError(errorData.error || 'Upload failed');
-            }
-          } catch (error) {
-            console.error('Upload error:', error);
-            handleDocumentUploadError(`Upload failed: ${error.message}`);
-          }
-        } else if (selectedFile) {
-          console.log('No review ID available for document upload');
-          handleDocumentUploadError('Review was created but document upload failed - no review ID');
-        }
-        
-        // Switch to non-editing mode to show the saved review
-        setIsEditing(false);
       } catch (error) {
         console.error('Error submitting review:', error);
         setSubmitError(error.message || 'Failed to submit review');
@@ -236,9 +161,6 @@ const ReviewForm = ({ initObj }) => {
     },
   });
 
-  const handleQuillChange = (value) => {
-    formik.setFieldValue("reviewText", value); // Update the formik value for reviewText
-  };
 
   const updateRating = (rating) => {
     formik.setFieldValue("rating", rating);
@@ -407,34 +329,16 @@ const ReviewForm = ({ initObj }) => {
             )}
           </div>
 
-          <div>
-            <label htmlFor="reviewText">
-              Review: {hasDocument && <span style={{color: '#28a745', fontSize: '0.9em'}}>(Document uploaded - review text optional)</span>}
-            </label>
-            {/* Quill Editor for reviewText */}
-            <ReactQuill
-              id="reviewText"
-              name="reviewText"
-              value={formik.values.reviewText}
-              onChange={handleQuillChange}
-              placeholder={hasDocument ? "Add additional review text (optional)..." : "Write your review here..."}
-              modules={{
-                toolbar: [
-                  [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                  [{ 'align': [] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  ['blockquote', 'code-block'],
-                  ['link', 'image'],
-                  [{ 'color': [] }, { 'background': [] }],
-                  ['clean']
-                ]
-              }}
-            />
-            {formik.touched.reviewText && formik.errors.reviewText && (
-              <Error>{formik.errors.reviewText}</Error>
-            )}
-          </div>
+          <RichTextEditor
+            value={formik.values.reviewText}
+            onChange={(value) => formik.setFieldValue("reviewText", value)}
+            onBlur={() => formik.setFieldTouched("reviewText", true)}
+            placeholder={hasDocument ? "Add additional review text (optional)..." : "Write your review here..."}
+            hasDocument={hasDocument}
+            label="Review"
+            error={formik.errors.reviewText}
+            touched={formik.touched.reviewText}
+          />
           
           {/* Tags Input */}
           <div>
@@ -477,6 +381,9 @@ const ReviewForm = ({ initObj }) => {
           formValues={(() => {
             // Use updatedReview if available, otherwise fall back to initObj
             const reviewData = updatedReview || initObj;
+            console.log('DEBUG - reviewData:', reviewData);
+            console.log('DEBUG - formik.values:', formik.values);
+            
             const values = {
               ...formik.values,
               ...reviewData, // Include all review data
