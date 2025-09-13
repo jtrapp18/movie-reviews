@@ -123,12 +123,13 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
         const uploadResult = await uploadDocument(file, result.id, true); // Always replace text
         console.log('Document uploaded successfully:', uploadResult);
         
-        // The backend has already updated the article with the extracted text
-        // We need to fetch the updated article data
-        const updatedArticle = await fetch(`/api/articles/${result.id}`).then(res => res.json());
-        if (updatedArticle) {
+        // The backend has already updated the review/article with the extracted text
+        // We need to fetch the updated data
+        const endpoint = isArticle ? `/api/articles/${result.id}` : `/api/reviews/${result.id}`;
+        const updatedData = await fetch(endpoint).then(res => res.json());
+        if (updatedData) {
           // Update the result with the fresh data from the database
-          Object.assign(result, updatedArticle);
+          Object.assign(result, updatedData);
         }
       } catch (uploadError) {
         console.error('Document upload failed:', uploadError);

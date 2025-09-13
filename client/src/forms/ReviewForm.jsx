@@ -13,8 +13,9 @@ import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
-import { handleFormSubmit, submitFormWithDocument } from "../utils/formSubmit";
+import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
 import useCrudStateDB from "../hooks/useCrudStateDB";
+import { snakeToCamel } from "../helper";
 
 const StarsContainer = styled.div`
   display: flex;
@@ -26,6 +27,7 @@ const ReviewForm = ({ initObj }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(!initObj);
+  const isEdit = !!initObj; // True if we have an existing review to edit
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -166,21 +168,46 @@ const ReviewForm = ({ initObj }) => {
         };
 
         // Submit the main form data first
-        const result = await submitFormWithDocument(formData, selectedFile, isEdit, id, false);
+        const result = await submitToDBAsync(formData);
         
-        if (result.success) {
-          // Update the movies context with the new/updated review
-          if (isEdit) {
-            updateKey("reviews", initObj.id, result.result, movieId);
-          } else {
-            addToKey("reviews", result.result, movieId);
+        // Upload document if file is selected
+        if (selectedFile && result?.id) {
+          try {
+            console.log('Attempting document upload for review ID:', result.id);
+            const uploadResult = await uploadDocument(selectedFile, result.id, true);
+            console.log('Document uploaded successfully:', uploadResult);
+            console.log('Upload result review:', uploadResult.review);
+            
+            // Fetch updated review data with extracted text
+            const updatedReview = await fetch(`/api/reviews/${result.id}`).then(res => res.json());
+            console.log('Updated review from API:', updatedReview);
+            console.log('Review text in updated review:', updatedReview?.review_text);
+            if (updatedReview) {
+              Object.assign(result, updatedReview);
+            }
+          } catch (uploadError) {
+            console.error('Document upload failed:', uploadError);
+            // Don't throw here - the main form was successful
           }
-          
-          // Switch to non-editing mode to show the saved review
-          setIsEditing(false);
-        } else {
-          setSubmitError(result.error);
         }
+        
+        // Update the movies context with the new/updated review
+        if (isEdit) {
+          updateKey("reviews", initObj.id, result, movieId);
+          // Update the initObj reference for existing reviews
+          if (initObj) {
+            console.log('Before updating initObj:', initObj);
+            Object.assign(initObj, result);
+            console.log('After updating initObj:', initObj);
+            console.log('initObj.reviewText:', initObj.reviewText);
+            console.log('initObj.review_text:', initObj.review_text);
+          }
+        } else {
+          addToKey("reviews", result, movieId);
+        }
+        
+        // Switch to non-editing mode to show the saved review
+        setIsEditing(false);
         
       } catch (error) {
         console.error('Error submitting review:', error);
@@ -200,18 +227,29 @@ const ReviewForm = ({ initObj }) => {
   };
 
   const handleDocumentUploadSuccess = (result) => {
+    console.log('handleDocumentUploadSuccess called with:', result);
     setHasDocument(true);
     
-    if (result.review && result.review.review_text) {
-      formik.setFieldValue("reviewText", result.review.review_text);
+    // Convert snake_case to camelCase
+    const review = snakeToCamel(result.review);
+    console.log('Converted review:', review);
+    
+    if (review && review.reviewText) {
+      console.log('Setting reviewText to:', review.reviewText);
+      formik.setFieldValue("reviewText", review.reviewText);
+      // Also update the initObj so it's available in the non-editing view
+      if (initObj) {
+        initObj.reviewText = review.reviewText;
+      }
     }
     
     formik.setFieldTouched("reviewText", false);
     
-    if (initObj && result.review) {
-      initObj.hasDocument = result.review.has_document;
-      initObj.documentFilename = result.review.document_filename;
-      initObj.documentType = result.review.document_type;
+    if (initObj && review) {
+      initObj.hasDocument = review.hasDocument;
+      initObj.documentFilename = review.documentFilename;
+      initObj.documentType = review.documentType;
+      console.log('Updated initObj:', initObj);
     }
   };
 
@@ -352,14 +390,20 @@ const ReviewForm = ({ initObj }) => {
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={{
-            ...formik.values,
-            hasDocument: initObj?.hasDocument || false,
-            documentFilename: initObj?.documentFilename || null,
-            documentType: initObj?.documentType || null,
-            dateAdded: initObj?.dateAdded || null,
-            tags: tags
-          }}
+          formValues={(() => {
+            const values = {
+              ...formik.values,
+              hasDocument: initObj?.hasDocument || false,
+              documentFilename: initObj?.documentFilename || null,
+              documentType: initObj?.documentType || null,
+              dateAdded: initObj?.dateAdded || null,
+              tags: tags
+            };
+            console.log('ContentDisplay formValues for review:', values);
+            console.log('reviewText:', values.reviewText);
+            console.log('review_text:', values.review_text);
+            return values;
+          })()}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}
         />
