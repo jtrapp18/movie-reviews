@@ -506,7 +506,7 @@ class DocumentUpload(Resource):
     """Handle document uploads for reviews."""
     
     def post(self):
-        """Upload and process a document for a review."""
+        """Upload and process a document for a review using temporary processing."""
         try:
             # Check if file is present
             if 'document' not in request.files:
@@ -521,17 +521,19 @@ class DocumentUpload(Resource):
             if not review_id:
                 return {'error': 'Review ID is required'}, 400
             
+            # Check if we should replace text
+            replace_text = request.form.get('replace_text', 'false').lower() == 'true'
+            
             # Find the review
             review = Review.query.get(review_id)
+            print(f"Found review: {review}")
             if not review:
                 return {'error': 'Review not found'}, 404
             
-            # Set up upload folder
-            upload_folder = os.path.join(app.root_path, 'uploads', 'documents')
-            os.makedirs(upload_folder, exist_ok=True)
-            
-            # Process the document
-            result = DocumentProcessor.process_uploaded_document(file, upload_folder)
+            # Process the document using temporary files (better for deployment)
+            print(f"Processing document: {file.filename}")
+            result = DocumentProcessor.process_uploaded_document_temporary(file)
+            print(f"Document processing result: {result}")
             
             if not result['success']:
                 return {'error': result['error']}, 400
@@ -539,21 +541,23 @@ class DocumentUpload(Resource):
             # Update review with document information
             review.has_document = True
             review.document_filename = result['filename']
-            review.document_path = result['file_path']
             review.document_type = result['file_type']
+            # No longer store file_path since we're using temporary processing
             
-            # Note: We no longer extract text - documents are rendered directly in the browser
-            # The review_text field can contain user-written content or remain empty
+            # Optionally replace review text with extracted text
+            if replace_text and result['extracted_text']:
+                review.review_text = result['extracted_text']
             
             db.session.commit()
             
             return {
-                'message': 'Document uploaded successfully',
+                'message': 'Document processed successfully',
                 'review': review.to_dict(),
                 'document_info': {
                     'filename': result['filename'],
                     'file_type': result['file_type'],
-                    'extracted_text_length': len(result['extracted_text'])
+                    'extracted_text_length': len(result['extracted_text']),
+                    'text_replaced': replace_text
                 }
             }, 200
             
@@ -629,20 +633,16 @@ class DocumentPreview(Resource):
             if not review:
                 return {'error': 'Review not found'}, 404
             
-            if not review.has_document or not review.document_path:
+            if not review.has_document:
                 return {'error': 'No document associated with this review'}, 404
             
-            if not os.path.exists(review.document_path):
-                return {'error': 'Document file not found'}, 404
-            
-            # Get preview text
-            preview = DocumentProcessor.get_document_preview(
-                review.document_path, 
-                review.document_type
-            )
+            # Get preview from review text
+            preview_text = ""
+            if review.review_text:
+                preview_text = review.review_text[:500] + "..." if len(review.review_text) > 500 else review.review_text
             
             return {
-                'preview': preview,
+                'preview': preview_text,
                 'filename': review.document_filename,
                 'file_type': review.document_type,
                 'has_document': review.has_document

@@ -12,8 +12,9 @@ import Stars from "../components/Stars"
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
+import SubmitButton from "../components/SubmitButton";
+import { handleFormSubmit, submitFormWithDocument } from "../utils/formSubmit";
 import useCrudStateDB from "../hooks/useCrudStateDB";
-import { snakeToCamel } from "../helper";
 
 const StarsContainer = styled.div`
   display: flex;
@@ -28,9 +29,10 @@ const ReviewForm = ({ initObj }) => {
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [replaceText, setReplaceText] = useState(false);
+  const [replaceText, setReplaceText] = useState(true);
   const [contentType, setContentType] = useState(initObj?.contentType || 'review');
   const [tags, setTags] = useState(initObj?.tags || []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { setMovies } = useOutletContext();
   const { addToKey, updateKey } = useCrudStateDB(setMovies, "movies");
   const movieId = parseInt(id);
@@ -152,93 +154,39 @@ const ReviewForm = ({ initObj }) => {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
+      if (isSubmitting) return; // Prevent double submission
+      
+      setIsSubmitting(true);
+      setSubmitError(null);
+      
       try {
-        // Clean up the rich text content
-        const cleanedReviewText = cleanRichText(values.reviewText);
-        
-        // First, create or update the review
-        const body = {
-          ...Object.fromEntries(
-            Object.entries(values).map(([key, value]) => [key, value === "" ? null : value])
-          ),
+        const formData = {
+          ...values,
           movieId: movieId,
         };
 
-        // Use cleaned review text
-        body.reviewText = cleanedReviewText;
-
-        // If there's a selected file but no review text, send empty string
-        if (selectedFile && (!cleanedReviewText || cleanedReviewText.trim() === '')) {
-          body.reviewText = '';
-        }
-
-        console.log('Submitting review with body:', body);
-
-        // Submit the review and get the result
-        const reviewResult = await submitToDBAsync(body);
-        console.log('Review result:', reviewResult);
+        // Submit the main form data first
+        const result = await submitFormWithDocument(formData, selectedFile, isEdit, id, false);
         
-        // If there's a selected file and we have a review ID, upload it
-        if (selectedFile && reviewResult?.id) {
-          console.log('Uploading document for review ID:', reviewResult.id);
-          try {
-            const formData = new FormData();
-            formData.append('document', selectedFile);
-            formData.append('review_id', reviewResult.id);
-            formData.append('replace_text', replaceText);
-
-            const uploadResponse = await fetch('/api/upload_document', {
-              method: 'POST',
-              body: formData,
-            });
-
-            if (uploadResponse.ok) {
-              const uploadResult = await uploadResponse.json();
-              console.log('Upload successful:', uploadResult);
-              console.log('ReviewResult (from initial creation):', reviewResult);
-              console.log('UploadResult.review (from document upload):', uploadResult.review);
-              handleDocumentUploadSuccess(uploadResult);
-              
-              // Now update the frontend state with the complete review data
-              // Transform uploadResult.review from snake_case to camelCase
-              const transformedReview = snakeToCamel(uploadResult.review);
-              if (initObj) {
-                updateKey("reviews", initObj.id, transformedReview, movieId);
-              } else {
-                addToKey("reviews", transformedReview, movieId);
-              }
-            } else {
-              const errorData = await uploadResponse.json();
-              console.error('Upload failed:', errorData);
-              handleDocumentUploadError(errorData.error || 'Upload failed');
-              
-              // Update state even if upload failed (review was created)
-              if (initObj) {
-                updateKey("reviews", initObj.id, reviewResult, movieId);
-              } else {
-                addToKey("reviews", reviewResult, movieId);
-              }
-            }
-          } catch (error) {
-            console.error('Upload error:', error);
-            handleDocumentUploadError(`Upload failed: ${error.message}`);
-          }
-        } else if (selectedFile) {
-          console.log('No review ID available for document upload');
-          handleDocumentUploadError('Review was created but document upload failed - no review ID');
-        } else {
-          // No file to upload, just update the state
-          if (initObj) {
-            updateKey("reviews", initObj.id, reviewResult, movieId);
+        if (result.success) {
+          // Update the movies context with the new/updated review
+          if (isEdit) {
+            updateKey("reviews", initObj.id, result.result, movieId);
           } else {
-            addToKey("reviews", reviewResult, movieId);
+            addToKey("reviews", result.result, movieId);
           }
+          
+          // Switch to non-editing mode to show the saved review
+          setIsEditing(false);
+        } else {
+          setSubmitError(result.error);
         }
-
-        setIsEditing(false);
+        
       } catch (error) {
-        console.error('Submission error:', error);
-        setSubmitError(`Submission failed: ${error.message || 'Unknown error'}`);
+        console.error('Error submitting review:', error);
+        setSubmitError(error.message || 'Failed to submit review');
+      } finally {
+        setIsSubmitting(false);
       }
     },
   });
@@ -252,34 +200,25 @@ const ReviewForm = ({ initObj }) => {
   };
 
   const handleDocumentUploadSuccess = (result) => {
-    // Update the hasDocument state
     setHasDocument(true);
     
-    // Update the review text if it was extracted from the document
     if (result.review && result.review.review_text) {
       formik.setFieldValue("reviewText", result.review.review_text);
     }
     
-    // Clear any validation errors
     formik.setFieldTouched("reviewText", false);
     
-    // Update the initObj with document information (using camelCase)
     if (initObj && result.review) {
       initObj.hasDocument = result.review.has_document;
       initObj.documentFilename = result.review.document_filename;
       initObj.documentType = result.review.document_type;
-    }
-    
-    // Refresh the movies data to show updated review
-    if (setMovies) {
-      // TODO: Add proper refresh function instead of full page reload
-      // window.location.reload(); // Removed - causes unwanted page refresh
     }
   };
 
   const handleDocumentUploadError = (error) => {
     setSubmitError(`Document upload failed: ${error}`);
   };
+
 
   const handleFileSelect = (file, replaceTextOption) => {
     setSelectedFile(file);
@@ -403,9 +342,12 @@ const ReviewForm = ({ initObj }) => {
                 navigate(-1);
               }
             }}>Cancel</Button>
-            <Button type="submit">
-              {initObj ? "Save Changes" : "Submit Review"}
-            </Button>
+            <SubmitButton 
+              isSubmitting={isSubmitting}
+              isEdit={isEdit}
+              editText="Save Changes"
+              createText="Submit Review"
+            />
           </div>
         </StyledForm>
       ) : (

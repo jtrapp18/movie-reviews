@@ -271,7 +271,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           
           <CheckboxContainer>
             <small style={{color: 'var(--cinema-gold)'}}>
-              <FaLightbulb /> Document will be displayed in a viewer below the review
+              <FaLightbulb /> Document content will be extracted and used as review text
             </small>
           </CheckboxContainer>
         </>

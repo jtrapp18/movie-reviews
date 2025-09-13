@@ -38,6 +38,10 @@ const routes = [
         element: <MovieReview />,
       },
       {
+        path: "articles",
+        element: <Articles />,
+      },
+      {
         path: "articles/:id",
         element: <Article />,
       },

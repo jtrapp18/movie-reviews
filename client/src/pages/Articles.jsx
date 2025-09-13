@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import MotionWrapper from '../styles/MotionWrapper';
 import ArticleCard from '../cards/ArticleCard';
 import SearchBar from '../components/SearchBar';
@@ -10,7 +11,7 @@ import 'slick-carousel/slick/slick-theme.css';
 
 
 function Articles() {
-  const [articles, setArticles] = useState([]);
+  const { articles, setArticles } = useOutletContext();
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 

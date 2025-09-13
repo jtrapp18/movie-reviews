@@ -10,7 +10,10 @@ import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
+import SubmitButton from "../components/SubmitButton";
 import { patchJSONToDb, postJSONToDb, snakeToCamel } from "../helper";
+import { handleFormSubmit, submitFormWithDocument } from "../utils/formSubmit";
+import useCrudStateDB from "../hooks/useCrudStateDB";
 
 const ArticleForm = ({ initObj }) => {
   const { id } = useParams();
@@ -18,6 +21,7 @@ const ArticleForm = ({ initObj }) => {
   // Check if we're creating a new article (no id and no existing article data)
   const isNewArticle = !id && (!initObj || !initObj.id);
   const [isEditing, setIsEditing] = useState(isNewArticle);
+  const isEdit = !!initObj; // True if we have an existing article to edit
 
   // Suppress ReactQuill findDOMNode warning
   useEffect(() => {
@@ -39,7 +43,9 @@ const ArticleForm = ({ initObj }) => {
   const [replaceText, setReplaceText] = useState(false);
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
   const [tags, setTags] = useState(initObj?.tags || []);
-  const { setMovies } = useOutletContext();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setMovies, setArticles } = useOutletContext();
+  const { addItem, updateItem } = useCrudStateDB(setArticles, "articles");
 
   const initialValues = initObj
     ? {
@@ -107,117 +113,83 @@ const ArticleForm = ({ initObj }) => {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
+      if (isSubmitting) return; // Prevent double submission
+      
+      setIsSubmitting(true);
+      setSubmitError(null);
+      
       try {
-        setSubmitError(null);
-        
-        // Clean up the rich text content
-        const cleanedReviewText = cleanRichText(values.reviewText);
-        
-        // Prepare the body for article submission
-        const body = {
+        const formData = {
           title: values.title,
-          review_text: cleanedReviewText,
+          reviewText: values.reviewText,
           content_type: 'article',
-          movie_id: null, // Articles don't have movie_id
-          rating: null,   // Articles don't have ratings
-          tags: tags,     // Include tags
+          movie_id: null,
+          rating: null,
+          tags: tags,
         };
 
-        // If a file is selected, send empty string
-        if (selectedFile && (!cleanedReviewText || cleanedReviewText.trim() === '')) {
-          body.review_text = '';
-        }
+        console.log('ArticleForm - Submitting with tags:', tags);
+
+        // Submit the main form data first
+        const result = await submitFormWithDocument(formData, selectedFile, isEdit, id, true);
         
-        const result = await submitToDB(body);
-        
-        // Update initObj with the newly created article data
-        if (result && result.id) {
-          // Convert snake_case to camelCase for consistency
-          const articleData = {
-            id: result.id,
-            title: result.title,
-            reviewText: result.review_text,
-            contentType: result.content_type,
-            dateAdded: result.date_added,
-            hasDocument: result.has_document || false,
-            documentFilename: result.document_filename || null,
-            documentType: result.document_type || null,
-            tags: result.tags || []
-          };
+        if (result.success) {
+          console.log('ArticleForm - API response result:', result.result);
+          console.log('ArticleForm - Tags in response:', result.result?.tags);
           
           // Store the created article data for new articles
-          setCreatedArticle(articleData);
+          if (!isEdit) {
+            setCreatedArticle(result.result);
+          }
           
-          // Update the initObj reference if it exists (for existing articles)
-          if (initObj !== null) {
-            // Preserve existing document data if not in response
-            const updatedData = {
-              ...articleData,
-              hasDocument: result.has_document !== undefined ? result.has_document : initObj.hasDocument,
-              documentFilename: result.document_filename || initObj.documentFilename,
-              documentType: result.document_type || initObj.documentType,
-              documentUrl: initObj.documentUrl // Preserve the document URL
-            };
-            Object.assign(initObj, updatedData);
-          }
-        }
-
-        // Handle document upload if file is selected
-        if (selectedFile && result && result.id) {
-          try {
-            const formData = new FormData();
-            formData.append('document', selectedFile);
-            formData.append('review_id', result.id);
-            formData.append('replace_text', replaceText);
-
-            const uploadResponse = await fetch('/api/upload_document', {
-              method: 'POST',
-              body: formData,
-            });
-
-            if (uploadResponse.ok) {
-              const uploadResult = await uploadResponse.json();
-              console.log('Upload successful:', uploadResult);
-              handleDocumentUploadSuccess(uploadResult);
-            } else {
-              const errorData = await uploadResponse.json();
-              console.error('Upload failed:', errorData);
-              handleDocumentUploadError(errorData.error || 'Upload failed');
+          // Update the articles context with the new/updated article
+          if (isEdit) {
+            updateItem(result.result, initObj.id);
+            // Update the initObj reference for existing articles
+            if (initObj) {
+              Object.assign(initObj, result.result);
             }
-          } catch (error) {
-            console.error('Upload error:', error);
-            handleDocumentUploadError(`Upload failed: ${error.message}`);
+          } else {
+            addItem(result.result);
           }
-        } else if (selectedFile) {
-          console.log('No article ID available for document upload');
-          handleDocumentUploadError('Article was created but document upload failed - no article ID');
+          
+          // Switch to non-editing mode to show the saved article
+          setIsEditing(false);
+        } else {
+          setSubmitError(result.error);
         }
-
-        setIsEditing(false);
+        
       } catch (error) {
-        console.error('Article submission error:', error);
-        setSubmitError(`Article submission failed: ${error.message}`);
+        console.error('Error submitting article:', error);
+        setSubmitError(error.message || 'Failed to submit article');
+      } finally {
+        setIsSubmitting(false);
       }
     },
   });
 
+
   const handleDocumentUploadSuccess = (result) => {
     setHasDocument(true);
     
-    if (result.review && result.review.review_text) {
-      formik.setFieldValue("reviewText", result.review.review_text);
+    // Convert snake_case to camelCase
+    const review = snakeToCamel(result.review);
+    
+    if (review && review.reviewText) {
+      formik.setFieldValue("reviewText", review.reviewText);
+      // Also update the initObj so it's available in the non-editing view
+      if (initObj) {
+        initObj.reviewText = review.reviewText;
+      }
     }
     
     formik.setFieldTouched("reviewText", false);
     
-    if (initObj && result.review) {
-      initObj.hasDocument = result.review.has_document;
-      initObj.documentFilename = result.review.document_filename;
-      initObj.documentType = result.review.document_type;
+    if (initObj && review) {
+      initObj.hasDocument = review.hasDocument;
+      initObj.documentFilename = review.documentFilename;
+      initObj.documentType = review.documentType;
     }
-    
-    // Don't reload the page - just update the form state
-    // The form should remain in edit mode after document upload
   };
 
   const handleDocumentUploadError = (error) => {
@@ -314,18 +286,29 @@ const ArticleForm = ({ initObj }) => {
                 navigate(-1);
               }
             }}>Cancel</Button>
-            <Button type="submit">{initObj ? "Save Changes" : "Create Article"}</Button>
+            <SubmitButton 
+              isSubmitting={isSubmitting}
+              isEdit={isEdit}
+              editText="Save Changes"
+              createText="Create Article"
+            />
           </div>
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={{
-            ...formik.values,
-            ...initObj, // Include all the original article data
-            hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
-            documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
-            documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)
-          }}
+          formValues={(() => {
+            const values = {
+              ...formik.values,
+              ...initObj, // Include all the original article data
+              hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
+              documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
+              documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)
+            };
+            console.log('ContentDisplay formValues:', values);
+            console.log('reviewText:', values.reviewText);
+            console.log('review_text:', values.review_text);
+            return values;
+          })()}
           setIsEditing={setIsEditing}
           reviewId={createdArticle?.id || initObj?.id}
         />

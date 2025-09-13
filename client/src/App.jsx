@@ -12,6 +12,7 @@ function App() {
 
   const { isMobile } = useContext(WindowWidthContext);
   const [movies, setMovies] = useState([]);
+  const [articles, setArticles] = useState([]);
 
   // Auto-login
   useEffect(() => {
@@ -52,7 +53,9 @@ function App() {
           <Outlet
               context={{
                 movies,
-                setMovies
+                setMovies,
+                articles,
+                setArticles
               }}
             />
         </Suspense>
