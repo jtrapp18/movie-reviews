@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import DOMPurify from 'dompurify';
 
 const RichTextContainer = styled.div`
   line-height: 1.6;
@@ -75,10 +76,20 @@ const RichTextDisplay = ({ content, className = "" }) => {
     return null;
   }
 
+  // Sanitize HTML content using DOMPurify for security
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: [
+      'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a', 'img', 'span', 'div'
+    ],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style'],
+    ALLOW_DATA_ATTR: false
+  });
+
   return (
     <RichTextContainer 
       className={className}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   );
 };

@@ -5,19 +5,6 @@
 
 import { snakeToCamel } from '../helper';
 
-/**
- * Clean rich text content by removing empty paragraphs and formatting
- */
-export const cleanRichText = (text) => {
-  if (!text) return '';
-  
-  // Remove empty paragraphs and clean up whitespace
-  return text
-    .replace(/<p><br><\/p>/g, '') // Remove empty paragraphs
-    .replace(/<p>\s*<\/p>/g, '') // Remove paragraphs with only whitespace
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
-};
 
 /**
  * Submit form data to the database
@@ -93,13 +80,10 @@ export const uploadDocument = async (file, reviewId, replaceText = true) => {
  */
 export const submitFormWithDocument = async (formData, file, isEdit = false, id = null, isArticle = false) => {
   try {
-    // Clean the review text
-    const cleanedText = cleanRichText(formData.reviewText);
-    
-    // Prepare the body
+    // Prepare the body - let Quill's HTML structure be preserved
     const body = {
       ...formData,
-      review_text: cleanedText,
+      review_text: formData.reviewText, // Use Quill's HTML directly
     };
 
     // Remove empty values
@@ -120,7 +104,7 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
     if (file && result?.id) {
       try {
         console.log('Attempting document upload for article ID:', result.id);
-        const uploadResult = await uploadDocument(file, result.id, true); // Always replace text
+        const uploadResult = await uploadDocument(file, result.id, false); // Don't replace existing text
         console.log('Document uploaded successfully:', uploadResult);
         
         // The backend has already updated the review/article with the extracted text
