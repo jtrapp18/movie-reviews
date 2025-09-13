@@ -35,6 +35,8 @@ const ReviewForm = ({ initObj }) => {
   const [contentType, setContentType] = useState(initObj?.contentType || 'review');
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [updatedReview, setUpdatedReview] = useState(null); // Track updated review data
   const { setMovies } = useOutletContext();
   const { addToKey, updateKey } = useCrudStateDB(setMovies, "movies");
   const movieId = parseInt(id);
@@ -157,58 +159,74 @@ const ReviewForm = ({ initObj }) => {
     validationSchema,
     onSubmit: async (values) => {
       if (isSubmitting) return; // Prevent double submission
-      
       setIsSubmitting(true);
       setSubmitError(null);
       
       try {
-        const formData = {
-          ...values,
-          movieId: movieId,
-        };
-
-        // Submit the main form data first
-        const result = await submitToDBAsync(formData);
+        // Clean up the rich text content
+        const cleanedReviewText = cleanRichText(values.reviewText);
         
-        // Upload document if file is selected
-        if (selectedFile && result?.id) {
-          try {
-            console.log('Attempting document upload for review ID:', result.id);
-            const uploadResult = await uploadDocument(selectedFile, result.id, true);
-            console.log('Document uploaded successfully:', uploadResult);
-            console.log('Upload result review:', uploadResult.review);
-            
-            // Fetch updated review data with extracted text
-            const updatedReview = await fetch(`/api/reviews/${result.id}`).then(res => res.json());
-            console.log('Updated review from API:', updatedReview);
-            console.log('Review text in updated review:', updatedReview?.review_text);
-            if (updatedReview) {
-              Object.assign(result, updatedReview);
-            }
-          } catch (uploadError) {
-            console.error('Document upload failed:', uploadError);
-            // Don't throw here - the main form was successful
+        // Prepare the body for review submission
+        const body = {
+          title: values.title,
+          rating: values.rating,
+          review_text: cleanedReviewText,
+          movie_id: movieId,
+          tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
+        };
+        
+        // Submit the review first
+        const result = await submitToDBAsync(body);
+        
+        if (result && result.id) {
+          // Convert snake_case to camelCase
+          const camelCaseResult = snakeToCamel(result);
+          
+          // Update the movies context with the new/updated review
+          if (isEdit) {
+            updateKey("reviews", initObj.id, camelCaseResult, movieId);
+            setUpdatedReview(camelCaseResult);
+            // Update initObj for immediate display
+            Object.assign(initObj, camelCaseResult);
+          } else {
+            addToKey("reviews", camelCaseResult, movieId);
+            setUpdatedReview(camelCaseResult);
           }
         }
         
-        // Update the movies context with the new/updated review
-        if (isEdit) {
-          updateKey("reviews", initObj.id, result, movieId);
-          // Update the initObj reference for existing reviews
-          if (initObj) {
-            console.log('Before updating initObj:', initObj);
-            Object.assign(initObj, result);
-            console.log('After updating initObj:', initObj);
-            console.log('initObj.reviewText:', initObj.reviewText);
-            console.log('initObj.review_text:', initObj.review_text);
+        // Handle document upload if file is selected
+        if (selectedFile && result && result.id) {
+          try {
+            const formData = new FormData();
+            formData.append('document', selectedFile);
+            formData.append('review_id', result.id);
+            formData.append('replace_text', replaceText);
+            
+            const uploadResponse = await fetch('/api/upload_document', {
+              method: 'POST',
+              body: formData,
+            });
+            
+            if (uploadResponse.ok) {
+              const uploadResult = await uploadResponse.json();
+              console.log('Upload successful:', uploadResult);
+              handleDocumentUploadSuccess(uploadResult);
+            } else {
+              const errorData = await uploadResponse.json();
+              console.error('Upload failed:', errorData);
+              handleDocumentUploadError(errorData.error || 'Upload failed');
+            }
+          } catch (error) {
+            console.error('Upload error:', error);
+            handleDocumentUploadError(`Upload failed: ${error.message}`);
           }
-        } else {
-          addToKey("reviews", result, movieId);
+        } else if (selectedFile) {
+          console.log('No review ID available for document upload');
+          handleDocumentUploadError('Review was created but document upload failed - no review ID');
         }
         
         // Switch to non-editing mode to show the saved review
         setIsEditing(false);
-        
       } catch (error) {
         console.error('Error submitting review:', error);
         setSubmitError(error.message || 'Failed to submit review');
@@ -234,15 +252,7 @@ const ReviewForm = ({ initObj }) => {
     const review = snakeToCamel(result.review);
     console.log('Converted review:', review);
     
-    if (review && review.reviewText) {
-      console.log('Setting reviewText to:', review.reviewText);
-      formik.setFieldValue("reviewText", review.reviewText);
-      // Also update the initObj so it's available in the non-editing view
-      if (initObj) {
-        initObj.reviewText = review.reviewText;
-      }
-    }
-    
+    // Don't automatically extract text - let user choose
     formik.setFieldTouched("reviewText", false);
     
     if (initObj && review) {
@@ -250,6 +260,50 @@ const ReviewForm = ({ initObj }) => {
       initObj.documentFilename = review.documentFilename;
       initObj.documentType = review.documentType;
       console.log('Updated initObj:', initObj);
+    }
+  };
+
+  const handleExtractText = async () => {
+    if (!selectedFile) {
+      setSubmitError('No file selected for text extraction');
+      return;
+    }
+
+    setIsExtracting(true);
+    setSubmitError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('document', selectedFile);
+      formData.append('extract_only', 'true'); // Flag to indicate we only want text extraction
+      
+      const uploadResponse = await fetch('/api/extract_text', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (uploadResponse.ok) {
+        const extractResult = await uploadResponse.json();
+        console.log('Text extraction successful:', extractResult);
+        
+        if (extractResult.text) {
+          console.log('Setting reviewText to:', extractResult.text);
+          formik.setFieldValue("reviewText", extractResult.text);
+          // Also update the initObj so it's available in the non-editing view
+          if (initObj) {
+            initObj.reviewText = extractResult.text;
+          }
+        }
+      } else {
+        const errorData = await uploadResponse.json();
+        console.error('Text extraction failed:', errorData);
+        setSubmitError(errorData.error || 'Text extraction failed');
+      }
+    } catch (error) {
+      console.error('Text extraction error:', error);
+      setSubmitError(`Text extraction failed: ${error.message}`);
+    } finally {
+      setIsExtracting(false);
     }
   };
 
@@ -306,6 +360,53 @@ const ReviewForm = ({ initObj }) => {
               <Error>{formik.errors.title}</Error>
             )}
           </div>
+
+          {/* Document Upload Section */}
+          <div>
+            <label>Document Upload (optional):</label>
+            <DocumentUpload
+              reviewId={initObj?.id || (initObj === null ? 'new' : null)}
+              onUploadSuccess={handleDocumentUploadSuccess}
+              onUploadError={handleDocumentUploadError}
+              onFileSelect={handleFileSelect}
+              existingDocument={hasDocument ? initObj : null}
+              onRemoveDocument={() => {
+                // Just update local state - persistence will happen on form submit
+                setHasDocument(false);
+                if (initObj) {
+                  initObj.hasDocument = false;
+                  initObj.documentFilename = null;
+                  initObj.documentType = null;
+                }
+              }}
+            />
+            
+            {/* Extract Text Button - only show if document is uploaded and review exists */}
+            {hasDocument && initObj?.id && (
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <Button
+                  type="button"
+                  onClick={handleExtractText}
+                  disabled={isExtracting}
+                  style={{
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: isExtracting ? 'not-allowed' : 'pointer',
+                    opacity: isExtracting ? 0.6 : 1
+                  }}
+                >
+                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
+                </Button>
+                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
+                  Click to extract text from the uploaded document into the review field below
+                </p>
+              </div>
+            )}
+          </div>
+
           <div>
             <label htmlFor="reviewText">
               Review: {hasDocument && <span style={{color: '#28a745', fontSize: '0.9em'}}>(Document uploaded - review text optional)</span>}
@@ -352,23 +453,6 @@ const ReviewForm = ({ initObj }) => {
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
           {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
           
-          {/* Document Upload Component - only show if we have a reviewId or are creating new */}
-          <DocumentUpload
-            reviewId={initObj?.id || (initObj === null ? 'new' : null)}
-            onUploadSuccess={handleDocumentUploadSuccess}
-            onUploadError={handleDocumentUploadError}
-            onFileSelect={handleFileSelect}
-            existingDocument={hasDocument ? initObj : null}
-            onRemoveDocument={() => {
-              // Just update local state - persistence will happen on form submit
-              setHasDocument(false);
-              if (initObj) {
-                initObj.hasDocument = false;
-                initObj.documentFilename = null;
-                initObj.documentType = null;
-              }
-            }}
-          />
           
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
             <Button type="button" onClick={() => {
@@ -391,12 +475,15 @@ const ReviewForm = ({ initObj }) => {
       ) : (
         <ContentDisplay
           formValues={(() => {
+            // Use updatedReview if available, otherwise fall back to initObj
+            const reviewData = updatedReview || initObj;
             const values = {
               ...formik.values,
-              hasDocument: initObj?.hasDocument || false,
-              documentFilename: initObj?.documentFilename || null,
-              documentType: initObj?.documentType || null,
-              dateAdded: initObj?.dateAdded || null,
+              ...reviewData, // Include all review data
+              hasDocument: reviewData?.hasDocument || false,
+              documentFilename: reviewData?.documentFilename || null,
+              documentType: reviewData?.documentType || null,
+              dateAdded: reviewData?.dateAdded || null,
               tags: tags
             };
             console.log('ContentDisplay formValues for review:', values);

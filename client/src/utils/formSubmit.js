@@ -148,6 +148,77 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
 };
 
 /**
+ * Submit review with optional document upload in one request
+ */
+export const submitReviewWithDocument = async (formData, file, isEdit = false, reviewId = null) => {
+  try {
+    // Prepare form data
+    const formDataToSend = new FormData();
+    
+    // Add review data
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('rating', formData.rating);
+    formDataToSend.append('review_text', cleanRichText(formData.reviewText));
+    formDataToSend.append('movie_id', formData.movieId);
+    formDataToSend.append('replace_text', 'true'); // Always replace text with extracted content
+    
+    // Add tags
+    if (formData.tags && formData.tags.length > 0) {
+      formDataToSend.append('tags', JSON.stringify(formData.tags.map(tag => ({
+        name: typeof tag === 'string' ? tag : tag.name
+      }))));
+    }
+    
+    // Add document if provided
+    if (file) {
+      formDataToSend.append('document', file);
+    }
+    
+    // Choose endpoint
+    const url = isEdit ? `/api/reviews_with_document/${reviewId}` : '/api/reviews_with_document';
+    const method = isEdit ? 'PATCH' : 'POST';
+    
+    console.log(`Submitting review with document: ${method} ${url}`);
+    
+    const response = await fetch(url, {
+      method,
+      body: formDataToSend,
+    });
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        console.error('Could not parse error response as JSON:', e);
+      }
+      throw new Error(errorMessage);
+    }
+    
+    let result;
+    try {
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+      result = JSON.parse(responseText);
+    } catch (e) {
+      console.error('Could not parse response as JSON:', e);
+      throw new Error('Invalid JSON response from server');
+    }
+    
+    console.log('Review with document submitted successfully:', result);
+    
+    return { success: true, result };
+  } catch (error) {
+    console.error('Review with document submission failed:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
  * Handle form submission - just submit and return result, no navigation
  */
 export const handleFormSubmit = async (formData, file, isEdit = false, id = null, isArticle = false) => {

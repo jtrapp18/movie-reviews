@@ -128,7 +128,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
 
   const handleDownload = () => {
     if (existingDocument) {
-      window.open(`/api/download_document/${reviewId}`, '_blank');
+      window.open(`/api/download_document/${reviewId}?v=${existingDocument?.documentFilename || 'unknown'}`, '_blank');
     }
   };
 
@@ -207,7 +207,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           overflow: 'hidden'
         }}>
           <iframe
-            src={`/api/view_document/${reviewId}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
+            src={`/api/view_document/${reviewId}?v=${existingDocument?.documentFilename || 'unknown'}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
             width="100%"
             height="300px"
             style={{

@@ -237,10 +237,10 @@ class DocumentProcessor:
     def process_uploaded_document_temporary(file) -> Dict[str, any]:
         """
         Process uploaded document using temporary files for better deployment compatibility.
-        Extracts text only - simple and reliable approach.
+        Extracts text and keeps file for serving - deployment-friendly approach.
         
         Returns:
-            Dict with keys: 'filename', 'file_type', 'extracted_text', 'success'
+            Dict with keys: 'filename', 'file_path', 'file_type', 'extracted_text', 'success'
         """
         if not file or not file.filename:
             return {'success': False, 'error': 'No file provided'}
@@ -276,6 +276,7 @@ class DocumentProcessor:
             return {
                 'success': True,
                 'filename': original_filename,
+                'file_path': temp_path,  # Return the temp file path for serving
                 'file_type': file_type,
                 'extracted_text': extracted_text
             }
@@ -286,11 +287,9 @@ class DocumentProcessor:
                 'error': f'Error processing document: {str(e)}'
             }
         finally:
-            # Clean up temporary file
+            # Don't clean up the temporary file - we need it for serving
             if temp_file:
                 temp_file.close()
-            if temp_path and os.path.exists(temp_path):
-                os.unlink(temp_path)
     
     @staticmethod
     def get_document_preview(file_path: str, file_type: str, max_chars: int = 500) -> str:

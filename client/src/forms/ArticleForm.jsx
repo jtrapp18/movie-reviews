@@ -44,6 +44,7 @@ const ArticleForm = ({ initObj }) => {
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const { setMovies, setArticles } = useOutletContext();
   const { addItem, updateItem } = useCrudStateDB(setArticles, "articles");
 
@@ -177,10 +178,6 @@ const ArticleForm = ({ initObj }) => {
     
     if (review && review.reviewText) {
       formik.setFieldValue("reviewText", review.reviewText);
-      // Also update the initObj so it's available in the non-editing view
-      if (initObj) {
-        initObj.reviewText = review.reviewText;
-      }
     }
     
     formik.setFieldTouched("reviewText", false);
@@ -189,6 +186,52 @@ const ArticleForm = ({ initObj }) => {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
       initObj.documentType = review.documentType;
+    }
+    // Don't reload the page - just update the form state
+    // The form should remain in edit mode after document upload
+  };
+
+  const handleExtractText = async () => {
+    if (!selectedFile) {
+      setSubmitError('No file selected for text extraction');
+      return;
+    }
+
+    setIsExtracting(true);
+    setSubmitError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('document', selectedFile);
+      formData.append('extract_only', 'true'); // Flag to indicate we only want text extraction
+      
+      const uploadResponse = await fetch('/api/extract_text', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (uploadResponse.ok) {
+        const extractResult = await uploadResponse.json();
+        console.log('Text extraction successful:', extractResult);
+        
+        if (extractResult.text) {
+          console.log('Setting reviewText to:', extractResult.text);
+          formik.setFieldValue("reviewText", extractResult.text);
+          // Also update the initObj so it's available in the non-editing view
+          if (initObj) {
+            initObj.reviewText = extractResult.text;
+          }
+        }
+      } else {
+        const errorData = await uploadResponse.json();
+        console.error('Text extraction failed:', errorData);
+        setSubmitError(errorData.error || 'Text extraction failed');
+      }
+    } catch (error) {
+      console.error('Text extraction error:', error);
+      setSubmitError(`Text extraction failed: ${error.message}`);
+    } finally {
+      setIsExtracting(false);
     }
   };
 
@@ -232,6 +275,52 @@ const ArticleForm = ({ initObj }) => {
             )}
           </div>
 
+          {/* Document Upload Section */}
+          <div>
+            <label>Document Upload (optional):</label>
+            <DocumentUpload
+              reviewId={initObj?.id}
+              onUploadSuccess={handleDocumentUploadSuccess}
+              onUploadError={handleDocumentUploadError}
+              existingDocument={hasDocument ? initObj : null}
+              onFileSelect={handleFileSelect}
+              onRemoveDocument={() => {
+                // Just update local state - persistence will happen on form submit
+                setHasDocument(false);
+                if (initObj) {
+                  initObj.hasDocument = false;
+                  initObj.documentFilename = null;
+                  initObj.documentType = null;
+                }
+              }}
+            />
+            
+            {/* Extract Text Button - only show if document is uploaded and article exists */}
+            {hasDocument && initObj?.id && (
+              <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                <Button
+                  type="button"
+                  onClick={handleExtractText}
+                  disabled={isExtracting}
+                  style={{
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '4px',
+                    cursor: isExtracting ? 'not-allowed' : 'pointer',
+                    opacity: isExtracting ? 0.6 : 1
+                  }}
+                >
+                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
+                </Button>
+                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
+                  Click to extract text from the selected document into the article content field below
+                </p>
+              </div>
+            )}
+          </div>
+
           <div>
             <label htmlFor="reviewText">
               Article Content: {hasDocument && <span style={{color: '#28a745', fontSize: '0.9em'}}>(Document uploaded - content optional)</span>}
@@ -248,23 +337,6 @@ const ArticleForm = ({ initObj }) => {
               <Error>{formik.errors.reviewText}</Error>
             )}
           </div>
-
-          <DocumentUpload
-            reviewId={initObj?.id}
-            onUploadSuccess={handleDocumentUploadSuccess}
-            onUploadError={handleDocumentUploadError}
-            existingDocument={hasDocument ? initObj : null}
-            onFileSelect={handleFileSelect}
-            onRemoveDocument={() => {
-              // Just update local state - persistence will happen on form submit
-              setHasDocument(false);
-              if (initObj) {
-                initObj.hasDocument = false;
-                initObj.documentFilename = null;
-                initObj.documentType = null;
-              }
-            }}
-          />
 
           <div>
             <label htmlFor="tags">Tags</label>

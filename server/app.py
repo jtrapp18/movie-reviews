@@ -502,6 +502,160 @@ class MovieRatings(Resource):
         except Exception as e:
             return {'error': f'Failed to fetch ratings: {str(e)}'}, 500
 
+class ReviewWithDocument(Resource):
+    """Handle review creation with optional document upload in one request."""
+    
+    def post(self):
+        """Create a new review with optional document upload."""
+        try:
+            # Check if this is a file upload (multipart/form-data)
+            if request.content_type and 'multipart/form-data' in request.content_type:
+                # Handle file upload
+                data = request.form.to_dict()
+                file = request.files.get('document')
+            else:
+                # Handle JSON data
+                data = request.get_json()
+                file = None
+            
+            # Validate required fields
+            if not data.get('title'):
+                return {'error': 'Review title is required'}, 400
+            if not data.get('rating'):
+                return {'error': 'Rating is required'}, 400
+            if not data.get('movie_id'):
+                return {'error': 'Movie ID is required'}, 400
+            
+            # Create new review
+            review = Review(
+                title=data.get('title'),
+                rating=data.get('rating'),
+                review_text=data.get('review_text', ''),
+                movie_id=data.get('movie_id'),
+                content_type='review'
+            )
+            
+            db.session.add(review)
+            db.session.flush()  # Flush to get the review ID
+            
+            # Handle tags if provided
+            if data.get('tags'):
+                tags_data = data['tags']
+                # Parse JSON string if needed
+                if isinstance(tags_data, str):
+                    import json
+                    tags_data = json.loads(tags_data)
+                
+                for tag_data in tags_data:
+                    if isinstance(tag_data, dict) and 'name' in tag_data:
+                        tag_name = tag_data['name'].strip().lower()
+                        if tag_name:
+                            # Find or create tag
+                            tag = Tag.query.filter_by(name=tag_name).first()
+                            if not tag:
+                                tag = Tag(name=tag_name)
+                                db.session.add(tag)
+                                db.session.flush()
+                            review.tags.append(tag)
+            
+            # Handle document upload if file is provided
+            if file and file.filename:
+                result = DocumentProcessor.process_uploaded_document_temporary(file)
+                
+                if result['success']:
+                    # Update review with document information
+                    review.has_document = True
+                    review.document_filename = result['filename']
+                    review.document_type = result['file_type']
+                    
+                    # Replace review text with extracted text if replace_text is true
+                    replace_text = data.get('replace_text', 'true').lower() == 'true'
+                    if replace_text and result['extracted_text']:
+                        review.review_text = result['extracted_text']
+                else:
+                    return {'error': f'Document processing failed: {result["error"]}'}, 400
+            
+            db.session.commit()
+            return review.to_dict(), 201
+            
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Failed to create review: {str(e)}'}, 500
+
+class ReviewWithDocumentById(Resource):
+    """Handle review updates with optional document upload in one request."""
+    
+    def patch(self, review_id):
+        """Update an existing review with optional document upload."""
+        try:
+            review = Review.query.get(review_id)
+            if not review:
+                return {'error': 'Review not found'}, 404
+            
+            # Check if this is a file upload (multipart/form-data)
+            if request.content_type and 'multipart/form-data' in request.content_type:
+                # Handle file upload
+                data = request.form.to_dict()
+                file = request.files.get('document')
+            else:
+                # Handle JSON data
+                data = request.get_json()
+                file = None
+            
+            # Update review fields
+            if 'title' in data:
+                review.title = data['title']
+            if 'rating' in data:
+                review.rating = data['rating']
+            if 'review_text' in data:
+                review.review_text = data['review_text']
+            
+            # Handle tags if provided
+            if 'tags' in data:
+                # Clear existing tags
+                review.tags.clear()
+                # Add new tags
+                tags_data = data['tags']
+                # Parse JSON string if needed
+                if isinstance(tags_data, str):
+                    import json
+                    tags_data = json.loads(tags_data)
+                
+                for tag_data in tags_data:
+                    if isinstance(tag_data, dict) and 'name' in tag_data:
+                        tag_name = tag_data['name'].strip().lower()
+                        if tag_name:
+                            # Find or create tag
+                            tag = Tag.query.filter_by(name=tag_name).first()
+                            if not tag:
+                                tag = Tag(name=tag_name)
+                                db.session.add(tag)
+                            review.tags.append(tag)
+            
+            # Handle document upload if file is provided
+            if file and file.filename:
+                result = DocumentProcessor.process_uploaded_document_temporary(file)
+                
+                if result['success']:
+                    # Update review with document information
+                    review.has_document = True
+                    review.document_filename = result['filename']
+                    review.document_type = result['file_type']
+                    
+                    # Replace review text with extracted text if replace_text is true
+                    replace_text = data.get('replace_text', 'true').lower() == 'true'
+                    if replace_text and result['extracted_text']:
+                        review.review_text = result['extracted_text']
+                else:
+                    return {'error': f'Document processing failed: {result["error"]}'}, 400
+            
+            db.session.commit()
+            return review.to_dict(), 200
+            
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Failed to update review: {str(e)}'}, 500
+
 class DocumentUpload(Resource):
     """Handle document uploads for reviews."""
     
@@ -541,8 +695,8 @@ class DocumentUpload(Resource):
             # Update review with document information
             review.has_document = True
             review.document_filename = result['filename']
+            review.document_path = result['file_path']  # Store the actual file path
             review.document_type = result['file_type']
-            # No longer store file_path since we're using temporary processing
             
             # Optionally replace review text with extracted text
             if replace_text and result['extracted_text']:
@@ -564,6 +718,35 @@ class DocumentUpload(Resource):
         except Exception as e:
             return {'error': f'Upload failed: {str(e)}'}, 500
 
+class ExtractText(Resource):
+    """Handle text extraction from documents without saving."""
+    
+    def post(self):
+        """Extract text from a document without saving it."""
+        try:
+            if 'document' not in request.files:
+                return {'error': 'No document provided'}, 400
+            
+            file = request.files['document']
+            if file.filename == '':
+                return {'error': 'No file selected'}, 400
+            
+            # Process the document to extract text
+            result = DocumentProcessor.process_uploaded_document_temporary(file)
+            
+            if not result['success']:
+                return {'error': f'Text extraction failed: {result.get("error", "Unknown error")}'}, 400
+            
+            return {
+                'text': result['extracted_text'],
+                'filename': result['filename'],
+                'file_type': result['file_type'],
+                'text_length': len(result['extracted_text'])
+            }, 200
+            
+        except Exception as e:
+            return {'error': f'Text extraction failed: {str(e)}'}, 500
+
 class DocumentDownload(Resource):
     """Handle document downloads."""
     
@@ -580,11 +763,18 @@ class DocumentDownload(Resource):
             if not os.path.exists(review.document_path):
                 return {'error': 'Document file not found'}, 404
             
-            return send_file(
+            response = send_file(
                 review.document_path,
                 as_attachment=True,
                 download_name=review.document_filename
             )
+            
+            # Add cache-busting headers
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            return response
             
         except Exception as e:
             return {'error': f'Download failed: {str(e)}'}, 500
@@ -614,11 +804,18 @@ class DocumentView(Resource):
                 print(f"DEBUG DocumentView - File not found at: {review.document_path}")
                 return {'error': 'Document file not found'}, 404
             
-            return send_file(
+            response = send_file(
                 review.document_path,
                 as_attachment=False,  # This allows inline viewing
                 mimetype='application/pdf' if review.document_type == 'pdf' else 'application/octet-stream'
             )
+            
+            # Add cache-busting headers
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            return response
             
         except Exception as e:
             return {'error': f'View failed: {str(e)}'}, 500
@@ -668,6 +865,9 @@ api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DiscoverMovies, '/api/discover_movies')
 api.add_resource(MovieRatings, '/api/movie-ratings')
 api.add_resource(DocumentUpload, '/api/upload_document')
+api.add_resource(ExtractText, '/api/extract_text')
+api.add_resource(ReviewWithDocument, '/api/reviews_with_document')
+api.add_resource(ReviewWithDocumentById, '/api/reviews_with_document/<int:review_id>')
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
 api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
 api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
