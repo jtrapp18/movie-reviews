@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
-import { DocumentContent } from '../MiscStyling';
+import RichTextDisplay from './RichTextDisplay';
 
 const LoadingMessage = styled.div`
   display: flex;
@@ -128,8 +128,8 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
       overflow: 'auto',
       marginBottom: '10px'
     }}>
-      <DocumentContent
-        dangerouslySetInnerHTML={{ __html: wordContent }}
+      <RichTextDisplay
+        content={wordContent}
       />
     </div>
   );

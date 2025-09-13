@@ -71,7 +71,7 @@ const RichTextContainer = styled.div`
   }
 `;
 
-const RichTextDisplay = ({ content, className = "rich-text" }) => {
+const RichTextDisplay = ({ content }) => {
   if (!content || !content.trim()) {
     return null;
   }
@@ -88,7 +88,6 @@ const RichTextDisplay = ({ content, className = "rich-text" }) => {
 
   return (
     <RichTextContainer 
-      className={className}
       dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   );

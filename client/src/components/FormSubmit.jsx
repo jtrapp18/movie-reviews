@@ -100,34 +100,36 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
           </TagsContainer>
         )}
       </ContentHeader>
-
-      {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
-      {isWordDocument ? (
-        <div className="document-viewer">
+      <div className="content-body">
+        {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
+        {isWordDocument ? (
           <DocumentViewer
+            className="word-document-viewer"
             documentUrl={`/api/view_document/${reviewId}`}
             documentType={formValues.documentType}
             filename={formValues.documentFilename}
             hasDocument={formValues.hasDocument}
           />
-        </div>
-      ) : (
-        hasContent && (
-          <RichTextDisplay content={formValues.reviewText} />
-        )
-      )}
+        ) : (
+          hasContent && (
+            <RichTextDisplay
+              content={formValues.reviewText}
+            />
+          )
+        )}
 
-      {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
-      {hasDocument && !isWordDocument && !hasContent && formValues.documentType && formValues.documentType.toLowerCase() === 'pdf' && (
-        <div className="document-viewer">
+        {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
+        {hasDocument && !isWordDocument && !hasContent && formValues.documentType && formValues.documentType.toLowerCase() === 'pdf' && (
           <DocumentViewer
+            className="pdf-document-viewer"
             documentUrl={`/api/view_document/${reviewId}`}
             documentType={formValues.documentType}
             filename={formValues.documentFilename}
             hasDocument={formValues.hasDocument}
           />
-        </div>
-      )}
+        )}
+
+      </div>
 
       {isAdmin && (
         <Button 
