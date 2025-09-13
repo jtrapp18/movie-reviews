@@ -1,22 +1,31 @@
-import { StyledSubmit, Button } from '../MiscStyling'
+import { Button } from '../MiscStyling'
 import DocumentViewer from './DocumentViewer'
 import Stars from './Stars'
 import { useAdmin } from '../hooks/useAdmin'
 import RichTextDisplay from './RichTextDisplay'
 import styled from 'styled-components'
 
+const StyledSubmit = styled.div`
+  width: 650px;
+  max-width: 75vw;
+  padding: 2%;
+  display: flex;
+  flex-direction: column;
+`;
+
 const ContentHeader = styled.div`
   text-align: center;
-  margin-bottom: 30px;
-  width: 95%;
+  margin-bottom: 1rem;
+  width: 100%;
   margin-left: auto;
   margin-right: auto;
+
+  border-bottom: 2px dotted gray;
 `;
 
 const ContentTitle = styled.h1`
-  margin: 0 0 10px 0;
-  color: var(--cinema-gold);
-  font-size: 2rem;
+  margin: 0;
+  padding: 0.5rem;
 `;
 
 const ContentMeta = styled.div`
@@ -27,11 +36,6 @@ const ContentMeta = styled.div`
 
 const PublishDate = styled.span`
   color: #666;
-`;
-
-const Rating = styled.span`
-  color: var(--cinema-gold);
-  font-weight: bold;
 `;
 
 const StarsContainer = styled.div`
@@ -56,6 +60,15 @@ const Tag = styled.span`
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 500;
+`;
+
+const ContentBody = styled.div`
+  padding: 2rem 1rem;
+  margin-bottom: 2rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  border-left: 3px solid var(--cinema-gold-dark);
 `;
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
@@ -100,7 +113,8 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
           </TagsContainer>
         )}
       </ContentHeader>
-      <div className="content-body">
+      
+      <ContentBody>
         {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
         {isWordDocument ? (
           <DocumentViewer
@@ -128,8 +142,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
             hasDocument={formValues.hasDocument}
           />
         )}
-
-      </div>
+      </ContentBody>
 
       {isAdmin && (
         <Button 

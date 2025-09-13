@@ -34,6 +34,16 @@ p {
   --cinema-gray: #2d2d2d;
   --cinema-light-gray: #4a4a4a;
   
+  /* Rich text display colors */
+  --rich-text-primary: #f8f9fa; /* Soft white for main text */
+  --rich-text-header: #ffffff; /* Pure white for headers */
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15); /* Gold tint for code */
+  --rich-text-code-border: rgba(255, 215, 0, 0.3);
+  --rich-text-blockquote-bg: rgba(255, 215, 0, 0.05);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.2);
+  
   /* Legacy colors (keeping for compatibility) */
   --green: #4E7839;
   --light-yellow: #fbf4a4;

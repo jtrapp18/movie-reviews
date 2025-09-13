@@ -97,30 +97,6 @@ const StyledForm = styled.form`
   }
 `
 
-const StyledSubmit = styled.div`
-  width: 650px;
-  max-width: 75vw;
-  padding: 2%;
-  display: flex;
-  flex-direction: column;
-
-  h1 {
-    padding: 5px;
-    border-radius: 200px;
-    text-align: center;
-  }
-
-  p {
-    color: var(--cinema-gold);
-  }
-
-  > div {
-    display: flex;
-    flex-direction: column;
-    border-bottom: 2px dotted gray;
-  }
-`
-
 const StyledDeleted = styled.div`
   width: fit-content;
   max-width: 90vw;
@@ -354,5 +330,5 @@ const DocumentContent = styled.div`
 `;
 
 export { StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
-  StyledSubmit, StyledDeleted, CardContainer, BorderGlow, Button, Tag,
+  StyledDeleted, CardContainer, BorderGlow, Button, Tag,
   StyledCard, StyledContainer, DocumentContent }
