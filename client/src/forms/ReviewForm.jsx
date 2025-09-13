@@ -13,6 +13,7 @@ import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
 import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
+import { extractTextFromFile } from "../utils/textExtraction";
 import useCrudStateDB from "../hooks/useCrudStateDB";
 import { snakeToCamel } from "../helper";
 
@@ -186,47 +187,13 @@ const ReviewForm = ({ initObj }) => {
   };
 
   const handleExtractText = async () => {
-    if (!selectedFile) {
-      setSubmitError('No file selected for text extraction');
-      return;
-    }
-
-    setIsExtracting(true);
-    setSubmitError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('document', selectedFile);
-      formData.append('extract_only', 'true'); // Flag to indicate we only want text extraction
-      
-      const uploadResponse = await fetch('/api/extract_text', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      if (uploadResponse.ok) {
-        const extractResult = await uploadResponse.json();
-        console.log('Text extraction successful:', extractResult);
-        
-        if (extractResult.text) {
-          console.log('Setting reviewText to:', extractResult.text);
-          formik.setFieldValue("reviewText", extractResult.text);
-          // Also update the initObj so it's available in the non-editing view
-          if (initObj) {
-            initObj.reviewText = extractResult.text;
-          }
-        }
-      } else {
-        const errorData = await uploadResponse.json();
-        console.error('Text extraction failed:', errorData);
-        setSubmitError(errorData.error || 'Text extraction failed');
-      }
-    } catch (error) {
-      console.error('Text extraction error:', error);
-      setSubmitError(`Text extraction failed: ${error.message}`);
-    } finally {
-      setIsExtracting(false);
-    }
+    await extractTextFromFile(
+      selectedFile,
+      setSubmitError,
+      setIsExtracting,
+      formik.setFieldValue,
+      initObj
+    );
   };
 
   const handleDocumentUploadError = (error) => {
