@@ -266,6 +266,7 @@ const StyledCard = styled.article`
 
   &:hover .movie-details {
     opacity: 1;
+    zoom: 1.03;
     background: rgba(0, 0, 0, .7);
   }
 `
@@ -329,6 +330,6 @@ const DocumentContent = styled.div`
   }
 `;
 
-export { StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
+export { StyledNavigation, StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
   StyledDeleted, CardContainer, BorderGlow, Button, Tag,
   StyledCard, StyledContainer, DocumentContent }

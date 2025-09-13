@@ -10,29 +10,29 @@ const ArticleCardContainer = styled.article`
   padding: 5%;
   width: 200px;
   height: 280px;
-  background: white;
-  border: px solid #e9ecef;
-  border-radius: 0px;
+  background: linear-gradient(135deg, var(--cinema-gold-ultra-light) 0%, #ffffff 60%, #f8f9fa 100%);
+  border-left: 4px solid var(--cinema-gold-dark);
+  border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    zoom: 1.03;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background: #f8f9fa;
   }
 `;
 
 const ArticleTitle = styled.h2`
   height: 50%;
   color: var(--cinema-black);
-  // background: var(--cinema-gold-dark);
   line-height: 1.3;
   font-size: clamp(1rem, 2.8vw, 1.5rem);
   font-weight: bold;
-  border-bottom: 3px double black;
+  border-bottom: 3px double var(--cinema-gold-dark);
   margin-bottom: 8px;
-  // text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: opacity 0.3s ease;
   display: flex;
   align-items: flex-end;
@@ -53,7 +53,7 @@ const ArticleDate = styled.div`
   position: absolute;
   top: 1%;
   right: 1%;
-  color: var(--cinema-gray);
+  color: var(--cinema-gold-dark);
   font-size: 9px;
   font-weight: 500;
   text-align: center;
@@ -66,22 +66,12 @@ const ArticleDate = styled.div`
 const TagContainer = styled.div`
   height: 10%;
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  flex-wrap: nowrap;
+  gap: 3px;
   align-items: flex-end;
-`;
-
-
-const DocumentIndicator = styled.div`
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  color: var(--cinema-black);
-  padding: 4px 8px;
-  font-size: 9px;
-  font-weight: 600;
-  z-index: 1001;
+  padding: 4px 6px 4px 4px;
+  border-radius: 4px;
+  overflow: hidden;
 `;
 
 function ArticleCard({ article }) {
@@ -113,7 +103,6 @@ function ArticleCard({ article }) {
 
   return (
     <ArticleCardContainer onClick={handleClick}>
-
       <ArticleDate>
         {formatDate(article.dateAdded)}
       </ArticleDate>  
@@ -131,7 +120,7 @@ function ArticleCard({ article }) {
           {article.tags.slice(0, 3).map((tag, index) => (
             <Tag 
               key={tag.id || index}
-              backgroundColor={tag.backgroundColor || '#007bff'}
+              backgroundColor={tag.backgroundColor || '#6c757d'}
               textColor={tag.textColor || '#ffffff'}
               size="small"
             >
@@ -139,7 +128,7 @@ function ArticleCard({ article }) {
             </Tag>
           ))}
           {article.tags.length > 3 && (
-            <Tag backgroundColor="#6c757d" textColor="#ffffff" size="small">
+            <Tag backgroundColor="#495057" textColor="#ffffff" size="small">
               +{article.tags.length - 3}
             </Tag>
           )}

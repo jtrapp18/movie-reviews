@@ -27,6 +27,7 @@ p {
   /* Movie-themed colors - Updated 2025 */
   --cinema-gold: #FFD700;
   --cinema-gold-dark: #B8860B;
+  --cinema-gold-ultra-light: rgba(255, 248, 220, 0.25); /* Very light warm gold background */
   --cinema-red: #DC143C;
   --cinema-red-dark: #B22222;
   --cinema-silver: #C0C0C0;
