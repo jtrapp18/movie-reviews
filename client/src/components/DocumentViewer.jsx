@@ -118,7 +118,7 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
         maxWidth: '100%',
         borderRadius: '8px',
         marginBottom: '10px',
-        minHeight: '750px',
+        minHeight: '750px'
       }}
       title={filename || 'PDF Document'}
     />

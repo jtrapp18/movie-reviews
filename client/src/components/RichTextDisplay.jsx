@@ -5,7 +5,7 @@ import DOMPurify from 'dompurify';
 const RichTextContainer = styled.div`
   /* Enhanced typography for better readability */
   font-family: 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-size: calc(clamp(1rem, 2.2vw, 1.2rem) * var(--zoom-multiplier, 1));
   line-height: 1.7;
   color: var(--rich-text-primary);
   max-width: 100%;
@@ -20,24 +20,24 @@ const RichTextContainer = styled.div`
   }
   
   h1 {
-    font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+    font-size: calc(clamp(1.8rem, 4.5vw, 2.5rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-header);
     border-bottom: 2px solid var(--cinema-gold);
     padding-bottom: 0.3em;
   }
   
   h2 {
-    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    font-size: calc(clamp(1.5rem, 3.5vw, 2rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
   h3 {
-    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    font-size: calc(clamp(1.3rem, 3vw, 1.7rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
   h4, h5, h6 {
-    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    font-size: calc(clamp(1.1rem, 2.5vw, 1.4rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
@@ -47,6 +47,8 @@ const RichTextContainer = styled.div`
   
   /* Enhanced paragraph styling */
   p {
+    font-size: calc(1rem * var(--zoom-multiplier, 1));
+    line-height: 1.7;
     margin: 1.2em 0;
     color: var(--rich-text-primary);
     text-align: justify;
@@ -91,7 +93,7 @@ const RichTextContainer = styled.div`
     padding: 0.3em 0.6em;
     border-radius: 4px;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+    font-size: calc(clamp(0.85rem, 1.8vw, 0.95rem) * var(--zoom-multiplier, 1));
     border: 1px solid var(--rich-text-code-border);
   }
   
@@ -171,7 +173,7 @@ const RichTextContainer = styled.div`
   
   /* Responsive adjustments */
   @media (max-width: 768px) {
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-size: calc(clamp(0.9rem, 2vw, 1.1rem) * var(--zoom-multiplier, 1));
     line-height: 1.6;
     
     blockquote {
@@ -181,7 +183,7 @@ const RichTextContainer = styled.div`
     
     pre {
       padding: 1em;
-      font-size: clamp(0.8rem, 1.6vw, 0.9rem);
+      font-size: calc(clamp(0.8rem, 1.6vw, 0.9rem) * var(--zoom-multiplier, 1));
     }
   }
 `;

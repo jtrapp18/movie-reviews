@@ -3,6 +3,7 @@ import DocumentViewer from './DocumentViewer'
 import Stars from './Stars'
 import { useAdmin } from '../hooks/useAdmin'
 import RichTextDisplay from './RichTextDisplay'
+import ZoomableContent from './ZoomableContent'
 import styled from 'styled-components'
 
 const StyledSubmit = styled.div`
@@ -82,6 +83,9 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
   const isWordDocument = hasDocument && formValues.documentType && 
     (formValues.documentType.toLowerCase() === 'docx' || formValues.documentType.toLowerCase() === 'doc');
 
+  // Determine if there's any content to display
+  const hasAnyContent = hasContent || hasDocument;
+
   return (
     <StyledSubmit>
       <ContentHeader>
@@ -114,35 +118,45 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
         )}
       </ContentHeader>
       
-      <ContentBody>
-        {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
-        {isWordDocument ? (
-          <DocumentViewer
-            className="word-document-viewer"
-            documentUrl={`/api/view_document/${reviewId}`}
-            documentType={formValues.documentType}
-            filename={formValues.documentFilename}
-            hasDocument={formValues.hasDocument}
-          />
-        ) : (
-          hasContent && (
-            <RichTextDisplay
-              content={formValues.reviewText}
-            />
-          )
-        )}
+      {hasAnyContent ? (
+        <ZoomableContent>
+          <ContentBody>
+            {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
+            {isWordDocument ? (
+              <DocumentViewer
+                className="word-document-viewer"
+                documentUrl={`/api/view_document/${reviewId}`}
+                documentType={formValues.documentType}
+                filename={formValues.documentFilename}
+                hasDocument={formValues.hasDocument}
+              />
+            ) : (
+              hasContent && (
+                <RichTextDisplay
+                  content={formValues.reviewText}
+                />
+              )
+            )}
 
-        {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
-        {hasDocument && !isWordDocument && !hasContent && formValues.documentType && formValues.documentType.toLowerCase() === 'pdf' && (
-          <DocumentViewer
-            className="pdf-document-viewer"
-            documentUrl={`/api/view_document/${reviewId}`}
-            documentType={formValues.documentType}
-            filename={formValues.documentFilename}
-            hasDocument={formValues.hasDocument}
-          />
-        )}
-      </ContentBody>
+            {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
+            {hasDocument && !isWordDocument && !hasContent && formValues.documentType && formValues.documentType.toLowerCase() === 'pdf' && (
+              <DocumentViewer
+                className="pdf-document-viewer"
+                documentUrl={`/api/view_document/${reviewId}`}
+                documentType={formValues.documentType}
+                filename={formValues.documentFilename}
+                hasDocument={formValues.hasDocument}
+              />
+            )}
+          </ContentBody>
+        </ZoomableContent>
+      ) : (
+        <ContentBody>
+          <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+            No content available for this article.
+          </p>
+        </ContentBody>
+      )}
 
       {isAdmin && (
         <Button 
