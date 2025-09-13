@@ -1,39 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
-
-
-
-
-const WordContent = styled.div`
-  padding: 20px;
-  line-height: 1.6;
-  
-  img {
-    max-width: 100%;
-    height: auto;
-    margin: 10px 0;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0;
-  }
-  
-  table, th, td {
-    border: 1px solid #ddd;
-  }
-  
-  th, td {
-    padding: 8px;
-    text-align: left;
-  }
-  
-  p {
-    margin: 10px 0;
-  }
-`;
+import { DocumentContent } from '../MiscStyling';
 
 const LoadingMessage = styled.div`
   display: flex;
@@ -160,7 +128,7 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
       overflow: 'auto',
       marginBottom: '10px'
     }}>
-      <WordContent
+      <DocumentContent
         dangerouslySetInnerHTML={{ __html: wordContent }}
       />
     </div>

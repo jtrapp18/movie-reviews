@@ -110,13 +110,13 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
       </ContentHeader>
 
       {hasContent && (
-        <ContentText>
+        <ContentText className="content-text">
           <RichTextDisplay content={formValues.reviewText} />
         </ContentText>
       )}
 
       {hasDocument && (
-        <div>
+        <div className="document-viewer">
           <DocumentViewer
             documentUrl={`/api/view_document/${reviewId}`}
             documentType={formValues.documentType}

@@ -323,6 +323,36 @@ const Tag = styled.div`
   width: fit-content;
 `
 
+const DocumentContent = styled.div`
+  padding: 20px;
+  line-height: 1.6;
+  
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+  
+  table, th, td {
+    border: 1px solid #ddd;
+  }
+  
+  th, td {
+    padding: 8px;
+    text-align: left;
+  }
+  
+  p {
+    margin: 10px 0;
+  }
+`;
+
 export { StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
   StyledSubmit, StyledDeleted, CardContainer, BorderGlow, Button, Tag,
-  StyledCard, StyledContainer }
+  StyledCard, StyledContainer, DocumentContent }

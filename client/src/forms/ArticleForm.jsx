@@ -75,27 +75,6 @@ const ArticleForm = ({ initObj }) => {
       }),
   });
 
-  // Function to clean up rich text content
-  const cleanRichText = (html) => {
-    if (!html) return '';
-    
-    // Remove empty paragraphs with just line breaks and whitespace
-    const cleaned = html
-      .replace(/<p><br><\/p>/gi, '') // Remove empty paragraphs
-      .replace(/<p><br\/><\/p>/gi, '') // Remove empty paragraphs with self-closing br
-      .replace(/<p>\s*<\/p>/gi, '') // Remove paragraphs with only whitespace
-      .replace(/<p>&nbsp;<\/p>/gi, '') // Remove paragraphs with non-breaking spaces
-      .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '') // Remove paragraphs with whitespace and nbsp
-      .trim();
-    
-    // If only empty tags remain, return empty string
-    if (cleaned === '' || cleaned === '<p></p>' || cleaned === '<br>' || cleaned === '<p> </p>') {
-      return '';
-    }
-    
-    return cleaned;
-  };
-
   const formik = useFormik({
     initialValues,
     validationSchema,

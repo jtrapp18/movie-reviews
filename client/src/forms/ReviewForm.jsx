@@ -81,27 +81,6 @@ const ReviewForm = ({ initObj }) => {
       }),
   });
 
-  // Function to clean up rich text content
-  const cleanRichText = (html) => {
-    if (!html) return '';
-    
-    // Remove empty paragraphs with just line breaks and whitespace
-    const cleaned = html
-      .replace(/<p><br><\/p>/gi, '') // Remove empty paragraphs
-      .replace(/<p><br\/><\/p>/gi, '') // Remove empty paragraphs with self-closing br
-      .replace(/<p>\s*<\/p>/gi, '') // Remove paragraphs with only whitespace
-      .replace(/<p>&nbsp;<\/p>/gi, '') // Remove paragraphs with non-breaking spaces
-      .replace(/<p>\s*&nbsp;\s*<\/p>/gi, '') // Remove paragraphs with whitespace and nbsp
-      .trim();
-    
-    // If only empty tags remain, return empty string
-    if (cleaned === '' || cleaned === '<p></p>' || cleaned === '<br>' || cleaned === '<p> </p>') {
-      return '';
-    }
-    
-    return cleaned;
-  };
-
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -111,16 +90,11 @@ const ReviewForm = ({ initObj }) => {
       setSubmitError(null);
       
       try {
-        // Clean up the rich text content
-        const cleanedReviewText = cleanRichText(values.reviewText);
-        console.log('DEBUG - Original reviewText:', values.reviewText);
-        console.log('DEBUG - Cleaned reviewText:', cleanedReviewText);
-        
         // Prepare the form data for submission
         const formData = {
           title: values.title,
           rating: values.rating,
-          reviewText: cleanedReviewText,
+          reviewText: values.reviewText,
           movieId: movieId,
           tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
         };
@@ -353,7 +327,7 @@ const ReviewForm = ({ initObj }) => {
             
             const values = {
               ...formik.values,
-              ...reviewData, // Include all review data
+              ...initObj, // Include all review data
               // Ensure we only use reviewText (camelCase) for consistency
               // Always prioritize the database value (which contains the HTML)
               reviewText: reviewData?.reviewText || reviewData?.review_text || formik.values.reviewText || '',

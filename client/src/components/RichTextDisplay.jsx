@@ -71,7 +71,7 @@ const RichTextContainer = styled.div`
   }
 `;
 
-const RichTextDisplay = ({ content, className = "" }) => {
+const RichTextDisplay = ({ content, className = "rich-text" }) => {
   if (!content || !content.trim()) {
     return null;
   }
