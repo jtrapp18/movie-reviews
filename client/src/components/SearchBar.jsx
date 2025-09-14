@@ -12,6 +12,11 @@ const SearchContainer = styled.div`
         width: 100%;
         height: 100%;
         position: relative;
+        color: white;
+
+        &:hover {
+            color: black;
+        }
     }
 
     input {
@@ -20,7 +25,7 @@ const SearchContainer = styled.div`
         font-size: 16px;
         border: 1px solid #ccc;
         padding: 10px 15px;
-        color: black;
+        color: inherit;
 
         &:hover {
             background: var(--cinema-gold);
@@ -32,8 +37,8 @@ const SearchContainer = styled.div`
         right: 5%;
         top: 50%;
         transform: translateY(-50%);
-        color: black;
         cursor: pointer;
+        color: inherit;
     }
 
 `

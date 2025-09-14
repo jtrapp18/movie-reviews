@@ -949,26 +949,28 @@ class UnifiedSearch(Resource):
                 'totalResults': 0
             }, 200
         
-        # Search movies by title + their reviews + tags
+        # Search movies by title + their reviews + tags (movies that have reviews)
+        # Make search case-insensitive
         movie_results = db.session.query(Movie).join(Review, Movie.id == Review.movie_id).filter(
             db.or_(
-                Movie.title.contains(search_query),
-                Review.review_text.contains(search_query),
-                Review.tags.any(Tag.name.contains(search_query))
+                Movie.title.ilike(f'%{search_query}%'),
+                Review.review_text.ilike(f'%{search_query}%'),
+                Review.tags.any(Tag.name.ilike(f'%{search_query}%'))
             )
         ).distinct().all()
         
-        # Search articles by title + content + tags
+        # Search articles by title + content + tags (case-insensitive)
         article_results = Review.query.filter_by(content_type='article').filter(
             db.or_(
-                Review.title.contains(search_query),
-                Review.review_text.contains(search_query),
-                Review.tags.any(Tag.name.contains(search_query))
+                Review.title.ilike(f'%{search_query}%'),
+                Review.review_text.ilike(f'%{search_query}%'),
+                Review.tags.any(Tag.name.ilike(f'%{search_query}%'))
             )
         ).all()
         
         # Convert to dictionaries
         movies_data = [movie.to_dict() for movie in movie_results]
+        
         articles_data = [article.to_dict() for article in article_results]
         
         return {

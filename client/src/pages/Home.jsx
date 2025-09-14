@@ -1,4 +1,4 @@
-import { getJSON, getMovieInfo } from '../helper';
+import { getJSON, getMovieInfo, snakeToCamel } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Movies from '../components/Movies';
@@ -60,8 +60,11 @@ function Home() {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
       const data = await response.json();
       
-      setShowMovies(data.movies || []);
-      setShowArticles(data.articles || []);
+      // Convert snake_case to camelCase for frontend compatibility
+      const camelData = snakeToCamel(data);
+      
+      setShowMovies(camelData.movies || []);
+      setShowArticles(camelData.articles || []);
     } catch (error) {
       console.error('Error searching:', error);
       // Fallback to showing all content on error
