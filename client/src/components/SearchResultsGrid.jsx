@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
 import { getMovieRatings } from '../helper';
+import Loading from '../pages/Loading';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -72,7 +73,7 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
     return (
       <GridContainer>
         <GridHeader>
-          <GridTitle>Loading...</GridTitle>
+          <Loading text="Loading results" compact={true} />
         </GridHeader>
       </GridContainer>
     );

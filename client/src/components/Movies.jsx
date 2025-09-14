@@ -3,6 +3,7 @@ import { CardContainer } from '../MiscStyling';
 import MovieCard from '../cards/MovieCard';
 import MotionWrapper from '../styles/MotionWrapper';
 import Carousel from './Carousel';
+import Loading from '../pages/Loading';
 import { getMovieRatings } from '../helper';
 
 function Movies({ showMovies, enterSearch }) {
@@ -20,10 +21,7 @@ function Movies({ showMovies, enterSearch }) {
   if (!showMovies || !Array.isArray(showMovies)) {
     return (
       <CardContainer>
-        <div className="text-center p-4">
-          <h3>Loading movies...</h3>
-          <p>Please wait while we fetch the latest movies.</p>
-        </div>
+        <Loading text="Loading movies" compact={true} />
       </CardContainer>
     );
   }

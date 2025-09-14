@@ -5,6 +5,7 @@ import MotionWrapper from '../styles/MotionWrapper'
 import SearchBar from '../components/SearchBar';
 import MovieSwimlane from '../components/MovieSwimlane';
 import SearchResultsGrid from '../components/SearchResultsGrid';
+import Loading from './Loading';
 import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
@@ -109,7 +110,7 @@ function SearchMovies() {
         
         {loading ? (
           <MotionWrapper index={4}>
-            <h3>Loading movies...</h3>
+            <Loading text="Loading movies" compact={true} />
           </MotionWrapper>
         ) : isSearchMode ? (
           <MotionWrapper index={4}>

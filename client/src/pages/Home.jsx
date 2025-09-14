@@ -5,6 +5,7 @@ import Movies from '../components/Movies';
 import Articles from '../components/Articles';
 import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
+import Loading from './Loading';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
@@ -18,30 +19,6 @@ const StyledContainer = styled.div`
   min-height: 100vh;
 `;
 
-const LoadingSpinner = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  color: #666;
-  font-size: 14px;
-  
-  &::before {
-    content: '';
-    width: 20px;
-    height: 20px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #007bff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-right: 10px;
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
 
 
 
@@ -116,9 +93,7 @@ function Home() {
       
       {/* Loading indicator */}
       {isSearching && (
-        <LoadingSpinner>
-          Searching...
-        </LoadingSpinner>
+        <Loading text="Searching" compact={true} />
       )}
       
       <Section

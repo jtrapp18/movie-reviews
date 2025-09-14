@@ -4,6 +4,7 @@ import ArticleCard from '../cards/ArticleCard';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
 import Carousel from './Carousel';
+import Loading from '../pages/Loading';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../hooks/useAdmin';
 
@@ -26,10 +27,7 @@ function Articles({ showArticles, enterSearch }) {
   if (!showArticles || !Array.isArray(showArticles)) {
     return (
       <CardContainer>
-        <div className="text-center p-4">
-          <h3>Loading articles...</h3>
-          <p>Please wait while we fetch the latest articles.</p>
-        </div>
+        <Loading text="Loading articles" compact={true} />
       </CardContainer>
     );
   }
