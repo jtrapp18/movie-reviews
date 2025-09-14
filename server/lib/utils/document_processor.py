@@ -14,6 +14,7 @@ import PyPDF2
 import pdfplumber
 from PIL import Image
 import io
+from .s3_client import get_s3_client
 
 
 class DocumentProcessor:
@@ -529,6 +530,105 @@ class DocumentProcessor:
             # Don't clean up the temporary file - we need it for serving
             if temp_file:
                 temp_file.close()
+    
+    @staticmethod
+    def process_uploaded_document_s3(file, review_id: int) -> Dict[str, any]:
+        """
+        Process uploaded document using S3 storage for deployment compatibility.
+        Extracts text and uploads file to S3 - production-ready approach.
+        
+        Args:
+            file: Uploaded file object
+            review_id: ID of the review this document belongs to
+            
+        Returns:
+            Dict with keys: 'filename', 's3_object_key', 'file_type', 'extracted_text', 'success'
+        """
+        if not file or not file.filename:
+            return {'success': False, 'error': 'No file provided'}
+        
+        if not DocumentProcessor.allowed_file(file.filename):
+            return {'success': False, 'error': 'File type not allowed'}
+        
+        file_type = DocumentProcessor.get_file_type(file.filename)
+        original_filename = secure_filename(file.filename)
+        
+        # Create temporary file for processing
+        temp_file = None
+        temp_path = None
+        
+        try:
+            # Get S3 client
+            s3_client = get_s3_client()
+            
+            # Create temporary file for text extraction
+            temp_fd, temp_path = tempfile.mkstemp(suffix=f'.{file_type}')
+            temp_file = os.fdopen(temp_fd, 'wb')
+            
+            # Save uploaded file to temporary location for processing
+            file.seek(0)  # Reset file pointer
+            temp_file.write(file.read())
+            temp_file.close()
+            
+            # Extract text with improved formatting and optional title removal
+            extracted_text = DocumentProcessor.extract_text_from_document(temp_path, file_type, clean_text=True, remove_title=True)
+            if not extracted_text.strip():
+                return {
+                    'success': False, 
+                    'error': 'Could not extract text from document',
+                    'filename': original_filename,
+                    'file_type': file_type
+                }
+            
+            # Generate S3 object key
+            s3_object_key = s3_client.generate_object_key(original_filename, review_id)
+            
+            # Upload file to S3
+            file.seek(0)  # Reset file pointer for upload
+            content_type = DocumentProcessor._get_content_type(file_type)
+            
+            upload_result = s3_client.upload_file(file, s3_object_key, content_type)
+            if not upload_result['success']:
+                return {
+                    'success': False,
+                    'error': f"Failed to upload to S3: {upload_result['error']}",
+                    'filename': original_filename,
+                    'file_type': file_type
+                }
+            
+            return {
+                'success': True,
+                'filename': original_filename,
+                'file_path': s3_object_key,  # Store S3 object key in file_path field
+                'file_type': file_type,
+                'extracted_text': extracted_text,
+                's3_url': upload_result.get('url')
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error processing document: {str(e)}'
+            }
+        finally:
+            # Clean up temporary file
+            if temp_file:
+                temp_file.close()
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.unlink(temp_path)
+                except:
+                    pass  # Ignore cleanup errors
+    
+    @staticmethod
+    def _get_content_type(file_type: str) -> str:
+        """Get MIME content type for file type."""
+        content_types = {
+            'pdf': 'application/pdf',
+            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'doc': 'application/msword'
+        }
+        return content_types.get(file_type, 'application/octet-stream')
     
     @staticmethod
     def get_document_preview(file_path: str, file_type: str, max_chars: int = 500) -> str:

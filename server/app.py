@@ -732,9 +732,9 @@ class DocumentUpload(Resource):
             if not review:
                 return {'error': 'Review not found'}, 404
             
-            # Process the document using temporary files (better for deployment)
+            # Process the document using S3 storage (production-ready)
             print(f"Processing document: {file.filename}")
-            result = DocumentProcessor.process_uploaded_document_temporary(file)
+            result = DocumentProcessor.process_uploaded_document_s3(file, int(review_id))
             print(f"Document processing result: {result}")
             
             if not result['success']:
@@ -810,6 +810,8 @@ class DocumentDownload(Resource):
     def get(self, review_id):
         """Download the document associated with a review."""
         try:
+            from lib.utils.s3_client import get_s3_client
+            
             review = Review.query.get(review_id)
             if not review:
                 return {'error': 'Review not found'}, 404
@@ -817,13 +819,21 @@ class DocumentDownload(Resource):
             if not review.has_document or not review.document_path:
                 return {'error': 'No document associated with this review'}, 404
             
-            if not os.path.exists(review.document_path):
-                return {'error': 'Document file not found'}, 404
+            # Download file from S3
+            s3_client = get_s3_client()
+            download_result = s3_client.download_file(review.document_path)
             
-            response = send_file(
-                review.document_path,
-                as_attachment=True,
-                download_name=review.document_filename
+            if not download_result['success']:
+                return {'error': download_result['error']}, 404
+            
+            # Create response with file data
+            from flask import Response
+            response = Response(
+                download_result['file_data'],
+                mimetype=download_result['content_type'],
+                headers={
+                    'Content-Disposition': f'attachment; filename="{review.document_filename}"'
+                }
             )
             
             # Add cache-busting headers
@@ -842,6 +852,8 @@ class DocumentView(Resource):
     def get(self, review_id):
         """View the document associated with a review inline."""
         try:
+            from lib.utils.s3_client import get_s3_client
+            
             print(f"DEBUG DocumentView - Looking for review_id: {review_id}")
             review = Review.query.get(review_id)
             if not review:
@@ -856,15 +868,20 @@ class DocumentView(Resource):
                 print(f"DEBUG DocumentView - No document associated with review {review_id}")
                 return {'error': 'No document associated with this review'}, 404
             
-            print(f"DEBUG DocumentView - Checking if file exists: {review.document_path}")
-            if not os.path.exists(review.document_path):
-                print(f"DEBUG DocumentView - File not found at: {review.document_path}")
-                return {'error': 'Document file not found'}, 404
+            # Download file from S3
+            s3_client = get_s3_client()
+            download_result = s3_client.download_file(review.document_path)
             
-            response = send_file(
-                review.document_path,
-                as_attachment=False,  # This allows inline viewing
-                mimetype='application/pdf' if review.document_type == 'pdf' else 'application/octet-stream'
+            if not download_result['success']:
+                print(f"DEBUG DocumentView - S3 download failed: {download_result['error']}")
+                return {'error': download_result['error']}, 404
+            
+            # Create response with file data for inline viewing
+            from flask import Response
+            mimetype = 'application/pdf' if review.document_type == 'pdf' else download_result['content_type']
+            response = Response(
+                download_result['file_data'],
+                mimetype=mimetype
             )
             
             # Add cache-busting headers
