@@ -27,6 +27,70 @@
 17. [✅] **Fix add article button visibility** - Add article button not showing on articles page (Fixed: Moved button after carousel, fixed overflow issue)
 18. [ ] **Fix intermittent file upload errors** - File uploads for reviews sometimes fail, doesn't happen every time (Bug reported)
 
+## 🚀 Document Upload S3 Migration Strategy
+
+### Phase 1: S3-Only Implementation (Current Focus)
+**Goal:** Replace temp file storage with persistent S3 storage for production deployment
+
+**Status:** [🔄] In Progress
+
+**Tasks:**
+- [✅] Set up Railway MinIO service
+- [✅] Create S3 client wrapper with boto3
+- [✅] Update document processor to use S3 storage
+- [✅] Modify API endpoints to serve from S3
+- [✅] Test S3 connection and bucket creation
+- [ ] Deploy and test document upload functionality
+- [ ] Verify file persistence across deployments
+- [ ] Test download and preview functionality
+
+**Benefits:**
+- ✅ Files persist across Railway deployments
+- ✅ No more temp file cleanup issues
+- ✅ Production-ready and reliable
+- ✅ Simple implementation with minimal complexity
+
+### Phase 2: Smart Caching (Future Enhancement)
+**Goal:** Add local caching layer for improved performance on frequently accessed files
+
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] Implement local temp file caching
+- [ ] Add cache TTL and invalidation logic
+- [ ] Create cache cleanup on startup
+- [ ] Add fallback to S3 on cache miss
+- [ ] Monitor cache hit rates and performance
+
+**When to implement:**
+- High-traffic documents (same file accessed frequently)
+- Large files (>50MB) causing slow S3 downloads
+- Performance issues identified in production
+
+**Implementation Strategy:**
+```python
+# Pseudo-code for smart caching
+def get_document(review_id):
+    # Check local cache first
+    if file_exists_in_cache(review_id):
+        if cache_is_fresh(review_id):
+            return serve_from_cache(review_id)
+        else:
+            delete_from_cache(review_id)
+    
+    # Download from S3 and cache
+    s3_file = download_from_s3(review_id)
+    cache_file_locally(review_id, s3_file)
+    return serve_from_cache(review_id)
+```
+
+### Technical Details
+- **Storage:** S3 object keys stored in existing `document_path` field
+- **Path Structure:** `uploads/documents/{uuid}_{filename}`
+- **Database:** No schema changes required
+- **Frontend:** No changes needed to DocumentUpload.jsx
+- **Cost:** Railway MinIO at $0.25/GB/month (predictable pricing)
+
 ## Status Legend
 - [ ] Pending
 - [🔄] In Progress
