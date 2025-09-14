@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Movies from '../components/Movies';
 import Articles from '../components/Articles';
 import Section from '../components/Section';
+import SearchBar from '../components/SearchBar';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled.div`
@@ -47,49 +48,56 @@ function Home() {
     fetchArticles();
   }, []);
 
-  const enterSearch = (text) => {
-    // Filter movies based on the search text
-    const filteredMovies = movies.filter((movie) =>
-      movie.title.toLowerCase().includes(text.toLowerCase())
-    );
-    setShowMovies(filteredMovies);
-  };
+  const unifiedSearch = async (text) => {
+    if (!text.trim()) {
+      // If empty search, show all content
+      setShowMovies(movies);
+      setShowArticles(articles);
+      return;
+    }
 
-  const enterArticleSearch = (text) => {
-    // Filter articles based on the search text
-    const filteredArticles = articles.filter((article) =>
-      article.title?.toLowerCase().includes(text.toLowerCase()) ||
-      article.review_text?.toLowerCase().includes(text.toLowerCase()) ||
-      article.tags?.some(tag => tag.name.toLowerCase().includes(text.toLowerCase()))
-    );
-    
-    setShowArticles(filteredArticles);
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
+      const data = await response.json();
+      
+      setShowMovies(data.movies || []);
+      setShowArticles(data.articles || []);
+    } catch (error) {
+      console.error('Error searching:', error);
+      // Fallback to showing all content on error
+      setShowMovies(movies);
+      setShowArticles(articles);
+    }
   };
 
 
   return (
     <StyledContainer>
+      {/* Single search bar at the top */}
+      <SearchBar 
+        enterSearch={unifiedSearch}
+        placeholder="Search everything... (movies, reviews, articles, tags)"
+      />
+      
       <Section
         title="Movies"
         subtitle="Click movie to view review"
-        searchPlaceholder="Search movies..."
-        onSearch={enterSearch}
+        showSearch={false}
       >
         <Movies
           showMovies={showMovies}
-          enterSearch={enterSearch}
+          enterSearch={unifiedSearch}
         />
       </Section>
       
       <Section
         title="Articles"
         subtitle="Browse theme-based articles and essays"
-        searchPlaceholder="Search articles by title, content, or tags..."
-        onSearch={enterArticleSearch}
+        showSearch={false}
       >
         <Articles
           showArticles={showArticles}
-          enterSearch={enterArticleSearch}
+          enterSearch={unifiedSearch}
         />
       </Section>
     </StyledContainer>

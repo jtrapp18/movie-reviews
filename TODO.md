@@ -9,17 +9,17 @@
 4. [✅] **Fix footer in search movie page** - Ensure footer stays at the bottom of the search movies page (Completed: Fixed layout with proper flex positioning)
 
 ### 📝 Content Pages
-5. [ ] **Format the articles page** - Improve the visual presentation and layout
-6. [ ] **Format the review page** - Enhance the review page design and user experience
-7. [ ] **Add tagging functionality to review page** - Implement a tagging system for reviews
-8. [ ] **Possibly merge review and articles components** - Consider consolidating similar functionality
+5. [✅] **Format the articles page** - Improve the visual presentation and layout
+6. [✅] **Format the review page** - Enhance the review page design and user experience
+7. [✅] **Add tagging functionality to review page** - Implement a tagging system for reviews
+8. [✅ ] **Possibly merge review and articles components** - Consider consolidating similar functionality
 9. [ ] **Add swimlanes for articles based on tags** - Create swimlanes for articles organized by tags (similar to movie genre swimlanes)
-10. [ ] **Reformat document reader pages** - Improve the visual presentation and layout of document viewing/reading pages
+10. [✅] **Reformat document reader pages** - Improve the visual presentation and layout of document viewing/reading pages
 
 ### 🛠️ Functionality & Tools
-10. [ ] **Remove PDF tools from viewer** - Clean up unnecessary PDF-related features
+10. [✅] **Remove PDF tools from viewer** - Clean up unnecessary PDF-related features
 11. [ ] **Add functionality to upload or seed multiple articles from the UI** - Enable bulk article management
-12. [ ] **Test login functionality** - Verify authentication is working properly
+12. [✅] **Test login functionality** - Verify authentication is working properly
 13. [ ] **Review search functionality** - Comprehensive review of search across titles, tags, and descriptions
 14. [✅] **Fix duplicate articles bug** - Articles with same title/ID appearing multiple times in search results (Fixed: Slick carousel was creating clones for single items)
 15. [✅] **DRY up duplicate code** - Created shared components: PageContainer (Completed: Consolidated duplicate styling, removed over-engineered components)

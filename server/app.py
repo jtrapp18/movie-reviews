@@ -937,6 +937,47 @@ api.add_resource(ArticleById, '/api/articles/<int:article_id>')
 api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DiscoverMovies, '/api/discover_movies')
+class UnifiedSearch(Resource):
+    def get(self):
+        search_query = request.args.get('q', '').strip()
+        
+        if not search_query:
+            # Return empty results if no search query
+            return {
+                'movies': [],
+                'articles': [],
+                'totalResults': 0
+            }, 200
+        
+        # Search movies by title + their reviews + tags
+        movie_results = db.session.query(Movie).join(Review, Movie.id == Review.movie_id).filter(
+            db.or_(
+                Movie.title.contains(search_query),
+                Review.review_text.contains(search_query),
+                Review.tags.any(Tag.name.contains(search_query))
+            )
+        ).distinct().all()
+        
+        # Search articles by title + content + tags
+        article_results = Review.query.filter_by(content_type='article').filter(
+            db.or_(
+                Review.title.contains(search_query),
+                Review.review_text.contains(search_query),
+                Review.tags.any(Tag.name.contains(search_query))
+            )
+        ).all()
+        
+        # Convert to dictionaries
+        movies_data = [movie.to_dict() for movie in movie_results]
+        articles_data = [article.to_dict() for article in article_results]
+        
+        return {
+            'movies': movies_data,
+            'articles': articles_data,
+            'totalResults': len(movies_data) + len(articles_data)
+        }, 200
+
+api.add_resource(UnifiedSearch, '/api/search')
 api.add_resource(MovieRatings, '/api/movie-ratings')
 api.add_resource(MovieRatingsBulk, '/api/movie-ratings-bulk')
 api.add_resource(DocumentUpload, '/api/upload_document')
