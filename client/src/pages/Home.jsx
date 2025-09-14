@@ -18,6 +18,32 @@ const StyledContainer = styled.div`
   min-height: 100vh;
 `;
 
+const LoadingSpinner = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-size: 14px;
+  
+  &::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+
 
 
 function Home() {
@@ -27,6 +53,7 @@ function Home() {
   const [showMovies, setShowMovies] = useState([]);
   const [articles, setArticles] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     setShowMovies(movies);
@@ -53,9 +80,12 @@ function Home() {
       // If empty search, show all content
       setShowMovies(movies);
       setShowArticles(articles);
+      setIsSearching(false);
       return;
     }
 
+    setIsSearching(true);
+    
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
       const data = await response.json();
@@ -70,6 +100,8 @@ function Home() {
       // Fallback to showing all content on error
       setShowMovies(movies);
       setShowArticles(articles);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -81,6 +113,13 @@ function Home() {
         enterSearch={unifiedSearch}
         placeholder="Search everything... (movies, reviews, articles, tags)"
       />
+      
+      {/* Loading indicator */}
+      {isSearching && (
+        <LoadingSpinner>
+          Searching...
+        </LoadingSpinner>
+      )}
       
       <Section
         title="Movies"

@@ -27,6 +27,113 @@
 17. [✅] **Fix add article button visibility** - Add article button not showing on articles page (Fixed: Moved button after carousel, fixed overflow issue)
 18. [ ] **Fix intermittent file upload errors** - File uploads for reviews sometimes fail, doesn't happen every time (Bug reported)
 
+### 🔍 Search Performance Optimization
+19. [ ] **Optimize unified search endpoint performance** - Current search is terribly slow, needs advanced optimization techniques
+
+## 🔍 Search Performance Optimization Strategy
+
+### Current Performance Issues Identified:
+- **Multiple Complex JOINs**: `Movie JOIN Review JOIN Tag` creates expensive operations
+- **ILIKE with Wildcards**: `%search_query%` prevents index usage
+- **N+1 Query Problem**: `.to_dict()` serialization likely triggers additional queries
+- **No Database Indexes**: No indexes on searchable fields
+- **Full Table Scans**: Searching across all movies/reviews without optimization
+
+### Implementation Plan (Priority Order):
+
+#### Phase 1: Database Optimization (Immediate Impact - 30-50% improvement)
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] **Add strategic database indexes** - Create GIN indexes for text search fields
+  ```python
+  # Text search indexes (PostgreSQL GIN with trigram)
+  Index('idx_movie_title_gin', Movie.title, postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
+  Index('idx_review_text_gin', Review.review_text, postgresql_using='gin', postgresql_ops={'review_text': 'gin_trgm_ops'})
+  Index('idx_review_title_gin', Review.title, postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
+  Index('idx_tag_name_gin', Tag.name, postgresql_using='gin', postgresql_ops={'name': 'gin_trgm_ops'})
+  
+  # Foreign key indexes (if not already present)
+  Index('idx_review_movie_id', Review.movie_id)
+  Index('idx_review_content_type', Review.content_type)
+  ```
+
+- [ ] **Optimize SQL queries** - Replace complex JOINs with subqueries and add LIMIT clauses
+- [ ] **Enable PostgreSQL trigram extension** - `CREATE EXTENSION IF NOT EXISTS pg_trgm;`
+
+#### Phase 2: Query Optimization (20-30% improvement)
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] **Reduce N+1 queries** - Use `joinedload()` or `select_related()` for relationships
+- [ ] **Add query result limits** - Prevent large result sets with pagination
+- [ ] **Use EXISTS instead of JOIN** - Where possible to reduce complexity
+- [ ] **Optimize serialization** - Minimize `.to_dict()` calls and use bulk operations
+
+#### Phase 3: Full-Text Search Implementation (50-80% improvement)
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] **Add full-text search columns** - Create TSVECTOR columns for Movie and Review
+  ```python
+  from sqlalchemy.dialects.postgresql import TSVECTOR
+  
+  class Movie(db.Model):
+      search_vector = Column(TSVECTOR)
+  
+  class Review(db.Model):
+      search_vector = Column(TSVECTOR)
+  ```
+
+- [ ] **Create GIN indexes on search vectors**
+  ```python
+  Index('idx_movie_search_vector', Movie.search_vector, postgresql_using='gin')
+  Index('idx_review_search_vector', Review.search_vector, postgresql_using='gin')
+  ```
+
+- [ ] **Implement search ranking** - Use `ts_rank()` for relevance scoring
+- [ ] **Add search vector population** - Auto-populate vectors on data changes
+
+#### Phase 4: Caching & Performance (90%+ improvement for repeated searches)
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] **Implement Redis caching layer** - Cache search results with TTL
+  ```python
+  import redis
+  import json
+  import hashlib
+  
+  def cached_search(search_query, cache_ttl=300):  # 5 minutes
+      cache_key = f"search:{hashlib.md5(search_query.encode()).hexdigest()}"
+      # Implementation details...
+  ```
+
+- [ ] **Add query result pagination** - Limit results per page (20 items max)
+- [ ] **Implement search debouncing** - Prevent excessive API calls from rapid typing
+
+#### Phase 5: Advanced Techniques (Future Enhancement)
+**Status:** [ ] Not Started
+
+**Tasks:**
+- [ ] **Async search with parallel processing** - Run movie and article searches concurrently
+- [ ] **Search analytics** - Track popular searches and optimize accordingly
+- [ ] **Search suggestions** - Auto-complete based on existing data
+- [ ] **Search result highlighting** - Highlight matching terms in results
+
+### Performance Targets:
+- **Current**: ~2-5 seconds for complex searches
+- **Phase 1**: ~1-2 seconds (30-50% improvement)
+- **Phase 2**: ~0.5-1 second (20-30% improvement)
+- **Phase 3**: ~0.2-0.5 seconds (50-80% improvement)
+- **Phase 4**: ~0.1 seconds for cached searches (90%+ improvement)
+
+### Implementation Notes:
+- Start with Phase 1 (database indexes) for immediate impact
+- Measure performance at each phase to validate improvements
+- Consider PostgreSQL-specific optimizations (GIN indexes, trigram extension)
+- Implement caching last as it requires additional infrastructure (Redis)
+
 ## 🚀 Document Upload S3 Migration Strategy
 
 ### Phase 1: S3-Only Implementation (Current Focus)

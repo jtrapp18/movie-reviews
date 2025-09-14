@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Slider from 'react-slick';
+import { FaSearch } from 'react-icons/fa';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -47,7 +48,46 @@ const CarouselStyles = styled.div`
   }
 `;
 
-const Carousel = ({ children, settings = {} }) => {
+const NoResultsPlaceholder = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  height: 200px;
+  
+  .icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+    background: #f0f0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #999;
+  }
+  
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #444;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 400px;
+    color: #666;
+  }
+`;
+
+const Carousel = ({ children, settings = {}, noResultsMessage = "No results found" }) => {
   const defaultSettings = {
     dots: true,
     infinite: true,
@@ -64,6 +104,23 @@ const Carousel = ({ children, settings = {} }) => {
   };
 
   const finalSettings = { ...defaultSettings, ...settings };
+
+  // Check if children array is empty
+  const hasChildren = React.Children.count(children) > 0;
+
+  if (!hasChildren) {
+    return (
+      <CarouselContainer>
+        <NoResultsPlaceholder>
+          <div className="icon">
+            <FaSearch />
+          </div>
+          <h3>{noResultsMessage}</h3>
+          <p>Try different search terms or browse our collection.</p>
+        </NoResultsPlaceholder>
+      </CarouselContainer>
+    );
+  }
 
   return (
     <CarouselContainer>

@@ -30,7 +30,7 @@ function Movies({ showMovies, enterSearch }) {
 
   return (
     <CardContainer>
-      <Carousel>
+      <Carousel noResultsMessage="No movies found">
         {showMovies.map((movie, index) => {
           // Get rating for this movie
           let rating = null;

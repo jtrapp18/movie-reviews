@@ -16,6 +16,10 @@ const SearchContainer = styled.div`
 
         &:hover {
             color: black;
+
+            input {
+                background: var(--cinema-gold);
+            }
         }
     }
 
@@ -26,10 +30,6 @@ const SearchContainer = styled.div`
         border: 1px solid #ccc;
         padding: 10px 15px;
         color: inherit;
-
-        &:hover {
-            background: var(--cinema-gold);
-        }
     }
 
     span {

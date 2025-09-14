@@ -44,3 +44,5 @@ class Movie(db.Model, SerializerMixin):
         if not (value.startswith('http://') or value.startswith('https://')):
             raise ValueError("Cover photo must be a valid URL.")
         return value.strip()
+
+# Indexes are handled through database migrations

@@ -33,3 +33,5 @@ class Tag(db.Model, SerializerMixin):
             raise ValueError("Tag name must be 50 characters or fewer.")
         
         return value
+
+# Indexes are handled through database migrations

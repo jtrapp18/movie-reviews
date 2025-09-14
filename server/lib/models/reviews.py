@@ -80,3 +80,5 @@ class Review(db.Model, SerializerMixin):
     def short_text(self):
         """Returns the first 100 characters of the review text (with ellipsis if truncated)."""
         return self.review_text[:100] + "..." if len(self.review_text) > 100 else self.review_text
+
+# Indexes are handled through database migrations

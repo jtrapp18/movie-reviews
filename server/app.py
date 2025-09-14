@@ -11,6 +11,7 @@ from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
+from sqlalchemy.orm import joinedload
 from lib.models import User, Movie, Review, Tag
 from lib.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
@@ -949,28 +950,43 @@ class UnifiedSearch(Resource):
                 'totalResults': 0
             }, 200
         
-        # Search movies by title + their reviews + tags (movies that have reviews)
-        # Make search case-insensitive
-        movie_results = db.session.query(Movie).join(Review, Movie.id == Review.movie_id).filter(
-            db.or_(
-                Movie.title.ilike(f'%{search_query}%'),
-                Review.review_text.ilike(f'%{search_query}%'),
-                Review.tags.any(Tag.name.ilike(f'%{search_query}%'))
-            )
-        ).distinct().all()
+        # Pre-compile search pattern for consistency
+        search_pattern = f'%{search_query}%'
         
-        # Search articles by title + content + tags (case-insensitive)
-        article_results = Review.query.filter_by(content_type='article').filter(
-            db.or_(
-                Review.title.ilike(f'%{search_query}%'),
-                Review.review_text.ilike(f'%{search_query}%'),
-                Review.tags.any(Tag.name.ilike(f'%{search_query}%'))
-            )
-        ).all()
+        # OPTIMIZED: Use eager loading to prevent N+1 queries
+        # Load movies with their reviews and tags in a single query
+        movie_results = db.session.query(Movie)\
+            .options(
+                joinedload(Movie.reviews).joinedload(Review.tags)
+            )\
+            .join(Review, Movie.id == Review.movie_id)\
+            .filter(
+                db.or_(
+                    Movie.title.ilike(search_pattern),
+                    Review.review_text.ilike(search_pattern),
+                    Review.tags.any(Tag.name.ilike(search_pattern))
+                )
+            )\
+            .distinct()\
+            .limit(25).all()  # Reduced limit for faster response
         
-        # Convert to dictionaries
+        # OPTIMIZED: Use eager loading for articles with tags
+        article_results = db.session.query(Review)\
+            .options(
+                joinedload(Review.tags)
+            )\
+            .filter_by(content_type='article')\
+            .filter(
+                db.or_(
+                    Review.title.ilike(search_pattern),
+                    Review.review_text.ilike(search_pattern),
+                    Review.tags.any(Tag.name.ilike(search_pattern))
+                )
+            )\
+            .limit(25).all()  # Reduced limit for faster response
+        
+        # Convert to dictionaries (now with pre-loaded relationships)
         movies_data = [movie.to_dict() for movie in movie_results]
-        
         articles_data = [article.to_dict() for article in article_results]
         
         return {
