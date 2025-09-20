@@ -7,7 +7,7 @@ const StyledList = styled.ul`
   margin: 0;
   
   li {
-    background: var(--cinema-gray);
+    background: var(--cinema-gray-dark);
     margin: 0.5rem 0;
     padding: 0.75rem 1.25rem;
     border-left: 4px solid var(--cinema-gold);

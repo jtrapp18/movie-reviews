@@ -58,25 +58,33 @@ const SearchContainer = styled.div`
 
     span {
         position: absolute;
-        right: 20px;
+        right: 16px;
         top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
         color: rgba(255, 255, 255, 0.7);
-        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        font-size: 16px;
         transition: all 0.2s ease;
-        padding: 8px;
+        padding: 4px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
+        width: 24px;
+        height: 24px;
 
         &:hover {
             color: white;
             background: rgba(255, 255, 255, 0.1);
         }
+    }
+
+    input:not(:placeholder-shown) + span {
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        padding: 8px;
+        width: 40px;
+        height: 40px;
+        right: 20px;
     }
 
     @media (max-width: 768px) {
@@ -102,10 +110,19 @@ const SearchContainer = styled.div`
         }
         
         span {
-            right: 16px;
+            right: 14px;
+            font-size: 14px;
+            width: 20px;
+            height: 20px;
+            padding: 2px;
+        }
+
+        input:not(:placeholder-shown) + span {
             font-size: clamp(1rem, 4vw, 1.4rem);
             width: 36px;
             height: 36px;
+            padding: 8px;
+            right: 16px;
         }
     }
 `

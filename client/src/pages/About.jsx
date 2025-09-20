@@ -17,7 +17,6 @@ const AboutContainer = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  margin-bottom: clamp(2.5rem, 6vw, 3.125rem);
   
   h1 {
     color: var(--cinema-gold);
@@ -33,7 +32,7 @@ const Header = styled.div`
 `;
 
 const ContentType = styled.div`
-  background: var(--cinema-gray);
+  background: var(--cinema-gray-dark);
   padding: clamp(1rem, 3vw, 1.25rem);
   margin: clamp(0.75rem, 2vw, 0.9375rem) 0;
   border-radius: 0.5rem;
@@ -82,7 +81,7 @@ function About() {
         <div className="subtitle">{aboutContent.header.subtitle}</div>
       </Header>
 
-      <AboutSection title="About James">
+      <AboutSection>
         <p>{aboutContent.aboutJames.personalStory}</p>
         
         <p>{aboutContent.aboutJames.intro}</p>
