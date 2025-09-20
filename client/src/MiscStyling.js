@@ -194,7 +194,9 @@ const Button = styled.button.attrs(props => ({
   }
 
   &:disabled {
-    background-color: #6c757d;
+    background-color: var(--cinema-gray-dark);
+    color: black;
+    border: 2px solid black;
     cursor: not-allowed;
   }
 `
@@ -252,7 +254,6 @@ const StyledCard = styled.article`
     text-align: center;
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     font-weight: bold;
-    // z-index: 1000;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(2px);
     transition: opacity 0.3s ease;
@@ -306,15 +307,19 @@ const StyledCard = styled.article`
 `
 
 const StyledContainer = styled.div`
-    width: 1000px;
-    max-width: 98vw;
-    margin: 0;
-    padding: 0% 5%;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    width: min(900px, 90vw);
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      width: 98vw;
+    }
 
     h1 {
       text-align: center;

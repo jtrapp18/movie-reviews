@@ -42,6 +42,19 @@ const StyledFooter = styled.footer`
             font-weight: 500;
         }
 
+        p:first-of-type {
+            color: #ffd700; /* Main title - full gold */
+        }
+
+        p:nth-of-type(2) {
+            color: #ffed4e; /* Tagline - lighter gold */
+            font-style: italic;
+        }
+
+        p:nth-of-type(3) {
+            color: #ffd700; /* Navigation - full gold */
+        }
+
         a {
             color: #ffd700;
             text-decoration: none;
@@ -73,10 +86,10 @@ const Footer = () => {
             <section>
                 <div>
                     <p><strong>Film Analysis & Reviews by James Trapp</strong></p>
-                    <p>Exploring cinema through critical analysis and thematic essays</p>
+                    <p><em>Exploring cinema through critical analysis and thematic essays</em></p>
                     <p>
-                        <a href="/#/about">About the Author</a> • 
-                        <a href="/contact">Contact</a>
+                        <a href="/#/about">ABOUT THE AUTHOR</a> • 
+                        <a href="/#/contact">CONTACT</a>
                     </p>
                     <p id='data-caveat'>© 2025 James Trapp</p>
                 </div>

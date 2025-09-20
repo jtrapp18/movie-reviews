@@ -4,6 +4,7 @@ import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '../components/AboutSection';
 import List from '../components/List';
+import { StyledContainer } from '../MiscStyling';
 
 const aboutContent = yaml.load(aboutContentYaml);
 
@@ -13,6 +14,10 @@ const AboutContainer = styled.div`
   padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
   color: white;
   line-height: 1.6;
+
+  @media (max-width: 768px) {
+    width: 100vw;
+  }
 `;
 
 const Header = styled.div`
@@ -75,7 +80,7 @@ const ContactMethod = styled.div`
 
 function About() {
   return (
-    <AboutContainer>
+    <StyledContainer>
       <Header>
         <h1>{aboutContent.header.title}</h1>
         <div className="subtitle">{aboutContent.header.subtitle}</div>
@@ -122,7 +127,7 @@ function About() {
           </ContactMethod>
         ))}
       </AboutSection>
-    </AboutContainer>
+    </StyledContainer>
   );
 }
 
