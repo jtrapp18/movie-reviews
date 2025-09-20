@@ -32,8 +32,11 @@ p {
   --cinema-red-dark: #B22222;
   --cinema-silver: #C0C0C0;
   --cinema-black: #1a1a1a;
-  --cinema-gray: #2d2d2d;
-  --cinema-light-gray: #4a4a4a;
+  --cinema-gray: #4e4d4d;
+  --cinema-gray-light: #9c9b9b;
+  --cinema-gray-dark: #373737;
+  --cinema-blue: #007bff;
+  --cinema-blue-dark: #0056b3;
   
   /* Rich text display colors */
   --rich-text-primary: #f8f9fa; /* Soft white for main text */

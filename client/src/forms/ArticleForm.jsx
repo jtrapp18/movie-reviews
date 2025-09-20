@@ -4,16 +4,18 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import RichTextEditor from "../components/RichTextEditor";
-import { StyledForm, Button } from "../MiscStyling";
+import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../MiscStyling";
 import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import { patchJSONToDb, postJSONToDb, snakeToCamel } from "../helper";
 import { handleFormSubmit, submitFormWithDocument } from "../utils/formSubmit";
 import { extractTextFromFile } from "../utils/textExtraction";
 import useCrudStateDB from "../hooks/useCrudStateDB";
+import { useAdmin } from "../hooks/useAdmin";
 
 const ArticleForm = ({ initObj }) => {
   const { id } = useParams();
@@ -31,8 +33,11 @@ const ArticleForm = ({ initObj }) => {
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { setMovies, setArticles } = useOutletContext();
-  const { addItem, updateItem } = useCrudStateDB(setArticles, "articles");
+  const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "articles");
+  const { isAdmin } = useAdmin();
 
   const initialValues = initObj
     ? {
@@ -55,6 +60,37 @@ const ArticleForm = ({ initObj }) => {
       // Create new article
       const response = await postJSONToDb("articles", body);
       return snakeToCamel(response);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!initObj || !initObj.id) return;
+    
+    setIsDeleting(true);
+    try {
+      // Call the API directly to ensure it completes before updating state
+      const response = await fetch(`/api/articles/${initObj.id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Use the CRUD hook to update the frontend state
+        deleteItem(initObj.id);
+        
+        // Navigate back to the articles list
+        navigate('/#/articles');
+      } else {
+        const errorData = await response.json();
+        setSubmitError(errorData.error || 'Failed to delete article');
+      }
+    } catch (error) {
+      console.error('Error deleting article:', error);
+      setSubmitError('Failed to delete article');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -229,22 +265,14 @@ const ArticleForm = ({ initObj }) => {
             {/* Extract Text Button - only show if document is uploaded and article exists */}
             {hasDocument && initObj?.id && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <Button
+                <ExtractButton
                   type="button"
                   onClick={handleExtractText}
                   disabled={isExtracting}
-                  style={{
-                    backgroundColor: '#17a2b8',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    cursor: isExtracting ? 'not-allowed' : 'pointer',
-                    opacity: isExtracting ? 0.6 : 1
-                  }}
+                  isExtracting={isExtracting}
                 >
                   {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </Button>
+                </ExtractButton>
                 <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
                   Click to extract text from the selected document into the article content field below
                 </p>
@@ -274,7 +302,7 @@ const ArticleForm = ({ initObj }) => {
           </div>
           
           <div style={{ marginTop: '30px', marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-            <Button type="button" onClick={() => {
+            <CancelButton type="button" onClick={() => {
               if (initObj) {
                 // If editing existing article, just exit edit mode
                 setIsEditing(false);
@@ -282,13 +310,22 @@ const ArticleForm = ({ initObj }) => {
                 // If creating new article, navigate back
                 navigate(-1);
               }
-            }}>Cancel</Button>
+            }}>Cancel</CancelButton>
             <SubmitButton 
               isSubmitting={isSubmitting}
               isEdit={isEdit}
               editText="Save Changes"
               createText="Create Article"
             />
+            {isAdmin && initObj && (
+              <DeleteButton 
+                type="button" 
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Article'}
+              </DeleteButton>
+            )}
           </div>
         </StyledForm>
       ) : (
@@ -312,6 +349,15 @@ const ArticleForm = ({ initObj }) => {
           reviewId={createdArticle?.id || initObj?.id}
         />
       )}
+      
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Article"
+        message={`Are you sure you want to delete this article? This action cannot be undone.`}
+        itemType="Article"
+      />
     </div>
   );
 };

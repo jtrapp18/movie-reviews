@@ -5,17 +5,19 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import RichTextEditor from "../components/RichTextEditor";
 import styled from 'styled-components';
-import { StyledForm, Button } from "../MiscStyling";
+import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../MiscStyling";
 import Error from "../styles/Error";
 import Stars from "../components/Stars"
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
 import { extractTextFromFile } from "../utils/textExtraction";
 import useCrudStateDB from "../hooks/useCrudStateDB";
-import { snakeToCamel, invalidateRatingsCache } from "../helper";
+import { snakeToCamel, invalidateRatingsCache, getJSON } from "../helper";
+import { useAdmin } from "../hooks/useAdmin";
 
 const StarsContainer = styled.div`
   display: flex;
@@ -37,8 +39,11 @@ const ReviewForm = ({ initObj }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [updatedReview, setUpdatedReview] = useState(null); // Track updated review data
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { setMovies } = useOutletContext();
-  const { addToKey, updateKey } = useCrudStateDB(setMovies, "movies");
+  const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, "movies");
+  const { isAdmin } = useAdmin();
   const movieId = parseInt(id);
 
   const initialValues = initObj
@@ -58,6 +63,44 @@ const ReviewForm = ({ initObj }) => {
   const submitToDB = initObj
     ? (body) => updateKey("reviews", initObj.id, body, movieId)
     : (body) => addToKey("reviews", body, movieId);
+
+  const handleDelete = async () => {
+    if (!movieId) return;
+    
+    setIsDeleting(true);
+    try {
+      // Call the API directly to ensure it completes before updating state
+      const response = await fetch(`/api/movies/${movieId}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Use the CRUD hook to update the frontend state
+        deleteItem(movieId);
+        
+        // Invalidate the ratings cache so the UI updates properly
+        invalidateRatingsCache();
+        
+        // Refresh the movies data to ensure UI is up to date
+        const movies = await getJSON('movies');
+        setMovies(movies);
+        
+        // Navigate back to the movie list or home
+        navigate('/#/search_movies');
+      } else {
+        const errorData = await response.json();
+        setSubmitError(errorData.error || 'Failed to delete movie');
+      }
+    } catch (error) {
+      console.error('Error deleting movie:', error);
+      setSubmitError('Failed to delete movie');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
 
   const validationSchema = Yup.object({
@@ -249,22 +292,14 @@ const ReviewForm = ({ initObj }) => {
             {/* Extract Text Button - only show if document is uploaded and review exists */}
             {hasDocument && initObj?.id && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <Button
+                <ExtractButton
                   type="button"
                   onClick={handleExtractText}
                   disabled={isExtracting}
-                  style={{
-                    backgroundColor: '#17a2b8',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '4px',
-                    cursor: isExtracting ? 'not-allowed' : 'pointer',
-                    opacity: isExtracting ? 0.6 : 1
-                  }}
+                  isExtracting={isExtracting}
                 >
                   {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </Button>
+                </ExtractButton>
                 <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
                   Click to extract text from the uploaded document into the review field below
                 </p>
@@ -302,7 +337,7 @@ const ReviewForm = ({ initObj }) => {
           
           
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
-            <Button type="button" onClick={() => {
+            <CancelButton type="button" onClick={() => {
               if (initObj) {
                 // If editing existing review, just exit edit mode
                 setIsEditing(false);
@@ -310,13 +345,22 @@ const ReviewForm = ({ initObj }) => {
                 // If creating new review, navigate back
                 navigate(-1);
               }
-            }}>Cancel</Button>
+            }}>Cancel</CancelButton>
             <SubmitButton 
               isSubmitting={isSubmitting}
               isEdit={isEdit}
               editText="Save Changes"
               createText="Submit Review"
             />
+            {isAdmin && initObj && (
+              <DeleteButton 
+                type="button" 
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Movie'}
+              </DeleteButton>
+            )}
           </div>
         </StyledForm>
       ) : (
@@ -348,6 +392,15 @@ const ReviewForm = ({ initObj }) => {
           reviewId={initObj?.id}
         />
       )}
+      
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="Delete Movie"
+        message={`Are you sure you want to delete this movie and all its reviews? This action cannot be undone.`}
+        itemType="Movie"
+      />
     </div>
   );
 };

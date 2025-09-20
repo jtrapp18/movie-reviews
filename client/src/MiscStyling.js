@@ -166,8 +166,8 @@ const Button = styled.button.attrs(props => ({
   color: var(--cinema-black);
   background: var(--cinema-gold);
   border: 2px solid var(--cinema-gold-dark);
-  border-radius: 20px;
-  padding: 10px;
+  border-radius: 15px;
+  padding: 5px;
   min-width: 120px;
   height: fit-content;
   font-size: 1rem;
@@ -199,6 +199,42 @@ const Button = styled.button.attrs(props => ({
   }
 `
 
+const DeleteButton = styled(Button)`
+  background-color: var(--cinema-red);
+  color: white;
+  border: 2px solid var(--cinema-red-dark);
+
+  &:hover {
+    background-color: var(--cinema-red-dark);
+    border-color: var(--cinema-red-dark);
+  }
+`
+
+const CancelButton = styled(Button)`
+  background-color: var(--cinema-gray-light);
+  border: 2px solid var(--cinema-gray);
+
+  &:hover {
+    background-color: var(--cinema-gray);
+    border-color: var(--cinema-gray);
+  }
+`
+
+const ExtractButton = styled(Button)`
+  background-color: var(--cinema-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: ${props => props.isExtracting ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.isExtracting ? 0.6 : 1};
+
+  &:hover {
+    background-color: var(--cinema-blue-dark);
+    border-color: var(--cinema-blue-dark);
+  }
+`
+
 const StyledCard = styled.article`
   position: relative;
   width: 200px;
@@ -208,13 +244,11 @@ const StyledCard = styled.article`
 
   h2 {
     position: absolute;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    right: 0.5rem;
+    bottom: 0;
+    width: 100%;
     color: white;
     background: rgba(0, 0, 0, 0.8);
     padding: 0.5rem;
-    border-radius: 0.5rem;
     text-align: center;
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     font-weight: bold;
@@ -331,5 +365,5 @@ const DocumentContent = styled.div`
 `;
 
 export { StyledNavigation, StyledMenuItem, StyledNavLink, StyledLink, StyledMain, StyledForm, 
-  StyledDeleted, CardContainer, BorderGlow, Button, Tag,
+  StyledDeleted, CardContainer, BorderGlow, Button, Tag, DeleteButton, CancelButton, ExtractButton,
   StyledCard, StyledContainer, DocumentContent }

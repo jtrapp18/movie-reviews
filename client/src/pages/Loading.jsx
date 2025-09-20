@@ -6,25 +6,33 @@ const LoadingContainer = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: ${props => props.compact ? '20px' : '40px'};
+    padding: ${props => {
+        if (props.size === 'small') return '10px';
+        if (props.size === 'large') return '60px';
+        return props.compact ? '20px' : '40px';
+    }};
     text-align: center;
     
     p {
-        color: ${props => props.compact ? '#666' : 'var(--yellow)'};
-        font-size: ${props => props.compact ? '14px' : 'clamp(1.4rem, 3.5vw, 2rem)'};
+        color: ${props => {
+            if (props.size === 'small') return '#999';
+            if (props.size === 'large') return 'var(--yellow)';
+            return props.compact ? '#666' : 'var(--yellow)';
+        }};
+        font-size: ${props => {
+            if (props.size === 'small') return '12px';
+            if (props.size === 'large') return 'clamp(3.5rem, 7vw, 8rem)';
+            return props.compact ? '16px' : 'clamp(3rem, 6vw, 7rem)';
+        }};
         margin: 0;
-        
-        strong {
-            font-size: ${props => props.compact ? '16px' : 'clamp(3rem, 6vw, 7rem)'};
-            font-weight: 600;
-        }
+        font-weight: 600;
     }
 
     .dots {
         display: inline-block;
-        font-size: ${props => props.compact ? '14px' : 'clamp(1.4rem, 3.5vw, 2rem)'};
+        font-size: inherit; // Use the same size as the parent p element
         white-space: nowrap;
-        margin-left: 8px;
+        margin-left: ${props => props.size === 'small' ? '4px' : '8px'};
     }
 
     .dot {
@@ -65,11 +73,12 @@ const LoadingContainer = styled.div`
 const Loading = ({ 
     text = "Loading", 
     compact = false,
+    size = 'medium', // 'small', 'medium', 'large'
     showDots = true,
     className = ""
 }) => {
     return (
-        <LoadingContainer compact={compact} className={className}>
+        <LoadingContainer compact={compact} size={size} className={className}>
             <p>
                 <strong>{text}</strong>
                 {showDots && (

@@ -1001,6 +1001,64 @@ class Sitemap(Resource):
             
         except Exception as e:
             return {'error': f'Sitemap generation failed: {str(e)}'}, 500
+
+class DeleteMovie(Resource):
+    """Delete a movie and all its associated data (admin only)"""
+    
+    def delete(self, movie_id):
+        try:
+            movie = Movie.query.get(movie_id)
+            if not movie:
+                return {'error': 'Movie not found'}, 404
+            
+            # Get all reviews for this movie to clean up S3 documents
+            reviews = Review.query.filter_by(movie_id=movie_id).all()
+            
+            # Delete associated S3 documents for all reviews
+            for review in reviews:
+                if review.has_document and review.document_path:
+                    try:
+                        from lib.utils.s3_client import s3_client
+                        s3_client.delete_object(Bucket='movie-reviews-documents', Key=review.document_path)
+                    except Exception as e:
+                        print(f"Warning: Could not delete S3 document: {e}")
+            
+            # Delete the movie (cascade will handle reviews and tags)
+            db.session.delete(movie)
+            db.session.commit()
+            
+            return {'message': 'Movie and all associated data deleted successfully'}, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Failed to delete movie: {str(e)}'}, 500
+
+class DeleteArticle(Resource):
+    """Delete an article (admin only)"""
+    
+    def delete(self, article_id):
+        try:
+            article = Review.query.filter_by(id=article_id, content_type='article').first()
+            if not article:
+                return {'error': 'Article not found'}, 404
+            
+            # Delete associated document if it exists
+            if article.has_document and article.document_path:
+                try:
+                    from lib.utils.s3_client import s3_client
+                    s3_client.delete_object(Bucket='movie-reviews-documents', Key=article.document_path)
+                except Exception as e:
+                    print(f"Warning: Could not delete S3 document: {e}")
+            
+            # Delete the article
+            db.session.delete(article)
+            db.session.commit()
+            
+            return {'message': 'Article deleted successfully'}, 200
+            
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Failed to delete article: {str(e)}'}, 500
         
 api.add_resource(ClearSession, '/api/clear', endpoint='clear')
 api.add_resource(AccountSignup, '/api/account_signup', endpoint='account_signup')
@@ -1085,6 +1143,8 @@ api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
 api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
 api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
 api.add_resource(Sitemap, '/sitemap.xml')
+api.add_resource(DeleteMovie, '/api/movies/<int:movie_id>/delete')
+api.add_resource(DeleteArticle, '/api/articles/<int:article_id>/delete')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

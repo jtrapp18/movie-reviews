@@ -10,7 +10,7 @@ const TagInputContainer = styled.div`
   padding: 12px;
   border: 2px solid var(--cinema-gold-dark);
   border-radius: 8px;
-  background-color: var(--cinema-gray);
+  background-color: var(--cinema-gray-dark);
 `;
 
 const InputRow = styled.div`

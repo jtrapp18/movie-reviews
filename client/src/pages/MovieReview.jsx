@@ -6,6 +6,7 @@ import MovieCard from '../cards/MovieCard';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
 import SEOHead from '../components/SEOHead';
+import Loading from './Loading';
 import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const MovieContainer = styled.div`
@@ -55,7 +56,7 @@ function MovieReview() {
   if (loading) {
     return (
       <StyledContainer>
-        <h1>Loading movie details...</h1>
+        <Loading text="Loading movie details" size="large" />
       </StyledContainer>
     );
   }
