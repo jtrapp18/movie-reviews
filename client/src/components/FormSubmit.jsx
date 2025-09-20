@@ -6,14 +6,6 @@ import RichTextDisplay from './RichTextDisplay'
 import ZoomableContent from './ZoomableContent'
 import styled from 'styled-components'
 
-const StyledSubmit = styled.div`
-  width: 650px;
-  max-width: 75vw;
-  padding: 2%;
-  display: flex;
-  flex-direction: column;
-`;
-
 const ContentHeader = styled.div`
   text-align: center;
   margin-bottom: 1rem;
@@ -87,7 +79,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
   const hasAnyContent = hasContent || hasDocument;
 
   return (
-    <StyledSubmit>
+    <div>
       <ContentHeader>
         <ContentTitle>{formValues.title}</ContentTitle>
         
@@ -166,7 +158,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
           Edit
         </Button>
       )}
-    </StyledSubmit>
+    </div>
   );
 };
 

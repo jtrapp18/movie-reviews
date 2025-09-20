@@ -142,6 +142,8 @@ const ArticleForm = ({ initObj }) => {
           // Store the created article data for new articles
           if (!isEdit) {
             setCreatedArticle(result.result);
+            // Navigate to the new article's detail page
+            navigate(`/#/articles/${result.result.id}`);
           }
           
           // Update the articles context with the new/updated article
@@ -151,12 +153,11 @@ const ArticleForm = ({ initObj }) => {
             if (initObj) {
               Object.assign(initObj, result.result);
             }
+            // Switch to non-editing mode to show the updated article
+            setIsEditing(false);
           } else {
             addItem(result.result);
           }
-          
-          // Switch to non-editing mode to show the saved article
-          setIsEditing(false);
         } else {
           setSubmitError(result.error);
         }
@@ -219,7 +220,7 @@ const ArticleForm = ({ initObj }) => {
 
 
   return (
-    <div>
+    <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? "Edit Article" : "Create New Article"}</h2>
@@ -262,8 +263,8 @@ const ArticleForm = ({ initObj }) => {
               }}
             />
             
-            {/* Extract Text Button - only show if document is uploaded and article exists */}
-            {hasDocument && initObj?.id && (
+            {/* Extract Text Button - show if document is uploaded */}
+            {hasDocument && selectedFile && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
                 <ExtractButton
                   type="button"
@@ -358,7 +359,7 @@ const ArticleForm = ({ initObj }) => {
         message={`Are you sure you want to delete this article? This action cannot be undone.`}
         itemType="Article"
       />
-    </div>
+    </>
   );
 };
 

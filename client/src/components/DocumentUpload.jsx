@@ -7,7 +7,7 @@ const UploadContainer = styled.div`
   margin: 20px 0;
   padding: 20px;
   border: 2px dashed var(--cinema-gold);
-  background-color: var(--cinema-gray);
+  background-color: var(--cinema-gray-dark);
   border-radius: 8px;
   text-align: center;
   color: var(--cinema-gold);

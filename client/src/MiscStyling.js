@@ -51,8 +51,7 @@ const StyledMain = styled.main`
 `;
 
 const StyledForm = styled.form`
-  width: 600px;
-  max-width: 75vw;
+  width: 100%;
   padding: 2%;
   overflow-y: visible;
   display: flex;
@@ -306,30 +305,31 @@ const StyledCard = styled.article`
   }
 `
 
+
 const StyledContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 
-    width: min(900px, 90vw);
-    margin: 0 auto;
-    padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
-    line-height: 1.6;
+  width: min(900px, 90vw);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
+  line-height: 1.6;
 
-    @media (max-width: 768px) {
-      width: 98vw;
-    }
+  @media (max-width: 768px) {
+    width: 98vw;
+  }
 
-    h1 {
-      text-align: center;
-      padding-top: 2vh;
-    }
+  h1 {
+    text-align: center;
+    padding-top: 2vh;
+  }
 
-    hr {
-      width: 100%;
-    }
-`
+  hr {
+    width: 100%;
+  }
+`;
 
 const Tag = styled.div`
   background: gray;

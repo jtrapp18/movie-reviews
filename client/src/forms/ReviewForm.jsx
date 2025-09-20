@@ -231,13 +231,6 @@ const ReviewForm = ({ initObj }) => {
     }
   };
 
-
-  // Debug logging
-  console.log('DEBUG - initObj:', initObj);
-  console.log('DEBUG - hasDocument:', hasDocument);
-  console.log('DEBUG - documentFilename:', initObj?.documentFilename);
-  console.log('DEBUG - documentType:', initObj?.documentType);
-
   return (
     <div>
       {isEditing ? (
@@ -289,8 +282,15 @@ const ReviewForm = ({ initObj }) => {
               }}
             />
             
-            {/* Extract Text Button - only show if document is uploaded and review exists */}
-            {hasDocument && initObj?.id && (
+            {/* Extract Text Button - show if document is uploaded */}
+            {(() => {
+              console.log('DEBUG EXTRACT BUTTON:', {
+                hasDocument,
+                selectedFile: selectedFile?.name,
+                hasDocumentAndFile: hasDocument && selectedFile
+              });
+              return hasDocument && selectedFile;
+            })() && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
                 <ExtractButton
                   type="button"
@@ -334,7 +334,6 @@ const ReviewForm = ({ initObj }) => {
           {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
           {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
-          
           
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
             <CancelButton type="button" onClick={() => {

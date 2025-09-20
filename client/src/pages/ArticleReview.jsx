@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { getJSON, snakeToCamel } from './helper';
 import ArticleForm from '../forms/ArticleForm';
+import { StyledContainer } from '../MiscStyling';
 
 function ArticleReview() {
   const { id } = useParams();
@@ -46,9 +47,9 @@ function ArticleReview() {
   }
 
   return (
-    <div>
+    <StyledContainer>
       <ArticleForm initObj={article} />
-    </div>
+    </StyledContainer>
   );
 }
 
