@@ -79,7 +79,7 @@ const HamburgerButton = styled.button`
 
   &.open {
     span:first-child {
-      transform: rotate(45deg) translate(6px, 6px);
+      transform: rotate(45deg) translate(5px, 5px);
       width: 30px;
     }
     
