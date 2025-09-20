@@ -6,7 +6,7 @@ import uuid
 from datetime import date
 from datetime import datetime
 # from flask_migrate import Migrate
-from flask import request, session, send_file, jsonify
+from flask import request, session, send_file, jsonify, Response
 from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
@@ -33,6 +33,27 @@ def uploaded_file(filename):
         return send_file(file_path)
     else:
         return jsonify({'error': 'File not found'}), 404
+
+@app.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for SEO"""
+    robots_content = """User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: {}/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin
+Disallow: /login
+Disallow: /articles/new
+
+# Allow all movie and article pages
+Allow: /movies/
+Allow: /articles/
+Allow: /search_movies""".format(request.url_root.rstrip('/'))
+    
+    return Response(robots_content, mimetype='text/plain')
 
 # @app.before_request
 # def check_if_logged_in():
@@ -922,6 +943,64 @@ class DocumentPreview(Resource):
             
         except Exception as e:
             return {'error': f'Preview failed: {str(e)}'}, 500
+
+class Sitemap(Resource):
+    """Generate XML sitemap for SEO"""
+    
+    def get(self):
+        try:
+            from flask import Response
+            import xml.etree.ElementTree as ET
+            
+            # Get all movies and articles
+            movies = Movie.query.all()
+            articles = Review.query.filter_by(content_type='article').all()
+            
+            # Create XML structure
+            root = ET.Element('urlset')
+            root.set('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+            
+            # Add home page
+            home_url = ET.SubElement(root, 'url')
+            ET.SubElement(home_url, 'loc').text = request.url_root.rstrip('/')
+            ET.SubElement(home_url, 'changefreq').text = 'daily'
+            ET.SubElement(home_url, 'priority').text = '1.0'
+            
+            # Add search page
+            search_url = ET.SubElement(root, 'url')
+            ET.SubElement(search_url, 'loc').text = f"{request.url_root.rstrip('/')}/#/search_movies"
+            ET.SubElement(search_url, 'changefreq').text = 'weekly'
+            ET.SubElement(search_url, 'priority').text = '0.8'
+            
+            # Add articles page
+            articles_url = ET.SubElement(root, 'url')
+            ET.SubElement(articles_url, 'loc').text = f"{request.url_root.rstrip('/')}/#/articles"
+            ET.SubElement(articles_url, 'changefreq').text = 'weekly'
+            ET.SubElement(articles_url, 'priority').text = '0.8'
+            
+            # Add movie pages
+            for movie in movies:
+                movie_url = ET.SubElement(root, 'url')
+                ET.SubElement(movie_url, 'loc').text = f"{request.url_root.rstrip('/')}/#/movies/{movie.id}"
+                ET.SubElement(movie_url, 'lastmod').text = movie.release_date.strftime('%Y-%m-%d')
+                ET.SubElement(movie_url, 'changefreq').text = 'monthly'
+                ET.SubElement(movie_url, 'priority').text = '0.7'
+            
+            # Add article pages
+            for article in articles:
+                article_url = ET.SubElement(root, 'url')
+                ET.SubElement(article_url, 'loc').text = f"{request.url_root.rstrip('/')}/#/articles/{article.id}"
+                ET.SubElement(article_url, 'lastmod').text = article.date_added.strftime('%Y-%m-%d')
+                ET.SubElement(article_url, 'changefreq').text = 'monthly'
+                ET.SubElement(article_url, 'priority').text = '0.6'
+            
+            # Convert to string
+            xml_str = ET.tostring(root, encoding='unicode')
+            
+            return Response(xml_str, mimetype='application/xml')
+            
+        except Exception as e:
+            return {'error': f'Sitemap generation failed: {str(e)}'}, 500
         
 api.add_resource(ClearSession, '/api/clear', endpoint='clear')
 api.add_resource(AccountSignup, '/api/account_signup', endpoint='account_signup')
@@ -1005,6 +1084,7 @@ api.add_resource(ReviewWithDocumentById, '/api/reviews_with_document/<int:review
 api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
 api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
 api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
+api.add_resource(Sitemap, '/sitemap.xml')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

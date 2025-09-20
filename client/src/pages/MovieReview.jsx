@@ -5,6 +5,8 @@ import { StyledContainer } from '../MiscStyling';
 import MovieCard from '../cards/MovieCard';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
+import SEOHead from '../components/SEOHead';
+import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const MovieContainer = styled.div`
   display: flex;
@@ -76,14 +78,38 @@ function MovieReview() {
 
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
 
+  // Generate SEO data
+  const seoTitle = review ? `${movie.title} Review - ${review.rating}/10` : `${movie.title} - Movie Review`;
+  const seoDescription = review 
+    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...` 
+    : `Read our detailed review of ${movie.title} (${movie.releaseDate}). ${movie.overview.substring(0, 100)}...`;
+  
+  const structuredData = generateMovieReviewStructuredData(movie, review);
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: window.location.origin + '/#/' },
+    { name: 'Movies', url: window.location.origin + '/#/search_movies' },
+    { name: movie.title, url: window.location.href }
+  ]);
+
   return (
-    <StyledContainer>
-      <MovieContainer>
-        <MovieCard movie={movie} />
-      </MovieContainer>
-      
-      <ReviewForm initObj={review} />
-    </StyledContainer>
+    <>
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        keywords={`${movie.title}, movie review, ${movie.originalLanguage}, ${movie.releaseDate}, film analysis`}
+        image={movie.coverPhoto}
+        url={`/#/movies/${movie.id}`}
+        type="article"
+        structuredData={[structuredData, breadcrumbData].filter(Boolean)}
+      />
+      <StyledContainer>
+        <MovieContainer>
+          <MovieCard movie={movie} />
+        </MovieContainer>
+        
+        <ReviewForm initObj={review} />
+      </StyledContainer>
+    </>
   );
 }
 

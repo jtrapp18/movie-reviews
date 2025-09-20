@@ -7,6 +7,8 @@ import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
 import Loading from './Loading';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import SEOHead from '../components/SEOHead';
+import { generateWebsiteStructuredData } from '../utils/seoUtils';
 
 const StyledContainer = styled.div`
   padding: 0;
@@ -83,41 +85,52 @@ function Home() {
   };
 
 
+  const structuredData = generateWebsiteStructuredData();
+
   return (
-    <StyledContainer>
-      {/* Single search bar at the top */}
-      <SearchBar 
-        enterSearch={unifiedSearch}
-        placeholder="Search everything... (movies, reviews, articles, tags)"
+    <>
+      <SEOHead
+        title="Movie Reviews Hub - Discover Great Films"
+        description="Explore detailed movie reviews, ratings, and film analysis. Find your next favorite movie with our comprehensive database of reviews and articles."
+        keywords="movie reviews, film analysis, cinema, ratings, movies, film criticism, movie database"
+        type="website"
+        structuredData={structuredData}
       />
-      
-      {/* Loading indicator */}
-      {isSearching && (
-        <Loading text="Searching" compact={true} />
-      )}
-      
-      <Section
-        title="Movies"
-        subtitle="Click movie to view review"
-        showSearch={false}
-      >
-        <Movies
-          showMovies={showMovies}
+      <StyledContainer>
+        {/* Single search bar at the top */}
+        <SearchBar 
           enterSearch={unifiedSearch}
+          placeholder="Search everything... (movies, reviews, articles, tags)"
         />
-      </Section>
-      
-      <Section
-        title="Articles"
-        subtitle="Browse theme-based articles and essays"
-        showSearch={false}
-      >
-        <Articles
-          showArticles={showArticles}
-          enterSearch={unifiedSearch}
-        />
-      </Section>
-    </StyledContainer>
+        
+        {/* Loading indicator */}
+        {isSearching && (
+          <Loading text="Searching" compact={true} />
+        )}
+        
+        <Section
+          title="Movies"
+          subtitle="Click movie to view review"
+          showSearch={false}
+        >
+          <Movies
+            showMovies={showMovies}
+            enterSearch={unifiedSearch}
+          />
+        </Section>
+        
+        <Section
+          title="Articles"
+          subtitle="Browse theme-based articles and essays"
+          showSearch={false}
+        >
+          <Articles
+            showArticles={showArticles}
+            enterSearch={unifiedSearch}
+          />
+        </Section>
+      </StyledContainer>
+    </>
   );
 }
 

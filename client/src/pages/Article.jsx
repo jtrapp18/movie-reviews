@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
 import PageContainer from '../components/PageContainer';
+import SEOHead from '../components/SEOHead';
+import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const LoadingMessage = styled.div`
   text-align: center;
@@ -79,10 +81,30 @@ function Article() {
     );
   }
 
+  // Generate SEO data
+  const seoTitle = article.title;
+  const seoDescription = article.description || article.title;
+  const structuredData = generateArticleStructuredData(article);
+  const breadcrumbData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: window.location.origin + '/#/' },
+    { name: 'Articles', url: window.location.origin + '/#/articles' },
+    { name: article.title, url: window.location.href }
+  ]);
+
   return (
-    <PageContainer>
-      <ArticleForm initObj={article} />
-    </PageContainer>
+    <>
+      <SEOHead
+        title={seoTitle}
+        description={seoDescription}
+        keywords={`${article.title}, movie article, film analysis, cinema`}
+        url={`/#/articles/${article.id}`}
+        type="article"
+        structuredData={[structuredData, breadcrumbData].filter(Boolean)}
+      />
+      <PageContainer>
+        <ArticleForm initObj={article} />
+      </PageContainer>
+    </>
   );
 }
 
