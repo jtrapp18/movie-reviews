@@ -252,7 +252,7 @@ const StyledCard = styled.article`
     text-align: center;
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
     font-weight: bold;
-    z-index: 1000;
+    // z-index: 1000;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(2px);
     transition: opacity 0.3s ease;

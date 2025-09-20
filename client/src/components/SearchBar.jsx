@@ -2,45 +2,112 @@ import { useState } from 'react';
 import styled from "styled-components";
 
 const SearchContainer = styled.div`
-    max-height: 100px;
-    width: min(500px, 90vw);
-    margin: 2% auto;
+    width: 100%;
+    max-width: 800px;
+    margin: 2rem auto;
     display: flex;
     align-items: center;
+    position: relative;
 
     div {
         width: 100%;
-        height: 100%;
         position: relative;
         color: white;
-
-        &:hover {
-            color: black;
-
-            input {
-                background: var(--cinema-gold);
-            }
-        }
     }
 
     input {
         width: 100%;
-        border-radius: 20px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        padding: 10px 15px;
-        color: inherit;
+        border-radius: 12px;
+        font-size: 18px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 16px 20px;
+        padding-right: 50px;
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        outline: none;
+        font-weight: 400;
+        line-height: 1.4;
+
+        &::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        &:not(:placeholder-shown) {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 600;
+            line-height: 1.2;
+            padding: 20px 24px;
+            padding-right: 60px;
+        }
+
+        &:focus {
+            border-color: var(--cinema-gold);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+
+        &:hover {
+            border-color: rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.4);
+        }
     }
 
     span {
         position: absolute;
-        right: 5%;
+        right: 20px;
         top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
-        color: inherit;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        transition: all 0.2s ease;
+        padding: 8px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+
+        &:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
     }
 
+    @media (max-width: 768px) {
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+        
+        input {
+            font-size: 16px;
+            padding: 14px 18px;
+            padding-right: 45px;
+            
+            &::placeholder {
+                font-size: 16px;
+            }
+
+            &:not(:placeholder-shown) {
+                font-size: clamp(1.2rem, 5vw, 1.8rem);
+                font-weight: 600;
+                line-height: 1.2;
+                padding: 16px 20px;
+                padding-right: 50px;
+            }
+        }
+        
+        span {
+            right: 16px;
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            width: 36px;
+            height: 36px;
+        }
+    }
 `
 
 const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {

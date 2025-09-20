@@ -100,7 +100,7 @@ function Home() {
         {/* Single search bar at the top */}
         <SearchBar 
           enterSearch={unifiedSearch}
-          placeholder="Search everything... (movies, reviews, articles, tags)"
+          placeholder="Search movies, reviews, articles, and tags..."
         />
         
         {/* Loading indicator */}

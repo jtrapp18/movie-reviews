@@ -32,7 +32,7 @@ const LinkContainer = styled.div`
   height: 100vh;
   
   left: 0;
-  z-index: 2000;
+  z-index: 9999;
   width: 100vw;
   text-decoration: none;
   text-align: right;
