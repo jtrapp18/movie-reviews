@@ -16,7 +16,6 @@ const StyledCard = styled.article`
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   &:hover {
-    transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   }
 
@@ -36,7 +35,7 @@ const StyledCard = styled.article`
     padding: 0.6rem 0;
     margin: 0;
     text-align: center;
-    font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(1px);
@@ -67,10 +66,6 @@ const StyledCard = styled.article`
     transition: transform 0.3s ease;
   }
 
-  &:hover img {
-    transform: scale(1.05);
-  }
-
   .movie-details {
     position: absolute;
     left: 0;
@@ -78,25 +73,14 @@ const StyledCard = styled.article`
     width: 100%;
     height: 100%;
     opacity: 0;
-    padding: 3%;
+    padding: 10px;
     align-items: start;
-    font-size: clamp(0.7rem, 2vw, 0.9rem);
-    line-height: 1.3;
     transition: all 0.3s ease;
 
-    .movie-metadata {
-      padding: 0;
-      align-items: start;
-
-      p {
-        margin: 0;
-        font-size: clamp(0.65rem, 1.8vw, 0.8rem);
-      }
-    }
-
     p {
-      font-size: clamp(0.6rem, 1.5vw, 0.75rem);
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
       line-height: 1.2;
+      margin: 0;
     }
   }
 
