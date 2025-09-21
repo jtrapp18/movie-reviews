@@ -25,7 +25,7 @@ const ArticleCardContainer = styled.article`
 `;
 
 const ArticleTitle = styled.h2`
-  height: 60%;
+  height: 80%;
   color: var(--cinema-black);
   line-height: 1.3;
   font-size: clamp(1rem, 2.8vw, 1.5rem);
@@ -36,24 +36,17 @@ const ArticleTitle = styled.h2`
   transition: opacity 0.3s ease;
   display: flex;
   align-items: flex-end;
-`;
 
-const ArticleContent = styled.div`
-  height: 30%;
-  color: var(--cinema-black);
-  font-size: clamp(0.7rem, 2vw, 0.9rem);
-  line-height: 1.4;
-  overflow: hidden;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: flex-end;
+  ${ArticleCardContainer}:hover & {
+    opacity: 0;
+  }
 `;
 
 const ArticleDate = styled.div`
   position: absolute;
   top: 1%;
   right: 1%;
-  color: var(--cinema-gold-dark);
+  color: var(--cinema-gray-dark);
   font-size: 9px;
   font-weight: 500;
   text-align: center;
@@ -64,7 +57,7 @@ const ArticleDate = styled.div`
 `;
 
 const TagContainer = styled.div`
-  height: 10%;
+  height: 20%;
   display: flex;
   flex-wrap: nowrap;
   gap: 3px;
@@ -72,6 +65,41 @@ const TagContainer = styled.div`
   padding: 4px 6px 4px 4px;
   border-radius: 4px;
   overflow: hidden;
+  transition: opacity 0.3s ease;
+
+  ${ArticleCardContainer}:hover & {
+    opacity: 0;
+  }
+`;
+
+const ArticleOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 6px;
+
+  ${ArticleCardContainer}:hover & {
+    opacity: 1;
+  }
+
+ p {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    line-height: 1.4;
+    flex-grow: 1;
+    margin-bottom: 10px;
+  }
 `;
 
 function ArticleCard({ article }) {
@@ -110,11 +138,7 @@ function ArticleCard({ article }) {
       <ArticleTitle>
         {article.title || 'Untitled Article'}
       </ArticleTitle>
-      
-      <ArticleContent>
-        {article.description || 'No description available'}
-      </ArticleContent>
-      
+
       <TagContainer>
         {article.tags && article.tags.length > 0 ? (
           <>
@@ -136,6 +160,10 @@ function ArticleCard({ article }) {
           </>
         ) : null}
       </TagContainer>
+
+      <ArticleOverlay>
+        <p>{article.description || 'No description available'}</p>
+      </ArticleOverlay>
 
     </ArticleCardContainer>
   );

@@ -3,11 +3,13 @@ import styled from "styled-components";
 
 const SearchContainer = styled.div`
     width: 100%;
-    max-width: 800px;
+    max-width: ${props => props.$isExpanded ? '100vw' : '800px'};
     margin: 2rem auto;
+    padding: ${props => props.$isExpanded ? '0 20px' : '0'};
     display: flex;
     align-items: center;
     position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
     div {
         width: 100%;
@@ -20,15 +22,17 @@ const SearchContainer = styled.div`
         border-radius: 12px;
         font-size: 18px;
         border: 2px solid rgba(255, 255, 255, 0.2);
+        border-bottom: ${props => props.$isExpanded ? '2px solid var(--cinema-gold)' : '2px solid rgba(255, 255, 255, 0.2)'};
         padding: 16px 20px;
         padding-right: 50px;
         color: white;
         background: rgba(0, 0, 0, 0.3);
         backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         outline: none;
         font-weight: 400;
         line-height: 1.4;
+        box-shadow: ${props => props.$isExpanded ? '0 2px 8px rgba(255, 215, 0, 0.15)' : 'none'};
 
         &::placeholder {
             color: rgba(255, 255, 255, 0.6);
@@ -46,8 +50,9 @@ const SearchContainer = styled.div`
 
         &:focus {
             border-color: var(--cinema-gold);
+            border-bottom: 2px solid var(--cinema-gold);
             background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2), ${props => props.$isExpanded ? '0 2px 8px rgba(255, 215, 0, 0.15)' : 'none'};
         }
 
         &:hover {
@@ -129,6 +134,7 @@ const SearchContainer = styled.div`
 
 const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     const [searchInput, setSearchInput] = useState('');
+    const [isExpanded, setIsExpanded] = useState(false);
     
     const handleChangeSearch = (event) => {
         setSearchInput(event.target.value);
@@ -137,6 +143,7 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     const handleClearSearch = () => {
         setSearchInput('');
         enterSearch('');
+        setIsExpanded(false);
     }
 
     const handleKeyDown = (event) => {
@@ -146,8 +153,19 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
         }
     };
 
+    const handleFocus = () => {
+        setIsExpanded(true);
+    };
+
+    const handleBlur = () => {
+        // Small delay to allow for clicking on clear button
+        setTimeout(() => {
+            setIsExpanded(false);
+        }, 200);
+    };
+
     return (
-        <SearchContainer className="search-bar">
+        <SearchContainer $isExpanded={isExpanded} className="search-bar">
             <div>
                 <input 
                     value={searchInput}
@@ -156,6 +174,8 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
                     placeholder={placeholder}
                     onChange={handleChangeSearch}
                     onKeyDown={handleKeyDown}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                 />
                 <span onClick={handleClearSearch}>✖</span>
             </div>
