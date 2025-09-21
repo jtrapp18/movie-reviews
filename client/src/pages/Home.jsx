@@ -22,9 +22,6 @@ const StyledContainer = styled.div`
 `;
 
 
-
-
-
 function Home() {
   const { movies } = useOutletContext();
   const navigate = useNavigate();
@@ -109,7 +106,7 @@ function Home() {
         )}
         
         <Section
-          title="Movies"
+          title="Movie Reviews"
           subtitle="Click movie to view review"
           showSearch={false}
         >

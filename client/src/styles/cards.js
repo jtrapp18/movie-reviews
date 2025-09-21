@@ -26,6 +26,10 @@ const StyledCard = styled.article`
     opacity: 0;
   }
 
+  &:hover .star-rating-overlay {
+    opacity: 0;
+  }
+
   img {
     position: absolute;
     left: 0;

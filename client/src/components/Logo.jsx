@@ -2,12 +2,12 @@ import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
 const LogoContainer = styled.div` 
-  height: 100%;
+  height: fit-content;
   display: flex;
   align-items: end;
 
   img {
-    height: clamp(2rem, 7vw, 4.2rem);
+    height: clamp(1.5rem, 5vw, 3rem);
     transition: transform 0.3s ease-in-out;
 
     &:hover {

@@ -7,32 +7,52 @@ const ArticleCardContainer = styled.article`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 5%;
+  padding: 1rem;
   width: 200px;
   height: 280px;
-  background: linear-gradient(135deg, var(--cinema-gold-ultra-light) 0%, #ffffff 60%, #f8f9fa 100%);
-  border-left: 4px solid var(--cinema-gold-dark);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(145deg, var(--cinema-bg-darker, rgba(10, 10, 10, 0.95)) 0%, var(--cinema-bg-lighter, rgba(30, 30, 30, 0.9)) 100%);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: all 0.3s ease;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cinema-gold) 0%, var(--cinema-gold-dark) 100%);
+    transition: height 0.3s ease;
+  }
 
   &:hover {
-    zoom: 1.03;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    background: #f8f9fa;
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 
+      0 16px 40px rgba(0, 0, 0, 0.9),
+      0 8px 24px rgba(0, 0, 0, 0.7),
+      0 0 0 2px rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, var(--cinema-bg-hover-darker, rgba(12, 12, 12, 0.98)) 0%, var(--cinema-bg-hover-lighter, rgba(32, 32, 32, 0.95)) 100%);
+    border-color: transparent;
+
+    &::before {
+      height: 6px;
+    }
   }
 `;
 
 const ArticleTitle = styled.h2`
   height: 80%;
-  color: var(--cinema-black);
+  color: var(--cinema-text-light, #f0f0f0);
   line-height: 1.3;
   font-size: clamp(1rem, 2.8vw, 1.5rem);
   font-weight: bold;
-  border-bottom: 3px double var(--cinema-gold-dark);
+  border-bottom: 3px double var(--cinema-gold);
   margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   transition: opacity 0.3s ease;
   display: flex;
   align-items: flex-end;
@@ -46,7 +66,7 @@ const ArticleDate = styled.div`
   position: absolute;
   top: 1%;
   right: 1%;
-  color: var(--cinema-gray-dark);
+  color: var(--cinema-gold);
   font-size: 9px;
   font-weight: 500;
   text-align: center;
@@ -76,16 +96,14 @@ const ArticleOverlay = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  justify-content: center;
-  align-items: center;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
   color: white;
-  padding: 15px;
+  padding: 20px;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
   border-radius: 6px;
@@ -94,11 +112,15 @@ const ArticleOverlay = styled.div`
     opacity: 1;
   }
 
- p {
+  p {
     font-size: clamp(0.8rem, 2vw, 0.9rem);
-    line-height: 1.4;
-    flex-grow: 1;
-    margin-bottom: 10px;
+    line-height: 1.5;
+    padding: 1px;
+    margin: 0;
+    
+    @media (max-width: 768px) {
+      padding: 4px 8px;
+    }
   }
 `;
 

@@ -30,7 +30,7 @@ const StarRatingOverlay = ({ rating }) => {
   const displayRating = rating.toFixed(1);
 
   return (
-    <OverlayContainer>
+    <OverlayContainer className='star-rating-overlay'>
       <Star>{stars}</Star>
       <span>{displayRating}</span>
     </OverlayContainer>
