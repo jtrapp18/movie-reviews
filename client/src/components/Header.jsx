@@ -5,7 +5,9 @@ import {WindowWidthContext} from "../context/windowSize";
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
 import Logo from './Logo';
-import {UserContext} from '../context/userProvider'
+import {UserContext} from '../context/userProvider';
+// Import image from public directory
+const vintagePhotoRoll = '/images/vintage-photo-roll.jpg';
 
 const StyledHeader = styled.div`
   width: 100%;
@@ -14,7 +16,7 @@ const StyledHeader = styled.div`
   display: flex;
   justify-content: space-between;
   background: white;
-  padding: 1% 5%;
+  padding: 1.5% 5% 0.5%;
   align-items: end;
   position: relative;
 `
@@ -45,28 +47,23 @@ const HeaderTitle = styled.div`
   .subtitle {
     font-family: inherit;
     font-size: 0.75rem;
-    color: #5c3c3c;
+    color: var(--cinema-maroon);
     margin-top: 1px;
     font-weight: 400;
     font-style: italic;
   }
 `
 
-const VintagePhotoRoll = styled.div`
+const VintagePhotoRoll = styled.img`
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  height: var(--height-header);
-  background-image: url('/images/vintage-photo-roll.jpg');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
   opacity: 0.4;
-  filter: blur(1px);
   z-index: 0;
-`
+`;
 
 const Header = () => {
   const { isMobile } = useContext(WindowWidthContext);
@@ -75,7 +72,10 @@ const Header = () => {
     return (
         <Headroom>
           <StyledHeader>
-            <VintagePhotoRoll />
+            <VintagePhotoRoll
+              src={vintagePhotoRoll} 
+              alt="Vintage film strip background"
+            />
             <LeftSection>
               <Logo />
               <HeaderTitle>

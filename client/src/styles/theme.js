@@ -6,6 +6,7 @@ export const theme = {
     cinemaGoldDark: 'var(--cinema-gold-dark)',
     cinemaRed: 'var(--cinema-red)',
     cinemaRedDark: 'var(--cinema-red-dark)',
+    cinemaMaroon: 'var(--cinema-maroon)',
     cinemaBlue: 'var(--cinema-blue)',
     cinemaBlueDark: 'var(--cinema-blue-dark)',
     cinemaGray: 'var(--cinema-gray)',

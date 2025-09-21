@@ -5,6 +5,7 @@ const LogoContainer = styled.div`
   height: fit-content;
   display: flex;
   align-items: end;
+  margin-top: 0.3rem;
 
   img {
     height: clamp(1.5rem, 5vw, 3rem);

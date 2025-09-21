@@ -23,7 +23,7 @@ const StyledNavigation = css`
   }
 
   &:hover {
-    color: var(--cinema-gold);
+    color: var(--cinema-maroon);
   }
 `;
 

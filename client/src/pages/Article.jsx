@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
-import PageContainer from '../components/PageContainer';
 import SEOHead from '../components/SEOHead';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 import Loading from '../components/ui/Loading';

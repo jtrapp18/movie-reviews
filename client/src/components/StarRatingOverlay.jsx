@@ -1,26 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const OverlayContainer = styled.div`
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  // background: rgba(0, 0, 0, 0.8);
+const InlineRatingContainer = styled.span`
   color: var(--cinema-gold);
-  padding: 4px 8px;
-  border-radius: 12px;
   font-size: 0.8rem;
-  font-weight: bold;
-  display: flex;
+  font-weight: 600;
+  display: inline-flex;
   align-items: center;
-  gap: 2px;
-  z-index: 10;
-  // backdrop-filter: blur(4px);
+  gap: 3px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
 `;
 
 const Star = styled.span`
   color: var(--cinema-gold);
   font-size: 0.9rem;
+`;
+
+const RatingNumber = styled.span`
+  font-size: 0.75rem;
+  opacity: 0.9;
 `;
 
 const StarRatingOverlay = ({ rating }) => {
@@ -30,10 +31,10 @@ const StarRatingOverlay = ({ rating }) => {
   const displayRating = rating.toFixed(1);
 
   return (
-    <OverlayContainer className='star-rating-overlay'>
+    <InlineRatingContainer>
       <Star>{stars}</Star>
-      <span>{displayRating}</span>
-    </OverlayContainer>
+      <RatingNumber>{displayRating}</RatingNumber>
+    </InlineRatingContainer>
   );
 };
 

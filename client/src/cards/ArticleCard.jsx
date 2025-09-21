@@ -30,7 +30,6 @@ const ArticleCardContainer = styled.article`
   }
 
   &:hover {
-    transform: translateY(-6px) scale(1.05);
     box-shadow: 
       0 16px 40px rgba(0, 0, 0, 0.9),
       0 8px 24px rgba(0, 0, 0, 0.7),
@@ -45,10 +44,10 @@ const ArticleCardContainer = styled.article`
 `;
 
 const ArticleTitle = styled.h2`
-  height: 80%;
+  height: 85%;
   color: var(--cinema-text-light, #f0f0f0);
   line-height: 1.3;
-  font-size: clamp(1rem, 2.8vw, 1.5rem);
+  font-size: clamp(1.2rem, 2.3vw, 1.7rem);
   font-weight: bold;
   border-bottom: 3px double var(--cinema-gold);
   margin-bottom: 8px;
@@ -77,7 +76,7 @@ const ArticleDate = styled.div`
 `;
 
 const TagContainer = styled.div`
-  height: 20%;
+  height: 15%;
   display: flex;
   flex-wrap: nowrap;
   gap: 3px;
@@ -100,7 +99,7 @@ const ArticleOverlay = styled.div`
   height: 100%;
   background: rgba(0, 0, 0, 0.85);
   color: white;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
