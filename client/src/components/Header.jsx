@@ -79,7 +79,7 @@ const Header = () => {
             <LeftSection>
               <Logo />
               <HeaderTitle>
-                <h1>Jamie Trapp's Movie Reviews</h1>
+                <h1>Movie Articles by Jamie Trapp</h1>
                 <div className="subtitle">Film Criticism & Analysis</div>
               </HeaderTitle>
             </LeftSection>

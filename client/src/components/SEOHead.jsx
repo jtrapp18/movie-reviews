@@ -9,7 +9,7 @@ const SEOHead = ({
   type = 'website',
   structuredData 
 }) => {
-  const siteName = 'Movie Reviews Hub';
+  const siteName = 'Jamie Trapp Movie Articles';
   const siteUrl = window.location.origin;
   const fullUrl = url ? `${siteUrl}${url}` : window.location.href;
   const fullImage = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : `${siteUrl}/default-og-image.jpg`;

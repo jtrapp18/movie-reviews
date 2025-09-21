@@ -1,27 +1,26 @@
-# Template
-[Click to Navigate to Deployed Project](https://hive-link.up.railway.app/)
+# Jamie Trapp Movie Articles
+[Click to Navigate to Deployed Project](https://jamie-trapp-movie-articles.up.railway.app/)
 
 ## About this project
 
-**Hive Link** is a platform designed for beekeepers to track hive inspections, analyze hive health, and connect with other beekeepers. Users can log and review hive data, visualize trends through interactive graphs, and leverage predictive models to improve colony management. 
+**Jamie Trapp Movie Articles** is a comprehensive platform for movie reviews, ratings, and film analysis. Users can browse detailed movie reviews, rate films, read in-depth articles about cinema, and discover new movies through an intuitive search interface. 
 
 ## Demo
 
 See this gif for an example of how the app works.
 
-![demo](https://raw.githubusercontent.com/jtrapp18/hive-link/refs/heads/main/client/public/images/hive-link.gif)
+![demo](https://raw.githubusercontent.com/jtrapp18/jamie-trapp-movie-articles/refs/heads/main/client/public/images/movie-articles-demo.gif)
 
 ## Features
 
-- **Hive Tracking**: Log hive inspections with details such as hive status, honey pulls, environmental factors, and hive health metrics.
-- **Data Visualization**: View hive trends over time with scatter plots showing impacts on honey production and varroa mites, with clickable pie charts filtering other graphs.
-- **Predictive Analysis**: Utilize machine learning (MLP Regressor from sklearn) to predict honey production based on inspection data for each hive.
-- **Personalized Hive Recommendations**: Get tailored insights based on the latest inspection data to optimize hive health and honey yield.
-- **Beekeeper Networking**: Connect with other beekeepers, view nearby hives on a hive map, and share insights.
-- **Authentication & Accounts**: Secure user authentication with JWT for managing hive data and accessing personalized recommendations.
-- **Forum**: Discuss bee-related topics, treatments, and best practices with other beekeepers.
-- **Specialized News Search**: Uses a Google Search API to find latest beekeeping-related news articles.
-- **Beekeeping Events**: Sign up for or create events related to beekeeping and search for events within a certain radius of a specified ZIP code.
+- **Movie Reviews**: Comprehensive movie reviews with detailed analysis and ratings
+- **Star Ratings**: Interactive star rating system for user feedback
+- **Movie Search**: Advanced search functionality to find movies by title, genre, or other criteria
+- **Article System**: In-depth articles about film analysis, cinema history, and movie culture
+- **User Authentication**: Secure login system for personalized experiences
+- **Responsive Design**: Mobile-friendly interface that works on all devices
+- **SEO Optimized**: Proper meta tags and structured data for search engine visibility
+- **Rich Text Editor**: Advanced text editing capabilities for articles and reviews
 
 ## Technical Details
 
@@ -41,35 +40,29 @@ See this gif for an example of how the app works.
 
 ### Client (Frontend - React)
 
-- **`src/cards/`** - Contains JSX components for displaying hive-related information in card format.
-- **`src/components/`** - Reusable UI elements such as buttons, modals, and navbar.
+- **`src/cards/`** - Contains JSX components for displaying movie and article information in card format.
+- **`src/components/`** - Reusable UI elements such as buttons, modals, navbar, and search functionality.
 - **`src/context/`** - Manages global state, including user authentication and UI preferences.
-- **`src/forms/`** - Components for handling user input, such as adding inspections and registering accounts.
-- **`src/graphing/`** - Graphing components utilizing Plotly for data visualization.
-- **`src/hooks/`** - Custom React hooks for handling data fetching, in state management, etc.
-- **`src/pages/`** - Main route components such as `Dashboard`, `HiveDetails`, and `Profile`.
-- **`src/styles/`** - Reusable UI elements such as error messages, and modals.
+- **`src/forms/`** - Components for handling user input, such as login, article creation, and reviews.
+- **`src/pages/`** - Main route components such as `Home`, `MovieReview`, `Articles`, and `SearchMovies`.
+- **`src/styles/`** - Reusable UI elements such as error messages, forms, and modals.
 - **`App.jsx`** - Root component handling routing and global context providers.
 - **`helper.js`** - Utility functions used throughout the frontend.
 - **`routes.jsx`** - Defines frontend route structure.
 - **`index.css`** - Global styles.
 - **`main.jsx`** - Application entry point.
-- **`MiscStyling.js`** - Reusable styled components.
 
 ### Server (Backend - Flask)
 
-- **`joblib/`** - Stores machine learning models for hive health and honey production predictions.
-- **`lib/experience_data/`** - Scripts for cleaning and structuring data for graphing and research.
-- **`lib/models/`** - SQLAlchemy models defining the database schema.
-- **`lib/seeding/`** - Scripts for database seeding, including data population and schema initialization.
+- **`lib/models/`** - SQLAlchemy models defining the database schema for movies, articles, users, and reviews.
+- **`lib/seeding/`** - Scripts for database seeding, including sample movie data and article content.
 - **`lib/config.py`** - Configuration file for database and application settings.
 - **`lib/migrations/`** - Handles database schema migrations.
 - **`app.py`** - Main Flask application file handling API routes and business logic.
 - **`Dockerfile`** - Defines containerization setup for deployment.
 - **`requirements.txt`** - Lists dependencies for the backend.
-- **`run_study.ipynb`** - Jupyter Notebook for running hive health experience studies and analyzing the latest data.
 
 ## Contributors
 
-**Jacqueline Trapp**  
+**Jamie Trapp**  
 GitHub: [JTrapp18](https://github.com/jtrapp18)

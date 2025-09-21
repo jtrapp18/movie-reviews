@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
 
-function LoginForm({ setShowConfirm }) {
+function LoginForm() {
 
   const { setUser } = useContext(UserContext);
 
@@ -21,7 +21,6 @@ function LoginForm({ setShowConfirm }) {
         const user = await postJSONToDb("login", body);  // Await the promise
         const userTransformed = snakeToCamel(user);
         setUser(userTransformed);
-        setShowConfirm(true);
       } catch (error) {
         setErrors({ password: error.message });
       }
