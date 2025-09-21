@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaFileUpload, FaFileAlt, FaPaperclip, FaCheck, FaLightbulb, FaEye, FaDownload, FaTimes } from 'react-icons/fa';
-import { Button } from '../MiscStyling';
+import { Button } from '../styles';
 
 const UploadContainer = styled.div`
   margin: 20px 0;

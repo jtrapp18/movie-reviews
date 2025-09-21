@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import RichTextEditor from "../components/RichTextEditor";
 import styled from 'styled-components';
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../MiscStyling";
+import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../styles";
 import Error from "../styles/Error";
 import Stars from "../components/Stars"
 import ContentDisplay from "../components/FormSubmit";

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Tag from './Tag';
-import {Button} from '../MiscStyling';
+import {Button} from '../styles';
 
 const TagInputContainer = styled.div`
   display: flex;

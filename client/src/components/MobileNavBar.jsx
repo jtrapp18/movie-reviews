@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useState, useRef, useEffect, useContext } from "react";
-import { StyledNavLink, StyledNavigation, StyledLink } from "../MiscStyling";
+import { StyledNavLink, StyledNavigation, StyledLink } from "../styles";
 import { scrollToTop } from "../helper";
 import { UserContext } from '../context/userProvider';
 import { AdminContext } from '../context/adminProvider';

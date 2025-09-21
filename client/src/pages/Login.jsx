@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import LoginForm from '../forms/LoginForm'
 import LoggedInConfirm from '../components/LoggedInConfirm';
 import Error from '../styles/Error';
-import { StyledContainer } from '../MiscStyling';
+import { StyledContainer } from '../styles';
 
 function Login({errMessage}) {
   const [showConfirm, setShowConfirm] = useState(false);

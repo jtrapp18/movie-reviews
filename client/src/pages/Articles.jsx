@@ -4,7 +4,7 @@ import MotionWrapper from '../styles/MotionWrapper';
 import ArticleCard from '../cards/ArticleCard';
 import SearchBar from '../components/SearchBar';
 import PageContainer from '../components/PageContainer';
-import { CardContainer } from '../MiscStyling';
+import { CardContainer } from '../styles';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';

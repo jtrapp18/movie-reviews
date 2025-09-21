@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import RichTextEditor from "../components/RichTextEditor";
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../MiscStyling";
+import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../styles";
 import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";

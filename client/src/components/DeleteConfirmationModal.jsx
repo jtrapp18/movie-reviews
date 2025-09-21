@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { CancelButton, DeleteButton } from '../MiscStyling';
+import { CancelButton, DeleteButton } from '../styles';
 
 const ModalOverlay = styled.div`
   position: fixed;

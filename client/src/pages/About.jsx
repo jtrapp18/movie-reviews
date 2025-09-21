@@ -4,7 +4,7 @@ import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '../components/AboutSection';
 import List from '../components/List';
-import { StyledContainer } from '../MiscStyling';
+import { StyledContainer } from '../styles';
 
 const aboutContent = yaml.load(aboutContentYaml);
 

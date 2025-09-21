@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { CardContainer } from '../MiscStyling';
+import { CardContainer } from '../styles';
 import MovieCard from '../cards/MovieCard';
 import MotionWrapper from '../styles/MotionWrapper';
 import Carousel from './Carousel';
-import Loading from '../pages/Loading';
+import Loading from './ui/Loading';
 import { getMovieRatings } from '../helper';
 
 function Movies({ showMovies, enterSearch }) {

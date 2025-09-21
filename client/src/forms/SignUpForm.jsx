@@ -5,7 +5,7 @@ import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
 import * as yup from 'yup';  // Import yup
 import Error from "../styles/Error";
-import { StyledForm, Button } from "../MiscStyling";
+import { StyledForm, Button } from "../styles";
 
 const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),

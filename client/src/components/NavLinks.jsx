@@ -1,4 +1,4 @@
-import { StyledMenuItem, StyledNavLink } from "../MiscStyling";
+import { StyledMenuItem, StyledNavLink } from "../styles";
 import { FaUserAlt } from 'react-icons/fa'; // Import icons
 import styled from "styled-components";
 import { useAdmin } from '../hooks/useAdmin';

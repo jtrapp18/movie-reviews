@@ -1,10 +1,10 @@
 import React from 'react';
-import { CardContainer, Button } from '../MiscStyling';
+import { CardContainer, Button } from '../styles';
 import ArticleCard from '../cards/ArticleCard';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper';
 import Carousel from './Carousel';
-import Loading from '../pages/Loading';
+import Loading from './ui/Loading';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../hooks/useAdmin';
 

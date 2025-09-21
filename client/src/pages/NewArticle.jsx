@@ -2,7 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import ArticleForm from '../forms/ArticleForm';
 import { useNavigate } from 'react-router-dom';
-import { StyledContainer} from '../MiscStyling';
+import { StyledContainer} from '../styles';
 
 function NewArticle() {
   const navigate = useNavigate();

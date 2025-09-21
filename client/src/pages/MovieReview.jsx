@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer } from '../MiscStyling';
+import { StyledContainer } from '../styles';
 import MovieCard from '../cards/MovieCard';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
 import SEOHead from '../components/SEOHead';
-import Loading from './Loading';
+import Loading from '../components/ui/Loading';
 import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const MovieContainer = styled.div`

@@ -5,8 +5,8 @@ import { Outlet } from 'react-router-dom';
 import { getJSON, snakeToCamel } from './helper';
 import { UserContext } from './context/userProvider';
 import { WindowWidthContext } from './context/windowSize'
-import Loading from './pages/Loading';
-import { StyledMain } from './MiscStyling';
+import Loading from './components/ui/Loading';
+import { StyledMain } from './styles';
 
 function App() {
 

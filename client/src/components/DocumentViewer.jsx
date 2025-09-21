@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
 import RichTextDisplay from './RichTextDisplay';
-import Loading from '../pages/Loading';
+import Loading from './ui/Loading';
 
 const ErrorMessage = styled.div`
   display: flex;

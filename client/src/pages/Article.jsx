@@ -6,8 +6,8 @@ import ArticleForm from '../forms/ArticleForm';
 import PageContainer from '../components/PageContainer';
 import SEOHead from '../components/SEOHead';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
-import Loading from './Loading';
-import { StyledContainer } from '../MiscStyling';
+import Loading from '../components/ui/Loading';
+import { StyledContainer } from '../styles';
 
 const LoadingMessage = styled.div`
   text-align: center;

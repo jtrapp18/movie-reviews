@@ -1,5 +1,5 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { StyledCard } from '../MiscStyling';
+import { StyledCard } from '../styles';
 import useCrudStateDB from "../hooks/useCrudStateDB";
 import { useAdmin } from '../hooks/useAdmin';
 import StarRatingOverlay from '../components/StarRatingOverlay';

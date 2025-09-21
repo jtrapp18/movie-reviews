@@ -3,7 +3,7 @@ import { userLogout } from "../helper";
 import styled from "styled-components";
 import {UserContext} from '../context/userProvider';
 import { NavLink } from "react-router-dom";
-import { Button, StyledContainer } from "../MiscStyling"
+import { Button, StyledContainer } from "../styles"
 
 const StyledDiv = styled.div`
   // max-width: 90vw;

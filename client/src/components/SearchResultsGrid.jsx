@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
 import { getMovieRatings } from '../helper';
-import Loading from '../pages/Loading';
+import Loading from './ui/Loading';
 
 const GridContainer = styled.div`
   width: 100%;

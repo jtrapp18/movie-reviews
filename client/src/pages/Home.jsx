@@ -5,7 +5,7 @@ import Movies from '../components/Movies';
 import Articles from '../components/Articles';
 import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
-import Loading from './Loading';
+import Loading from '../components/ui/Loading';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { generateWebsiteStructuredData } from '../utils/seoUtils';

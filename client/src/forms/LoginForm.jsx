@@ -3,7 +3,7 @@ import { snakeToCamel, postJSONToDb } from "../helper";
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
 import Error from "../styles/Error";
-import { StyledForm, Button } from "../MiscStyling";
+import { StyledForm, Button } from "../styles";
 
 function LoginForm({ setShowConfirm }) {
 

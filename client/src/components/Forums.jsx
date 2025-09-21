@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { NavLink } from "react-router-dom";
-import { StyledContainer, Tag } from '../MiscStyling';
+import { StyledContainer, Tag } from '../styles';
 import { formattedTime } from '../helper';
 import MotionWrapper from '../styles/MotionWrapper'
 

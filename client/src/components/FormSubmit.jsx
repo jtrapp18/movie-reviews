@@ -1,4 +1,4 @@
-import { Button } from '../MiscStyling'
+import { Button } from '../styles'
 import DocumentViewer from './DocumentViewer'
 import Stars from './Stars'
 import { useAdmin } from '../hooks/useAdmin'

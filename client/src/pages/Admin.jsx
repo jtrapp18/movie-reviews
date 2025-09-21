@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from '../context/userProvider';
 import { AdminContext } from '../context/adminProvider';
 import LoginForm from '../forms/LoginForm';
-import { StyledContainer } from "../MiscStyling";
+import { StyledContainer } from "../styles";
 import styled from 'styled-components';
 
 const AdminTitle = styled.h1`
