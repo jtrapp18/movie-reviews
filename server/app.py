@@ -320,7 +320,7 @@ class ReviewById(Resource):
 class Articles(Resource):
     def get(self):
         search_query = request.args.get('search', '')
-        articles = Review.query.filter_by(content_type='article')
+        articles = Review.query.filter_by(movie_id=None)
         
         if search_query:
             articles = articles.filter(
@@ -346,7 +346,6 @@ class Articles(Resource):
         article = Review(
             title=data.get('title'),
             review_text=data.get('review_text'),
-            content_type='article',
             movie_id=None,  # Articles don't have movie_id
             rating=None,    # Articles don't have ratings
             date_added=date.today()
@@ -376,13 +375,13 @@ class Articles(Resource):
 
 class ArticleById(Resource):
     def get(self, article_id):
-        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        article = Review.query.filter_by(id=article_id, movie_id=None).first()
         if not article:
             return {'error': 'Article not found'}, 404
         return article.to_dict(), 200
 
     def patch(self, article_id):
-        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        article = Review.query.filter_by(id=article_id, movie_id=None).first()
         if not article:
             return {'error': 'Article not found'}, 404
         data = request.get_json()
@@ -410,7 +409,7 @@ class ArticleById(Resource):
         return article.to_dict(), 200
 
     def delete(self, article_id):
-        article = Review.query.filter_by(id=article_id, content_type='article').first()
+        article = Review.query.filter_by(id=article_id, movie_id=None).first()
         if not article:
             return {'error': 'Article not found'}, 404
         db.session.delete(article)
@@ -954,7 +953,7 @@ class Sitemap(Resource):
             
             # Get all movies and articles
             movies = Movie.query.all()
-            articles = Review.query.filter_by(content_type='article').all()
+            articles = Review.query.filter_by(movie_id=None).all()
             
             # Create XML structure
             root = ET.Element('urlset')
@@ -1038,7 +1037,7 @@ class DeleteArticle(Resource):
     
     def delete(self, article_id):
         try:
-            article = Review.query.filter_by(id=article_id, content_type='article').first()
+            article = Review.query.filter_by(id=article_id, movie_id=None).first()
             if not article:
                 return {'error': 'Article not found'}, 404
             
@@ -1112,7 +1111,7 @@ class UnifiedSearch(Resource):
             .options(
                 joinedload(Review.tags)
             )\
-            .filter_by(content_type='article')\
+            .filter_by(movie_id=None)\
             .filter(
                 db.or_(
                     Review.title.ilike(search_pattern),

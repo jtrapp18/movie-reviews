@@ -36,19 +36,17 @@ const ArticleForm = ({ initObj }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { setMovies, setArticles } = useOutletContext();
-  const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "articles");
+  const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "reviews");
   const { isAdmin } = useAdmin();
 
   const initialValues = initObj
     ? {
         title: initObj.title || "",
         reviewText: initObj.reviewText || "",
-        contentType: 'article',
       }
     : {
         title: "",
         reviewText: "",
-        contentType: 'article',
       };
 
   const submitToDB = async (body) => {
@@ -124,26 +122,28 @@ const ArticleForm = ({ initObj }) => {
         const formData = {
           title: values.title,
           reviewText: values.reviewText,
-          content_type: 'article',
           movie_id: null,
           rating: null,
           tags: tags,
         };
 
         console.log('ArticleForm - Submitting with tags:', tags);
+        console.log('ArticleForm - Starting submission...');
 
         // Submit the main form data first
         const result = await submitFormWithDocument(formData, selectedFile, isEdit, id);
         
+        console.log('ArticleForm - Submission completed, success:', result.success);
+        
         if (result.success) {
-          console.log('ArticleForm - API response result:', result.result);
-          console.log('ArticleForm - Tags in response:', result.result?.tags);
+          console.log('ArticleForm - API response ID:', result.result?.id);
+          console.log('ArticleForm - Tags count:', result.result?.tags?.length || 0);
           
           // Store the created article data for new articles
           if (!isEdit) {
             setCreatedArticle(result.result);
             // Navigate to the new article's detail page
-            navigate(`/#/articles/${result.result.id}`);
+            navigate(`/articles/${result.result.id}`);
           }
           
           // Update the articles context with the new/updated article
@@ -155,8 +155,6 @@ const ArticleForm = ({ initObj }) => {
             }
             // Switch to non-editing mode to show the updated article
             setIsEditing(false);
-          } else {
-            addItem(result.result);
           }
         } else {
           setSubmitError(result.error);
@@ -223,7 +221,7 @@ const ArticleForm = ({ initObj }) => {
     <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
-          <h2>{initObj ? "Edit Article" : "Create New Article"}</h2>
+          <h1>{initObj ? "Edit Article" : "Create New Article"}</h1>
           
           {submitError && <Error>{submitError}</Error>}
           

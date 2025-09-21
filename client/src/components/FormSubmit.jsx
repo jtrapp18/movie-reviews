@@ -66,7 +66,7 @@ const ContentBody = styled.div`
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
   const { isAdmin } = useAdmin();
-  const isReview = formValues.contentType === 'review';
+  const isReview = formValues.movieId !== null && formValues.movieId !== undefined;
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
   const hasContent = formValues.reviewText && formValues.reviewText.trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;

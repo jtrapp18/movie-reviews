@@ -2,20 +2,7 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import ArticleForm from '../forms/ArticleForm';
 import { useNavigate } from 'react-router-dom';
-import PageContainer from '../components/PageContainer';
-
-const ArticleHeader = styled.div`
-  text-align: center;
-  margin-bottom: 30px;
-  max-width: 800px;
-`;
-
-const ArticleTitle = styled.h1`
-  color: #333;
-  margin-bottom: 10px;
-  font-size: 2.5rem;
-`;
-
+import { StyledContainer} from '../MiscStyling';
 
 function NewArticle() {
   const navigate = useNavigate();
@@ -24,13 +11,9 @@ function NewArticle() {
 
 
   return (
-    <PageContainer>
-      <ArticleHeader>
-        <ArticleTitle>Create New Article</ArticleTitle>
-      </ArticleHeader>
-
+    <StyledContainer>
       <ArticleForm initObj={newArticle} />
-    </PageContainer>
+    </StyledContainer>
   );
 }
 

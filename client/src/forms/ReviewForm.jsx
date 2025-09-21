@@ -34,7 +34,6 @@ const ReviewForm = ({ initObj }) => {
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [replaceText, setReplaceText] = useState(true);
-  const [contentType, setContentType] = useState(initObj?.contentType || 'review');
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -51,13 +50,11 @@ const ReviewForm = ({ initObj }) => {
         rating: initObj.rating || "",
         reviewText: initObj.reviewText || "",
         title: initObj.title || "",
-        contentType: initObj.contentType || 'review',
       }
     : {
         rating: 0,
         reviewText: "",
         title: "",
-        contentType: 'review',
       };
 
   const submitToDB = initObj

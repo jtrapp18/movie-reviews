@@ -36,7 +36,7 @@ function Article() {
     const fetchArticle = async () => {
       try {
         setLoading(true);
-        const data = await getJSON(`articles/${id}`);
+        const data = await getJSON(`reviews/${id}`);
         if (data.error) {
           setError(data.error);
         } else {

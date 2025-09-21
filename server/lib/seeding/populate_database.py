@@ -207,7 +207,6 @@ def process_documents(documents_dir, dry_run=False):
             title=title,
             review_text="",  # Empty - content is in the PDF document
             description=description,
-            content_type='article',
             has_document=True,
             document_filename=doc_file.name,  # Original filename
             document_path=destination_path,   # Full absolute path (same as frontend upload)

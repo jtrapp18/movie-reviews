@@ -25,14 +25,14 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
       ? await patchJSONToDb('reviews', id, cleanFormData)
       : await postJSONToDb('reviews', cleanFormData);
 
-    console.log('Form submitted successfully:', result);
+            console.log('Form submitted successfully, ID:', result?.id);
 
-    // Handle document upload if file is provided
-    if (file && result?.id) {
-      try {
-        console.log('Uploading document for ID:', result.id);
-        await uploadDocument(file, result.id, false);
-        console.log('Document uploaded successfully');
+            // Handle document upload if file is provided
+            if (file && result?.id) {
+              try {
+                console.log('Uploading document for ID:', result.id);
+                await uploadDocument(file, result.id, false);
+                console.log('Document uploaded successfully');
       } catch (uploadError) {
         console.error('Document upload failed:', uploadError);
         // Don't fail the whole submission if document upload fails
