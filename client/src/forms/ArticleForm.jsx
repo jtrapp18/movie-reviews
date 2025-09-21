@@ -42,10 +42,12 @@ const ArticleForm = ({ initObj }) => {
   const initialValues = initObj
     ? {
         title: initObj.title || "",
+        description: initObj.description || "",
         reviewText: initObj.reviewText || "",
       }
     : {
         title: "",
+        description: "",
         reviewText: "",
       };
 
@@ -97,6 +99,8 @@ const ArticleForm = ({ initObj }) => {
       .required("Article title is required")
       .min(5, "Title must be at least 5 characters")
       .max(200, "Title must be less than 200 characters"),
+    description: Yup.string()
+      .max(500, "Description must be less than 500 characters"),
     reviewText: Yup.string()
       .test('content-or-document', 'Either article content or a document is required.', function(value) {
         const hasContent = value && value.trim().length >= 10;
@@ -121,6 +125,7 @@ const ArticleForm = ({ initObj }) => {
       try {
         const formData = {
           title: values.title,
+          description: values.description,
           reviewText: values.reviewText,
           movie_id: null,
           rating: null,
@@ -238,6 +243,22 @@ const ArticleForm = ({ initObj }) => {
             />
             {formik.touched.title && formik.errors.title && (
               <Error>{formik.errors.title}</Error>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="description">Article Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Enter a brief description of your article..."
+              rows="3"
+            />
+            {formik.touched.description && formik.errors.description && (
+              <Error>{formik.errors.description}</Error>
             )}
           </div>
 

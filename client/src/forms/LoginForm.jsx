@@ -40,7 +40,6 @@ function LoginForm({ setShowConfirm }) {
 
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
-      <h1>Login</h1>
       <div>
         <label htmlFor="username">Username</label>
         <input

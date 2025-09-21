@@ -37,10 +37,6 @@ const StyledForm = styled.form`
     margin-bottom: 12px;
   }
 
-  span {
-    color: gray;
-  }
-
   .submit-error {
     cursor: pointer;
   }

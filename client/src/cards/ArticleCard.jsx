@@ -25,7 +25,7 @@ const ArticleCardContainer = styled.article`
 `;
 
 const ArticleTitle = styled.h2`
-  height: 50%;
+  height: 60%;
   color: var(--cinema-black);
   line-height: 1.3;
   font-size: clamp(1rem, 2.8vw, 1.5rem);
@@ -39,7 +39,7 @@ const ArticleTitle = styled.h2`
 `;
 
 const ArticleContent = styled.div`
-  height: 23%;
+  height: 30%;
   color: var(--cinema-black);
   font-size: clamp(0.7rem, 2vw, 0.9rem);
   line-height: 1.4;
@@ -115,25 +115,27 @@ function ArticleCard({ article }) {
         {article.description || 'No description available'}
       </ArticleContent>
       
-      {article.tags && article.tags.length > 0 && (
-        <TagContainer>
-          {article.tags.slice(0, 3).map((tag, index) => (
-            <Tag 
-              key={tag.id || index}
-              backgroundColor={tag.backgroundColor || '#6c757d'}
-              textColor={tag.textColor || '#ffffff'}
-              size="small"
-            >
-              {tag.name}
-            </Tag>
-          ))}
-          {article.tags.length > 3 && (
-            <Tag backgroundColor="#495057" textColor="#ffffff" size="small">
-              +{article.tags.length - 3}
-            </Tag>
-          )}
-        </TagContainer>
-      )}
+      <TagContainer>
+        {article.tags && article.tags.length > 0 ? (
+          <>
+            {article.tags.slice(0, 3).map((tag, index) => (
+              <Tag 
+                key={tag.id || index}
+                backgroundColor={tag.backgroundColor || '#6c757d'}
+                textColor={tag.textColor || '#ffffff'}
+                size="small"
+              >
+                {tag.name}
+              </Tag>
+            ))}
+            {article.tags.length > 3 && (
+              <Tag backgroundColor="#495057" textColor="#ffffff" size="small">
+                +{article.tags.length - 3}
+              </Tag>
+            )}
+          </>
+        ) : null}
+      </TagContainer>
 
     </ArticleCardContainer>
   );

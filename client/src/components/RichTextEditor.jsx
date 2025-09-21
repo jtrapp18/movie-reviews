@@ -1,6 +1,13 @@
 import React from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import styled from 'styled-components';
+
+const OptionalText = styled.p`
+  color: var(--cinema-gold);
+  font-size: 0.9em;
+  font-family: var(--default-font);
+`;
 
 const RichTextEditor = ({ 
   value, 
@@ -40,7 +47,7 @@ const RichTextEditor = ({
   return (
     <div>
       <label htmlFor={id}>
-        {label}: {hasDocument && <span style={{color: '#28a745', fontSize: '0.9em'}}>(Document uploaded - content optional)</span>}
+        {label}: {hasDocument && <OptionalText>(Document uploaded - content optional)</OptionalText>}
       </label>
       <ReactQuill
         id={id}

@@ -24,6 +24,7 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   gap: .5rem;
+  margin-top: .5rem;
 `;
 
 const Message = styled.p`

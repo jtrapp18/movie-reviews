@@ -35,7 +35,7 @@ const AdminLoginForm = () => {
 function Admin() {
   return (
     <StyledContainer>
-      <AdminTitle>Admin Access</AdminTitle>
+      <AdminTitle>Admin Login</AdminTitle>
       <AdminLoginForm />
     </StyledContainer>
   );
