@@ -133,7 +133,7 @@ const ArticleForm = ({ initObj }) => {
         console.log('ArticleForm - Submitting with tags:', tags);
 
         // Submit the main form data first
-        const result = await submitFormWithDocument(formData, selectedFile, isEdit, id, true);
+        const result = await submitFormWithDocument(formData, selectedFile, isEdit, id);
         
         if (result.success) {
           console.log('ArticleForm - API response result:', result.result);

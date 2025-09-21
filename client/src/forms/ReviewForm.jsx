@@ -143,9 +143,11 @@ const ReviewForm = ({ initObj }) => {
         };
         
         console.log('DEBUG - Final formData being sent:', formData);
+        console.log('DEBUG - movieId value:', movieId);
+        console.log('DEBUG - typeof movieId:', typeof movieId);
         
-        // Submit the review using the same approach as ArticleForm
-        const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id, false);
+        // Submit the review
+        const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id);
         
         if (result.success) {
           console.log('ReviewForm - API response result:', result.result);
@@ -156,12 +158,13 @@ const ReviewForm = ({ initObj }) => {
           
           // Update the movies context with the new/updated review
           if (isEdit) {
-            updateKey("reviews", initObj.id, camelCaseResult, movieId);
+            // For edits, update the existing review in state
             setUpdatedReview(camelCaseResult);
             // Update initObj for immediate display
             Object.assign(initObj, camelCaseResult);
           } else {
-            addToKey("reviews", camelCaseResult, movieId);
+            // For new reviews, just store the result - no need to call addToKey since we already submitted
+            setUpdatedReview(camelCaseResult);
           }
           
           // Invalidate ratings cache since ratings may have changed
