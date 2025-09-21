@@ -13,7 +13,7 @@ const LoadingContainer = styled.div`
     }};
     text-align: center;
     
-    p {
+    & p {
         color: ${props => {
             if (props.size === 'small') return '#999';
             if (props.size === 'large') return 'var(--yellow)';
@@ -28,14 +28,17 @@ const LoadingContainer = styled.div`
         font-weight: 600;
     }
 
-    .dots {
+    & .dots {
         display: inline-block;
+        color: inherit;
         font-size: inherit; // Use the same size as the parent p element
         white-space: nowrap;
         margin-left: ${props => props.size === 'small' ? '4px' : '8px'};
     }
 
-    .dot {
+    & .dot {
+        font-size: inherit;
+        color: inherit;
         display: inline-block;
         opacity: 0;
         animation: dotAnimation 1.5s forwards;
@@ -74,7 +77,7 @@ const Loading = ({
     text = "Loading", 
     compact = false,
     size = 'medium', // 'small', 'medium', 'large'
-    showDots = true,
+    showDots = true, // Always show dots by default
     className = ""
 }) => {
     return (

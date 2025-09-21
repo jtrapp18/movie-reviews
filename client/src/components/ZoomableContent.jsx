@@ -5,6 +5,7 @@ import ZoomControls from './ZoomControls';
 const ZoomableContainer = styled.div`
   /* Apply zoom as a font-size multiplier using CSS custom property */
   --zoom-multiplier: ${props => props.zoomLevel || 1};
+  width: 100%;
   transition: --zoom-multiplier 0.3s ease;
 `;
 

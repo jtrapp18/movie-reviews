@@ -6,6 +6,10 @@ import RichTextDisplay from './RichTextDisplay'
 import ZoomableContent from './ZoomableContent'
 import styled from 'styled-components'
 
+const ContentDisplayContainer = styled.div`
+  width: 100%;
+`;
+
 const ContentHeader = styled.div`
   text-align: center;
   margin-bottom: 1rem;
@@ -56,6 +60,7 @@ const Tag = styled.span`
 `;
 
 const ContentBody = styled.div`
+  width: 100%;
   padding: 2rem 1rem;
   margin-bottom: 2rem;
   background-color: rgba(255, 255, 255, 0.02);
@@ -79,7 +84,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
   const hasAnyContent = hasContent || hasDocument;
 
   return (
-    <div>
+    <ContentDisplayContainer className="content-display">
       <ContentHeader>
         <ContentTitle>{formValues.title}</ContentTitle>
         
@@ -112,7 +117,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
       
       {hasAnyContent ? (
         <ZoomableContent>
-          <ContentBody>
+          <ContentBody className="content-body">
             {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
             {isWordDocument ? (
               <DocumentViewer
@@ -158,7 +163,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
           Edit
         </Button>
       )}
-    </div>
+    </ContentDisplayContainer>
   );
 };
 

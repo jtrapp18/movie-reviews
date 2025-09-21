@@ -2,15 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
 import RichTextDisplay from './RichTextDisplay';
-
-const LoadingMessage = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #666;
-  font-size: 16px;
-`;
+import Loading from '../pages/Loading';
 
 const ErrorMessage = styled.div`
   display: flex;
@@ -21,6 +13,22 @@ const ErrorMessage = styled.div`
   font-size: 16px;
   text-align: center;
   padding: 20px;
+`;
+
+const PDFIframe = styled.iframe`
+  display: block;
+  background-color: var(--cinema-black);
+  width: 100%;
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  min-height: 750px;
+`;
+
+const WordDocumentContainer = styled.div`
+  border-radius: 8px;
+  overflow: auto;
+  margin-bottom: 10px;
 `;
 
 const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) => {
@@ -93,45 +101,25 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     }
   };
 
-
-
-
   console.log('DocumentViewer render - loading:', loading, 'error:', error, 'documentType:', documentType);
 
-  if (loading) {
-    console.log('DocumentViewer - rendering loading state');
-    return <LoadingMessage>Loading document, please wait...</LoadingMessage>;
-  }
+  if (loading) return <Loading text="Loading document, please wait" size="small" />
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;
   }
 
   return documentType === 'pdf' ? (
-    <iframe
+    <PDFIframe
       src={`${documentUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
-      width="100%"
-      style={{
-        display: 'block',
-        backgroundColor: 'var(--cinema-black)',
-        width: '100%',
-        maxWidth: '100%',
-        borderRadius: '8px',
-        marginBottom: '10px',
-        minHeight: '750px'
-      }}
       title={filename || 'PDF Document'}
     />
   ) : (
-    <div style={{ 
-      borderRadius: '8px', 
-      overflow: 'auto',
-      marginBottom: '10px'
-    }}>
+    <WordDocumentContainer>
       <RichTextDisplay
         content={wordContent}
       />
-    </div>
+    </WordDocumentContainer>
   );
 };
 

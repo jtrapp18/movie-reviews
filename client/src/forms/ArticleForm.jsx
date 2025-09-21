@@ -339,9 +339,6 @@ const ArticleForm = ({ initObj }) => {
               documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
               documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)
             };
-            console.log('ContentDisplay formValues:', values);
-            console.log('reviewText:', values.reviewText);
-            console.log('review_text:', values.review_text);
             return values;
           })()}
           setIsEditing={setIsEditing}

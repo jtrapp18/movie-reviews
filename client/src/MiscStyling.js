@@ -309,7 +309,6 @@ const StyledCard = styled.article`
 const StyledContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 
   width: min(900px, 90vw);

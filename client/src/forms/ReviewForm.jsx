@@ -232,7 +232,7 @@ const ReviewForm = ({ initObj }) => {
   };
 
   return (
-    <div>
+    <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
@@ -400,7 +400,7 @@ const ReviewForm = ({ initObj }) => {
         message={`Are you sure you want to delete this movie and all its reviews? This action cannot be undone.`}
         itemType="Movie"
       />
-    </div>
+    </>
   );
 };
 

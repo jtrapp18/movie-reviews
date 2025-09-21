@@ -6,6 +6,8 @@ import ArticleForm from '../forms/ArticleForm';
 import PageContainer from '../components/PageContainer';
 import SEOHead from '../components/SEOHead';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
+import Loading from './Loading';
+import { StyledContainer } from '../MiscStyling';
 
 const LoadingMessage = styled.div`
   text-align: center;
@@ -59,25 +61,25 @@ function Article() {
 
   if (loading) {
     return (
-      <PageContainer>
-        <LoadingMessage>Loading article...</LoadingMessage>
-      </PageContainer>
+      <StyledContainer>
+        <Loading text="Loading article" size="medium" />
+      </StyledContainer>
     );
   }
 
   if (error) {
     return (
-      <PageContainer>
+      <StyledContainer>
         <ErrorMessage>{error}</ErrorMessage>
-      </PageContainer>
+      </StyledContainer>
     );
   }
 
   if (!article) {
     return (
-      <PageContainer>
+      <StyledContainer>
         <ErrorMessage>Article not found</ErrorMessage>
-      </PageContainer>
+      </StyledContainer>
     );
   }
 
@@ -101,9 +103,9 @@ function Article() {
         type="article"
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
       />
-      <PageContainer>
+      <StyledContainer>
         <ArticleForm initObj={article} />
-      </PageContainer>
+      </StyledContainer>
     </>
   );
 }
