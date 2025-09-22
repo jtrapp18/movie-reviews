@@ -13,7 +13,7 @@ const MovieContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 30px;
+  margin: 1rem 0;
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 12px;
@@ -24,6 +24,13 @@ const MovieContainer = styled.div`
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
   }
 `;
 

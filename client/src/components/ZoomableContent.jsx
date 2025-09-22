@@ -35,6 +35,9 @@ const ZoomableContent = ({
 
   return (
     <>
+      <ZoomableContainer zoomLevel={zoomLevel}>
+        {children}
+      </ZoomableContainer>
       {showControls && (
         <ZoomControls
           zoomLevel={zoomLevel}
@@ -47,9 +50,6 @@ const ZoomableContent = ({
           style={controlsStyle}
         />
       )}
-      <ZoomableContainer zoomLevel={zoomLevel}>
-        {children}
-      </ZoomableContainer>
     </>
   );
 };
