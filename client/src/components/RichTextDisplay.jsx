@@ -20,24 +20,24 @@ const RichTextContainer = styled.div`
   }
   
   h1 {
-    font-size: calc(clamp(1.8rem, 4.5vw, 2.5rem) * var(--zoom-multiplier, 1));
+    font-size: calc(clamp(1.4rem, 3.5vw, 1.8rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-header);
-    border-bottom: 2px solid var(--cinema-gold);
+    border-bottom: 2px solid var(--cinema-gray);
     padding-bottom: 0.3em;
   }
   
   h2 {
-    font-size: calc(clamp(1.5rem, 3.5vw, 2rem) * var(--zoom-multiplier, 1));
+    font-size: calc(clamp(1.2rem, 3vw, 1.5rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
   h3 {
-    font-size: calc(clamp(1.3rem, 3vw, 1.7rem) * var(--zoom-multiplier, 1));
+    font-size: calc(clamp(1.1rem, 2.5vw, 1.3rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
   h4, h5, h6 {
-    font-size: calc(clamp(1.1rem, 2.5vw, 1.4rem) * var(--zoom-multiplier, 1));
+    font-size: calc(clamp(1rem, 2.2vw, 1.2rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
   
