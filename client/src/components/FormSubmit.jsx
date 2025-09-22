@@ -67,6 +67,11 @@ const ContentBody = styled.div`
   border-radius: 12px;
   border: 1px solid rgba(255, 215, 0, 0.1);
   border-left: 3px solid var(--cinema-gold-dark);
+
+  @media (max-width: 768px) {
+    padding: 0;
+    border: none;
+  }
 `;
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {

@@ -32,7 +32,7 @@ p {
   --cinema-red-dark: #B22222;
   --cinema-maroon: #800020;
   --cinema-silver: #C0C0C0;
-  --cinema-black: #1a1a1a;
+  --cinema-black: #0C0C13;
   --cinema-gray: #4e4d4d;
   --cinema-gray-light: #9c9b9b;
   --cinema-gray-dark: #272727;
@@ -40,11 +40,12 @@ p {
   --cinema-blue-dark: #0056b3;
   
   /* Rich text display colors */
+  --rich-text-background: #0C0C13; /* Dark background from mobile theme */
   --rich-text-primary: #f8f9fa; /* Soft white for main text */
   --rich-text-header: #ffffff; /* Pure white for headers */
   --rich-text-code-bg: rgba(255, 215, 0, 0.15); /* Gold tint for code */
   --rich-text-code-border: rgba(255, 215, 0, 0.3);
-  --rich-text-blockquote-bg: rgba(255, 215, 0, 0.05);
+  --rich-text-blockquote-bg: #16161D; /* Card background from mobile theme */
   --rich-text-table-bg: rgba(255, 255, 255, 0.05);
   --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
   --rich-text-table-border: rgba(255, 215, 0, 0.2);
@@ -70,10 +71,10 @@ p {
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
   --padding-top: 75px;
-  --height-header: clamp(1rem, 10vw, 6rem);
+  --height-header: clamp(4rem, 10vw, 6rem);
   --size-body: calc(100vh - var(--height-header) - 4px);
   /* --size-body: 100vh; */
-  --default-font-size: clamp(0.9rem, 1.9vw, 1.1rem);
+  --default-font-size: clamp(0.8rem, 1.5vw, 1.1rem);
   --shadow: 0px 4px 8px rgba(0, 0, 0, 0.7);
   --title-font: 'RopaSans';
   --default-font: 'RopaSans';
@@ -82,7 +83,7 @@ p {
 #root {
   overflow-x: hidden;
   overflow-y: auto;
-  background: var(--cinema-black);
+  background: var(--background);
   /* color: white; */
   font-family: var(--default-font);
   font-size: var(--default-font-size);
@@ -187,6 +188,13 @@ div.star-ratings{
   src: url('/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
   font-weight: 100 900;
+}
+
+@font-face {
+  font-family: 'NotoSerif';
+  src: url('/fonts/NotoSerif-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {

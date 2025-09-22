@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify';
 
 const RichTextContainer = styled.div`
   /* Enhanced typography for better readability */
-  font-family: 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   font-size: calc(clamp(1rem, 2.2vw, 1.2rem) * var(--zoom-multiplier, 1));
   line-height: 1.7;
   color: var(--rich-text-primary);
@@ -14,9 +14,9 @@ const RichTextContainer = styled.div`
   h1, h2, h3, h4, h5, h6 {
     margin: 1.8em 0 0.8em 0;
     line-height: 1.3;
-    font-weight: 600;
+    font-weight: 400;
     color: var(--rich-text-header);
-    font-family: 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   }
   
   h1 {
@@ -47,7 +47,7 @@ const RichTextContainer = styled.div`
   
   /* Enhanced paragraph styling */
   p {
-    font-size: calc(1rem * var(--zoom-multiplier, 1));
+    font-size: calc(var(--default-font-size) * var(--zoom-multiplier, 1));
     line-height: 1.7;
     margin: 1.2em 0;
     color: var(--rich-text-primary);
@@ -173,8 +173,8 @@ const RichTextContainer = styled.div`
   
   /* Responsive adjustments */
   @media (max-width: 768px) {
-    font-size: calc(clamp(0.9rem, 2vw, 1.1rem) * var(--zoom-multiplier, 1));
-    line-height: 1.6;
+    font-size: calc(var(--default-font-size) * var(--zoom-multiplier, 1));
+    line-height: 1.4;
     
     blockquote {
       margin: 1.5em 0;

@@ -22,7 +22,7 @@ const LoadingContainer = styled.div`
         font-size: ${props => {
             if (props.size === 'small') return '12px';
             if (props.size === 'large') return 'clamp(3.5rem, 7vw, 8rem)';
-            return props.compact ? '16px' : 'clamp(3rem, 6vw, 7rem)';
+            return props.compact ? '16px' : 'clamp(2.5rem, 5vw, 6rem)';
         }};
         margin: 0;
         font-weight: 600;

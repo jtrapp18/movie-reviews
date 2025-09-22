@@ -45,7 +45,7 @@ const LinkContainer = styled.div`
   transition: transform 0.3s ease-in-out; /* Smooth fold-out animation */
 
   a {
-    height: 8.5vh;
+    height: 20vh;
     display: flex;
     align-items: center;
     justify-content: center;

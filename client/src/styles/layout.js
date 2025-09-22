@@ -22,7 +22,7 @@ const StyledContainer = styled.div`
 
   width: min(900px, 90vw);
   margin: 0 auto;
-  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
+  padding: 1rem;
   line-height: 1.6;
 
   @media (max-width: 768px) {
@@ -31,7 +31,6 @@ const StyledContainer = styled.div`
 
   h1 {
     text-align: center;
-    padding-top: 2vh;
   }
 
   hr {
