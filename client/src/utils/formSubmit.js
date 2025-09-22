@@ -19,6 +19,7 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
     });
 
     console.log('submitFormWithDocument - Form data:', cleanFormData);
+    console.log('submitFormWithDocument - About to send PATCH with data:', JSON.stringify(cleanFormData, null, 2));
 
     // All submissions go to reviews table - articles and reviews are the same model
     const result = isEdit 
@@ -58,7 +59,7 @@ export const uploadDocument = async (file, reviewId, replaceText = true) => {
   const response = await fetch('/api/upload_document', {
     method: 'POST',
     body: formData,
-  });
+  }); 
 
   if (!response.ok) {
     const errorData = await response.json();

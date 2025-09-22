@@ -283,6 +283,11 @@ class ReviewById(Resource):
             return {'error': 'Review not found'}, 404
         data = request.get_json()
         
+        print(f"DEBUG PATCH - Review ID: {review_id}")
+        print(f"DEBUG PATCH - Current document_path: {review.document_path}")
+        print(f"DEBUG PATCH - Received data: {data}")
+        print(f"DEBUG PATCH - Data keys: {list(data.keys()) if data else 'None'}")
+        
         # Handle tags separately since it's a relationship
         if 'tags' in data:
             tags_data = data.pop('tags')  # Remove tags from data
@@ -304,9 +309,12 @@ class ReviewById(Resource):
         
         # Handle other attributes normally
         for attr in data:
+            print(f"DEBUG PATCH - Setting {attr} = {data.get(attr)}")
             setattr(review, attr, data.get(attr))
 
+        print(f"DEBUG PATCH - After update, document_path: {review.document_path}")
         db.session.commit()
+        print(f"DEBUG PATCH - After commit, document_path: {review.document_path}")
         return review.to_dict(), 200
 
     def delete(self, review_id):
@@ -741,15 +749,19 @@ class DocumentUpload(Resource):
             
             # Get review_id from form data
             review_id = request.form.get('review_id')
+            print(f"DEBUG DocumentUpload - Received review_id: {review_id}")
             if not review_id:
                 return {'error': 'Review ID is required'}, 400
             
             # Check if we should replace text
             replace_text = request.form.get('replace_text', 'false').lower() == 'true'
+            print(f"DEBUG DocumentUpload - Replace text: {replace_text}")
             
             # Find the review
             review = Review.query.get(review_id)
-            print(f"Found review: {review}")
+            print(f"DEBUG DocumentUpload - Found review: {review}")
+            print(f"DEBUG DocumentUpload - Review ID: {review.id if review else 'None'}")
+            print(f"DEBUG DocumentUpload - Review current document_path: {review.document_path if review else 'None'}")
             if not review:
                 return {'error': 'Review not found'}, 404
             
@@ -762,16 +774,25 @@ class DocumentUpload(Resource):
                 return {'error': result['error']}, 400
             
             # Update review with document information
+            print(f"DEBUG DocumentUpload - Before update - document_path: {review.document_path}")
             review.has_document = True
             review.document_filename = result['filename']
             review.document_path = result['file_path']  # Store the actual file path
             review.document_type = result['file_type']
+            print(f"DEBUG DocumentUpload - After update - document_path: {review.document_path}")
+            print(f"DEBUG DocumentUpload - New file_path from result: {result['file_path']}")
             
             # Optionally replace review text with extracted text
             if replace_text and result['extracted_text']:
                 review.review_text = result['extracted_text']
             
+            print(f"DEBUG DocumentUpload - About to commit changes")
             db.session.commit()
+            print(f"DEBUG DocumentUpload - Commit successful")
+            
+            # Verify the update worked
+            db.session.refresh(review)
+            print(f"DEBUG DocumentUpload - After refresh - document_path: {review.document_path}")
             
             return {
                 'message': 'Document processed successfully',

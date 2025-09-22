@@ -123,6 +123,7 @@ const ArticleForm = ({ initObj }) => {
       setSubmitError(null);
       
       try {
+        // Only send the fields we want to update - no document fields
         const formData = {
           title: values.title,
           description: values.description,
@@ -153,7 +154,8 @@ const ArticleForm = ({ initObj }) => {
           
           // Update the articles context with the new/updated article
           if (isEdit) {
-            updateItem(result.result, initObj.id);
+            // Don't call updateItem - the form submission already updated the database
+            // updateItem(result.result, initObj.id);
             // Update the initObj reference for existing articles
             if (initObj) {
               Object.assign(initObj, result.result);
@@ -321,7 +323,15 @@ const ArticleForm = ({ initObj }) => {
             />
           </div>
           
-          <div style={{ marginTop: '30px', marginBottom: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <div style={{ 
+            marginTop: '30px', 
+            marginBottom: '20px', 
+            display: 'flex', 
+            flexWrap: 'wrap',
+            gap: '10px', 
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
             <CancelButton type="button" onClick={() => {
               if (initObj) {
                 // If editing existing article, just exit edit mode

@@ -63,7 +63,7 @@ function MovieReview() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading movie details" size="medium" />
+        <Loading text="Loading movie details" compact={true} />
       </StyledContainer>
     );
   }

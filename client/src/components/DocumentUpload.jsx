@@ -51,8 +51,10 @@ const ErrorMessage = styled.div`
 const DocumentActions = styled.div`
   margin-top: 8px;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
+  align-items: center;
 `;
 
 const CheckboxContainer = styled.div`

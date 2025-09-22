@@ -335,7 +335,14 @@ const ReviewForm = ({ initObj }) => {
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
           {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
           
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '20px' }}>
+          <div style={{ 
+            display: 'flex', 
+            flexWrap: 'wrap',
+            gap: '10px', 
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '20px' 
+          }}>
             <CancelButton type="button" onClick={() => {
               if (initObj) {
                 // If editing existing review, just exit edit mode
