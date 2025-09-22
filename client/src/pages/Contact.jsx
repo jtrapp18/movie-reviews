@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Button, StyledContainer } from '../styles';
+import { Button, StyledContainer, StyledForm } from '../styles';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 
@@ -11,7 +11,7 @@ const Header = styled.div`
   margin-bottom: 2rem;
   
   h1 {
-    color: var(--cinema-gold);
+    color: var(--cinema-gold-dark);
     font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.5rem;
   }
@@ -23,78 +23,6 @@ const Header = styled.div`
   }
 `;
 
-const ContactForm = styled.form`
-  width: 100%;
-  background: var(--cinema-gray-dark);
-  padding: 2rem;
-  border-radius: 12px;
-  border-left: 4px solid var(--cinema-gold);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-  
-  label {
-    display: block;
-    color: var(--cinema-gold);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    font-size: 1rem;
-  }
-  
-  input, textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.6);
-    }
-    
-    &:focus {
-      outline: none;
-      border-color: var(--cinema-gold);
-      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-    }
-  }
-  
-  textarea {
-    min-height: 180px;
-    resize: vertical;
-    font-family: inherit;
-  }
-  
-  .submit-section {
-    text-align: center;
-    margin-top: 2rem;
-  }
-  
-  .success-message {
-    color: #4CAF50;
-    background: rgba(76, 175, 80, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-  
-  .error-message {
-    color: var(--cinema-red);
-    background: rgba(220, 20, 60, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid rgba(220, 20, 60, 0.3);
-    margin-bottom: 1rem;
-    text-align: center;
-  }
-`;
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -155,7 +83,7 @@ function Contact() {
         <div className="subtitle">Get in touch about film reviews, suggestions, or feedback</div>
       </Header>
 
-      <ContactForm onSubmit={handleSubmit}>
+      <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
           <div className="success-message">
             Your email client should open with a pre-filled message to Jamie. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
@@ -168,7 +96,7 @@ function Contact() {
           </div>
         )}
 
-        <div className="form-group">
+        <div>
           <label htmlFor="name">Name</label>
           <input
             type="text"
@@ -181,7 +109,7 @@ function Contact() {
           />
         </div>
 
-        <div className="form-group">
+        <div>
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -194,7 +122,7 @@ function Contact() {
           />
         </div>
 
-        <div className="form-group">
+        <div>
           <label htmlFor="subject">Subject</label>
           <input
             type="text"
@@ -207,7 +135,7 @@ function Contact() {
           />
         </div>
 
-        <div className="form-group">
+        <div>
           <label htmlFor="message">Message</label>
           <textarea
             id="message"
@@ -242,7 +170,7 @@ function Contact() {
             </p>
           )}
         </div>
-      </ContactForm>
+      </StyledForm>
 
     </StyledContainer>
   );

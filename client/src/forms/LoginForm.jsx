@@ -2,12 +2,14 @@ import React, { useContext } from "react";
 import { snakeToCamel, postJSONToDb } from "../helper";
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
 
 function LoginForm() {
 
   const { setUser } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -21,6 +23,8 @@ function LoginForm() {
         const user = await postJSONToDb("login", body);  // Await the promise
         const userTransformed = snakeToCamel(user);
         setUser(userTransformed);
+        // Navigate to home page after successful login
+        navigate('/');
       } catch (error) {
         setErrors({ password: error.message });
       }

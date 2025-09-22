@@ -112,7 +112,7 @@ function MovieReview() {
       />
       <StyledContainer>
         <MovieContainer>
-          <MovieCard movie={movie} />
+          <MovieCard movie={movie} clickable={false} />
         </MovieContainer>
         
         <ReviewForm initObj={review} />

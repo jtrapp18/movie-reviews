@@ -1,5 +1,5 @@
 import { getMoviesByGenre, getMovieInfo } from '../helper';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '../styles/MotionWrapper'
 import SearchBar from '../components/SearchBar';
@@ -7,6 +7,7 @@ import MovieSwimlane from '../components/MovieSwimlane';
 import SearchResultsGrid from '../components/SearchResultsGrid';
 import Loading from '../components/ui/Loading';
 import { useNavigate } from 'react-router-dom';
+import { AdminContext } from '../context/adminProvider';
 
 const StyledContainer = styled.div`
   min-height: 100%;
@@ -31,6 +32,7 @@ const GENRES = [
 
 function SearchMovies() {
   const navigate = useNavigate();
+  const { isAdmin } = useContext(AdminContext);
   const [genreData, setGenreData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +101,12 @@ function SearchMovies() {
           <h1>Search Movies</h1>
         </MotionWrapper>
         <MotionWrapper index={2}>
-          <h3>Click any movie card to add a new review</h3>
+          <p><i>
+            {isAdmin 
+              ? "Click any movie card to add a new review" 
+              : "Click any movie card to view review"
+            }
+          </i></p>
         </MotionWrapper>
         <MotionWrapper index={3}>
           <SearchBar 

@@ -9,7 +9,7 @@ const StyledCard = styled.article`
   width: 200px;
   height: 280px;
   max-height: 90vh;
-  cursor: pointer;
+  cursor: ${props => props.$clickable ? 'pointer' : 'default'};
   overflow: hidden;
   transition: all 0.3s ease;
   border-radius: 8px;
@@ -90,7 +90,7 @@ const StyledCard = styled.article`
   }
 `;
 
-function MovieCard({ movie, rating = null }) {
+function MovieCard({ movie, rating = null, clickable = true }) {
 
     const { originalLanguage, originalTitle, overview, 
         title, releaseDate, coverPhoto } = movie;
@@ -136,7 +136,10 @@ function MovieCard({ movie, rating = null }) {
     };
 
     return (
-        <StyledCard onClick={handleClick}>
+        <StyledCard 
+            onClick={clickable ? handleClick : undefined}
+            $clickable={clickable}
+        >
             <img
                 src={coverPhoto}
                 alt={`${title} poster`}

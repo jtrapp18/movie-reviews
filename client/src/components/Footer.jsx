@@ -5,9 +5,11 @@ const StyledFooter = styled.footer`
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: black;
+    background: var(--cinema-black);
     padding: 10px 0 0 0;
     margin-top: auto;
+    position: relative;
+    z-index: 1000;
 
     section {
         color: white;
