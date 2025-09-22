@@ -5,6 +5,7 @@ import Movies from '../components/Movies';
 import Articles from '../components/Articles';
 import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
+import SearchResultsHeader from '../components/SearchResultsHeader';
 import Loading from '../components/ui/Loading';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
@@ -30,6 +31,7 @@ function Home() {
   const [articles, setArticles] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     setShowMovies(movies);
@@ -57,10 +59,12 @@ function Home() {
       setShowMovies(movies);
       setShowArticles(articles);
       setIsSearching(false);
+      setSearchQuery('');
       return;
     }
 
     setIsSearching(true);
+    setSearchQuery(text);
     
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
@@ -100,14 +104,25 @@ function Home() {
           placeholder="Search movies, reviews, articles, and tags..."
         />
         
+        {/* Search results header */}
+        {searchQuery && (
+          <SearchResultsHeader
+            searchQuery={searchQuery}
+            movieCount={showMovies.length}
+            articleCount={showArticles.length}
+            isLoading={isSearching}
+            showNoResults={!isSearching && showMovies.length === 0 && showArticles.length === 0}
+          />
+        )}
+        
         {/* Loading indicator */}
-        {isSearching && (
+        {isSearching && !searchQuery && (
           <Loading text="Searching" compact={true} />
         )}
         
         <Section
-          title="Movie Reviews"
-          subtitle="Click movie to view review"
+          title={searchQuery ? "Movies" : "Movie Reviews"}
+          subtitle={searchQuery ? "" : "Click movie to view review"}
           showSearch={false}
         >
           <Movies
@@ -117,8 +132,8 @@ function Home() {
         </Section>
         
         <Section
-          title="Articles"
-          subtitle="Browse theme-based articles and essays"
+          title={searchQuery ? "Articles" : "Articles"}
+          subtitle={searchQuery ? "" : "Browse theme-based articles and essays"}
           showSearch={false}
         >
           <Articles

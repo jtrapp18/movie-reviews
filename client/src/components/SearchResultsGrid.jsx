@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
+import SearchResultsHeader from './SearchResultsHeader';
 import { getMovieRatings } from '../helper';
 import Loading from './ui/Loading';
 
@@ -9,22 +10,6 @@ const GridContainer = styled.div`
   padding: 0 20px;
 `;
 
-const GridHeader = styled.div`
-  margin-bottom: 20px;
-  text-align: center;
-`;
-
-const GridTitle = styled.h2`
-  color: var(--cinema-gold);
-  font-size: 1.8rem;
-  margin-bottom: 10px;
-`;
-
-const ResultsCount = styled.p`
-  color: #ccc;
-  font-size: 1rem;
-  margin: 0;
-`;
 
 const MoviesGrid = styled.div`
   display: grid;
@@ -61,10 +46,11 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
   if (!movies || movies.length === 0) {
     return (
       <GridContainer>
-        <GridHeader>
-          <GridTitle>No Results Found</GridTitle>
-          <ResultsCount>Try a different search term</ResultsCount>
-        </GridHeader>
+        <SearchResultsHeader
+          searchQuery={searchQuery}
+          movieCount={0}
+          showNoResults={true}
+        />
       </GridContainer>
     );
   }
@@ -72,19 +58,20 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
   if (loading) {
     return (
       <GridContainer>
-        <GridHeader>
-          <Loading text="Loading results" compact={true} />
-        </GridHeader>
+        <SearchResultsHeader
+          searchQuery={searchQuery}
+          isLoading={true}
+        />
       </GridContainer>
     );
   }
 
   return (
     <GridContainer>
-      <GridHeader>
-        <GridTitle>Search Results for "{searchQuery}"</GridTitle>
-        <ResultsCount>{movies.length} movie{movies.length !== 1 ? 's' : ''} found</ResultsCount>
-      </GridHeader>
+      <SearchResultsHeader
+        searchQuery={searchQuery}
+        movieCount={movies.length}
+      />
       
       <MoviesGrid>
         {movies.map((movie) => {
