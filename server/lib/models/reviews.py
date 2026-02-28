@@ -2,6 +2,12 @@ from datetime import datetime, date
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from lib.utils import (
+    validate_optional_int_in_range,
+    validate_required_string,
+    validate_date_or_yyyy_mm_dd,
+    validate_enum,
+)
 from lib.config import db
 from .tags import review_tags
 
@@ -10,6 +16,7 @@ class Review(db.Model, SerializerMixin):
 
     id = Column(Integer, primary_key=True)
     movie_id = db.Column(db.Integer, db.ForeignKey('movies.id'), nullable=True)
+    director_id = db.Column(db.Integer, db.ForeignKey('directors.id'), nullable=True)
     rating = Column(Integer, nullable=True)  # Optional for theme-based articles
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
@@ -23,20 +30,17 @@ class Review(db.Model, SerializerMixin):
     document_type = Column(String(10), nullable=True)  # 'pdf', 'docx', etc.
 
     movie = db.relationship('Movie', back_populates='reviews')
+    director = db.relationship('Director', back_populates='reviews')
     tags = db.relationship('Tag', secondary=review_tags, back_populates='reviews')
 
-    serialize_rules = ('-movie.reviews', '-tags.reviews')
+    serialize_rules = ('-movie.reviews', '-tags.reviews', '-director.reviews')
 
     def __repr__(self):
         return f'<Review {self.id}, Movie ID: {self.movie_id}, Rating: {self.rating}>'
 
     @validates('rating')
     def validate_rating(self, key, value):
-        """Validates that the rating is between 1 and 10, or None for articles."""
-        if value is not None:
-            if not isinstance(value, int) or value < 1 or value > 10:
-                raise ValueError("Rating must be an integer between 1 and 10, or None for articles.")
-        return value
+        return validate_optional_int_in_range(value, 1, 10, 'Rating')
 
     @validates('review_text')
     def validate_review_text(self, key, value):
@@ -59,22 +63,11 @@ class Review(db.Model, SerializerMixin):
 
     @validates('content_type')
     def validate_content_type(self, key, value):
-        """Validates that content_type is either 'review' or 'article'."""
-        if value not in ['review', 'article']:
-            raise ValueError("Content type must be either 'review' or 'article'.")
-        return value
+        return validate_enum(value, ['review', 'article'], 'Content type')
 
     @validates('date_added')
     def validate_date_added(self, key, value):
-        """Validates that the date_added field is a valid date."""
-        if isinstance(value, str):
-            try:
-                datetime.strptime(value, '%Y-%m-%d')
-            except ValueError:
-                raise ValueError("Invalid date format. Must be YYYY-MM-DD.")
-        elif not isinstance(value, (datetime, date)):
-            raise ValueError("Invalid date format. Must be a string or date object.")
-        return value
+        return validate_date_or_yyyy_mm_dd(value, 'date_added')
 
     @property
     def short_text(self):

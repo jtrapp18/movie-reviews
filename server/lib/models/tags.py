@@ -2,6 +2,7 @@ from datetime import datetime, date
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from lib.utils import normalize_tag_name
 from lib.config import db
 
 review_tags = db.Table(
@@ -23,15 +24,6 @@ class Tag(db.Model, SerializerMixin):
     
     @validates('name')
     def validate_name(self, key, value):
-        """Ensure tag name is non-empty, stripped, lowercase, and within length."""
-        if not value or not value.strip():
-            raise ValueError("Tag name cannot be empty.")
-        
-        value = value.strip().lower()
-
-        if len(value) > 50:
-            raise ValueError("Tag name must be 50 characters or fewer.")
-        
-        return value
+        return normalize_tag_name(value, max_length=50)
 
 # Indexes are handled through database migrations
