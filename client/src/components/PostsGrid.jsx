@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import PostCard from '../cards/PostCard';
 import { Button } from '../styles';
 import { formatDate } from '../utils/formatting';
+import MotionWrapper from '../styles/MotionWrapper';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -60,7 +61,7 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
   return (
     <GridContainer>
       <StyledGrid>
-        {visiblePosts.map((post) => {
+        {visiblePosts.map((post, index) => {
           const title = post.title || post.movie?.title || 'Untitled';
           const date = formatDate(post.dateAdded || post.date_added);
           const description =
@@ -70,14 +71,15 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
           const photo = post.movie?.coverPhoto || null;
 
           return (
-            <PostCard
-              key={post.id}
-              photo={photo}
-              title={title}
-              date={date}
-              description={description}
-              onClick={() => handleCardClick(post)}
-            />
+            <MotionWrapper key={post.id} index={index}>
+              <PostCard
+                photo={photo}
+                title={title}
+                date={date}
+                description={description}
+                onClick={() => handleCardClick(post)}
+              />
+            </MotionWrapper>
           );
         })}
       </StyledGrid>
