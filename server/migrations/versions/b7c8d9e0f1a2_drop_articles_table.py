@@ -17,43 +17,39 @@ depends_on = None
 
 
 def upgrade():
-    # Drop indexes and FKs on articles if they exist
-    try:
-        with op.batch_alter_table('articles', schema=None) as batch_op:
-            # Drop indexes (names must match previously created)
-            try:
-                batch_op.drop_index('ix_articles_director_id')
-            except Exception:
-                pass
-            try:
-                batch_op.drop_index('ix_articles_movie_id')
-            except Exception:
-                pass
-
-            # Drop foreign keys
-            try:
-                batch_op.drop_constraint(batch_op.f('fk_articles_director_id_directors'), type_='foreignkey')
-            except Exception:
-                pass
-            try:
-                batch_op.drop_constraint(batch_op.f('fk_articles_movie_id_movies'), type_='foreignkey')
-            except Exception:
-                pass
-    except Exception:
-        # Table may not exist; skip
-        pass
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
 
     # Drop association table article_tags if present
-    try:
+    if inspector.has_table('article_tags'):
         op.drop_table('article_tags')
-    except Exception:
-        pass
 
-    # Finally, drop the articles table
-    try:
+    # Drop indexes, FKs, and table for articles if it exists
+    if inspector.has_table('articles'):
+        article_indexes = [ix['name'] for ix in inspector.get_indexes('articles')]
+        article_fks = [fk['name'] for fk in inspector.get_foreign_keys('articles')]
+
+        with op.batch_alter_table('articles', schema=None) as batch_op:
+            # Drop indexes if they exist
+            if 'ix_articles_director_id' in article_indexes:
+                batch_op.drop_index('ix_articles_director_id')
+            if 'ix_articles_movie_id' in article_indexes:
+                batch_op.drop_index('ix_articles_movie_id')
+
+            # Drop foreign keys if they exist
+            if 'fk_articles_director_id_directors' in article_fks:
+                batch_op.drop_constraint(
+                    batch_op.f('fk_articles_director_id_directors'),
+                    type_='foreignkey'
+                )
+            if 'fk_articles_movie_id_movies' in article_fks:
+                batch_op.drop_constraint(
+                    batch_op.f('fk_articles_movie_id_movies'),
+                    type_='foreignkey'
+                )
+
+        # Finally, drop the articles table
         op.drop_table('articles')
-    except Exception:
-        pass
 
 
 def downgrade():

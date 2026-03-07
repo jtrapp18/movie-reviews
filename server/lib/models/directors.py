@@ -9,6 +9,7 @@ class Director(db.Model, SerializerMixin):
     __tablename__ = 'directors'
 
     id = Column(Integer, primary_key=True)
+    external_id = Column(Integer, nullable=True, unique=True)  # TheMovieDB ID
     name = Column(String(255), nullable=False)
     cover_photo = Column(String(500), nullable=False)
     biography = Column(Text, nullable=True)
