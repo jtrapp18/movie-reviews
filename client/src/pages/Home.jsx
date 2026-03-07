@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Movies from '../components/Movies';
 import Articles from '../components/Articles';
+import RecentPosts from '../components/RecentPosts';
 import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
 import SearchResultsHeader from '../components/SearchResultsHeader';
@@ -32,6 +33,7 @@ function Home() {
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [recentPosts, setRecentPosts] = useState([]);
 
   useEffect(() => {
     setShowMovies(movies);
@@ -51,6 +53,29 @@ function Home() {
     };
     
     fetchArticles();
+  }, []);
+
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        const data = await getJSON('reviews');
+        if (Array.isArray(data)) {
+          const sorted = [...data].sort(
+            (a, b) =>
+              new Date(b.dateAdded || b.date_added || 0) -
+              new Date(a.dateAdded || a.date_added || 0)
+          );
+          setRecentPosts(sorted);
+        } else {
+          setRecentPosts([]);
+        }
+      } catch (error) {
+        console.error('Error fetching recent posts:', error);
+        setRecentPosts([]);
+      }
+    };
+
+    fetchRecentPosts();
   }, []);
 
   const unifiedSearch = async (text) => {
@@ -119,6 +144,16 @@ function Home() {
         {isSearching && !searchQuery && (
           <Loading text="Searching" compact={true} />
         )}
+
+        <Section
+          title="Recent Posts"
+          subtitle={searchQuery ? "" : "Latest movie reviews and articles"}
+          showSearch={false}
+        >
+          <RecentPosts
+            posts={recentPosts}
+          />
+        </Section>
         
         <Section
           title={searchQuery ? "Movies" : "Movie Reviews"}
