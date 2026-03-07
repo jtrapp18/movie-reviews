@@ -12,7 +12,7 @@ from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, Tag
+from lib.models import User, Movie, Review, Tag, Director
 from lib.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
@@ -149,6 +149,96 @@ class Logout(Resource):
         session['user_id'] = None
         return {}, 204
 
+
+def _fetch_tmdb_director_for_movie(external_movie_id):
+    """Fetch director details from TMDb for a given movie external_id."""
+    API_KEY = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+
+    if not API_KEY or not external_movie_id:
+        return None
+
+    # Step 1: Get credits for the movie to find the director (crew member with job "Director")
+    credits_url = f"{base_url}/movie/{external_movie_id}/credits?api_key={API_KEY}&language=en-US"
+    try:
+        credits_response = requests.get(credits_url)
+    except Exception:
+        return None
+
+    if credits_response.status_code != 200:
+        return None
+
+    credits_data = credits_response.json() or {}
+    crew = credits_data.get('crew', []) or []
+    director_entry = next((c for c in crew if c.get('job') == 'Director'), None)
+
+    if not director_entry:
+        return None
+
+    person_id = director_entry.get('id')
+    if not person_id:
+        return None
+
+    # Step 2: Fetch person details to get biography and better profile photo info
+    person_url = f"{base_url}/person/{person_id}?api_key={API_KEY}&language=en-US"
+    try:
+        person_response = requests.get(person_url)
+    except Exception:
+        person_response = None
+
+    person_data = person_response.json() if person_response and person_response.status_code == 200 else {}
+
+    name = person_data.get('name') or director_entry.get('name')
+    profile_path = person_data.get('profile_path') or director_entry.get('profile_path')
+    biography = person_data.get('biography') or None
+
+    if not name:
+        return None
+
+    image_base_url = "https://image.tmdb.org/t/p/w500"
+    cover_photo = f"{image_base_url}{profile_path}" if profile_path else None
+
+    return {
+        'external_id': person_id,
+        'name': name,
+        'cover_photo': cover_photo,
+        'biography': biography,
+    }
+
+
+def _get_or_create_director_for_movie(external_movie_id):
+    """Ensure there is a Director row for the given TMDb movie external_id."""
+    director_data = _fetch_tmdb_director_for_movie(external_movie_id)
+    if not director_data:
+        return None
+
+    external_id = director_data['external_id']
+    if not external_id:
+        return None
+
+    # Look up existing director by external_id
+    director = Director.query.filter_by(external_id=external_id).first()
+    if director:
+        # Optionally refresh basic fields from TMDb (non-destructive)
+        director.name = director_data['name'] or director.name
+        if director_data['cover_photo']:
+            director.cover_photo = director_data['cover_photo']
+        if director_data['biography']:
+            director.biography = director_data['biography']
+        return director
+
+    # Create new director
+    cover_photo = director_data['cover_photo'] or ""
+    director = Director(
+        external_id=external_id,
+        name=director_data['name'],
+        cover_photo=cover_photo,
+        biography=director_data['biography'],
+    )
+    db.session.add(director)
+    db.session.flush()  # ensure director.id is available
+    return director
+
 class UserById(Resource):
     def get(self, user_id):
         user = User.query.get(user_id)
@@ -201,6 +291,14 @@ class Movies(Resource):
             )
 
             db.session.add(new_movie)
+            db.session.flush()
+
+            # If this movie came from TMDb, try to associate a director
+            if new_movie.external_id:
+                director = _get_or_create_director_for_movie(new_movie.external_id)
+                if director:
+                    new_movie.director_id = director.id
+
             db.session.commit()
             
             return new_movie.to_dict(), 201
@@ -446,7 +544,14 @@ class Tags(Resource):
         db.session.commit()
         
         return new_tag.to_dict(), 201
-    
+
+
+class Directors(Resource):
+    def get(self):
+        """Return all directors, sorted by name."""
+        directors = Director.query.order_by(Director.name.asc()).all()
+        return [director.to_dict() for director in directors], 200
+
 class PullMovieInfo(Resource):
     def get(self):
         searchText = request.args.get("search", "").strip()
@@ -1095,6 +1200,7 @@ api.add_resource(ArticleById, '/api/articles/<int:article_id>')
 api.add_resource(Tags, '/api/tags')
 api.add_resource(PullMovieInfo, '/api/pull_movie_info')
 api.add_resource(DiscoverMovies, '/api/discover_movies')
+api.add_resource(Directors, '/api/directors')
 class UnifiedSearch(Resource):
     def get(self):
         search_query = request.args.get('q', '').strip()
@@ -1104,6 +1210,7 @@ class UnifiedSearch(Resource):
             return {
                 'movies': [],
                 'articles': [],
+                'directors': [],
                 'totalResults': 0
             }, 200
         
@@ -1141,15 +1248,27 @@ class UnifiedSearch(Resource):
                 )
             )\
             .limit(25).all()  # Reduced limit for faster response
+
+        # Directors: search by name or biography
+        director_results = db.session.query(Director)\
+            .filter(
+                db.or_(
+                    Director.name.ilike(search_pattern),
+                    Director.biography.ilike(search_pattern)
+                )
+            )\
+            .limit(25).all()
         
         # Convert to dictionaries (now with pre-loaded relationships)
         movies_data = [movie.to_dict() for movie in movie_results]
         articles_data = [article.to_dict() for article in article_results]
+        directors_data = [director.to_dict() for director in director_results]
         
         return {
             'movies': movies_data,
             'articles': articles_data,
-            'totalResults': len(movies_data) + len(articles_data)
+            'directors': directors_data,
+            'totalResults': len(movies_data) + len(articles_data) + len(directors_data)
         }, 200
 
 api.add_resource(UnifiedSearch, '/api/search')

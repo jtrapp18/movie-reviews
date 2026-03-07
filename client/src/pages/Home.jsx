@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Movies from '../components/Movies';
 import Articles from '../components/Articles';
 import RecentPosts from '../components/RecentPosts';
+import Directors from '../components/Directors';
 import Section from '../components/Section';
 import SearchBar from '../components/SearchBar';
 import SearchResultsHeader from '../components/SearchResultsHeader';
@@ -34,6 +35,8 @@ function Home() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [recentPosts, setRecentPosts] = useState([]);
+  const [directors, setDirectors] = useState([]);
+  const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
     setShowMovies(movies);
@@ -78,11 +81,33 @@ function Home() {
     fetchRecentPosts();
   }, []);
 
+  useEffect(() => {
+    const fetchDirectors = async () => {
+      try {
+        const data = await getJSON('directors');
+        if (Array.isArray(data)) {
+          setDirectors(data);
+          setShowDirectors(data);
+        } else {
+          setDirectors([]);
+          setShowDirectors([]);
+        }
+      } catch (error) {
+        console.error('Error fetching directors:', error);
+        setDirectors([]);
+        setShowDirectors([]);
+      }
+    };
+
+    fetchDirectors();
+  }, []);
+
   const unifiedSearch = async (text) => {
     if (!text.trim()) {
       // If empty search, show all content
       setShowMovies(movies);
       setShowArticles(articles);
+       setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
       return;
@@ -100,6 +125,7 @@ function Home() {
       
       setShowMovies(camelData.movies || []);
       setShowArticles(camelData.articles || []);
+      setShowDirectors(camelData.directors || []);
     } catch (error) {
       console.error('Error searching:', error);
       // Fallback to showing all content on error
@@ -146,13 +172,19 @@ function Home() {
         )}
 
         <Section
+          title="Directors"
+          subtitle={searchQuery ? "" : "Explore directors in the collection"}
+          showSearch={false}
+        >
+          <Directors directors={showDirectors} />
+        </Section>
+
+        <Section
           title="Recent Posts"
           subtitle={searchQuery ? "" : "Latest movie reviews and articles"}
           showSearch={false}
         >
-          <RecentPosts
-            posts={recentPosts}
-          />
+          <RecentPosts posts={recentPosts} />
         </Section>
         
         <Section

@@ -74,10 +74,10 @@ const Header = () => {
     return (
         <Headroom>
           <StyledHeader>
-            <VintagePhotoRoll
+            {/* <VintagePhotoRoll
               src={vintagePhotoRoll} 
               alt="Vintage film strip background"
-            />
+            /> */}
             <LeftSection>
               <Logo />
               <HeaderTitle>
