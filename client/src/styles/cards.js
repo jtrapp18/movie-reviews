@@ -23,8 +23,7 @@ const BorderGlow = styled.span`
 const Tag = styled.small`
   background: var(--cinema-black);
   border-radius: 5px;
-  padding: 5px;
-  color: white;
+  padding: 2px;
   width: fit-content;
 `;
 
@@ -127,6 +126,10 @@ const CardOverlay = styled.div`
   flex-direction: column;
   justify-content: center;
   transition: opacity .25s ease;
+  
+  p {
+    font-size: var(--card-font-size);
+  }
 
   ${MediaCard}:hover & {
     opacity: 1;
@@ -138,7 +141,7 @@ const CardDate = styled.div`
   top: 6px;
   right: 6px;
   z-index: 2;
-  color: var(--cinema-gold);
+  color: var(--secondary);
   font-size: 9px;
   font-weight: 500;
   background: rgba(0, 0, 0, 0.65);

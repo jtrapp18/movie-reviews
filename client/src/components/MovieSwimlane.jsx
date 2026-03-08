@@ -9,7 +9,7 @@ const SwimlaneContainer = styled.div`
 `;
 
 const SwimlaneHeader = styled.h3`
-  color: var(--cinema-gold);
+  // color: var(--cinema-gold);
   font-size: 1.5rem;
   margin-bottom: 15px;
   padding-left: 20px;
@@ -22,7 +22,7 @@ const MoviesContainer = styled.div`
   padding: 0 20px 0 0;
   gap: 15px;
   scrollbar-width: thin;
-  scrollbar-color: var(--cinema-gold) transparent;
+  scrollbar-color: var(--primary) transparent;
   
   &::-webkit-scrollbar {
     height: 8px;
@@ -33,7 +33,7 @@ const MoviesContainer = styled.div`
   }
   
   &::-webkit-scrollbar-thumb {
-    background: var(--cinema-gold);
+    background: var(--primay);
     border-radius: 4px;
   }
   

@@ -66,8 +66,10 @@ p {
   --gray: #d1d1d1; 
   --yellow: var(--cinema-gold);
   --background: var(--cinema-black);
-  --font-color-1: var(--cinema-gold);
-  --font-color-2: var(--rich-text-primary);
+  --primary: #ADD8E6;
+  --secondary: var(--rich-text-primary);
+  --font-color-1: var(--primary);
+  --font-color-2: var(--secondary);
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
   --padding-top: 75px;
@@ -75,6 +77,8 @@ p {
   --size-body: calc(100vh - var(--height-header) - 4px);
   /* --size-body: 100vh; */
   --default-font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+  /* --card-font-size: clamp(0.8rem, 1rem, 1.1rem); */
+  --card-font-size: .8rem;
   --shadow: 0px 4px 8px rgba(0, 0, 0, 0.7);
   --title-font: 'NotoSerif';
   --default-font: 'Rubik';

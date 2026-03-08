@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import MovieCard from '../cards/MovieCard';
 import SearchResultsHeader from './SearchResultsHeader';
 import { getMovieRatings } from '../helper';
-import Loading from './ui/Loading';
+import MoviesGrid from './MoviesGrid';
 
 const GridContainer = styled.div`
   width: 100%;
   padding: 0 20px;
-`;
-
-
-const MoviesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 0;
-  max-width: 100%;
 `;
 
 const MovieCardWrapper = styled.div`
@@ -72,30 +62,10 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
         searchQuery={searchQuery}
         movieCount={movies.length}
       />
-      
-      <MoviesGrid>
-        {movies.map((movie) => {
-          const movieData = ratingsMap[movie.externalId];
-          const rating = movieData?.rating || null;
-          const localId = movieData?.local_id;
-          
-          // If we have a local ID, use it for navigation
-          // Otherwise, keep the external ID for creating new movies
-          const movieWithCorrectId = localId 
-            ? { ...movie, id: localId }
-            : movie;
-          
-          return (
-            <MovieCardWrapper key={movie.externalId || movie.id}>
-              <MovieCard
-                movie={movieWithCorrectId}
-                rating={rating}
-                onClick={() => onMovieClick(movie)}
-              />
-            </MovieCardWrapper>
-          );
-        })}
-      </MoviesGrid>
+      <MoviesGrid
+        movies={movies}
+        onMovieClick={onMovieClick}
+      />
     </GridContainer>
   );
 };

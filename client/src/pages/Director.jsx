@@ -5,7 +5,7 @@ import { getJSON } from '../helper';
 import SEOHead from '../components/SEOHead';
 import Loading from '../components/ui/Loading';
 import DirectorBio from '../components/DirectorBio';
-import SearchResultsGrid from '../components/SearchResultsGrid';
+import MoviesGrid from '../components/MoviesGrid';
 
 function Director() {
   const { id } = useParams();
@@ -94,8 +94,7 @@ function Director() {
         <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>
           Movies by {director.name}
         </h2>
-        <SearchResultsGrid
-          searchQuery={`Films by ${director.name}`}
+        <MoviesGrid
           movies={movies}
           onMovieClick={handleMovieClick}
         />
