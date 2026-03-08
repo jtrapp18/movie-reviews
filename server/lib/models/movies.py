@@ -15,6 +15,7 @@ class Movie(db.Model, SerializerMixin):
     title = Column(String(255), nullable=False)
     release_date = Column(Date, nullable=False)
     cover_photo = Column(String(500), nullable=False)  # URL to cover image
+    backdrop = Column(String(500), nullable=True) # URL to backdrop photo
     director_id = db.Column(db.Integer, db.ForeignKey('directors.id'), nullable=True)
 
     reviews = db.relationship('Review', back_populates='movie', cascade='all')

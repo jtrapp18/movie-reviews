@@ -12,7 +12,9 @@ class Director(db.Model, SerializerMixin):
     external_id = Column(Integer, nullable=True, unique=True)  # TheMovieDB ID
     name = Column(String(255), nullable=False)
     cover_photo = Column(String(500), nullable=False)
+    backdrop = Column(String(500), nullable=True) # URL to backdrop photo
     biography = Column(Text, nullable=True)
+    description = Column(Text, nullable=True) # long-form editorial
 
     # Relationships
     movies = db.relationship('Movie', back_populates='director', cascade='all', lazy='select')
