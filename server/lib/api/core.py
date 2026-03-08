@@ -123,7 +123,8 @@ class Movies(Resource):
                 overview=data.get('overview'),
                 title=data.get('title'),
                 release_date=data.get('release_date'),
-                cover_photo=data.get('cover_photo')
+                cover_photo=data.get('cover_photo'),
+                backdrop=data.get('backdrop')
             )
 
             db.session.add(new_movie)
@@ -395,6 +396,22 @@ class DirectorById(Resource):
         director = Director.query.get(director_id)
         if not director:
             return {'error': 'Director not found'}, 404
+        return director.to_dict(), 200
+
+    def patch(self, director_id):
+        """Update editable fields on a director (e.g., biography, cover photo)."""
+        director = Director.query.get(director_id)
+        if not director:
+            return {'error': 'Director not found'}, 404
+
+        data = request.get_json() or {}
+
+        # Allow updating a safe subset of fields
+        for attr in ['name', 'biography', 'cover_photo']:
+            if attr in data:
+                setattr(director, attr, data.get(attr))
+
+        db.session.commit()
         return director.to_dict(), 200
 
 class PullMovieInfo(Resource):

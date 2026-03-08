@@ -65,10 +65,8 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
           const title = post.title || post.movie?.title || 'Untitled';
           const date = formatDate(post.dateAdded || post.date_added);
           const description =
-            post.description ||
-            post.shortText ||
-            (post.reviewText ? `${post.reviewText.slice(0, 140)}...` : '');
-          const photo = post.movie?.coverPhoto || null;
+            post.description
+          const photo = post.backdrop || post.movie?.backdrop;
 
           return (
             <MotionWrapper key={post.id} index={index}>

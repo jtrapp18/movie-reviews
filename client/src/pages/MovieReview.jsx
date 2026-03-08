@@ -17,20 +17,23 @@ const MovieContainer = styled.div`
   padding: 20px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 12px;
-  border: 1px solid var(--cinema-gold);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  img {
+    filter: grayscale(80%);
+    width: 100%;
   }
 
   @media (max-width: 768px) {
     padding: 0;
     background-color: transparent;
-    border: none;
     box-shadow: none;
+
+    img {
+      filter: grayscale(80%);
+      width: 100vw;
+    }
   }
 `;
 
@@ -112,7 +115,11 @@ function MovieReview() {
       />
       <StyledContainer>
         <MovieContainer>
-          <MovieCard movie={movie} clickable={false} />
+          <img
+            src={movie.backdrop}
+          />
+          <h2>{movie.title}</h2>
+          {/* <MovieCard movie={movie} clickable={false} /> */}
         </MovieContainer>
         
         <ReviewForm initObj={review} />

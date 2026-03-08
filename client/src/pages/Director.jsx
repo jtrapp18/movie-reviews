@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { StyledContainer } from '../styles';
-import { getJSON } from '../helper';
+import { StyledContainer, Button } from '../styles';
+import { getJSON, patchJSONToDb } from '../helper';
 import SEOHead from '../components/SEOHead';
 import Loading from '../components/ui/Loading';
 import DirectorBio from '../components/DirectorBio';
 import MoviesGrid from '../components/MoviesGrid';
+import { useAdmin } from '../hooks/useAdmin';
 
 function Director() {
   const { id } = useParams();
@@ -14,6 +15,10 @@ function Director() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [bioDraft, setBioDraft] = useState('');
+  const [saving, setSaving] = useState(false);
+  const { isAdmin } = useAdmin();
 
   useEffect(() => {
     const fetchDirector = async () => {
@@ -23,6 +28,7 @@ function Director() {
         if (data && !data.error) {
           setDirector(data);
           setMovies(data.movies || []);
+          setBioDraft(data.biography || '');
         } else {
           setError(data?.error || 'Director not found');
         }
@@ -69,6 +75,32 @@ function Director() {
     }
   };
 
+  const handleStartEdit = () => {
+    setBioDraft(director.biography || '');
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setBioDraft(director.biography || '');
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      setSaving(true);
+      const updated = await patchJSONToDb('directors', director.id, {
+        biography: bioDraft,
+      });
+      setDirector(updated);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating director:', err);
+      // Keep edit mode open; user can retry
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const pageTitle = `${director.name} - Director`;
   const pageDescription =
     director.biography && director.biography.length > 150
@@ -87,9 +119,36 @@ function Director() {
         structuredData={null}
       />
       <StyledContainer>
-        <DirectorBio
-          director={director}
-        />
+        <DirectorBio director={director} />
+
+        {isAdmin && (
+          <div style={{ marginTop: '1rem', width: '100%' }}>
+            {!isEditing ? (
+              <Button onClick={handleStartEdit}>
+                Edit Director Bio
+              </Button>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="director-bio"><strong>Edit biography</strong></label>
+                <textarea
+                  id="director-bio"
+                  value={bioDraft}
+                  onChange={(e) => setBioDraft(e.target.value)}
+                  rows={6}
+                  style={{ width: '100%', padding: '8px' }}
+                />
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <Button onClick={handleSaveEdit} disabled={saving}>
+                    {saving ? 'Saving...' : 'Save'}
+                  </Button>
+                  <Button onClick={handleCancelEdit} disabled={saving}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>
           Movies by {director.name}

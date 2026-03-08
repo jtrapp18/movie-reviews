@@ -122,7 +122,7 @@ function deleteJSONFromDb(dbKey, Id) {
   .catch(e => console.error(e));
 }
 
-async function getMovieInfo(searchQuery=null) {
+  async function getMovieInfo(searchQuery=null) {
   const queryText = searchQuery ? `?search=${searchQuery}` : "";
   const imgUrl = "https://image.tmdb.org/t/p/w1280"
   const url = `/api/pull_movie_info${queryText}`;
@@ -145,7 +145,7 @@ async function getMovieInfo(searchQuery=null) {
       title: m.title,
       releaseDate: m.releaseDate,
       coverPhoto: `${imgUrl}${m.posterPath}`,
-      // backdropPath: `${imgUrl}${m.backdropPath}`
+      backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
     }));
     return movieInfo;
   } catch (err) {
@@ -183,6 +183,7 @@ async function getMoviesByGenre(genreId, searchQuery=null) {
       title: m.title,
       releaseDate: m.releaseDate,
       coverPhoto: `${imgUrl}${m.posterPath}`,
+      backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
       voteAverage: m.voteAverage,
       genreIds: m.genreIds
     }));

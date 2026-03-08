@@ -1,6 +1,5 @@
 import { MediaCard, CardContent, CardOverlay, CardTitle } from "../styles/cards";
 import MotionWrapper from "../styles/MotionWrapper";
-import styled from "styled-components";
 
 const FALLBACK_PHOTO = "https://via.placeholder.com/300x450.png?text=Director";
 const MAX_BIO_LENGTH = 140;
