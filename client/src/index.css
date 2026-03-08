@@ -67,7 +67,7 @@ p {
   --yellow: var(--cinema-gold);
   --background: var(--cinema-black);
   --font-color-1: var(--cinema-gold);
-  --font-color-2: white;
+  --font-color-2: var(--rich-text-primary);
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
   --padding-top: 75px;
@@ -232,12 +232,12 @@ h1 {
 }
 
 h1 {
-  color: var(--cinema-gold);
+  color: var(--font-color-1);
 }
 
 h2, h3 {
   /* color: var(--cinema-gold); */
-  color: white;
+  color: var(--font-color-2);
 }
 
 h1 {

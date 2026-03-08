@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
 const StyledCard = styled.article`
-  display: flex;
+  // display: flex;
+  width: 100%;
   gap: 12px;
   padding: 12px 16px;
   border-radius: 8px;
   background-color: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--cinema-gold);
+  // border: 1px solid var(--cinema-gold);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 
@@ -16,7 +17,8 @@ const StyledCard = styled.article`
   }
 
   img {
-    width: 80px;
+    // width: 80px;
+    width: 100%;
     height: 120px;
     object-fit: cover;
     border-radius: 4px;
@@ -49,11 +51,9 @@ function PostCard({ photo, title, description, date, onClick }) {
   return (
     <StyledCard onClick={onClick}>
       {photo && <img src={photo} alt={title} />}
-      <div className="content">
-        <h2>{title}</h2>
-        {date && <small>{date}</small>}
-        {description && <p>{description}</p>}
-      </div>
+      <h2>{title}</h2>
+      {date && <small>{date}</small>}
+      {description && <p>{description}</p>}
     </StyledCard>
   );
 }

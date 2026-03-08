@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CardContainer } from '../styles';
 import Carousel from './Carousel';
 import Loading from './ui/Loading';
 import DirectorCard from '../cards/DirectorCard';
 
 function Directors({ directors }) {
+  const navigate = useNavigate();
   if (!directors) {
     return (
       <CardContainer>
@@ -29,7 +31,7 @@ function Directors({ directors }) {
             key={director.id}
             director={director}
             index={index}
-            onClick={undefined} // easy to wire up later (e.g., filter by director or open director page)
+            onClick={() => navigate(`/directors/${director.id}`)}
           />
         ))}
       </Carousel>

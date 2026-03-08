@@ -20,12 +20,20 @@ const BorderGlow = styled.span`
   animation: fadeIn 0.8s ease-in-out forwards;
 `;
 
-const Tag = styled.div`
-  background: gray;
+const Tag = styled.small`
+  background: var(--cinema-black);
   border-radius: 5px;
   padding: 5px;
   color: white;
   width: fit-content;
+`;
+
+const TagContainer = styled.div`
+  display: flex;
+  padding-bottom: 5%;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  z-index: 4; /* above gradient */
 `;
 
 const DocumentContent = styled.div`
@@ -152,4 +160,4 @@ const CardTitle = styled.h2`
   // padding: 10% 5%;
 `;
 
-export { BorderGlow, Tag, DocumentContent, MediaCard, CardContent, CardOverlay, CardDate, CardTitle };
+export { BorderGlow, Tag, TagContainer, DocumentContent, MediaCard, CardContent, CardOverlay, CardDate, CardTitle };
