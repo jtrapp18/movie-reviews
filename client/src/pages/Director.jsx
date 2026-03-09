@@ -120,49 +120,64 @@ function Director() {
         structuredData={null}
       />
       <StyledContainer>
-        <DirectorBio director={director} />
-
-        {isAdmin && (
-          <div style={{ marginTop: '1rem', width: '100%' }}>
-            {!isEditing ? (
-              <Button onClick={handleStartEdit}>
-                Edit Director Bio
-              </Button>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <label htmlFor="director-bio"><strong>Edit biography</strong></label>
-                <textarea
-                  id="director-bio"
-                  value={bioDraft}
-                  onChange={(e) => setBioDraft(e.target.value)}
-                  rows={6}
-                  style={{ width: '100%', padding: '8px' }}
-                />
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <Button onClick={handleSaveEdit} disabled={saving}>
-                    {saving ? 'Saving...' : 'Save'}
-                  </Button>
-                  <Button onClick={handleCancelEdit} disabled={saving}>
-                    Cancel
-                  </Button>
-                </div>
+        {!isEditing && (
+          <>
+            <DirectorBio director={director} />
+            {isAdmin && (
+              <div style={{ marginTop: '0.75rem', width: '100%', textAlign: 'right' }}>
+                <Button onClick={handleStartEdit}>
+                  Edit Director
+                </Button>
               </div>
             )}
+          </>
+        )}
 
-            <div style={{ marginTop: '1rem' }}>
-              <label><strong>Backdrop image</strong></label>
+        {isEditing && isAdmin && (
+          <div style={{ marginTop: '1rem', width: '100%' }}>
+            <h1>{director.name}</h1>
+
+            <div style={{ marginTop: '0.5rem' }}>
+              <label><strong>Cover / backdrop image</strong></label>
               <BackdropUpload
                 uploadUrl={`/api/directors/${director.id}/backdrop`}
-                currentUrl={director.backdrop}
+                currentUrl={
+                  director.backdrop
+                    ? `/api/directors/${director.id}/backdrop/view?v=${encodeURIComponent(
+                        director.backdrop
+                      )}`
+                    : null
+                }
                 onUploaded={(url) =>
                   setDirector((prev) => ({ ...prev, backdrop: url }))
                 }
               />
             </div>
+
+            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label htmlFor="director-bio"><strong>Biography</strong></label>
+              <textarea
+                id="director-bio"
+                value={bioDraft}
+                onChange={(e) => setBioDraft(e.target.value)}
+                rows={8}
+                style={{ width: '100%', padding: '8px' }}
+              />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <Button onClick={handleSaveEdit} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save'}
+                </Button>
+                <Button onClick={handleCancelEdit} disabled={saving}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 
-        <h2 style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+        <hr style={{ width: '100%', marginTop: '2rem', marginBottom: '1.5rem' }} />
+
+        <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>
           Movies by {director.name}
         </h2>
         <MoviesGrid

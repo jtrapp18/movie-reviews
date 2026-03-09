@@ -172,19 +172,21 @@ function Home() {
         )}
 
         <Section
-          title="Directors"
-          subtitle={searchQuery ? "" : "Explore directors in the collection"}
-          showSearch={false}
-        >
-          <Directors directors={showDirectors} />
-        </Section>
-
-        <Section
           title="Recent Posts"
           subtitle={searchQuery ? "" : "Latest movie reviews and articles"}
           showSearch={false}
         >
           <RecentPosts posts={recentPosts} />
+        </Section>
+
+        <hr />
+
+        <Section
+          title="Directors"
+          subtitle={searchQuery ? "" : "Explore directors in the collection"}
+          showSearch={false}
+        >
+          <Directors directors={showDirectors} />
         </Section>
         
         <Section

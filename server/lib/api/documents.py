@@ -440,7 +440,8 @@ class ArticleBackdropUpload(Resource):
             if not upload_result['success']:
                 return {'error': upload_result['error']}, 400
 
-            review.backdrop = upload_result['url']
+            # Store the object key; we'll serve via a backend endpoint
+            review.backdrop = upload_result['object_key']
             db.session.commit()
 
             return {
@@ -476,7 +477,8 @@ class DirectorBackdropUpload(Resource):
             if not upload_result['success']:
                 return {'error': upload_result['error']}, 400
 
-            director.backdrop = upload_result['url']
+            # Store the object key; we'll serve via a backend endpoint
+            director.backdrop = upload_result['object_key']
             db.session.commit()
 
             return {
@@ -489,6 +491,54 @@ class DirectorBackdropUpload(Resource):
             return {'error': f'Backdrop upload failed: {str(e)}'}, 500
 
 
+class ArticleBackdropView(Resource):
+    """Serve article backdrop image from S3."""
+
+    def get(self, article_id):
+        try:
+            review = Review.query.filter_by(id=article_id, movie_id=None).first()
+            if not review or not review.backdrop:
+                return {'error': 'Backdrop not found'}, 404
+
+            s3_client = get_s3_client()
+            key = review.backdrop
+            download = s3_client.download_file(key)
+            if not download['success']:
+                return {'error': download['error']}, 404
+
+            from flask import Response
+            return Response(
+                download['file_data'],
+                mimetype=download.get('content_type', 'image/jpeg'),
+            )
+        except Exception as e:
+            return {'error': f'Backdrop fetch failed: {str(e)}'}, 500
+
+
+class DirectorBackdropView(Resource):
+    """Serve director backdrop image from S3."""
+
+    def get(self, director_id):
+        try:
+            director = Director.query.get(director_id)
+            if not director or not director.backdrop:
+                return {'error': 'Backdrop not found'}, 404
+
+            s3_client = get_s3_client()
+            key = director.backdrop
+            download = s3_client.download_file(key)
+            if not download['success']:
+                return {'error': download['error']}, 404
+
+            from flask import Response
+            return Response(
+                download['file_data'],
+                mimetype=download.get('content_type', 'image/jpeg'),
+            )
+        except Exception as e:
+            return {'error': f'Backdrop fetch failed: {str(e)}'}, 500
+
+
 def register_routes(api):
     api.add_resource(ExtractText, '/api/extract_text')
     api.add_resource(ReviewWithDocument, '/api/reviews_with_document')
@@ -498,3 +548,5 @@ def register_routes(api):
     api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
     api.add_resource(ArticleBackdropUpload, '/api/articles/<int:article_id>/backdrop')
     api.add_resource(DirectorBackdropUpload, '/api/directors/<int:director_id>/backdrop')
+    api.add_resource(ArticleBackdropView, '/api/articles/<int:article_id>/backdrop/view')
+    api.add_resource(DirectorBackdropView, '/api/directors/<int:director_id>/backdrop/view')

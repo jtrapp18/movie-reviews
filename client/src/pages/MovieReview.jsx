@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer } from '../styles';
-import MovieCard from '../cards/MovieCard';
+import CoverHeader from '../components/CoverHeader';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
 import SEOHead from '../components/SEOHead';
@@ -10,31 +10,8 @@ import Loading from '../components/ui/Loading';
 import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const MovieContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 1rem 0;
-  padding: 20px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  img {
-    filter: grayscale(80%);
-    width: 100%;
-  }
-
-  @media (max-width: 768px) {
-    padding: 0;
-    background-color: transparent;
-    box-shadow: none;
-
-    img {
-      filter: grayscale(80%);
-      width: 100vw;
-    }
-  }
+  margin: 1rem 0 2rem 0;
+  width: 100%;
 `;
 
 function MovieReview() {
@@ -115,11 +92,7 @@ function MovieReview() {
       />
       <StyledContainer>
         <MovieContainer>
-          <img
-            src={movie.backdrop}
-          />
-          <h2>{movie.title}</h2>
-          {/* <MovieCard movie={movie} clickable={false} /> */}
+          <CoverHeader imageUrl={movie.coverPhoto} title={movie.title} />
         </MovieContainer>
         
         <ReviewForm initObj={review} />

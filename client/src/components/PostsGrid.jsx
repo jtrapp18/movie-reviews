@@ -64,9 +64,27 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
         {visiblePosts.map((post, index) => {
           const title = post.title || post.movie?.title || 'Untitled';
           const date = formatDate(post.dateAdded || post.date_added);
-          const description =
-            post.description
-          const photo = post.backdrop || post.movie?.backdrop;
+
+          const stripHtml = (str) =>
+            typeof str === 'string' ? str.replace(/<[^>]+>/g, '') : str;
+
+          const rawDescription =
+            post.description ||
+            post.shortText ||
+            (post.reviewText ? `${post.reviewText.slice(0, 140)}...` : '');
+
+          const description = stripHtml(rawDescription);
+
+          let photo = null;
+          if (post.backdrop && !post.movieId && !post.movie_id) {
+            // Article backdrop served via backend
+            photo = `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(
+              post.backdrop
+            )}`;
+          } else {
+            // Fallback to movie backdrop if present
+            photo = post.movie?.backdrop || null;
+          }
 
           return (
             <MotionWrapper key={post.id} index={index}>

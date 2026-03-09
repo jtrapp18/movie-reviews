@@ -51,8 +51,8 @@ const TagsContainer = styled.div`
 `;
 
 const Tag = styled.span`
-  background-color: var(--cinema-gold);
-  color: var(--cinema-black);
+  background-color: var(--primary);
+  color: var(--font-color-2);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -63,10 +63,10 @@ const ContentBody = styled.div`
   width: 100%;
   padding: 2rem 1rem;
   margin-bottom: 2rem;
-  background-color: rgba(255, 255, 255, 0.02);
+  // background-color: rgba(255, 255, 255, 0.02);
   border-radius: 12px;
-  border: 1px solid rgba(255, 215, 0, 0.1);
-  border-left: 3px solid var(--cinema-gold-dark);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
 
   @media (max-width: 768px) {
     padding: 0;

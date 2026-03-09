@@ -11,14 +11,14 @@ const Header = styled.div`
   margin-bottom: 2rem;
   
   h1 {
-    color: var(--cinema-gold-dark);
-    font-size: clamp(2rem, 6vw, 3rem);
+    // color: var(--cinema-gold-dark);
+    // font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.5rem;
   }
   
   .subtitle {
-    color: var(--cinema-silver);
-    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    // color: var(--cinema-silver);
+    // font-size: clamp(1.1rem, 3vw, 1.3rem);
     font-style: italic;
   }
 `;

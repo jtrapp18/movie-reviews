@@ -3,34 +3,79 @@ import styled from 'styled-components';
 
 
 const Image = styled.img`
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    filter: grayscale(80%);
-`
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  filter: grayscale(60%);
+  border-radius: 8px 8px 0 0;
+`;
+
+const InfoShell = styled.div`
+  width: 100%;
+  background: var(--background-secondary);
+  border-radius: 0 0 8px 8px;
+  padding: 16px 20px;
+`;
 
 const Info = styled.div`
- display: flex;
-`
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+`;
+
+const NameBlock = styled.div`
+  text-align: left;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    text-align: left;
+  }
+`;
+
+const BioColumn = styled.div`
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+
+  @media (max-width: 768px) {
+    border-left: none;
+    padding-left: 0;
+  }
+`;
+
+const BioText = styled.p`
+  margin: 0;
+  max-width: 800px;
+  text-align: justify;
+  line-height: 1.5;
+`;
 
 function DirectorBio({director}) {
-  const { name, coverPhoto, backdrop, biography } = director;
-  const imageSrc = backdrop || coverPhoto;
+  const { id, name, coverPhoto, backdrop, biography } = director;
+  const imageSrc = backdrop
+    ? `/api/directors/${id}/backdrop/view?v=${encodeURIComponent(backdrop)}`
+    : coverPhoto;
 
 
   return (
     <StyledContainer>
-        <Image
-            src={imageSrc}
-        />
+      <Image src={imageSrc} />
+      <InfoShell>
         <Info>
+          <NameBlock>
             <h1>{name}</h1>
-            {biography && (
-                <p style={{ maxWidth: '800px', textAlign: 'justify' }}>
-                {biography}
-                </p>
-            )}
+          </NameBlock>
+          <BioColumn>
+            {biography && <BioText>{biography}</BioText>}
+          </BioColumn>
         </Info>
+      </InfoShell>
     </StyledContainer>
   );
 }

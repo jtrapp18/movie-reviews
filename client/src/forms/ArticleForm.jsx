@@ -39,6 +39,7 @@ const ArticleForm = ({ initObj }) => {
   const { setMovies, setArticles } = useOutletContext();
   const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "reviews");
   const { isAdmin } = useAdmin();
+  const [backdropKey, setBackdropKey] = useState(initObj?.backdrop || null);
 
   const initialValues = initObj
     ? {
@@ -230,9 +231,29 @@ const ArticleForm = ({ initObj }) => {
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h1>{initObj ? "Edit Article" : "Create New Article"}</h1>
-          
           {submitError && <Error>{submitError}</Error>}
-          
+          {/* Backdrop Image Upload (for existing articles) */}
+          {initObj?.id && (
+            <div>
+              <label>Backdrop Image (optional):</label>
+              <BackdropUpload
+                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
+                currentUrl={
+                  backdropKey
+                    ? `/api/articles/${initObj.id}/backdrop/view?v=${encodeURIComponent(
+                        backdropKey
+                      )}`
+                    : null
+                }
+                onUploaded={(url) => {
+                  setBackdropKey(url);
+                  if (initObj) {
+                    initObj.backdrop = url;
+                  }
+                }}
+              />
+            </div>
+          )}
           <div>
             <label htmlFor="title">Article Title *</label>
             <input
@@ -302,22 +323,6 @@ const ArticleForm = ({ initObj }) => {
               </div>
             )}
           </div>
-
-          {/* Backdrop Image Upload (for existing articles) */}
-          {initObj?.id && (
-            <div>
-              <label>Backdrop Image (optional):</label>
-              <BackdropUpload
-                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
-                currentUrl={initObj.backdrop}
-                onUploaded={(url) => {
-                  if (initObj) {
-                    initObj.backdrop = url;
-                  }
-                }}
-              />
-            </div>
-          )}
 
           <RichTextEditor
             value={formik.values.reviewText}

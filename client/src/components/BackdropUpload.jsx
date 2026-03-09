@@ -1,21 +1,76 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '../styles';
+import { FaImage, FaEdit } from 'react-icons/fa';
 
 const Container = styled.div`
   margin: 16px 0;
-  padding: 12px;
-  border: 1px dashed var(--cinema-gold);
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.4);
+`;
+
+const Frame = styled.div`
+  position: relative;
+  width: 100%;
+  padding-top: 40%; /* 2.5:1 aspect ratio banner */
+  border-radius: 10px;
+  overflow: hidden;
+  background: radial-gradient(circle at top left, #222 0%, #111 40%, #050505 100%);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--font-color-2);
 `;
 
 const PreviewImage = styled.img`
+  position: absolute;
+  inset: 0;
   width: 100%;
-  max-height: 200px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 6px;
-  margin-bottom: 8px;
+  filter: brightness(0.85);
+`;
+
+const Placeholder = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--font-color-2);
+  font-size: 0.95rem;
+`;
+
+const IconCircle = styled.div`
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border);
+`;
+
+const OverlayLabel = styled.div`
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  // background: rgba(0, 0, 0, 0.6);
+  background: var(--background-tertiary);
+  font-size: 0.8rem;
+  color: var(--font-color-2);
+`;
+
+const Controls = styled.div`
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
 `;
 
 const FileInput = styled.input`
@@ -82,11 +137,26 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
 
   return (
     <Container>
-      {displayUrl && (
-        <PreviewImage src={displayUrl} alt="Backdrop preview" />
-      )}
+      <Frame>
+        {displayUrl && <PreviewImage src={displayUrl} alt="Backdrop preview" />}
+        {!displayUrl && (
+          <Placeholder>
+            <IconCircle>
+              <FaImage />
+            </IconCircle>
+            <span>No cover photo</span>
+            <small>Click below to add one</small>
+          </Placeholder>
+        )}
+        {displayUrl && (
+          <OverlayLabel>
+            <FaImage style={{ marginRight: 6 }} />
+            Cover photo
+          </OverlayLabel>
+        )}
+      </Frame>
 
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+      <Controls>
         <FileInput
           id="backdrop-upload-input"
           type="file"
@@ -99,7 +169,8 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
             document.getElementById('backdrop-upload-input').click()
           }
         >
-          Choose Image
+          <FaEdit style={{ marginRight: 6 }} />
+          {displayUrl ? 'Change Image' : 'Choose Image'}
         </Button>
         <Button
           type="button"
@@ -108,7 +179,12 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </Button>
-      </div>
+        {selectedFile && (
+          <span style={{ fontSize: '0.85rem', color: '#ccc' }}>
+            {selectedFile.name}
+          </span>
+        )}
+      </Controls>
 
       {error && (
         <p style={{ color: '#f44336', marginTop: '8px' }}>{error}</p>
