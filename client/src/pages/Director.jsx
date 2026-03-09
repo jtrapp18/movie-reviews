@@ -7,6 +7,7 @@ import Loading from '../components/ui/Loading';
 import DirectorBio from '../components/DirectorBio';
 import MoviesGrid from '../components/MoviesGrid';
 import { useAdmin } from '../hooks/useAdmin';
+import BackdropUpload from '../components/BackdropUpload';
 
 function Director() {
   const { id } = useParams();
@@ -147,6 +148,17 @@ function Director() {
                 </div>
               </div>
             )}
+
+            <div style={{ marginTop: '1rem' }}>
+              <label><strong>Backdrop image</strong></label>
+              <BackdropUpload
+                uploadUrl={`/api/directors/${director.id}/backdrop`}
+                currentUrl={director.backdrop}
+                onUploaded={(url) =>
+                  setDirector((prev) => ({ ...prev, backdrop: url }))
+                }
+              />
+            </div>
           </div>
         )}
 

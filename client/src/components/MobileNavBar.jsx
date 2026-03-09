@@ -10,14 +10,14 @@ import { userLogout } from "../helper";
 //   color: var(--cinema-gold-dark);
 // `
 const StyledMobileMenu = styled(StyledLink)`
-  color: var(--cinema-gold-dark);
+  color: var(--background-secondary);
 `
 
 const StyledMobileLink = styled(StyledNavLink)`
-  color: var(--cinema-gold-dark);
+  color: var(--background-secondary);
 
   &.active {
-    color: var(--cinema-gold);
+    color: var(--background);
   }
 `
 const StyledDiv = styled.div`
@@ -36,7 +36,7 @@ const LinkContainer = styled.div`
   width: 100vw;
   text-decoration: none;
   text-align: right;
-  background: black;
+  background: var(--secondary);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Ensures smooth animation */
@@ -92,7 +92,7 @@ const HamburgerButton = styled.button`
   span {
     display: block;
     height: 3px;
-    background-color: black;
+    background-color: var(--primary);
     border-radius: 2px;
     transition: all 0.3s ease;
     position: absolute;

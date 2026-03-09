@@ -129,6 +129,7 @@ const CardOverlay = styled.div`
   
   p {
     font-size: var(--card-font-size);
+    color: var(--card-font);
   }
 
   ${MediaCard}:hover & {
@@ -141,7 +142,7 @@ const CardDate = styled.div`
   top: 6px;
   right: 6px;
   z-index: 2;
-  color: var(--secondary);
+  color: var(--card-font);
   font-size: 9px;
   font-weight: 500;
   background: rgba(0, 0, 0, 0.65);
@@ -154,6 +155,7 @@ const CardTitle = styled.h2`
   line-height: 1.2;
   font-weight: bold;
   font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--card-font);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
   display: flex;
   flex-direction: column;

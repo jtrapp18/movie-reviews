@@ -14,14 +14,14 @@ const Info = styled.div`
 `
 
 function DirectorBio({director}) {
-
-  const { name, coverPhoto, biography } = director;
+  const { name, coverPhoto, backdrop, biography } = director;
+  const imageSrc = backdrop || coverPhoto;
 
 
   return (
     <StyledContainer>
         <Image
-            src={coverPhoto}
+            src={imageSrc}
         />
         <Info>
             <h1>{name}</h1>

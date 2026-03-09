@@ -14,6 +14,7 @@ from lib.config import app, db, api
 from sqlalchemy.orm import joinedload
 from lib.models import User, Movie, Review, Tag, Director
 from lib.utils.document_processor import DocumentProcessor
+from lib.utils.s3_client import get_s3_client
 from flask_cors import CORS
 
 
@@ -414,6 +415,80 @@ class DocumentPreview(Resource):
         except Exception as e:
             return {'error': f'Preview failed: {str(e)}'}, 500
 
+
+class ArticleBackdropUpload(Resource):
+    """Upload an image to use as an article (review) backdrop."""
+
+    def post(self, article_id):
+        try:
+            if 'image' not in request.files:
+                return {'error': 'No image file provided'}, 400
+
+            file = request.files['image']
+            if not file or file.filename == '':
+                return {'error': 'No file selected'}, 400
+
+            # Ensure this is an article (review with no movie_id)
+            review = Review.query.filter_by(id=article_id, movie_id=None).first()
+            if not review:
+                return {'error': 'Article not found'}, 404
+
+            s3_client = get_s3_client()
+            object_key = s3_client.generate_object_key(file.filename, int(article_id))
+            upload_result = s3_client.upload_file(file, object_key, file.mimetype or 'image/jpeg')
+
+            if not upload_result['success']:
+                return {'error': upload_result['error']}, 400
+
+            review.backdrop = upload_result['url']
+            db.session.commit()
+
+            return {
+                'backdrop': review.backdrop,
+                'article': review.to_dict(),
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Backdrop upload failed: {str(e)}'}, 500
+
+
+class DirectorBackdropUpload(Resource):
+    """Upload an image to use as a director backdrop."""
+
+    def post(self, director_id):
+        try:
+            if 'image' not in request.files:
+                return {'error': 'No image file provided'}, 400
+
+            file = request.files['image']
+            if not file or file.filename == '':
+                return {'error': 'No file selected'}, 400
+
+            director = Director.query.get(director_id)
+            if not director:
+                return {'error': 'Director not found'}, 404
+
+            s3_client = get_s3_client()
+            object_key = s3_client.generate_object_key(file.filename, int(director_id))
+            upload_result = s3_client.upload_file(file, object_key, file.mimetype or 'image/jpeg')
+
+            if not upload_result['success']:
+                return {'error': upload_result['error']}, 400
+
+            director.backdrop = upload_result['url']
+            db.session.commit()
+
+            return {
+                'backdrop': director.backdrop,
+                'director': director.to_dict(),
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {'error': f'Backdrop upload failed: {str(e)}'}, 500
+
+
 def register_routes(api):
     api.add_resource(ExtractText, '/api/extract_text')
     api.add_resource(ReviewWithDocument, '/api/reviews_with_document')
@@ -421,3 +496,5 @@ def register_routes(api):
     api.add_resource(DocumentDownload, '/api/download_document/<int:review_id>')
     api.add_resource(DocumentView, '/api/view_document/<int:review_id>')
     api.add_resource(DocumentPreview, '/api/document_preview/<int:review_id>')
+    api.add_resource(ArticleBackdropUpload, '/api/articles/<int:article_id>/backdrop')
+    api.add_resource(DirectorBackdropUpload, '/api/directors/<int:director_id>/backdrop')

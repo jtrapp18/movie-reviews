@@ -8,6 +8,7 @@ import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from ".
 import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
+import BackdropUpload from "../components/BackdropUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
@@ -301,6 +302,22 @@ const ArticleForm = ({ initObj }) => {
               </div>
             )}
           </div>
+
+          {/* Backdrop Image Upload (for existing articles) */}
+          {initObj?.id && (
+            <div>
+              <label>Backdrop Image (optional):</label>
+              <BackdropUpload
+                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
+                currentUrl={initObj.backdrop}
+                onUploaded={(url) => {
+                  if (initObj) {
+                    initObj.backdrop = url;
+                  }
+                }}
+              />
+            </div>
+          )}
 
           <RichTextEditor
             value={formik.values.reviewText}
