@@ -400,7 +400,6 @@ const ReviewForm = ({ initObj }) => {
           })()}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}
-          showHeader={false}
         />
       )}
       

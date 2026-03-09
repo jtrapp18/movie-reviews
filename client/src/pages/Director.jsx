@@ -115,16 +115,11 @@ function Director() {
       />
       <StyledContainer>
         {!isEditing && (
-          <>
-            <DirectorBio director={director} />
-            {isAdmin && (
-              <div style={{ marginTop: '0.75rem', width: '100%', textAlign: 'right' }}>
-                <Button onClick={handleStartEdit}>
-                  Edit Director
-                </Button>
-              </div>
-            )}
-          </>
+          <DirectorBio
+            director={director}
+            isAdmin={isAdmin}
+            onEdit={handleStartEdit}
+          />
         )}
 
         {isEditing && isAdmin && (
@@ -168,8 +163,6 @@ function Director() {
             </div>
           </div>
         )}
-
-        <hr style={{ width: '100%', marginTop: '2rem', marginBottom: '1.5rem' }} />
 
         <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>
           Movies by {director.name}

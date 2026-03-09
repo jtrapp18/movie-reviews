@@ -412,7 +412,6 @@ const ArticleForm = ({ initObj }) => {
           })()}
           setIsEditing={setIsEditing}
           reviewId={createdArticle?.id || initObj?.id}
-          showHeader={false}
         />
       )}
       

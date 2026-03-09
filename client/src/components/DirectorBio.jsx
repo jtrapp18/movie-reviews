@@ -1,4 +1,4 @@
-import { StyledContainer } from '../styles';
+import { StyledContainer, Button } from '../styles';
 import styled from 'styled-components';
 
 
@@ -13,8 +13,9 @@ const Image = styled.img`
 const InfoShell = styled.div`
   width: 100%;
   background: var(--background-secondary);
-  border-radius: 0 0 8px 8px;
-  padding: 16px 20px;
+  // border-radius: 0 0 8px 8px;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
 `;
 
 const Info = styled.div`
@@ -56,7 +57,14 @@ const BioText = styled.p`
   line-height: 1.5;
 `;
 
-function DirectorBio({director}) {
+const ActionsRow = styled.div`
+  margin-top: 0.75rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
   const { id, name, coverPhoto, backdrop, biography } = director;
   const imageSrc = backdrop
     ? `/api/directors/${id}/backdrop/view?v=${encodeURIComponent(backdrop)}`
@@ -75,6 +83,11 @@ function DirectorBio({director}) {
             {biography && <BioText>{biography}</BioText>}
           </BioColumn>
         </Info>
+        {isAdmin && (
+          <ActionsRow>
+            <Button onClick={onEdit}>Edit Director</Button>
+          </ActionsRow>
+        )}
       </InfoShell>
     </StyledContainer>
   );
