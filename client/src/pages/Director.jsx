@@ -5,7 +5,7 @@ import { getJSON, patchJSONToDb } from '../helper';
 import SEOHead from '../components/SEOHead';
 import Loading from '../components/ui/Loading';
 import DirectorBio from '../components/DirectorBio';
-import MoviesGrid from '../components/MoviesGrid';
+import DirectorTimeline from '../components/DirectorTimeline';
 import { useAdmin } from '../hooks/useAdmin';
 import BackdropUpload from '../components/BackdropUpload';
 
@@ -69,12 +69,6 @@ function Director() {
       </StyledContainer>
     );
   }
-
-  const handleMovieClick = (movie) => {
-    if (movie && movie.id) {
-      navigate(`/movies/${movie.id}`);
-    }
-  };
 
   const handleStartEdit = () => {
     setBioDraft(director.biography || '');
@@ -180,10 +174,7 @@ function Director() {
         <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>
           Movies by {director.name}
         </h2>
-        <MoviesGrid
-          movies={movies}
-          onMovieClick={handleMovieClick}
-        />
+        <DirectorTimeline movies={movies} />
       </StyledContainer>
     </>
   );

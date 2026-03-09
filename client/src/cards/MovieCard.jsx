@@ -11,7 +11,7 @@ const MetadataContainer = styled.div`
   gap: 4px;
 `;
 
-function MovieCard({ movie, rating = null, clickable = true }) {
+function MovieCard({ movie, rating = null, clickable = true, size = "default" }) {
   const {
     originalLanguage,
     originalTitle,
@@ -46,8 +46,16 @@ function MovieCard({ movie, rating = null, clickable = true }) {
     }
   };
 
+  const cardStyle =
+    size === "small"
+      ? { width: '150px', height: '210px' }
+      : undefined;
+
   return (
-    <MediaCard onClick={clickable ? handleClick : undefined}>
+    <MediaCard
+      onClick={clickable ? handleClick : undefined}
+      style={cardStyle}
+    >
       <img src={coverPhoto} alt={`${title} poster`} />
 
       <CardDate>{releaseDate}</CardDate>

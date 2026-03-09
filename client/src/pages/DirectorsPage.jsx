@@ -15,12 +15,13 @@ const PageHeader = styled.div`
 
 const Title = styled.h1`
   margin: 0 0 0.25rem 0;
-  text-align: left;
+  text-align: center;
 `;
 
 const Intro = styled.p`
   margin: 0;
   color: var(--font-color-2);
+  text-align: center;
 `;
 
 const Layout = styled.div`
@@ -55,6 +56,30 @@ const AZColumn = styled.aside`
     font-weight: 600;
     color: var(--font-color-1);
   }
+
+  @media (max-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding-top: 0;
+    margin-bottom: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 4px;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    & > strong {
+      flex-shrink: 0;
+    }
+
+    button {
+      flex-shrink: 0;
+      padding: 2px 6px;
+      font-size: 0.85rem;
+    }
+  }
 `;
 
 const AccordionContainer = styled.div`
@@ -86,11 +111,6 @@ const AccordionBody = styled.div`
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
-`;
-
-const ScaledMovies = styled.div`
-  transform: scale(0.5);
-  transform-origin: top left;
 `;
 
 function DirectorsPage() {
@@ -155,8 +175,8 @@ function DirectorsPage() {
   return (
     <StyledContainer>
       <PageHeader>
-        <Title>Directors</Title>
-        <Intro>Explore the filmmakers behind the reviews and articles.</Intro>
+        <Title>Director Highlights</Title>
+        <Intro>A movie is only as good as its director.</Intro>
       </PageHeader>
 
       <SearchBar
@@ -240,11 +260,10 @@ function DirectorsPage() {
                   <h3 style={{ marginBottom: '0.75rem' }}>
                     Movies by {director.name}
                   </h3>
-                  <ScaledMovies>
-                    <Movies
-                      showMovies={director.movies || []}
-                    />
-                  </ScaledMovies>
+                  <Movies
+                    showMovies={director.movies || []}
+                    cardSize="small"
+                  />
                 </AccordionBody>
               </Details>
             );
