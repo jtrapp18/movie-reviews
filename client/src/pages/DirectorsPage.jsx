@@ -3,8 +3,8 @@ import { StyledContainer, Button } from '../styles';
 import { getJSON } from '../helper';
 import Loading from '../components/ui/Loading';
 import DirectorCard from '../cards/DirectorCard';
-import MoviesGrid from '../components/MoviesGrid';
-import DirectorBio from '../components/DirectorBio';
+import Movies from '../components/Movies';
+import SearchBar from '../components/SearchBar';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,14 +23,37 @@ const Intro = styled.p`
   color: var(--font-color-2);
 `;
 
-const SearchRow = styled.div`
-  margin: 1.5rem 0;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+const Layout = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 16px;
 
-  input {
-    max-width: 260px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const AZColumn = styled.aside`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+  font-size: 0.95rem;
+  color: var(--font-color-2);
+
+  button {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 2px 0;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  button.active {
+    font-weight: 600;
+    color: var(--font-color-1);
   }
 `;
 
@@ -41,15 +64,16 @@ const AccordionContainer = styled.div`
   gap: 12px;
 `;
 
-const AccordionHeader = styled.div`
-  cursor: pointer;
+const Row = styled.div`
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  padding: 8px 0;
 `;
 
 const AccordionBody = styled.div`
   margin-top: 8px;
-  padding: 12px 16px 16px;
-  border-radius: 8px;
-  background: var(--background-secondary);
+  padding: 12px 0 0;
 `;
 
 function DirectorsPage() {
@@ -58,6 +82,7 @@ function DirectorsPage() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
+  const [letterFilter, setLetterFilter] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,13 +103,21 @@ function DirectorsPage() {
   }, []);
 
   const filteredDirectors = useMemo(() => {
-    if (!searchQuery.trim()) return directors;
+    let list = directors;
+
+    if (letterFilter) {
+      list = list.filter((d) =>
+        (d.name || '').toUpperCase().startsWith(letterFilter)
+      );
+    }
+
+    if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return directors.filter((d) =>
+    return list.filter((d) =>
       (d.name || '').toLowerCase().includes(q) ||
       (d.biography || '').toLowerCase().includes(q)
     );
-  }, [directors, searchQuery]);
+  }, [directors, searchQuery, letterFilter]);
 
   if (loading) {
     return (
@@ -109,61 +142,90 @@ function DirectorsPage() {
         <Intro>Explore the filmmakers behind the reviews and articles.</Intro>
       </PageHeader>
 
-      <SearchRow>
-        <input
-          type="text"
-          placeholder="Search directors..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </SearchRow>
+      <SearchBar
+        enterSearch={(value) => setSearchQuery(value)}
+        placeholder="Search directors by name or bio..."
+      />
 
-      <AccordionContainer>
-        {filteredDirectors.map((director, index) => {
-          const isExpanded = expandedId === director.id;
-          return (
-            <div key={director.id}>
-              <AccordionHeader
-                onClick={() =>
-                  setExpandedId(isExpanded ? null : director.id)
-                }
-              >
-                <DirectorCard
-                  director={director}
-                  index={index}
-                  onClick={() => setExpandedId(isExpanded ? null : director.id)}
-                />
-              </AccordionHeader>
-              {isExpanded && (
-                <AccordionBody>
-                  <DirectorBio director={director} />
-                  <div style={{ marginTop: '1.5rem' }}>
+      <Layout>
+        <AZColumn>
+          <strong>A–Z</strong>
+          <button
+            type="button"
+            className={!letterFilter ? 'active' : ''}
+            onClick={() => setLetterFilter(null)}
+          >
+            All
+          </button>
+          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
+            <button
+              key={letter}
+              type="button"
+              className={letterFilter === letter ? 'active' : ''}
+              onClick={() => setLetterFilter(letter)}
+            >
+              {letter}
+            </button>
+          ))}
+        </AZColumn>
+
+        <AccordionContainer>
+          {filteredDirectors.map((director, index) => {
+            const isExpanded = expandedId === director.id;
+            const shortBio =
+              (director.biography && director.biography.length > 220)
+                ? `${director.biography.slice(0, 220)}…`
+                : (director.biography || 'Director biography coming soon.');
+
+            return (
+              <div key={director.id}>
+                <Row>
+                  <div
+                    onClick={() => navigate(`/directors/${director.id}`)}
+                    style={{ flexShrink: 0 }}
+                  >
+                    <DirectorCard
+                      director={director}
+                      index={index}
+                    />
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <p style={{ margin: 0, color: 'var(--font-color-2)', fontSize: '0.95rem' }}>
+                      {shortBio}
+                    </p>
+                    <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <Button
+                        variant="secondary"
+                        onClick={() =>
+                          setExpandedId(isExpanded ? null : director.id)
+                        }
+                      >
+                        {isExpanded ? 'Hide movies' : 'Show movies'}
+                      </Button>
+                      <Button onClick={() => navigate(`/directors/${director.id}`)}>
+                        View page
+                      </Button>
+                    </div>
+                  </div>
+                </Row>
+                {isExpanded && (
+                  <AccordionBody>
                     <h3 style={{ marginBottom: '0.75rem' }}>
                       Movies by {director.name}
                     </h3>
-                    <MoviesGrid
-                      movies={director.movies || []}
-                      onMovieClick={(movie) => {
-                        if (movie && movie.id) {
-                          navigate(`/movies/${movie.id}`);
-                        }
-                      }}
+                    <Movies
+                      showMovies={director.movies || []}
                     />
-                  </div>
-                  <div style={{ marginTop: '1rem', textAlign: 'right' }}>
-                    <Button onClick={() => navigate(`/directors/${director.id}`)}>
-                      View full page
-                    </Button>
-                  </div>
-                </AccordionBody>
-              )}
-            </div>
-          );
-        })}
-        {!filteredDirectors.length && (
-          <p>No directors match your search.</p>
-        )}
-      </AccordionContainer>
+                  </AccordionBody>
+                )}
+              </div>
+            );
+          })}
+          {!filteredDirectors.length && (
+            <p>No directors match your search.</p>
+          )}
+        </AccordionContainer>
+      </Layout>
     </StyledContainer>
   );
 }
