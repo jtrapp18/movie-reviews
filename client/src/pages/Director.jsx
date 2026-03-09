@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { StyledContainer, Button } from '../styles';
 import { getJSON, patchJSONToDb } from '../helper';
 import SEOHead from '../components/SEOHead';
@@ -8,6 +9,23 @@ import DirectorBio from '../components/DirectorBio';
 import DirectorTimeline from '../components/DirectorTimeline';
 import { useAdmin } from '../hooks/useAdmin';
 import BackdropUpload from '../components/BackdropUpload';
+
+const DirectorSection = styled.div`
+  width: 100%;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+const MoviesSection = styled.div`
+  width: 100%;
+  padding: 16px 20px 20px;
+`;
+
+const MoviesHeader = styled.h2`
+  margin-top: 0;
+  margin-bottom: 1rem;
+`;
 
 function Director() {
   const { id } = useParams();
@@ -115,11 +133,19 @@ function Director() {
       />
       <StyledContainer>
         {!isEditing && (
-          <DirectorBio
-            director={director}
-            isAdmin={isAdmin}
-            onEdit={handleStartEdit}
-          />
+          <DirectorSection>
+            <DirectorBio
+              director={director}
+              isAdmin={isAdmin}
+              onEdit={handleStartEdit}
+            />
+            <MoviesSection>
+              <MoviesHeader>
+                Movies by {director.name}
+              </MoviesHeader>
+              <DirectorTimeline movies={movies} />
+            </MoviesSection>
+          </DirectorSection>
         )}
 
         {isEditing && isAdmin && (
@@ -163,11 +189,6 @@ function Director() {
             </div>
           </div>
         )}
-
-        <h2 style={{ marginTop: 0, marginBottom: '1rem' }}>
-          Movies by {director.name}
-        </h2>
-        <DirectorTimeline movies={movies} />
       </StyledContainer>
     </>
   );

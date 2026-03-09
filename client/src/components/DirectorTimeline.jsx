@@ -1,5 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
+import { getMovieRatings } from '../helper';
 
 const TimelineContainer = styled.div`
   position: relative;
@@ -86,6 +88,22 @@ const MovieTitle = styled.h3`
 `;
 
 function DirectorTimeline({ movies }) {
+  const [ratingsMap, setRatingsMap] = useState({});
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (!movies || !movies.length) {
+        setRatingsMap({});
+        return;
+      }
+
+      const ratings = await getMovieRatings(movies);
+      setRatingsMap(ratings);
+    };
+
+    fetchRatings();
+  }, [movies]);
+
   if (!movies || !movies.length) return null;
 
   const sorted = [...movies].sort((a, b) => {
@@ -103,14 +121,30 @@ function DirectorTimeline({ movies }) {
             ? `${movie.overview.slice(0, 180)}…`
             : movie.overview || 'No synopsis available.';
 
+        // Determine rating and correct ID using ratings map
+        let rating = null;
+        let movieWithCorrectId = movie;
+
+        if (movie.externalId) {
+          const movieData = ratingsMap[movie.externalId];
+          rating = movieData?.rating || null;
+          const localId = movieData?.local_id;
+          if (localId) {
+            movieWithCorrectId = { ...movie, id: localId };
+          }
+        } else if (movie.id) {
+          const localData = ratingsMap[movie.id];
+          rating = localData?.rating || null;
+        }
+
         return (
-          <TimelineItem key={movie.id || movie.externalId || idx}>
+          <TimelineItem key={movieWithCorrectId.id || movie.externalId || idx}>
             <YearColumn>
               <YearDot />
               <span>{year}</span>
             </YearColumn>
             <ContentColumn>
-              <MovieCard movie={movie} />
+              <MovieCard movie={movieWithCorrectId} rating={rating} />
               <MovieInfo>
                 <MovieTitle>{movie.title}</MovieTitle>
                 <p style={{ margin: 0 }}>{overview}</p>

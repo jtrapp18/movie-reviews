@@ -1,4 +1,4 @@
-import { StyledContainer, Button } from '../styles';
+import { Button } from '../styles';
 import styled from 'styled-components';
 
 
@@ -12,8 +12,6 @@ const Image = styled.img`
 
 const InfoShell = styled.div`
   width: 100%;
-  background: var(--background-secondary);
-  // border-radius: 0 0 8px 8px;
   padding: 16px 20px 12px;
   border-bottom: 1px solid var(--border);
 `;
@@ -64,6 +62,10 @@ const ActionsRow = styled.div`
   justify-content: flex-end;
 `;
 
+const BioContainer = styled.div`
+  width: 100%;
+`;
+
 function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
   const { id, name, coverPhoto, backdrop, biography } = director;
   const imageSrc = backdrop
@@ -72,7 +74,7 @@ function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
 
 
   return (
-    <StyledContainer>
+    <BioContainer>
       <Image src={imageSrc} />
       <InfoShell>
         <Info>
@@ -89,7 +91,7 @@ function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
           </ActionsRow>
         )}
       </InfoShell>
-    </StyledContainer>
+    </BioContainer>
   );
 }
 
