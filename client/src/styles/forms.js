@@ -2,10 +2,10 @@ import styled from 'styled-components';
 
 const StyledForm = styled.form`
   width: 100%;
-  // background: var(--cinema-gray-dark);
+  background: var(--background-secondary);
   padding: 2rem;
   border-radius: 12px;
-  border-left: 4px solid var(--cinema-gold-dark);
+  border-left: 4px solid var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow-y: visible;
   display: flex;
@@ -25,7 +25,6 @@ const StyledForm = styled.form`
 
   label {
     display: block;
-    // color: var(--cinema-gold-dark);
     font-weight: 600;
     margin-bottom: 0.5rem;
     font-size: 1rem;
@@ -44,20 +43,26 @@ const StyledForm = styled.form`
     border: 2px solid var(--border);
     border-radius: 8px;
     // background: rgba(0, 0, 0, 0.3);
-    background: var(--background);
+    background: var(--background-secondary);
     // color: white;
     font-size: 1rem;
     transition: all 0.3s ease;
     box-sizing: border-box;
     
     &::placeholder {
-      color: rgba(255, 255, 255, 0.6);
+      // color: rgba(255, 255, 255, 0.6);
+      color: var(--font-color-2);
     }
     
     &:focus {
       outline: none;
       // border-color: var(--cinema-gold-dark);
+      background: var(--background-tertiary);
       box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.2);
+    }
+
+    &:hover {
+      background: var(--background);
     }
   }
 

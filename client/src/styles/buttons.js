@@ -11,9 +11,9 @@ const Button = styled.button.attrs(props => ({
   /* Button styling */
   width: fit-content;
   margin: 5px;
-  color: var(--cinema-black);
-  background: var(--cinema-gold);
-  border: 2px solid var(--cinema-gold-dark);
+  color: var(--background-secondary);
+  background: var(--primary);
+  border: 1px solid var(--border);
   border-radius: 15px;
   padding: 5px;
   min-width: 120px;
@@ -25,8 +25,7 @@ const Button = styled.button.attrs(props => ({
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background: var(--cinema-gold-dark);
-    border-color: var(--cinema-gold-dark);
+    background: var(--secondary);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
@@ -43,7 +42,7 @@ const Button = styled.button.attrs(props => ({
 
   &:disabled {
     background-color: var(--cinema-gray-dark);
-    color: black;
+    color: var(--gray);
     border: 2px solid black;
     cursor: not-allowed;
   }

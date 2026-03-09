@@ -14,9 +14,8 @@ const LinkContainer = styled.div`
   width: 20%;
   text-decoration: none;
   text-align: right;
-  background: var(--cinema-gold);
-  border: 1px solid black;
-  border-bottom: 3px double black;
+  background: var(--background-tertiary);
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Ensures smooth animation */
@@ -43,7 +42,6 @@ const LinkContainer = styled.div`
 
 const StyledNavLink = styled(NavLink)`
   text-decoration: none;
-  color: var(--cinema-black);
   position: relative;
   cursor: pointer;
   padding: 10px;
@@ -58,13 +56,12 @@ const StyledNavLink = styled(NavLink)`
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;
-    color: black;
   }
 
   &:hover {
-    color: var(--cinema-gold-dark);
-    background: var(--cinema-black);
-    border: 1px solid var(--cinema-gold);
+    color: var(--font-color-2);
+    background: var(--background-secondary);
+    // border: 1px solid var(--border);
   }
 `
 
