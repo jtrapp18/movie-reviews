@@ -64,16 +64,33 @@ const AccordionContainer = styled.div`
   gap: 12px;
 `;
 
-const Row = styled.div`
+const Details = styled.details`
+  border-radius: 8px;
+  background: var(--background-secondary);
+  padding: 8px 12px;
+`;
+
+const SummaryRow = styled.summary`
+  list-style: none;
   display: flex;
   align-items: stretch;
   gap: 16px;
-  padding: 8px 0;
+  cursor: pointer;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
 `;
 
 const AccordionBody = styled.div`
   margin-top: 8px;
-  padding: 12px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle, rgba(255,255,255,0.06));
+`;
+
+const ScaledMovies = styled.div`
+  transform: scale(0.5);
+  transform-origin: top left;
 `;
 
 function DirectorsPage() {
@@ -178,10 +195,20 @@ function DirectorsPage() {
                 : (director.biography || 'Director biography coming soon.');
 
             return (
-              <div key={director.id}>
-                <Row>
+              <Details
+                key={director.id}
+                open={isExpanded}
+                onToggle={(e) =>
+                  setExpandedId(e.target.open ? director.id : null)
+                }
+              >
+                <SummaryRow>
                   <div
-                    onClick={() => navigate(`/directors/${director.id}`)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigate(`/directors/${director.id}`);
+                    }}
                     style={{ flexShrink: 0 }}
                   >
                     <DirectorCard
@@ -193,32 +220,33 @@ function DirectorsPage() {
                     <p style={{ margin: 0, color: 'var(--font-color-2)', fontSize: '0.95rem' }}>
                       {shortBio}
                     </p>
-                    <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'space-between', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--font-color-3)' }}>
+                        {isExpanded ? 'Hide movies ▲' : 'Show movies ▼'}
+                      </span>
                       <Button
-                        variant="secondary"
-                        onClick={() =>
-                          setExpandedId(isExpanded ? null : director.id)
-                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigate(`/directors/${director.id}`);
+                        }}
                       >
-                        {isExpanded ? 'Hide movies' : 'Show movies'}
-                      </Button>
-                      <Button onClick={() => navigate(`/directors/${director.id}`)}>
                         View page
                       </Button>
                     </div>
                   </div>
-                </Row>
-                {isExpanded && (
-                  <AccordionBody>
-                    <h3 style={{ marginBottom: '0.75rem' }}>
-                      Movies by {director.name}
-                    </h3>
+                </SummaryRow>
+                <AccordionBody>
+                  <h3 style={{ marginBottom: '0.75rem' }}>
+                    Movies by {director.name}
+                  </h3>
+                  <ScaledMovies>
                     <Movies
                       showMovies={director.movies || []}
                     />
-                  </AccordionBody>
-                )}
-              </div>
+                  </ScaledMovies>
+                </AccordionBody>
+              </Details>
             );
           })}
           {!filteredDirectors.length && (
