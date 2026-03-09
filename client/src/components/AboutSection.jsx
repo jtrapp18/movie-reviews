@@ -9,8 +9,6 @@ const AboutSectionContainer = styled.div`
 `;
 
 const AboutSectionTitle = styled.h2`
-  // color: var(--cinema-gold);
-  // font-size: 1.5rem;
   margin-bottom: 1rem;
   text-align: left;
 `;

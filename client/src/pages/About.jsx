@@ -37,16 +37,14 @@ const Header = styled.div`
 `;
 
 const ContentType = styled.div`
-  // background: var(--cinema-gray-dark);
+  background: var(--background-secondary);
   padding: clamp(1rem, 3vw, 1.25rem);
   margin: clamp(0.75rem, 2vw, 0.9375rem) 0;
   border-radius: 0.5rem;
   border-left: 4px solid var(--border);
   
   h4 {
-    // color: var(--cinema-gold);
     margin: 0 0 0.625rem 0;
-    // font-size: clamp(1rem, 2.5vw, 1.2rem);
   }
   
   p {

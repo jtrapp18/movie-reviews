@@ -2,22 +2,37 @@ import styled from 'styled-components';
 import MovieCard from '../cards/MovieCard';
 
 const TimelineContainer = styled.div`
+  position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 28px;
+    width: 2px;
+    background: var(--border-subtle, rgba(0, 0, 0, 0.08));
+  }
+
+  @media (max-width: 768px) {
+    &::before {
+      left: 22px;
+    }
+  }
 `;
 
 const TimelineItem = styled.div`
   display: grid;
-  grid-template-columns: auto 200px minmax(0, 1fr);
+  grid-template-columns: 56px minmax(0, 1fr);
   gap: 16px;
-  align-items: stretch;
+  align-items: center;
 
   @media (max-width: 768px) {
-    grid-template-columns: 24px minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    row-gap: 8px;
+    grid-template-columns: 44px minmax(0, 1fr);
   }
 `;
 
@@ -25,22 +40,34 @@ const YearColumn = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--font-color-3);
+  position: relative;
+  z-index: 1;
 `;
 
 const YearDot = styled.div`
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--cinema-gold);
+  background: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.18);
 `;
 
-const YearLine = styled.div`
-  flex: 1;
-  width: 2px;
-  background: var(--border-subtle, rgba(255, 255, 255, 0.06));
+const ContentColumn = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+
+  & > *:first-child {
+    flex-shrink: 0;
+  }
 `;
 
 const MovieInfo = styled.div`
@@ -81,13 +108,14 @@ function DirectorTimeline({ movies }) {
             <YearColumn>
               <YearDot />
               <span>{year}</span>
-              <YearLine />
             </YearColumn>
-            <MovieCard movie={movie} />
-            <MovieInfo>
-              <MovieTitle>{movie.title}</MovieTitle>
-              <p style={{ margin: 0 }}>{overview}</p>
-            </MovieInfo>
+            <ContentColumn>
+              <MovieCard movie={movie} />
+              <MovieInfo>
+                <MovieTitle>{movie.title}</MovieTitle>
+                <p style={{ margin: 0 }}>{overview}</p>
+              </MovieInfo>
+            </ContentColumn>
           </TimelineItem>
         );
       })}

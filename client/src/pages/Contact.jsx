@@ -79,14 +79,14 @@ function Contact() {
   return (
     <StyledContainer>
       <Header>
-        <h1>Contact Jamie</h1>
+        <h1>Contact James</h1>
         <div className="subtitle">Get in touch about film reviews, suggestions, or feedback</div>
       </Header>
 
       <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
           <div className="success-message">
-            Your email client should open with a pre-filled message to Jamie. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
+            Your email client should open with a pre-filled message to James. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
           </div>
         )}
         

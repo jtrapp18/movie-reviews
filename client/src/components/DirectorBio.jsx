@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 const Image = styled.img`
   width: 100%;
-  height: 220px;
+  max-height: 500px;
   object-fit: cover;
   filter: grayscale(60%);
   border-radius: 8px 8px 0 0;

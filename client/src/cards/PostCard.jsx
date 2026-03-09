@@ -3,8 +3,7 @@ import styled from 'styled-components';
 const StyledCard = styled.article`
   width: 100%;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   background-color: var(--background-secondary);
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
@@ -26,6 +25,7 @@ const StyledCard = styled.article`
   .content {
     display: flex;
     flex-direction: column;
+    padding: .5rem;
     gap: 4px;
   }
 
