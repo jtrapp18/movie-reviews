@@ -20,7 +20,7 @@ const StyledCard = styled.article`
     object-fit: cover;
     border-radius: 4px;
     flex-shrink: 0;
-    filter: grayscale(80%);
+    filter: grayscale(90%);
   }
 
   .content {

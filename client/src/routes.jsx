@@ -12,6 +12,7 @@ import Article from './pages/Article';
 import NewArticle from './pages/NewArticle';
 import Admin from './pages/Admin';
 import Director from './pages/Director';
+import DirectorsPage from './pages/DirectorsPage';
 
 const routes = [
   {
@@ -38,6 +39,10 @@ const routes = [
       {
         path: "search_movies",
         element: <SearchMovies />,
+      },
+      {
+        path: "directors",
+        element: <DirectorsPage />,
       },
       {
         path: "movies/:id",

@@ -157,6 +157,13 @@ const MobileNavBar = () => {
           Search Movies
         </StyledMobileLink>
         <StyledMobileLink
+          to="/directors"
+          className="nav-link"
+          onClick={handleClick}
+        >
+          Directors
+        </StyledMobileLink>
+        <StyledMobileLink
           to="/about"
           className="nav-link"
           onClick={handleClick}
