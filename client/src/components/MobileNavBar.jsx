@@ -11,6 +11,10 @@ import { userLogout } from "../helper";
 // `
 const StyledMobileMenu = styled(StyledLink)`
   color: var(--background-secondary);
+
+  &:hover {
+    color: var(--background-tertiary);
+  }
 `
 
 const StyledMobileLink = styled(StyledNavLink)`
@@ -18,6 +22,10 @@ const StyledMobileLink = styled(StyledNavLink)`
 
   &.active {
     color: var(--background);
+  }
+
+  &:hover {
+    color: var(--background-tertiary);
   }
 `
 const StyledDiv = styled.div`
@@ -45,7 +53,7 @@ const LinkContainer = styled.div`
   transition: transform 0.3s ease-in-out; /* Smooth fold-out animation */
 
   a {
-    height: 20vh;
+    height: 15vh;
     display: flex;
     align-items: center;
     justify-content: center;
