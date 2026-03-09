@@ -10,37 +10,6 @@ const ContentDisplayContainer = styled.div`
   width: 100%;
 `;
 
-const ContentHeader = styled.div`
-  text-align: center;
-  margin-bottom: 1rem;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-
-  border-bottom: 2px dotted gray;
-`;
-
-const ContentTitle = styled.h1`
-  margin: 0;
-  padding: 0.5rem;
-`;
-
-const ContentMeta = styled.div`
-  color: #666;
-  font-size: 1rem;
-  margin-bottom: 20px;
-`;
-
-const PublishDate = styled.span`
-  color: #666;
-`;
-
-const StarsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-`;
-
 const TagsContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -74,7 +43,43 @@ const ContentBody = styled.div`
   }
 `;
 
-const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
+const ContentHeader = styled.div`
+  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border-bottom: 2px dotted gray;
+`;
+
+const ContentTitle = styled.h1`
+  margin: 0;
+  padding: 0.5rem;
+`;
+
+const ContentMeta = styled.div`
+  color: #666;
+  font-size: 1rem;
+  margin-bottom: 20px;
+`;
+
+const PublishDate = styled.span`
+  color: #666;
+`;
+
+const StarsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+`;
+
+const ContentDisplay = ({
+  formValues,
+  setIsEditing,
+  reviewId,
+  onRemoveDocument,
+  showHeader = true,
+}) => {
   const { isAdmin } = useAdmin();
   const isReview = formValues.movieId !== null && formValues.movieId !== undefined;
   const hasRating = isReview && formValues.rating && formValues.rating > 0;
@@ -90,26 +95,47 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
 
   return (
     <ContentDisplayContainer className="content-display">
-      <ContentHeader>
-        <ContentTitle>{formValues.title}</ContentTitle>
-        
-        {hasRating && (
-          <StarsContainer>
-            <Stars rating={formValues.rating} />
-          </StarsContainer>
-        )}
-        
-        <ContentMeta>
-          {(formValues.dateAdded || formValues.date_added) && (
-            <PublishDate>Published on {new Date(formValues.dateAdded || formValues.date_added).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</PublishDate>
+      {showHeader && (
+        <ContentHeader>
+          <ContentTitle>{formValues.title}</ContentTitle>
+          
+          {hasRating && (
+            <StarsContainer>
+              <Stars rating={formValues.rating} />
+            </StarsContainer>
           )}
-        </ContentMeta>
+          
+          <ContentMeta>
+            {(formValues.dateAdded || formValues.date_added) && (
+              <PublishDate>
+                Published on{' '}
+                {new Date(
+                  formValues.dateAdded || formValues.date_added
+                ).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </PublishDate>
+            )}
+          </ContentMeta>
 
-        {(formValues.tags || formValues.tag) && (formValues.tags || formValues.tag).length > 0 && (
+          {(formValues.tags || formValues.tag) &&
+            (formValues.tags || formValues.tag).length > 0 && (
+              <TagsContainer className="tags-container">
+                {(formValues.tags || formValues.tag).map((tag, index) => (
+                  <Tag key={index}>
+                    {typeof tag === 'string' ? tag : tag.name}
+                  </Tag>
+                ))}
+              </TagsContainer>
+            )}
+        </ContentHeader>
+      )}
+
+      {!showHeader &&
+        (formValues.tags || formValues.tag) &&
+        (formValues.tags || formValues.tag).length > 0 && (
           <TagsContainer className="tags-container">
             {(formValues.tags || formValues.tag).map((tag, index) => (
               <Tag key={index}>
@@ -118,7 +144,6 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
             ))}
           </TagsContainer>
         )}
-      </ContentHeader>
       
       {hasAnyContent ? (
         <ZoomableContent>

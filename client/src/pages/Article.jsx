@@ -112,7 +112,10 @@ function Article() {
                 )}`
               : null
           }
-          title={article.title}
+          title={article.movie?.title || article.title}
+          subtitle={article.movie?.title ? article.title : undefined}
+          rating={article.rating}
+          publishDate={article.dateAdded || article.date_added}
         />
         <ArticleForm initObj={article} />
       </StyledContainer>

@@ -92,7 +92,13 @@ function MovieReview() {
       />
       <StyledContainer>
         <MovieContainer>
-          <CoverHeader imageUrl={movie.coverPhoto} title={movie.title} />
+          <CoverHeader
+            imageUrl={movie.coverPhoto}
+            title={movie.title}
+            subtitle={review?.title}
+            rating={review?.rating}
+            publishDate={review?.dateAdded || review?.date_added}
+          />
         </MovieContainer>
         
         <ReviewForm initObj={review} />

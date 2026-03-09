@@ -382,12 +382,16 @@ const ReviewForm = ({ initObj }) => {
               ...initObj, // Include all review data
               // Ensure we only use reviewText (camelCase) for consistency
               // Always prioritize the database value (which contains the HTML)
-              reviewText: reviewData?.reviewText || reviewData?.review_text || formik.values.reviewText || '',
+              reviewText:
+                reviewData?.reviewText ||
+                reviewData?.review_text ||
+                formik.values.reviewText ||
+                '',
               hasDocument: reviewData?.hasDocument || false,
               documentFilename: reviewData?.documentFilename || null,
               documentType: reviewData?.documentType || null,
               dateAdded: reviewData?.dateAdded || null,
-              tags: tags
+              tags: tags,
             };
             console.log('ContentDisplay formValues for review:', values);
             console.log('reviewText:', values.reviewText);
@@ -396,6 +400,7 @@ const ReviewForm = ({ initObj }) => {
           })()}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}
+          showHeader={false}
         />
       )}
       
