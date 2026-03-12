@@ -8,6 +8,7 @@ import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from ".
 import Error from "../styles/Error";
 import ContentDisplay from "../components/FormSubmit";
 import DocumentUpload from "../components/DocumentUpload";
+import BackdropUpload from "../components/BackdropUpload";
 import TagInput from "../components/TagInput";
 import SubmitButton from "../components/SubmitButton";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
@@ -38,6 +39,7 @@ const ArticleForm = ({ initObj }) => {
   const { setMovies, setArticles } = useOutletContext();
   const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "reviews");
   const { isAdmin } = useAdmin();
+  const [backdropKey, setBackdropKey] = useState(initObj?.backdrop || null);
 
   const initialValues = initObj
     ? {
@@ -229,9 +231,29 @@ const ArticleForm = ({ initObj }) => {
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h1>{initObj ? "Edit Article" : "Create New Article"}</h1>
-          
           {submitError && <Error>{submitError}</Error>}
-          
+          {/* Backdrop Image Upload (for existing articles) */}
+          {initObj?.id && (
+            <div>
+              <label>Backdrop Image (optional):</label>
+              <BackdropUpload
+                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
+                currentUrl={
+                  backdropKey
+                    ? `/api/articles/${initObj.id}/backdrop/view?v=${encodeURIComponent(
+                        backdropKey
+                      )}`
+                    : null
+                }
+                onUploaded={(url) => {
+                  setBackdropKey(url);
+                  if (initObj) {
+                    initObj.backdrop = url;
+                  }
+                }}
+              />
+            </div>
+          )}
           <div>
             <label htmlFor="title">Article Title *</label>
             <input
@@ -365,10 +387,26 @@ const ArticleForm = ({ initObj }) => {
               ...formik.values,
               ...initObj, // Include all the original article data
               // Ensure we only use reviewText (camelCase) for consistency
-              reviewText: formik.values.reviewText || initObj?.reviewText || initObj?.review_text || '',
-              hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
-              documentFilename: selectedFile?.name || initObj?.documentFilename || initObj?.document_filename || null,
-              documentType: selectedFile ? selectedFile.name.split('.').pop().toLowerCase() : (initObj?.documentType || initObj?.document_type || null)
+              reviewText:
+                formik.values.reviewText ||
+                initObj?.reviewText ||
+                initObj?.review_text ||
+                '',
+              hasDocument:
+                hasDocument ||
+                initObj?.hasDocument ||
+                initObj?.has_document ||
+                false,
+              documentFilename:
+                selectedFile?.name ||
+                initObj?.documentFilename ||
+                initObj?.document_filename ||
+                null,
+              documentType: selectedFile
+                ? selectedFile.name.split('.').pop().toLowerCase()
+                : initObj?.documentType ||
+                  initObj?.document_type ||
+                  null,
             };
             return values;
           })()}

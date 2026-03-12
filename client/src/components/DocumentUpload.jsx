@@ -6,11 +6,11 @@ import { Button } from '../styles';
 const UploadContainer = styled.div`
   margin: 20px 0;
   padding: 20px;
-  border: 2px dashed var(--cinema-gold);
-  background-color: var(--cinema-gray-dark);
+  border: 2px dashed var(--border);
+  background-color: var(--background-secondary);
   border-radius: 8px;
   text-align: center;
-  color: var(--cinema-gold);
+  color: var(--font-color-2);
   min-height: 120px;
   display: flex;
   flex-direction: column;
@@ -18,8 +18,8 @@ const UploadContainer = styled.div`
   align-items: center;
   
   &.drag-over {
-    border-color: var(--cinema-gold-dark);
-    background-color: var(--cinema-black);
+    border-color: var(--border);
+    background-color: var(--background-tertiary);
   }
 `;
 
@@ -32,20 +32,21 @@ const FileInfo = styled.div`
   padding: 8px 12px;
   opacity: 0.8;
   border-radius: 4px;
-  border: 1px solid var(--cinema-gold);
+  border: 1px solid var(--border);
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
-  color: var(--cinema-gold);
+  color: var(--font-color-2);
 `;
 
 const ErrorMessage = styled.div`
   margin-top: 10px;
   padding: 10px;
-  background-color: rgba(244, 67, 54, 0.1);
+  // background-color: rgba(244, 67, 54, 0.1);
+  background-color: var(--background-tertiary);
   border-radius: 4px;
-  border: 1px solid #f44336;
-  color: #f44336;
+  border: 1px solid var(--cinema-red);
+  color: var(--cinema-red);
 `;
 
 const DocumentActions = styled.div`

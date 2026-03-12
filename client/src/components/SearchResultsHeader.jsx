@@ -63,7 +63,7 @@ const SearchResultsHeader = ({
   return (
     <HeaderContainer>
       <Title>
-        Search Results for <SearchQuery>"{searchQuery}"</SearchQuery>
+        Results for <SearchQuery>"{searchQuery}"</SearchQuery>
       </Title>
       <ResultsCount>{resultsText}</ResultsCount>
     </HeaderContainer>

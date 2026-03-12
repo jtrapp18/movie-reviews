@@ -7,15 +7,16 @@ const StyledList = styled.ul`
   margin: 0;
   
   li {
-    background: var(--cinema-gray-dark);
+    // background: var(--cinema-gray-dark);
+    background: var(--background-secondary);
     margin: 0.5rem 0;
     padding: 0.75rem 1.25rem;
-    border-left: 4px solid var(--cinema-gold);
+    border-left: 4px solid var(--border);
     border-radius: 4px;
     transition: all 0.3s ease;
     
     &:hover {
-      background: var(--cinema-light-gray);
+      // background: var(--cinema-light-gray);
       transform: translateX(0.3rem);
     }
   }

@@ -10,14 +10,22 @@ import { userLogout } from "../helper";
 //   color: var(--cinema-gold-dark);
 // `
 const StyledMobileMenu = styled(StyledLink)`
-  color: var(--cinema-gold-dark);
+  color: var(--background-secondary);
+
+  &:hover {
+    color: var(--background-tertiary);
+  }
 `
 
 const StyledMobileLink = styled(StyledNavLink)`
-  color: var(--cinema-gold-dark);
+  color: var(--background-secondary);
 
   &.active {
-    color: var(--cinema-gold);
+    color: var(--background);
+  }
+
+  &:hover {
+    color: var(--background-tertiary);
   }
 `
 const StyledDiv = styled.div`
@@ -36,7 +44,7 @@ const LinkContainer = styled.div`
   width: 100vw;
   text-decoration: none;
   text-align: right;
-  background: black;
+  background: var(--secondary);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Ensures smooth animation */
@@ -45,7 +53,7 @@ const LinkContainer = styled.div`
   transition: transform 0.3s ease-in-out; /* Smooth fold-out animation */
 
   a {
-    height: 20vh;
+    height: 15vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,7 +100,7 @@ const HamburgerButton = styled.button`
   span {
     display: block;
     height: 3px;
-    background-color: black;
+    background-color: var(--primary);
     border-radius: 2px;
     transition: all 0.3s ease;
     position: absolute;
@@ -155,6 +163,13 @@ const MobileNavBar = () => {
           onClick={handleClick}
         >
           Search Movies
+        </StyledMobileLink>
+        <StyledMobileLink
+          to="/directors"
+          className="nav-link"
+          onClick={handleClick}
+        >
+          Directors
         </StyledMobileLink>
         <StyledMobileLink
           to="/about"

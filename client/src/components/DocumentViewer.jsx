@@ -26,7 +26,7 @@ const PDFIframe = styled.iframe`
 `;
 
 const WordDocumentContainer = styled.div`
-  border-radius: 8px;
+  // border-radius: 8px;
   overflow: auto;
   margin-bottom: 10px;
 `;

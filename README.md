@@ -1,9 +1,9 @@
-# Jamie Trapp Movie Articles
+# James Trapp Movie Articles
 [Click to Navigate to Deployed Project](https://jamie-trapp-movie-articles.up.railway.app/)
 
 ## About this project
 
-**Jamie Trapp Movie Articles** is a comprehensive platform for movie reviews, ratings, and film analysis. Users can browse detailed movie reviews, rate films, read in-depth articles about cinema, and discover new movies through an intuitive search interface. 
+**James Trapp Movie Articles** is a comprehensive platform for movie reviews, ratings, and film analysis. Users can browse detailed movie reviews, rate films, read in-depth articles about cinema, and discover new movies through an intuitive search interface. 
 
 ## Demo
 
@@ -64,5 +64,5 @@ See this gif for an example of how the app works.
 
 ## Contributors
 
-**Jamie Trapp**  
+**James Trapp**  
 GitHub: [JTrapp18](https://github.com/jtrapp18)

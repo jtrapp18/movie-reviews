@@ -9,7 +9,7 @@ const StyledMenuItem = css`
   cursor: pointer;
   display: flex;
   align-items: center;
-  color: var(--cinema-black);
+  color: var(--font-color-1);
 `;
 
 const StyledNavigation = css`
@@ -23,7 +23,8 @@ const StyledNavigation = css`
   }
 
   &:hover {
-    color: var(--cinema-maroon);
+    color: var(--font-color-2);
+    font-weight: bold;
   }
 `;
 

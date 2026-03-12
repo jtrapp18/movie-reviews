@@ -6,7 +6,7 @@ import Carousel from './Carousel';
 import Loading from './ui/Loading';
 import { getMovieRatings } from '../helper';
 
-function Movies({ showMovies, enterSearch }) {
+function Movies({ showMovies, enterSearch, cardSize = "default" }) {
   const [ratingsMap, setRatingsMap] = useState({});
 
   useEffect(() => {
@@ -50,13 +50,19 @@ function Movies({ showMovies, enterSearch }) {
           
           return (
             <MotionWrapper key={movie.title} index={index}>
-              <div style={{ 
-                margin: '0',
-                width: '200px',
-                height: '100%',
-                flexShrink: 0
-              }}>
-                <MovieCard movie={movieWithCorrectId} rating={rating} />
+              <div
+                style={{
+                  margin: '0',
+                  width: cardSize === 'small' ? '150px' : '200px',
+                  height: '100%',
+                  flexShrink: 0,
+                }}
+              >
+                <MovieCard
+                  movie={movieWithCorrectId}
+                  rating={rating}
+                  size={cardSize}
+                />
               </div>
             </MotionWrapper>
           );
