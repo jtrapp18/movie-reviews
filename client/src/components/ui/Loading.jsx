@@ -14,14 +14,9 @@ const LoadingContainer = styled.div`
     text-align: center;
     
     & p {
-        color: ${props => {
-            if (props.size === 'small') return '#999';
-            if (props.size === 'large') return 'var(--yellow)';
-            return props.compact ? '#666' : 'var(--yellow)';
-        }};
         font-size: ${props => {
             if (props.size === 'small') return '12px';
-            if (props.size === 'large') return 'clamp(3.5rem, 7vw, 8rem)';
+            if (props.size === 'large') return '20px';
             return props.compact ? '16px' : 'clamp(2.5rem, 5vw, 6rem)';
         }};
         margin: 0;

@@ -6,9 +6,9 @@ import Articles from '../components/Articles';
 import RecentPosts from '../components/RecentPosts';
 import Directors from '../components/Directors';
 import Section from '../components/Section';
-import SearchBar from '../components/SearchBar';
 import SearchResultsHeader from '../components/SearchResultsHeader';
 import Loading from '../components/ui/Loading';
+import SearchPageFrame from '../components/SearchPageFrame';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { generateWebsiteStructuredData } from '../utils/seoUtils';
@@ -149,67 +149,72 @@ function Home() {
         structuredData={structuredData}
       />
       <StyledContainer>
-        {/* Single search bar at the top */}
-        <SearchBar 
-          enterSearch={unifiedSearch}
-          placeholder="Search movies, reviews, articles, and tags..."
-        />
-        
-        {/* Search results header */}
-        {searchQuery && (
-          <SearchResultsHeader
-            searchQuery={searchQuery}
-            movieCount={showMovies.length}
-            articleCount={showArticles.length}
-            isLoading={isSearching}
-            showNoResults={!isSearching && showMovies.length === 0 && showArticles.length === 0}
-          />
-        )}
-        
-        {/* Loading indicator */}
-        {isSearching && !searchQuery && (
-          <Loading text="Searching" compact={true} />
-        )}
+        <SearchPageFrame
+          title={null}
+          subtitle={null}
+          searchPlaceholder="Search movies, reviews, articles, and tags..."
+          onSearch={unifiedSearch}
+          isLoading={isSearching}
+          loadingText="Searching"
+          showHeader={false}
+        >
+          <>
+            {/* Search results header */}
+            {searchQuery && (
+              <SearchResultsHeader
+                searchQuery={searchQuery}
+                movieCount={showMovies.length}
+                articleCount={showArticles.length}
+                isLoading={isSearching}
+                showNoResults={
+                  !isSearching &&
+                  showMovies.length === 0 &&
+                  showArticles.length === 0
+                }
+              />
+            )}
 
-        <Section
-          title="Recent Posts"
-          subtitle={searchQuery ? "" : "Latest movie reviews and articles"}
-          showSearch={false}
-        >
-          <RecentPosts posts={recentPosts} />
-        </Section>
+            <Section
+              title="Recent Posts"
+              subtitle={searchQuery ? '' : 'Latest movie reviews and articles'}
+              showSearch={false}
+            >
+              <RecentPosts posts={recentPosts} />
+            </Section>
 
-        <hr />
+            <hr />
 
-        <Section
-          title="Directors"
-          subtitle={searchQuery ? "" : "Explore directors in the collection"}
-          showSearch={false}
-        >
-          <Directors directors={showDirectors} />
-        </Section>
-        
-        <Section
-          title={searchQuery ? "Movies" : "Movie Reviews"}
-          subtitle={searchQuery ? "" : "Click movie to view review"}
-          showSearch={false}
-        >
-          <Movies
-            showMovies={showMovies}
-            enterSearch={unifiedSearch}
-          />
-        </Section>
-        
-        <Section
-          title={searchQuery ? "Articles" : "Articles"}
-          subtitle={searchQuery ? "" : "Browse theme-based articles and essays"}
-          showSearch={false}
-        >
-          <Articles
-            showArticles={showArticles}
-            enterSearch={unifiedSearch}
-          />
-        </Section>
+            <Section
+              title="Directors"
+              subtitle={searchQuery ? '' : 'Explore directors in the collection'}
+              showSearch={false}
+            >
+              <Directors directors={showDirectors} />
+            </Section>
+            
+            <Section
+              title={searchQuery ? 'Movies' : 'Movie Reviews'}
+              subtitle={searchQuery ? '' : 'Click movie to view review'}
+              showSearch={false}
+            >
+              <Movies
+                showMovies={showMovies}
+                enterSearch={unifiedSearch}
+              />
+            </Section>
+            
+            <Section
+              title={searchQuery ? 'Articles' : 'Articles'}
+              subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
+              showSearch={false}
+            >
+              <Articles
+                showArticles={showArticles}
+                enterSearch={unifiedSearch}
+              />
+            </Section>
+          </>
+        </SearchPageFrame>
       </StyledContainer>
     </>
   );

@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { StyledContainer, Button } from '../styles';
 import { getJSON } from '../helper';
-import Loading from '../components/ui/Loading';
 import DirectorCard from '../cards/DirectorCard';
 import Movies from '../components/Movies';
-import SearchBar from '../components/SearchBar';
+import SearchPageFrame from '../components/SearchPageFrame';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -156,14 +155,6 @@ function DirectorsPage() {
     );
   }, [directors, searchQuery, letterFilter]);
 
-  if (loading) {
-    return (
-      <StyledContainer>
-        <Loading text="Loading directors" compact={true} />
-      </StyledContainer>
-    );
-  }
-
   if (error) {
     return (
       <StyledContainer>
@@ -173,17 +164,14 @@ function DirectorsPage() {
   }
 
   return (
-    <StyledContainer>
-      <PageHeader>
-        <Title>Director Highlights</Title>
-        <Intro>A movie is only as good as its director.</Intro>
-      </PageHeader>
-
-      <SearchBar
-        enterSearch={(value) => setSearchQuery(value)}
-        placeholder="Search directors by name or bio..."
-      />
-
+    <SearchPageFrame
+      title="Director Highlights"
+      subtitle="A movie is only as good as its director."
+      searchPlaceholder="Search directors by name or bio..."
+      onSearch={(value) => setSearchQuery(value)}
+      isLoading={loading}
+      loadingText="Loading directors"
+    >
       <Layout>
         <AZColumn>
           <strong>A–Z</strong>
@@ -273,7 +261,7 @@ function DirectorsPage() {
           )}
         </AccordionContainer>
       </Layout>
-    </StyledContainer>
+    </SearchPageFrame>
   );
 }
 
