@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
@@ -33,6 +33,12 @@ class Review(db.Model, SerializerMixin):
     movie = db.relationship('Movie', back_populates='reviews')
     director = db.relationship('Director', back_populates='reviews')
     tags = db.relationship('Tag', secondary=review_tags, back_populates='reviews')
+    comments = db.relationship(
+        'ReviewComment',
+        back_populates='review',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
     serialize_rules = ('-movie.reviews', '-tags.reviews', '-director.reviews')
 
@@ -74,5 +80,4 @@ class Review(db.Model, SerializerMixin):
     def short_text(self):
         """Returns the first 100 characters of the review text (with ellipsis if truncated)."""
         return self.review_text[:100] + "..." if len(self.review_text) > 100 else self.review_text
-
 # Indexes are handled through database migrations
