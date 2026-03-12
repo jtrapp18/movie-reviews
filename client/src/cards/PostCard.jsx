@@ -37,10 +37,12 @@ const StyledCard = styled.article`
 
 `;
 
+const DEFAULT_POST_IMAGE = "/images/default-article.jpeg";
+
 function PostCard({ photo, title, description, date, onClick }) {
   return (
     <StyledCard onClick={onClick}>
-      {photo && <img src={photo} alt={title} />}
+      <img src={photo || DEFAULT_POST_IMAGE} alt={title} />
       <div className="content">
         <h2>{title}</h2>
         {date && <small>{date}</small>}
