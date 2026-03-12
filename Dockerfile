@@ -17,6 +17,10 @@ RUN apt-get update && apt-get install -y \
     curl \
     && apt-get clean
 
+# Environment configuration
+ENV FLASK_ENV=production
+ENV PORT=8000
+
 # Set working directory
 WORKDIR /app
 
@@ -31,5 +35,5 @@ COPY --from=frontend-build /app/client/dist ./client/dist
 COPY server ./server
 
 # Expose the port and set the command to start Gunicorn
-EXPOSE $PORT
-CMD ["sh", "-c", "gunicorn --chdir server --log-level debug -b 0.0.0.0:$PORT app:app"]
+EXPOSE ${PORT}
+CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
