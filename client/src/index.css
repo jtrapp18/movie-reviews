@@ -121,7 +121,7 @@ p {
   --border: var(--cinema-gray-light);
   --primary: var(--cinema-gold);
   --secondary: var(--cinema-gold-dark);
-  --font-color-1: var(--soft-white);
+  --font-color-1: var(--cinema-gold-dark);
   --font-color-2: var(--soft-white);
 
   --rich-text-background: var(--cinema-gray-dark);
@@ -287,11 +287,11 @@ h1 {
   font-weight: bold;
 }
 
-h1 {
+h1, h2 {
   color: var(--font-color-1);
 }
 
-h2, h3 {
+h3, small {
   /* color: var(--cinema-gold); */
   color: var(--font-color-2);
 }
