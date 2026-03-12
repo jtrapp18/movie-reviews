@@ -93,6 +93,48 @@ p {
   --default-font: 'Rubik';
 }
 
+:root[data-theme='light'] {
+  --background: var(--light-gray);
+  --background-secondary: var(--soft-white);
+  --background-tertiary: var(--gray);
+  --border: var(--navy-blue);
+  --primary: var(--blue);
+  --secondary: var(--navy-blue);
+  --font-color-1: var(--primary);
+  --font-color-2: var(--secondary);
+
+  --rich-text-background: var(--background-secondary);
+  --rich-text-primary: var(--font-color-2);
+  --rich-text-header: var(--font-color-1);
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15);
+  --rich-text-code-border: rgba(255, 215, 0, 0.3);
+  --rich-text-blockquote-bg: var(--cinema-gray-dark);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.2);
+}
+
+:root[data-theme='dark'] {
+  --background: var(--cinema-black);
+  --background-secondary: var(--cinema-gray-dark);
+  --background-tertiary: var(--cinema-gray);
+  --border: var(--cinema-gray-light);
+  --primary: var(--cinema-gold);
+  --secondary: var(--cinema-gold-dark);
+  --font-color-1: var(--soft-white);
+  --font-color-2: var(--soft-white);
+
+  --rich-text-background: var(--cinema-gray-dark);
+  --rich-text-primary: var(--soft-white);
+  --rich-text-header: var(--cinema-gold);
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15);
+  --rich-text-code-border: rgba(255, 215, 0, 0.4);
+  --rich-text-blockquote-bg: var(--cinema-black);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.3);
+}
+
 #root {
   overflow-x: hidden;
   overflow-y: auto;

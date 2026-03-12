@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import NavBar from "./NavBar"
 import MobileNavBar from './MobileNavBar';
 import {WindowWidthContext} from "../context/windowSize";
@@ -15,18 +15,25 @@ const StyledHeader = styled.div`
   margin: 0;
   display: flex;
   justify-content: space-between;
-  background: white;
+  background: var(--background-secondary);
   padding: 1.5% 5% 0.5%;
   align-items: end;
   position: relative;
-`
+`;
 
 const LeftSection = styled.div`
   display: flex;
   align-items: end;
   gap: 1rem;
   z-index: 1;
-`
+`;
+
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1;
+`;
 
 const HeaderTitle = styled.div`
   display: flex;
@@ -85,7 +92,9 @@ const Header = () => {
                 <div className="subtitle">Film Criticism & Analysis</div>
               </HeaderTitle>
             </LeftSection>
-            {isMobile ? <MobileNavBar /> : <NavBar />}
+            <RightSection>
+              {isMobile ? <MobileNavBar /> : <NavBar />}
+            </RightSection>
           </StyledHeader>
         </Headroom>
     );

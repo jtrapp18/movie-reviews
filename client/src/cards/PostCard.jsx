@@ -15,7 +15,8 @@ const StyledCard = styled.article`
 
   img {
     width: 100%;
-    max-height: 300px;
+    height: 300px;
+    max-height: 80vh;
     object-fit: cover;
     border-radius: 4px 4px 0 0;
     flex-shrink: 0;

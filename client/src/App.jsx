@@ -7,6 +7,7 @@ import { UserContext } from './context/userProvider';
 import { WindowWidthContext } from './context/windowSize'
 import Loading from './components/ui/Loading';
 import { StyledMain } from './styles';
+import ThemeToggle from './components/ThemeToggle';
 
 function App() {
 
@@ -61,6 +62,7 @@ function App() {
         </Suspense>
       </StyledMain>
       <Footer />
+      <ThemeToggle />
     </div>
   );
 }
