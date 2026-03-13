@@ -25,7 +25,10 @@ const CarouselStyles = styled.div`
   
   /* Dots styling */
   .slick-dots {
-    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
   
   .slick-dots li {
@@ -38,13 +41,13 @@ const CarouselStyles = styled.div`
   }
   
   .slick-dots li button:before {
-    color: var(--cinema-gold);
+    color: var(--primary);
     opacity: 0.5;
   }
   
   .slick-dots li.slick-active button:before {
     opacity: 1;
-    color: var(--cinema-gold);
+    color: var(--primary);
   }
 `;
 

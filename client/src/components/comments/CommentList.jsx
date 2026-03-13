@@ -1,10 +1,12 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { snakeToCamel } from '../../helper';
 import { UserContext } from '../../context/userProvider';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
 import Loading from '../ui/Loading';
+
+const COMMENT_PAGE_SIZE = 5;
 
 const Section = styled.section`
   margin-top: 2rem;
@@ -29,6 +31,26 @@ const Empty = styled.p`
   color: var(--font-color-2);
   font-size: 0.95rem;
   margin-bottom: 1rem;
+`;
+
+const LoadMore = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--cinema-gold);
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--cinema-gold-dark);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 `;
 
 /** Build a tree from flat list: { id -> comment } then attach replies. */
@@ -58,34 +80,64 @@ function buildCommentTree(flatList) {
 
 function CommentList({ reviewId }) {
   const { user } = useContext(UserContext);
-  const [comments, setComments] = useState([]);
+  const [flatComments, setFlatComments] = useState([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchComments = async () => {
-    if (!reviewId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/reviews/${reviewId}/comments`);
-      if (!res.ok) {
+  const fetchPage = useCallback(
+    async (offset, append = false) => {
+      if (!reviewId) return;
+      if (!append) setLoading(true);
+      else setLoadingMore(true);
+      setError(null);
+      try {
+        const res = await fetch(
+          `/api/reviews/${reviewId}/comments?limit=${COMMENT_PAGE_SIZE}&offset=${offset}`
+        );
+        if (!res.ok) {
+          setError('Failed to load comments');
+          return;
+        }
+        const data = await res.json();
+        const camel = snakeToCamel(data);
+        const nextFlat = camel.comments || [];
+        const nextTotal = camel.total ?? 0;
+        if (append) {
+          setFlatComments((prev) => [...nextFlat, ...prev]);
+        } else {
+          setFlatComments(nextFlat);
+        }
+        setTotal(nextTotal);
+      } catch (err) {
+        console.error(err);
         setError('Failed to load comments');
-        return;
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
       }
-      const data = await res.json();
-      const camel = snakeToCamel(data);
-      setComments(buildCommentTree(camel));
-    } catch (err) {
-      console.error(err);
-      setError('Failed to load comments');
-    } finally {
-      setLoading(false);
-    }
+    },
+    [reviewId]
+  );
+
+  const fetchComments = useCallback(() => {
+    fetchPage(0, false);
+  }, [fetchPage]);
+
+  const loadMore = () => {
+    const topLevelLoaded = flatComments.filter((c) => c.parentCommentId == null).length;
+    if (topLevelLoaded >= total) return;
+    fetchPage(topLevelLoaded, true);
   };
 
   useEffect(() => {
-    fetchComments();
-  }, [reviewId]);
+    fetchPage(0, false);
+  }, [fetchPage]);
+
+  const tree = buildCommentTree(flatComments);
+  const topLevelLoaded = flatComments.filter((c) => c.parentCommentId == null).length;
+  const hasMore = total > topLevelLoaded;
 
   if (!reviewId) return null;
 
@@ -94,28 +146,39 @@ function CommentList({ reviewId }) {
       <Title>Comments</Title>
       {loading && <Loading text="Loading comments" size="small" />}
       {error && <Empty>{error}</Empty>}
-      {!loading && !error && comments.length === 0 && !user && (
-        <Empty>No comments yet. Log in to leave the first comment.</Empty>
-      )}
-      {!loading && !error && comments.length === 0 && user && (
-        <Empty>No comments yet. Be the first to comment.</Empty>
-      )}
-      {!loading && !error && user && (
-        <CommentForm reviewId={reviewId} onSuccess={fetchComments} />
-      )}
-      {!loading && !error && !user && (
-        <LoginPrompt>Log in to comment.</LoginPrompt>
-      )}
-      {!loading && !error && comments.length > 0 && (
+      {!loading && !error && (
         <>
-          {comments.map((comment) => (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              reviewId={reviewId}
-              onReplySuccess={fetchComments}
-            />
-          ))}
+          {hasMore && tree.length > 0 && (
+            <LoadMore type="button" onClick={loadMore} disabled={loadingMore}>
+              {loadingMore
+                ? 'Loading…'
+                : `View ${total - topLevelLoaded} earlier comment${total - topLevelLoaded !== 1 ? 's' : ''}`}
+            </LoadMore>
+          )}
+          {tree.length === 0 && !user && (
+            <Empty>No comments yet. Log in to leave the first comment.</Empty>
+          )}
+          {tree.length === 0 && user && (
+            <Empty>No comments yet. Be the first to comment.</Empty>
+          )}
+          {tree.length > 0 && (
+            <>
+              {tree.map((comment) => (
+                <Comment
+                  key={comment.id}
+                  comment={comment}
+                  reviewId={reviewId}
+                  onReplySuccess={fetchComments}
+                />
+              ))}
+            </>
+          )}
+          {!user && tree.length > 0 && (
+            <LoginPrompt>Log in to comment.</LoginPrompt>
+          )}
+          {user && (
+            <CommentForm reviewId={reviewId} onSuccess={fetchComments} />
+          )}
         </>
       )}
     </Section>

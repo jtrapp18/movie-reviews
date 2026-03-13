@@ -6,19 +6,48 @@ from lib.models import Review, ReviewComment
 
 
 class ReviewComments(Resource):
-    """GET all comments for a review; POST a new comment (requires session)."""
+    """GET comments for a review (paginated by top-level). POST a new comment (requires session)."""
 
     def get(self, review_id):
         review = Review.query.get(review_id)
         if not review:
             return {"error": "Review not found"}, 404
+        limit = min(int(request.args.get("limit", 5)), 50)
+        offset = max(int(request.args.get("offset", 0)), 0)
+        # Total = count of top-level comments only
+        total = ReviewComment.query.filter_by(
+            review_id=review_id, parent_comment_id=None
+        ).count()
+        # Page of top-level comments (newest first)
+        top_level = (
+            ReviewComment.query.filter_by(
+                review_id=review_id, parent_comment_id=None
+            )
+            .order_by(ReviewComment.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+        top_level_ids = [c.id for c in top_level]
+        if not top_level_ids:
+            return {"comments": [], "total": total}, 200
+        # All comments in this page: top-level + their replies
         comments = (
-            ReviewComment.query.filter_by(review_id=review_id)
+            ReviewComment.query.filter(
+                ReviewComment.review_id == review_id,
+                (
+                    (ReviewComment.id.in_(top_level_ids))
+                    | (ReviewComment.parent_comment_id.in_(top_level_ids))
+                ),
+            )
             .options(joinedload(ReviewComment.user))
             .order_by(ReviewComment.created_at)
             .all()
         )
-        return [c.to_dict() for c in comments], 200
+        return {
+            "comments": [c.to_dict() for c in comments],
+            "total": total,
+        }, 200
 
     def post(self, review_id):
         user_id = session.get("user_id")

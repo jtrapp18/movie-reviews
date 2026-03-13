@@ -41,7 +41,7 @@ const ReplyToggle = styled.button`
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  color: var(--cinema-gold);
+  // color: var(--cinema-gold);
   padding: 0;
 
   &:hover {
