@@ -3,9 +3,10 @@ import { snakeToCamel, postJSONToDb } from '../helper';
 import styled from "styled-components";
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
-import * as yup from 'yup';  // Import yup
+import * as yup from 'yup';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
+import { useTheme } from "../context/themeProvider";
 
 const validationSchema = yup.object({
   firstName: yup.string().required('First Name is required'),
@@ -34,6 +35,7 @@ const validationSchema = yup.object({
 
 function SignUpForm({ setShowConfirm }) {
   const { setUser } = useContext(UserContext);
+  const { setTheme } = useTheme();
 
   const formik = useFormik({
     initialValues: {
@@ -58,8 +60,12 @@ function SignUpForm({ setShowConfirm }) {
       try {
         const newUser = await postJSONToDb("account_signup", body);
         if (newUser) {
-            setUser(newUser);
-            setShowConfirm(true);
+          const userTransformed = snakeToCamel(newUser);
+          setUser(userTransformed);
+          if (typeof userTransformed.darkMode === 'boolean') {
+            setTheme(userTransformed.darkMode ? 'dark' : 'light');
+          }
+          setShowConfirm(true);
         }
       } catch (error) {
           const errors = {};
@@ -78,34 +84,6 @@ function SignUpForm({ setShowConfirm }) {
 
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
-      <h1>Sign Up</h1>
-      <div>
-        <label htmlFor="firstName">First Name</label>
-        <input
-          type="text"
-          id="firstName"
-          name="firstName"
-          autoComplete="off"
-          value={formik.values.firstName}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-        {formik.touched.firstName && formik.errors.firstName ? (
-          <Error>{formik.errors.firstName}</Error>
-        ) : null}
-      </div>
-      <div>
-        <label htmlFor="lastName">Last Name</label>
-        <input
-          type="text"
-          id="lastName"
-          name="lastName"
-          autoComplete="off"
-          value={formik.values.lastName}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-      </div>
       <div>
         <label htmlFor="username">Username</label>
         <input
@@ -130,6 +108,7 @@ function SignUpForm({ setShowConfirm }) {
           value={formik.values.email}
           onChange={formik.handleChange}
           autoComplete="off"
+          placeholder="you@example.com"
         />
         {formik.touched.email && formik.errors.email ? (
           <Error>{formik.errors.email}</Error>
