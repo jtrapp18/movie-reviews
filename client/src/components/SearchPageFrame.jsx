@@ -59,9 +59,7 @@ function SearchPageFrame({
       <SearchBar enterSearch={onSearch} placeholder={searchPlaceholder} />
 
       {isLoading ? (
-        <ContentWrapper>
-          <Loading text={loadingText} size="large" />
-        </ContentWrapper>
+        <Loading text={loadingText} size="large" />
       ) : (
         <ContentWrapper>{children}</ContentWrapper>
       )}

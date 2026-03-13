@@ -11,9 +11,13 @@ import 'slick-carousel/slick/slick-theme.css';
 
 
 function Articles() {
-  const { articles, setArticles } = useOutletContext();
-  const [filteredArticles, setFilteredArticles] = useState([]);
+  const { articles, setArticles, coreDataLoaded } = useOutletContext();
+  const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    setFilteredArticles(articles ?? []);
+  }, [articles]);
 
   // Slick carousel settings
   const settings = {
@@ -53,10 +57,6 @@ function Articles() {
     }
   };
 
-  useEffect(() => {
-    fetchArticles();
-  }, []);
-
   const handleSearch = async (searchText) => {
     if (!searchText.trim()) {
       setFilteredArticles(articles);
@@ -66,15 +66,15 @@ function Articles() {
     }
   };
 
-  // Handle null or undefined articles
-  if (!filteredArticles || !Array.isArray(filteredArticles)) {
+  const isLoading = !coreDataLoaded && (!articles || articles.length === 0);
+  if (!filteredArticles || !Array.isArray(filteredArticles) || isLoading) {
     return (
       <PageContainer fullHeight>
         <MotionWrapper index={1}>
           <h1>Articles</h1>
         </MotionWrapper>
         <MotionWrapper index={2}>
-          <h3>Loading articles...</h3>
+          <h3>{isLoading ? 'Loading articles...' : 'No articles yet.'}</h3>
         </MotionWrapper>
       </PageContainer>
     );

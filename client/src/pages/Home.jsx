@@ -1,4 +1,4 @@
-import { getJSON, getMovieInfo, snakeToCamel } from '../helper';
+import { getJSON, snakeToCamel } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Movies from '../components/Movies';
@@ -26,81 +26,26 @@ const StyledContainer = styled.div`
 
 
 function Home() {
-  const { movies } = useOutletContext();
+  const { movies, articles, posts, directors } = useOutletContext();
   const navigate = useNavigate();
-  
+
   const [showMovies, setShowMovies] = useState([]);
-  const [articles, setArticles] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [recentPosts, setRecentPosts] = useState([]);
-  const [directors, setDirectors] = useState([]);
   const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
-    setShowMovies(movies);
+    setShowMovies(movies ?? []);
   }, [movies]);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const data = await getJSON('articles');
-        setArticles(data);
-        setShowArticles(data);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-        setArticles([]);
-        setShowArticles([]);
-      }
-    };
-    
-    fetchArticles();
-  }, []);
+    setShowArticles(articles ?? []);
+  }, [articles]);
 
   useEffect(() => {
-    const fetchRecentPosts = async () => {
-      try {
-        const data = await getJSON('reviews');
-        if (Array.isArray(data)) {
-          const sorted = [...data].sort(
-            (a, b) =>
-              new Date(b.dateAdded || b.date_added || 0) -
-              new Date(a.dateAdded || a.date_added || 0)
-          );
-          setRecentPosts(sorted);
-        } else {
-          setRecentPosts([]);
-        }
-      } catch (error) {
-        console.error('Error fetching recent posts:', error);
-        setRecentPosts([]);
-      }
-    };
-
-    fetchRecentPosts();
-  }, []);
-
-  useEffect(() => {
-    const fetchDirectors = async () => {
-      try {
-        const data = await getJSON('directors');
-        if (Array.isArray(data)) {
-          setDirectors(data);
-          setShowDirectors(data);
-        } else {
-          setDirectors([]);
-          setShowDirectors([]);
-        }
-      } catch (error) {
-        console.error('Error fetching directors:', error);
-        setDirectors([]);
-        setShowDirectors([]);
-      }
-    };
-
-    fetchDirectors();
-  }, []);
+    setShowDirectors(directors ?? []);
+  }, [directors]);
 
   const unifiedSearch = async (text) => {
     if (!text.trim()) {
@@ -179,7 +124,7 @@ function Home() {
               subtitle={searchQuery ? '' : 'Latest movie reviews and articles'}
               showSearch={false}
             >
-              <RecentPosts posts={recentPosts} />
+              <RecentPosts posts={posts} />
             </Section>
 
             <hr />

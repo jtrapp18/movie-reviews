@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StyledContainer, Button } from '../styles';
-import { getJSON } from '../helper';
 import DirectorCard from '../cards/DirectorCard';
 import Movies from '../components/Movies';
 import SearchPageFrame from '../components/SearchPageFrame';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
 const PageHeader = styled.div`
   width: 100%;
@@ -113,30 +112,12 @@ const AccordionBody = styled.div`
 `;
 
 function DirectorsPage() {
-  const [directors, setDirectors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { directors = [], coreDataLoaded } = useOutletContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
   const [letterFilter, setLetterFilter] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchDirectors = async () => {
-      try {
-        setLoading(true);
-        const data = await getJSON('directors');
-        setDirectors(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error('Error fetching directors:', err);
-        setError('Failed to load directors');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDirectors();
-  }, []);
+  const loading = !coreDataLoaded;
 
   const filteredDirectors = useMemo(() => {
     let list = directors;
@@ -154,14 +135,6 @@ function DirectorsPage() {
       (d.biography || '').toLowerCase().includes(q)
     );
   }, [directors, searchQuery, letterFilter]);
-
-  if (error) {
-    return (
-      <StyledContainer>
-        <h1>Error: {error}</h1>
-      </StyledContainer>
-    );
-  }
 
   return (
     <SearchPageFrame
