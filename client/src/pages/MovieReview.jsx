@@ -5,6 +5,7 @@ import { StyledContainer } from '../styles';
 import CoverHeader from '../components/CoverHeader';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
+import CommentList from '../components/comments/CommentList';
 import SEOHead from '../components/SEOHead';
 import Loading from '../components/ui/Loading';
 import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
@@ -102,6 +103,7 @@ function MovieReview() {
         </MovieContainer>
         
         <ReviewForm initObj={review} />
+        {review && <CommentList reviewId={review.id} />}
       </StyledContainer>
     </>
   );

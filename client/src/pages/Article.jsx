@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
+import CommentList from '../components/comments/CommentList';
 import SEOHead from '../components/SEOHead';
 import CoverHeader from '../components/CoverHeader';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
@@ -121,6 +122,7 @@ function Article() {
           publishDate={article.dateAdded || article.date_added}
         />
         <ArticleForm initObj={article} />
+        <CommentList reviewId={article.id} />
       </StyledContainer>
     </>
   );
