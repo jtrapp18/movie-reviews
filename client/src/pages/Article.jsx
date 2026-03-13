@@ -64,7 +64,7 @@ function Article() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading article" size="medium" />
+        <Loading text="Loading article" size="large" />
       </StyledContainer>
     );
   }
