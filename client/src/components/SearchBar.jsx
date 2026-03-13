@@ -26,7 +26,7 @@ const SearchContainer = styled.div`
         // border-bottom: ${props => props.$isExpanded ? '2px solid var(--border)' : '1px solid var(--border)'};
         padding: 16px 20px;
         padding-right: 50px;
-        color: white;
+        // color: white;
         background: var(--background-secondary);
         backdrop-filter: blur(10px);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);

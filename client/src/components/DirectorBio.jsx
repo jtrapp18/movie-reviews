@@ -66,16 +66,18 @@ const BioContainer = styled.div`
   width: 100%;
 `;
 
+const DIRECTOR_CREW_FALLBACK = "/images/crew.jpeg";
+
 function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
-  const { id, name, coverPhoto, backdrop, biography } = director;
+  const { id, name, backdrop, biography } = director;
   const imageSrc = backdrop
     ? `/api/directors/${id}/backdrop/view?v=${encodeURIComponent(backdrop)}`
-    : coverPhoto;
+    : DIRECTOR_CREW_FALLBACK;
 
 
   return (
     <BioContainer>
-      <Image src={imageSrc} />
+      <Image src={imageSrc} alt={`Backdrop for ${name}`} />
       <InfoShell>
         <Info>
           <NameBlock>

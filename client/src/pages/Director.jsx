@@ -67,7 +67,7 @@ function Director() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading director" compact={true} />
+        <Loading text="Loading director" size="large" />
       </StyledContainer>
     );
   }

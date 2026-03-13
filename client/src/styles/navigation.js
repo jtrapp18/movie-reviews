@@ -18,7 +18,7 @@ const StyledNavigation = css`
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;
-    color: black;
+    // color: var(--font-color-2);
     font-weight: bold;
   }
 

@@ -9,6 +9,8 @@ import { generateArticleStructuredData, generateBreadcrumbStructuredData } from 
 import Loading from '../components/ui/Loading';
 import { StyledContainer } from '../styles';
 
+const DEFAULT_ARTICLE_BACKDROP = "/images/default-article.jpeg";
+
 const LoadingMessage = styled.div`
   text-align: center;
   padding: 50px;
@@ -62,7 +64,7 @@ function Article() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading article" size="medium" />
+        <Loading text="Loading article" size="large" />
       </StyledContainer>
     );
   }
@@ -93,6 +95,13 @@ function Article() {
     { name: article.title, url: window.location.href }
   ]);
 
+  const coverImageUrl =
+    article.backdrop
+      ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
+          article.backdrop
+        )}`
+      : DEFAULT_ARTICLE_BACKDROP;
+
   return (
     <>
       <SEOHead
@@ -105,13 +114,7 @@ function Article() {
       />
       <StyledContainer>
         <CoverHeader
-          imageUrl={
-            article.backdrop
-              ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
-                  article.backdrop
-                )}`
-              : null
-          }
+          imageUrl={coverImageUrl}
           title={article.movie?.title || article.title}
           subtitle={article.movie?.title ? article.title : undefined}
           rating={article.rating}

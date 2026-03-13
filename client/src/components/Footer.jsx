@@ -36,7 +36,7 @@ const StyledFooter = styled.footer`
         }
 
         p {
-            color: var(--background);
+            color: var(--light-gray);
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             margin: 5px 0;
@@ -45,7 +45,7 @@ const StyledFooter = styled.footer`
         }
 
         p:first-of-type {
-            color: var(--background-secondary);
+            color: var(--soft-white);
         }
 
         p:nth-of-type(2) {
@@ -58,14 +58,13 @@ const StyledFooter = styled.footer`
         }
 
         a {
-            color: var(--background);
+            color: var(--light-gray);
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: 600;
             
             &:hover {
-                color: var(--background-tertiary);
-                // text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+                color: var(--soft-white);
             }
         }
     }

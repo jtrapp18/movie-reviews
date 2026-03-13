@@ -24,9 +24,14 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False, unique=True)
     zipcode = db.Column(db.String, nullable=False)
 
-    # No relationships defined yet
+    review_comments = db.relationship(
+        'ReviewComment',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-_password_hash',)
+    serialize_rules = ('-_password_hash', '-review_comments.user')
     
     @hybrid_property
     def password_hash(self):

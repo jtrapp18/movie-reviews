@@ -15,7 +15,8 @@ const StyledCard = styled.article`
 
   img {
     width: 100%;
-    max-height: 300px;
+    height: 300px;
+    max-height: 80vh;
     object-fit: cover;
     border-radius: 4px 4px 0 0;
     flex-shrink: 0;
@@ -37,10 +38,12 @@ const StyledCard = styled.article`
 
 `;
 
+const DEFAULT_POST_IMAGE = "/images/default-article.jpeg";
+
 function PostCard({ photo, title, description, date, onClick }) {
   return (
     <StyledCard onClick={onClick}>
-      {photo && <img src={photo} alt={title} />}
+      <img src={photo || DEFAULT_POST_IMAGE} alt={title} />
       <div className="content">
         <h2>{title}</h2>
         {date && <small>{date}</small>}

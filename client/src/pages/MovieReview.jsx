@@ -43,7 +43,7 @@ function MovieReview() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading movie details" compact={true} />
+        <Loading text="Loading movie details" size='large' />
       </StyledContainer>
     );
   }
@@ -85,7 +85,7 @@ function MovieReview() {
         title={seoTitle}
         description={seoDescription}
         keywords={`${movie.title}, movie review, ${movie.originalLanguage}, ${movie.releaseDate}, film analysis`}
-        image={movie.coverPhoto}
+        image={movie.backdrop ?? undefined}
         url={`/#/movies/${movie.id}`}
         type="article"
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
@@ -93,7 +93,7 @@ function MovieReview() {
       <StyledContainer>
         <MovieContainer>
           <CoverHeader
-            imageUrl={movie.coverPhoto}
+            imageUrl={movie.backdrop ?? null}
             title={movie.title}
             subtitle={review?.title}
             rating={review?.rating}
