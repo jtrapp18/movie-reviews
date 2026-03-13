@@ -5,11 +5,13 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
+import { useTheme } from "../context/themeProvider";
 
 function LoginForm() {
 
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { setTheme } = useTheme();
 
   const formik = useFormik({
     initialValues: {
@@ -24,6 +26,9 @@ function LoginForm() {
         const userTransformed = snakeToCamel(user);
         console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
+        if (typeof userTransformed.darkMode === 'boolean') {
+          setTheme(userTransformed.darkMode ? 'dark' : 'light');
+        }
         // Navigate to home page after successful login
         navigate('/');
       } catch (error) {

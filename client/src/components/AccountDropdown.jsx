@@ -86,6 +86,15 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
         onMouseOut={()=>setIsMenuOpen(false)}
         className={isMenuOpen ? "open" : "closed"}
       >
+        {user && (
+          <StyledNavLink
+            to="/account"
+            className="nav-link"
+            onClick={handleClick}
+          >
+            Account
+          </StyledNavLink>
+        )}
         <StyledNavLink
             as="button"
             className="nav-link"

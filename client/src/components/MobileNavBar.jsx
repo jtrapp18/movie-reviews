@@ -174,6 +174,15 @@ const MobileNavBar = () => {
         >
           About
         </StyledMobileLink>
+        {user && (
+          <StyledMobileLink
+            to="/account"
+            className="nav-link"
+            onClick={handleClick}
+          >
+            Account
+          </StyledMobileLink>
+        )}
         <StyledMobileMenu
           to="/"
           className="nav-link"

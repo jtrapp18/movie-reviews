@@ -12,6 +12,7 @@ import Article from './pages/Article';
 import NewArticle from './pages/NewArticle';
 import Director from './pages/Director';
 import DirectorsPage from './pages/DirectorsPage';
+import Account from './pages/Account';
 
 const routes = [
   {
@@ -62,6 +63,10 @@ const routes = [
       {
         path: "articles/new",
         element: <NewArticle />,
+      },
+      {
+        path: "account",
+        element: <Account />,
       },
     ],
   },
