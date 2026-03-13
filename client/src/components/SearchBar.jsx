@@ -21,12 +21,13 @@ const SearchContainer = styled.div`
         width: 100%;
         border-radius: 12px;
         font-size: 18px;
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-bottom: ${props => props.$isExpanded ? '2px solid var(--cinema-gold)' : '2px solid rgba(255, 255, 255, 0.2)'};
+        // border: 2px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid var(--border);
+        // border-bottom: ${props => props.$isExpanded ? '2px solid var(--border)' : '1px solid var(--border)'};
         padding: 16px 20px;
         padding-right: 50px;
-        color: white;
-        background: rgba(0, 0, 0, 0.3);
+        // color: white;
+        background: var(--background-secondary);
         backdrop-filter: blur(10px);
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         outline: none;
@@ -35,7 +36,7 @@ const SearchContainer = styled.div`
         box-shadow: ${props => props.$isExpanded ? '0 2px 8px rgba(255, 215, 0, 0.15)' : 'none'};
 
         &::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--secondary);
             font-size: 18px;
             font-weight: 400;
         }
@@ -49,15 +50,15 @@ const SearchContainer = styled.div`
         }
 
         &:focus {
-            border-color: var(--cinema-gold);
-            border-bottom: 2px solid var(--cinema-gold);
-            background: rgba(0, 0, 0, 0.5);
+            border-color: var(--border);
+            border-bottom: 2px solid var(--border);
+            // background: rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2), ${props => props.$isExpanded ? '0 2px 8px rgba(255, 215, 0, 0.15)' : 'none'};
         }
 
         &:hover {
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.4);
+            color: var(--font-color-2);
+            background: var(--background-tertiary);
         }
     }
 
@@ -67,7 +68,7 @@ const SearchContainer = styled.div`
         top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
-        color: rgba(255, 255, 255, 0.7);
+        // color: rgba(255, 255, 255, 0.7);
         font-size: 16px;
         transition: all 0.2s ease;
         padding: 4px;
@@ -79,8 +80,8 @@ const SearchContainer = styled.div`
         height: 24px;
 
         &:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
+            color: var(--font-color-2);
+            background: var(--background-tertiary);
         }
     }
 

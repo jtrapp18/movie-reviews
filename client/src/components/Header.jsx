@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, { useContext } from 'react';
 import NavBar from "./NavBar"
 import MobileNavBar from './MobileNavBar';
 import {WindowWidthContext} from "../context/windowSize";
@@ -15,18 +15,25 @@ const StyledHeader = styled.div`
   margin: 0;
   display: flex;
   justify-content: space-between;
-  background: white;
+  background: var(--background-secondary);
   padding: 1.5% 5% 0.5%;
   align-items: end;
   position: relative;
-`
+`;
 
 const LeftSection = styled.div`
   display: flex;
   align-items: end;
   gap: 1rem;
   z-index: 1;
-`
+`;
+
+const RightSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1;
+`;
 
 const HeaderTitle = styled.div`
   display: flex;
@@ -39,7 +46,7 @@ const HeaderTitle = styled.div`
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
     font-size: 1.4rem;
     font-weight: 600;
-    color: var(--cinema-black);
+    // color: var(--font-color-1);
     margin: 0;
     line-height: 1.1;
     transform: rotate(-1deg);
@@ -74,18 +81,20 @@ const Header = () => {
     return (
         <Headroom>
           <StyledHeader>
-            <VintagePhotoRoll
+            {/* <VintagePhotoRoll
               src={vintagePhotoRoll} 
               alt="Vintage film strip background"
-            />
+            /> */}
             <LeftSection>
               <Logo />
               <HeaderTitle>
-                <h1>Jamie Trapp</h1>
+                <h1>James Trapp</h1>
                 <div className="subtitle">Film Criticism & Analysis</div>
               </HeaderTitle>
             </LeftSection>
-            {isMobile ? <MobileNavBar /> : <NavBar />}
+            <RightSection>
+              {isMobile ? <MobileNavBar /> : <NavBar />}
+            </RightSection>
           </StyledHeader>
         </Headroom>
     );

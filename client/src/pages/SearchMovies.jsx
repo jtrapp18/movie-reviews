@@ -1,24 +1,11 @@
 import { getMoviesByGenre, getMovieInfo } from '../helper';
 import { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
-import MotionWrapper from '../styles/MotionWrapper'
-import SearchBar from '../components/SearchBar';
+import MotionWrapper from '../styles/MotionWrapper';
 import MovieSwimlane from '../components/MovieSwimlane';
 import SearchResultsGrid from '../components/SearchResultsGrid';
-import Loading from '../components/ui/Loading';
 import { useNavigate } from 'react-router-dom';
 import { AdminContext } from '../context/adminProvider';
-
-const StyledContainer = styled.div`
-  min-height: 100%;
-  padding: 20px 0 40px 0;
-  margin: 0;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-`;
+import SearchPageFrame from '../components/SearchPageFrame';
 
 // Define genres we want to show
 const GENRES = [
@@ -95,50 +82,40 @@ function SearchMovies() {
     navigate(`/movies/${movie.id}`);
   };
 
+  const introText = isAdmin
+    ? 'Click any movie card to add a new review'
+    : 'Click any movie card to view review';
+
   return (
-    <StyledContainer>
+    <SearchPageFrame
+      title="Search Movies"
+      subtitle={<i>{introText}</i>}
+      searchPlaceholder={loading ? 'Searching...' : 'Search movies by title...'}
+      onSearch={enterSearch}
+      isLoading={loading}
+      loadingText="Loading movies"
+      wide
+    >
+      {isSearchMode ? (
         <MotionWrapper index={1}>
-          <h1>Search Movies</h1>
-        </MotionWrapper>
-        <MotionWrapper index={2}>
-          <p><i>
-            {isAdmin 
-              ? "Click any movie card to add a new review" 
-              : "Click any movie card to view review"
-            }
-          </i></p>
-        </MotionWrapper>
-        <MotionWrapper index={3}>
-          <SearchBar 
-            enterSearch={enterSearch} 
-            placeholder={loading ? "Searching..." : "Search movies by title..."} 
+          <SearchResultsGrid
+            searchQuery={searchQuery}
+            movies={searchResults}
+            onMovieClick={handleMovieClick}
           />
         </MotionWrapper>
-        
-        {loading ? (
-          <MotionWrapper index={4}>
-            <Loading text="Loading movies" compact={true} />
-          </MotionWrapper>
-        ) : isSearchMode ? (
-          <MotionWrapper index={4}>
-            <SearchResultsGrid
-              searchQuery={searchQuery}
-              movies={searchResults}
+      ) : (
+        genreData.map((genre, index) => (
+          <MotionWrapper key={genre.id} index={index + 1}>
+            <MovieSwimlane
+              genre={genre}
+              movies={genre.movies}
               onMovieClick={handleMovieClick}
             />
           </MotionWrapper>
-        ) : (
-          genreData.map((genre, index) => (
-            <MotionWrapper key={genre.id} index={index + 4}>
-              <MovieSwimlane
-                genre={genre}
-                movies={genre.movies}
-                onMovieClick={handleMovieClick}
-              />
-            </MotionWrapper>
-          ))
-        )}
-    </StyledContainer>
+        ))
+      )}
+    </SearchPageFrame>
   );
 }
 

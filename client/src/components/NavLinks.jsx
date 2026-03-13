@@ -29,6 +29,13 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
         Search Movies
       </StyledNavLink>
       <StyledNavLink
+        to="/directors"
+        className="nav-link"
+        onClick={handleClick}
+      >
+        Directors
+      </StyledNavLink>
+      <StyledNavLink
         to="/about"
         className="nav-link"
         onClick={handleClick}

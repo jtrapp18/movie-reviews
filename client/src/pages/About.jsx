@@ -12,7 +12,7 @@ const AboutContainer = styled.div`
   max-width: min(800px, 90vw);
   margin: 0 auto;
   padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
-  color: white;
+  // color: white;
   line-height: 1.6;
 
   @media (max-width: 768px) {
@@ -24,35 +24,33 @@ const Header = styled.div`
   text-align: center;
   
   h1 {
-    color: var(--cinema-gold);
-    font-size: clamp(2rem, 6vw, 3rem);
+    // color: var(--cinema-gold);
+    // font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.625rem;
   }
   
   .subtitle {
-    color: var(--cinema-silver);
-    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    // color: var(--cinema-silver);
+    // font-size: clamp(1.1rem, 3vw, 1.5rem);
     font-style: italic;
   }
 `;
 
 const ContentType = styled.div`
-  background: var(--cinema-gray-dark);
+  background: var(--background-secondary);
   padding: clamp(1rem, 3vw, 1.25rem);
   margin: clamp(0.75rem, 2vw, 0.9375rem) 0;
   border-radius: 0.5rem;
-  border-left: 4px solid var(--cinema-gold);
+  border-left: 4px solid var(--border);
   
   h4 {
-    color: var(--cinema-gold);
     margin: 0 0 0.625rem 0;
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
   }
   
   p {
     margin: 0;
-    color: var(--cinema-silver);
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    // color: var(--cinema-silver);
+    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 
@@ -64,16 +62,16 @@ const ContactMethod = styled.div`
   gap: 0.5rem;
   
   .type {
-    color: var(--cinema-gold);
+    // color: var(--cinema-gold);
     font-weight: bold;
     min-width: clamp(4rem, 10vw, 5rem);
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
   
   .value {
-    color: var(--cinema-silver);
+    // color: var(--cinema-silver);
     margin-left: clamp(0.75rem, 2vw, 0.9375rem);
-    font-size: clamp(0.9rem, 2vw, 1rem);
+    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 

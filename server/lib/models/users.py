@@ -4,6 +4,12 @@ from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import CheckConstraint
 from lib.config import db, bcrypt
+from lib.utils import (
+    validate_required_string,
+    validate_optional_email,
+    validate_optional_phone,
+    validate_zipcode,
+)
 import re
 
 class User(db.Model, SerializerMixin):
@@ -18,9 +24,14 @@ class User(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False, unique=True)
     zipcode = db.Column(db.String, nullable=False)
 
-    # No relationships defined yet
+    review_comments = db.relationship(
+        'ReviewComment',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-_password_hash',)
+    serialize_rules = ('-_password_hash', '-review_comments.user')
     
     @hybrid_property
     def password_hash(self):
@@ -54,44 +65,30 @@ class User(db.Model, SerializerMixin):
 
     @validates('username')
     def validate_username(self, key, value):
-        if not value or len(value) < 3:
-            raise ValueError("Username is required and must be at least 3 characters long.")
+        value = validate_required_string(value, 'Username', min_length=3)
         if db.session.query(User).filter(User.username == value).first():
             raise ValueError("Username is already taken.")
         return value
 
     @validates('email')
     def validate_email(self, key, value):
-        if value:  # Email is optional
-            email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-            if not re.match(email_regex, value):
-                raise ValueError("A valid email address is required.")
-            if db.session.query(User).filter(User.email == value).first():
-                raise ValueError("Email address is already in use.")
+        value = validate_optional_email(value)
+        if value and db.session.query(User).filter(User.email == value).first():
+            raise ValueError("Email address is already in use.")
         return value
 
     @validates('first_name')
     def validate_first_name(self, key, value):
-        if not value or len(value) < 1:
-            raise ValueError("First name is required.")
-        return value
+        return validate_required_string(value, 'First name')
 
     @validates('last_name')
     def validate_last_name(self, key, value):
-        if len(value) < 1:
-            raise ValueError("Last name needs to be greater than 0 characters.")
-        return value
+        return validate_required_string(value, 'Last name')
 
     @validates('phone_number')
     def validate_phone_number(self, key, value):
-        if value:  # Phone number is optional
-            phone_regex = r'^\+?1?\d{9,15}$'
-            if not re.match(phone_regex, value):
-                raise ValueError("Phone number must be in a valid format.")
-        return value
+        return validate_optional_phone(value)
     
     @validates('zipcode')
     def validate_zipcode(self, key, value):
-        if isinstance(value, str) and value.isdigit() and len(value) in [5, 9]:  # Adjust length based on your postal code format
-            return value
-        raise ValueError("Invalid zipcode format")
+        return validate_zipcode(value)

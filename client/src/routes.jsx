@@ -11,6 +11,8 @@ import Articles from './pages/Articles';
 import Article from './pages/Article';
 import NewArticle from './pages/NewArticle';
 import Admin from './pages/Admin';
+import Director from './pages/Director';
+import DirectorsPage from './pages/DirectorsPage';
 
 const routes = [
   {
@@ -39,8 +41,16 @@ const routes = [
         element: <SearchMovies />,
       },
       {
+        path: "directors",
+        element: <DirectorsPage />,
+      },
+      {
         path: "movies/:id",
         element: <MovieReview />,
+      },
+      {
+        path: "directors/:id",
+        element: <Director />,
       },
       {
         path: "articles",

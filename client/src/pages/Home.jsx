@@ -1,12 +1,14 @@
-import { getJSON, getMovieInfo, snakeToCamel } from '../helper';
+import { getJSON, snakeToCamel } from '../helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Movies from '../components/Movies';
 import Articles from '../components/Articles';
+import RecentPosts from '../components/RecentPosts';
+import Directors from '../components/Directors';
 import Section from '../components/Section';
-import SearchBar from '../components/SearchBar';
 import SearchResultsHeader from '../components/SearchResultsHeader';
 import Loading from '../components/ui/Loading';
+import SearchPageFrame from '../components/SearchPageFrame';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import SEOHead from '../components/SEOHead';
 import { generateWebsiteStructuredData } from '../utils/seoUtils';
@@ -24,40 +26,33 @@ const StyledContainer = styled.div`
 
 
 function Home() {
-  const { movies } = useOutletContext();
+  const { movies, articles, posts, directors } = useOutletContext();
   const navigate = useNavigate();
-  
+
   const [showMovies, setShowMovies] = useState([]);
-  const [articles, setArticles] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
-    setShowMovies(movies);
+    setShowMovies(movies ?? []);
   }, [movies]);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const data = await getJSON('articles');
-        setArticles(data);
-        setShowArticles(data);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
-        setArticles([]);
-        setShowArticles([]);
-      }
-    };
-    
-    fetchArticles();
-  }, []);
+    setShowArticles(articles ?? []);
+  }, [articles]);
+
+  useEffect(() => {
+    setShowDirectors(directors ?? []);
+  }, [directors]);
 
   const unifiedSearch = async (text) => {
     if (!text.trim()) {
       // If empty search, show all content
       setShowMovies(movies);
       setShowArticles(articles);
+       setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
       return;
@@ -75,6 +70,7 @@ function Home() {
       
       setShowMovies(camelData.movies || []);
       setShowArticles(camelData.articles || []);
+      setShowDirectors(camelData.directors || []);
     } catch (error) {
       console.error('Error searching:', error);
       // Fallback to showing all content on error
@@ -98,49 +94,72 @@ function Home() {
         structuredData={structuredData}
       />
       <StyledContainer>
-        {/* Single search bar at the top */}
-        <SearchBar 
-          enterSearch={unifiedSearch}
-          placeholder="Search movies, reviews, articles, and tags..."
-        />
-        
-        {/* Search results header */}
-        {searchQuery && (
-          <SearchResultsHeader
-            searchQuery={searchQuery}
-            movieCount={showMovies.length}
-            articleCount={showArticles.length}
-            isLoading={isSearching}
-            showNoResults={!isSearching && showMovies.length === 0 && showArticles.length === 0}
-          />
-        )}
-        
-        {/* Loading indicator */}
-        {isSearching && !searchQuery && (
-          <Loading text="Searching" compact={true} />
-        )}
-        
-        <Section
-          title={searchQuery ? "Movies" : "Movie Reviews"}
-          subtitle={searchQuery ? "" : "Click movie to view review"}
-          showSearch={false}
+        <SearchPageFrame
+          title={null}
+          subtitle={null}
+          searchPlaceholder="Search movies, reviews, articles, and tags..."
+          onSearch={unifiedSearch}
+          isLoading={isSearching}
+          loadingText="Searching"
+          showHeader={false}
         >
-          <Movies
-            showMovies={showMovies}
-            enterSearch={unifiedSearch}
-          />
-        </Section>
-        
-        <Section
-          title={searchQuery ? "Articles" : "Articles"}
-          subtitle={searchQuery ? "" : "Browse theme-based articles and essays"}
-          showSearch={false}
-        >
-          <Articles
-            showArticles={showArticles}
-            enterSearch={unifiedSearch}
-          />
-        </Section>
+          <>
+            {/* Search results header */}
+            {searchQuery && (
+              <SearchResultsHeader
+                searchQuery={searchQuery}
+                movieCount={showMovies.length}
+                articleCount={showArticles.length}
+                isLoading={isSearching}
+                showNoResults={
+                  !isSearching &&
+                  showMovies.length === 0 &&
+                  showArticles.length === 0
+                }
+              />
+            )}
+
+            <Section
+              title="Recent Posts"
+              subtitle={searchQuery ? '' : 'Latest movie reviews and articles'}
+              showSearch={false}
+            >
+              <RecentPosts posts={posts} />
+            </Section>
+
+            <hr />
+
+            <Section
+              title="Directors"
+              subtitle={searchQuery ? '' : 'Explore directors in the collection'}
+              showSearch={false}
+            >
+              <Directors directors={showDirectors} />
+            </Section>
+            
+            <Section
+              title={searchQuery ? 'Movies' : 'Movie Reviews'}
+              subtitle={searchQuery ? '' : 'Click movie to view review'}
+              showSearch={false}
+            >
+              <Movies
+                showMovies={showMovies}
+                enterSearch={unifiedSearch}
+              />
+            </Section>
+            
+            <Section
+              title={searchQuery ? 'Articles' : 'Articles'}
+              subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
+              showSearch={false}
+            >
+              <Articles
+                showArticles={showArticles}
+                enterSearch={unifiedSearch}
+              />
+            </Section>
+          </>
+        </SearchPageFrame>
       </StyledContainer>
     </>
   );

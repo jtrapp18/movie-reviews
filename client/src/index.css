@@ -39,17 +39,6 @@ p {
   --cinema-blue: #007bff;
   --cinema-blue-dark: #0056b3;
   
-  /* Rich text display colors */
-  --rich-text-background: #0C0C13; /* Dark background from mobile theme */
-  --rich-text-primary: #f8f9fa; /* Soft white for main text */
-  --rich-text-header: #ffffff; /* Pure white for headers */
-  --rich-text-code-bg: rgba(255, 215, 0, 0.15); /* Gold tint for code */
-  --rich-text-code-border: rgba(255, 215, 0, 0.3);
-  --rich-text-blockquote-bg: var(--cinema-gray-dark); /* Card background from mobile theme */
-  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
-  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
-  --rich-text-table-border: rgba(255, 215, 0, 0.2);
-  
   /* Legacy colors (keeping for compatibility) */
   --green: #4E7839;
   --light-yellow: #fbf4a4;
@@ -61,13 +50,34 @@ p {
   --light-orange: rgb(247, 216, 160);
   --bright-blue: rgb(40, 203, 215);
   --dark-green: #334F26;
-  --light-gray: #b8c2d8;
+  --light-gray: #f0f0f0;
   --dark-gray: #212D40;
   --gray: #d1d1d1; 
+  --navy-blue: #00113d;
+  --blue: #022658;
   --yellow: var(--cinema-gold);
-  --background: var(--cinema-black);
-  --font-color-1: var(--cinema-gold);
-  --font-color-2: white;
+  --soft-white: #f8f9fa;
+  /* --background: var(--cinema-black); */
+  --background: var(--light-gray);
+  --background-secondary: var(--soft-white);
+  --background-tertiary: var(--gray);
+  --border: var(--navy-blue);
+  --primary: var(--blue);
+  --secondary: var(--navy-blue);
+  --font-color-1: var(--primary);
+  --font-color-2: var(--secondary);
+
+  /* Rich text display colors */
+  --rich-text-background: var(--background-secondary); /* Dark background from mobile theme */
+  --rich-text-primary: var(--font-color-2); /* Soft white for main text */
+  --rich-text-header: var(--font-color-1); /* Pure white for headers */
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15); /* Gold tint for code */
+  --rich-text-code-border: rgba(255, 215, 0, 0.3);
+  --rich-text-blockquote-bg: var(--cinema-gray-dark);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.2);
+
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
   --padding-top: 75px;
@@ -75,9 +85,54 @@ p {
   --size-body: calc(100vh - var(--height-header) - 4px);
   /* --size-body: 100vh; */
   --default-font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+  /* --card-font-size: clamp(0.8rem, 1rem, 1.1rem); */
+  --card-font: var(--soft-white);
+  --card-font-size: .8rem;
   --shadow: 0px 4px 8px rgba(0, 0, 0, 0.7);
-  --title-font: 'RopaSans';
-  --default-font: 'RopaSans';
+  --title-font: 'NotoSerif';
+  --default-font: 'Rubik';
+}
+
+:root[data-theme='light'] {
+  --background: var(--light-gray);
+  --background-secondary: var(--soft-white);
+  --background-tertiary: var(--gray);
+  --border: var(--navy-blue);
+  --primary: var(--blue);
+  --secondary: var(--navy-blue);
+  --font-color-1: var(--primary);
+  --font-color-2: var(--secondary);
+
+  --rich-text-background: var(--background-secondary);
+  --rich-text-primary: var(--font-color-2);
+  --rich-text-header: var(--font-color-1);
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15);
+  --rich-text-code-border: rgba(255, 215, 0, 0.3);
+  --rich-text-blockquote-bg: var(--cinema-gray-dark);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.2);
+}
+
+:root[data-theme='dark'] {
+  --background: var(--cinema-black);
+  --background-secondary: var(--cinema-gray-dark);
+  --background-tertiary: var(--cinema-gray);
+  --border: var(--cinema-gray-light);
+  --primary: var(--cinema-gold);
+  --secondary: var(--cinema-gold-dark);
+  --font-color-1: var(--cinema-gold-dark);
+  --font-color-2: var(--soft-white);
+
+  --rich-text-background: var(--cinema-gray-dark);
+  --rich-text-primary: var(--soft-white);
+  --rich-text-header: var(--cinema-gold);
+  --rich-text-code-bg: rgba(255, 215, 0, 0.15);
+  --rich-text-code-border: rgba(255, 215, 0, 0.4);
+  --rich-text-blockquote-bg: var(--cinema-black);
+  --rich-text-table-bg: rgba(255, 255, 255, 0.05);
+  --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
+  --rich-text-table-border: rgba(255, 215, 0, 0.3);
 }
 
 #root {
@@ -229,15 +284,16 @@ body::before {
 
 h1 {
   font-family: var(--title-font), sans-serif;
+  font-weight: bold;
 }
 
-h1 {
-  color: var(--cinema-gold);
+h1, h2 {
+  color: var(--font-color-1);
 }
 
-h2, h3 {
+h3, small {
   /* color: var(--cinema-gold); */
-  color: white;
+  color: var(--font-color-2);
 }
 
 h1 {
@@ -245,7 +301,7 @@ h1 {
 }
 
 h2 {
-  font-size: clamp(1.3rem, 2vw, 1.9rem);
+  font-size: clamp(1.3rem, 2vw, 1.5rem);
   font-family: var(--default-font)
 }
 
@@ -256,6 +312,10 @@ h3 {
 
 p, label, i, li, a, span, option, select, input, textarea {
   font-size: var(--default-font-size);
+  color: var(--font-color-2);
+}
+
+hr {
   color: var(--font-color-2);
 }
 

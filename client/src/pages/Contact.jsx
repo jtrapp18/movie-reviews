@@ -11,14 +11,14 @@ const Header = styled.div`
   margin-bottom: 2rem;
   
   h1 {
-    color: var(--cinema-gold-dark);
-    font-size: clamp(2rem, 6vw, 3rem);
+    // color: var(--cinema-gold-dark);
+    // font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.5rem;
   }
   
   .subtitle {
-    color: var(--cinema-silver);
-    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    // color: var(--cinema-silver);
+    // font-size: clamp(1.1rem, 3vw, 1.3rem);
     font-style: italic;
   }
 `;
@@ -79,14 +79,14 @@ function Contact() {
   return (
     <StyledContainer>
       <Header>
-        <h1>Contact Jamie</h1>
+        <h1>Contact James</h1>
         <div className="subtitle">Get in touch about film reviews, suggestions, or feedback</div>
       </Header>
 
       <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
           <div className="success-message">
-            Your email client should open with a pre-filled message to Jamie. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
+            Your email client should open with a pre-filled message to James. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
           </div>
         )}
         

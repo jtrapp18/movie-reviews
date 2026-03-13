@@ -8,6 +8,7 @@ import routes from './routes'; // Import your routes configuration
 import { WindowWidthProvider } from './context/windowSize';
 import AdminIndicator from './components/AdminIndicator';
 import { HelmetProvider } from 'react-helmet-async';
+import { ThemeProvider } from './context/themeProvider';
 
 // Create the hash-based router
 const router = createHashRouter(routes);
@@ -18,14 +19,16 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
     <HelmetProvider>
-      <WindowWidthProvider>
-        <UserProvider>
-          <AdminProvider>
-            <RouterProvider router={router} />
-            <AdminIndicator />
-          </AdminProvider>
-        </UserProvider>
-      </WindowWidthProvider>
+      <ThemeProvider>
+        <WindowWidthProvider>
+          <UserProvider>
+            <AdminProvider>
+              <RouterProvider router={router} />
+              <AdminIndicator />
+            </AdminProvider>
+          </UserProvider>
+        </WindowWidthProvider>
+      </ThemeProvider>
     </HelmetProvider>
   </StrictMode>,
 );

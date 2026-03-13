@@ -8,9 +8,9 @@ const TagInputContainer = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 12px;
-  border: 2px solid var(--cinema-gold-dark);
+  border: 2px solid var(--border);
   border-radius: 8px;
-  background-color: var(--cinema-gray-dark);
+  // background-color: var(--background-secondary);
 `;
 
 const InputRow = styled.div`
@@ -34,10 +34,11 @@ const Input = styled.input`
   padding: 4px 8px;
   min-width: 120px;
   flex: 1;
-  color: var(--cinema-black);
+  // color: var(--cinema-black);
 
   &::placeholder {
-    color: var(--cinema-gray);
+    // color: var(--cinema-gray);
+    color: var(--font-color-2); 
   }
 `;
 
@@ -111,12 +112,12 @@ const TagInput = ({
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
             />
-            <AddButton 
+            <Button 
               onClick={handleAddTag}
               disabled={!inputValue.trim() || tags.length >= maxTags}
             >
               Add
-            </AddButton>
+            </Button>
           </>
         )}
         

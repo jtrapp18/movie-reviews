@@ -1,44 +1,12 @@
-import { Button } from '../styles'
-import DocumentViewer from './DocumentViewer'
-import Stars from './Stars'
-import { useAdmin } from '../hooks/useAdmin'
-import RichTextDisplay from './RichTextDisplay'
-import ZoomableContent from './ZoomableContent'
-import styled from 'styled-components'
+import { Button } from '../styles';
+import DocumentViewer from './DocumentViewer';
+import { useAdmin } from '../hooks/useAdmin';
+import RichTextDisplay from './RichTextDisplay';
+import ZoomableContent from './ZoomableContent';
+import styled from 'styled-components';
 
 const ContentDisplayContainer = styled.div`
   width: 100%;
-`;
-
-const ContentHeader = styled.div`
-  text-align: center;
-  margin-bottom: 1rem;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-
-  border-bottom: 2px dotted gray;
-`;
-
-const ContentTitle = styled.h1`
-  margin: 0;
-  padding: 0.5rem;
-`;
-
-const ContentMeta = styled.div`
-  color: #666;
-  font-size: 1rem;
-  margin-bottom: 20px;
-`;
-
-const PublishDate = styled.span`
-  color: #666;
-`;
-
-const StarsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
 `;
 
 const TagsContainer = styled.div`
@@ -51,8 +19,8 @@ const TagsContainer = styled.div`
 `;
 
 const Tag = styled.span`
-  background-color: var(--cinema-gold);
-  color: var(--cinema-black);
+  background-color: var(--primary);
+  color: var(--font-color-2);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -63,21 +31,20 @@ const ContentBody = styled.div`
   width: 100%;
   padding: 2rem 1rem;
   margin-bottom: 2rem;
-  background-color: rgba(255, 255, 255, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 215, 0, 0.1);
-  border-left: 3px solid var(--cinema-gold-dark);
+  background: var(--background-secondary);
 
   @media (max-width: 768px) {
-    padding: 0;
-    border: none;
+    padding: 1rem 0rem;
   }
 `;
 
-const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }) => {
+const ContentDisplay = ({
+  formValues,
+  setIsEditing,
+  reviewId,
+  onRemoveDocument,
+}) => {
   const { isAdmin } = useAdmin();
-  const isReview = formValues.movieId !== null && formValues.movieId !== undefined;
-  const hasRating = isReview && formValues.rating && formValues.rating > 0;
   const hasContent = formValues.reviewText && formValues.reviewText.trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
   
@@ -90,26 +57,8 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
 
   return (
     <ContentDisplayContainer className="content-display">
-      <ContentHeader>
-        <ContentTitle>{formValues.title}</ContentTitle>
-        
-        {hasRating && (
-          <StarsContainer>
-            <Stars rating={formValues.rating} />
-          </StarsContainer>
-        )}
-        
-        <ContentMeta>
-          {(formValues.dateAdded || formValues.date_added) && (
-            <PublishDate>Published on {new Date(formValues.dateAdded || formValues.date_added).toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</PublishDate>
-          )}
-        </ContentMeta>
-
-        {(formValues.tags || formValues.tag) && (formValues.tags || formValues.tag).length > 0 && (
+      {(formValues.tags || formValues.tag) &&
+        (formValues.tags || formValues.tag).length > 0 && (
           <TagsContainer className="tags-container">
             {(formValues.tags || formValues.tag).map((tag, index) => (
               <Tag key={index}>
@@ -118,7 +67,6 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId, onRemoveDocument }
             ))}
           </TagsContainer>
         )}
-      </ContentHeader>
       
       {hasAnyContent ? (
         <ZoomableContent>

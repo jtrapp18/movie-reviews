@@ -4,9 +4,12 @@ import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
 import SEOHead from '../components/SEOHead';
+import CoverHeader from '../components/CoverHeader';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 import Loading from '../components/ui/Loading';
 import { StyledContainer } from '../styles';
+
+const DEFAULT_ARTICLE_BACKDROP = "/images/default-article.jpeg";
 
 const LoadingMessage = styled.div`
   text-align: center;
@@ -61,7 +64,7 @@ function Article() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading article" size="medium" />
+        <Loading text="Loading article" size="large" />
       </StyledContainer>
     );
   }
@@ -92,6 +95,13 @@ function Article() {
     { name: article.title, url: window.location.href }
   ]);
 
+  const coverImageUrl =
+    article.backdrop
+      ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
+          article.backdrop
+        )}`
+      : DEFAULT_ARTICLE_BACKDROP;
+
   return (
     <>
       <SEOHead
@@ -103,6 +113,13 @@ function Article() {
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
       />
       <StyledContainer>
+        <CoverHeader
+          imageUrl={coverImageUrl}
+          title={article.movie?.title || article.title}
+          subtitle={article.movie?.title ? article.title : undefined}
+          rating={article.rating}
+          publishDate={article.dateAdded || article.date_added}
+        />
         <ArticleForm initObj={article} />
       </StyledContainer>
     </>

@@ -7,19 +7,19 @@ const HeaderContainer = styled.div`
 `;
 
 const Title = styled.h2`
-  color: var(--cinema-gold);
+  // color: var(--cinema-gold);
   font-size: 1.8rem;
   margin-bottom: 10px;
 `;
 
 const ResultsCount = styled.p`
-  color: var(--cinema-silver);
+  // color: var(--cinema-silver);
   font-size: 1rem;
   margin: 0;
 `;
 
 const SearchQuery = styled.span`
-  color: var(--cinema-gold-dark);
+  // color: var(--cinema-gold-dark);
   font-weight: 600;
 `;
 
@@ -63,7 +63,7 @@ const SearchResultsHeader = ({
   return (
     <HeaderContainer>
       <Title>
-        Search Results for <SearchQuery>"{searchQuery}"</SearchQuery>
+        Results for <SearchQuery>"{searchQuery}"</SearchQuery>
       </Title>
       <ResultsCount>{resultsText}</ResultsCount>
     </HeaderContainer>
