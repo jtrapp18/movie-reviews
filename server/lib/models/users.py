@@ -23,6 +23,9 @@ class User(db.Model, SerializerMixin):
     phone_number = db.Column(db.String, nullable=True)
     email = db.Column(db.String, nullable=False, unique=True)
     zipcode = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    dark_mode = db.Column(db.Boolean, default=False)
+    icon_color = db.Column(db.String, default='blue')
 
     review_comments = db.relationship(
         'ReviewComment',

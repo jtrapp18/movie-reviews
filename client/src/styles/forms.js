@@ -6,7 +6,7 @@ const StyledForm = styled.form`
   padding: 2rem;
   border-radius: 12px;
   border-left: 4px solid var(--border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   overflow-y: visible;
   display: flex;
   flex-direction: column;

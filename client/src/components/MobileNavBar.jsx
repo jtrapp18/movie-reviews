@@ -1,10 +1,9 @@
 import styled from "styled-components";
-import { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { StyledNavLink, StyledNavigation, StyledLink } from "../styles";
 import { scrollToTop } from "../helper";
-import { UserContext } from '../context/userProvider';
-import { AdminContext } from '../context/adminProvider';
-import { userLogout } from "../helper";
+import { useAccountActions } from "../utils/account";
 
 // const StyledMobileMenu = styled(StyledLink)`
 //   color: var(--cinema-gold-dark);
@@ -120,10 +119,10 @@ const HamburgerButton = styled.button`
 
 // MobileNavBar Component
 const MobileNavBar = () => {
-  const { user, setUser } = useContext(UserContext);
-  const { isAdmin, logoutAdmin } = useContext(AdminContext);
+  const { user, isAdmin, handleAccount } = useAccountActions();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const cardRef = useRef(null); // Create a reference to the card element
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -134,14 +133,11 @@ const MobileNavBar = () => {
     setIsMenuOpen(false); // Close menu after navigation
   };
 
-  const handleAdminLogout = () => {
-    if (isAdmin) {
-      logoutAdmin();
-      setUser(null);
+  const handleAccountClick = () => {
+    handleAccount(() => {
       setIsMenuOpen(false);
-    }
-    handleClick()
-  }
+    });
+  };
 
   return (
     <StyledDiv
@@ -178,15 +174,13 @@ const MobileNavBar = () => {
         >
           About
         </StyledMobileLink>
-        {isAdmin && (
-          <StyledMobileMenu
-            to="/"
-            className="nav-link"
-            onClick={handleAdminLogout}
-          >
-            Logout Admin
-          </StyledMobileMenu>
-        )}
+        <StyledMobileMenu
+          to="/"
+          className="nav-link"
+          onClick={handleAccountClick}
+        >
+          {user ? "Logout" : "Login"}
+        </StyledMobileMenu>
       </LinkContainer>
       <HamburgerButton 
         className={isMenuOpen ? "open" : ""} 

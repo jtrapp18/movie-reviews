@@ -1,10 +1,8 @@
 import styled from "styled-components";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { scrollToTop } from "../helper";
-import { UserContext } from '../context/userProvider';
-import { AdminContext } from '../context/adminProvider';
 import { NavLink } from "react-router-dom";
-import { userLogout } from "../helper";
+import { useAccountActions } from "../utils/account";
 
 const LinkContainer = styled.div`
   position: absolute;
@@ -66,17 +64,13 @@ const StyledNavLink = styled(NavLink)`
 `
 
 const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
-  const { user, setUser } = useContext(UserContext);
-  const { isAdmin, logoutAdmin } = useContext(AdminContext);
-
+  const { user, handleAccount } = useAccountActions();
   const cardRef = useRef(null);
 
-  const handleAdminLogout = () => {
-    if (isAdmin) {
-      logoutAdmin();
-      setUser(null);
+  const handleAccountToggle = () => {
+    handleAccount(() => {
       setIsMenuOpen(false);
-    }
+    });
   }
 
   const handleClick = () => {
@@ -84,10 +78,6 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
     setIsMenuOpen(false); // Close menu after navigation
   };
 
-  // Only show dropdown if admin is logged in
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
       <LinkContainer 
@@ -99,9 +89,9 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
         <StyledNavLink
             as="button"
             className="nav-link"
-            onClick={handleAdminLogout}
+            onClick={handleAccountToggle}
         >
-            Logout Admin
+            {user ? "Logout" : "Login"}
         </StyledNavLink>
       </LinkContainer>
   );
