@@ -22,6 +22,7 @@ function LoginForm() {
       try {
         const user = await postJSONToDb("login", body);  // Await the promise
         const userTransformed = snakeToCamel(user);
+        console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
         // Navigate to home page after successful login
         navigate('/');

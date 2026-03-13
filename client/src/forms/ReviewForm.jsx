@@ -139,16 +139,21 @@ const ReviewForm = ({ initObj }) => {
           tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
         };
         
-        console.log('DEBUG - Final formData being sent:', formData);
-        console.log('DEBUG - movieId value:', movieId);
-        console.log('DEBUG - typeof movieId:', typeof movieId);
+        console.info('ReviewForm - submitting review', {
+          movieId,
+          isEdit,
+          hasDocument,
+          tagCount: tags.length,
+        });
         
         // Submit the review
         const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id);
         
         if (result.success) {
-          console.log('ReviewForm - API response result:', result.result);
-          console.log('ReviewForm - Tags in response:', result.result?.tags);
+          console.info('ReviewForm - review submitted successfully', {
+            id: result.result?.id,
+            tagCount: result.result?.tags?.length || 0,
+          });
           
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
@@ -187,12 +192,10 @@ const ReviewForm = ({ initObj }) => {
   };
 
   const handleDocumentUploadSuccess = (result) => {
-    console.log('handleDocumentUploadSuccess called with:', result);
     setHasDocument(true);
     
     // Convert snake_case to camelCase
     const review = snakeToCamel(result.review);
-    console.log('Converted review:', review);
     
     // Don't automatically extract text - let user choose
     formik.setFieldTouched("reviewText", false);
@@ -201,7 +204,6 @@ const ReviewForm = ({ initObj }) => {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
       initObj.documentType = review.documentType;
-      console.log('Updated initObj:', initObj);
     }
   };
 
@@ -283,14 +285,7 @@ const ReviewForm = ({ initObj }) => {
             />
             
             {/* Extract Text Button - show if document is uploaded */}
-            {(() => {
-              console.log('DEBUG EXTRACT BUTTON:', {
-                hasDocument,
-                selectedFile: selectedFile?.name,
-                hasDocumentAndFile: hasDocument && selectedFile
-              });
-              return hasDocument && selectedFile;
-            })() && (
+            {hasDocument && selectedFile && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
                 <ExtractButton
                   type="button"
@@ -374,8 +369,6 @@ const ReviewForm = ({ initObj }) => {
           formValues={(() => {
             // Use updatedReview if available, otherwise fall back to initObj
             const reviewData = updatedReview || initObj;
-            console.log('DEBUG - reviewData:', reviewData);
-            console.log('DEBUG - formik.values:', formik.values);
             
             const values = {
               ...formik.values,
@@ -393,9 +386,6 @@ const ReviewForm = ({ initObj }) => {
               dateAdded: reviewData?.dateAdded || null,
               tags: tags,
             };
-            console.log('ContentDisplay formValues for review:', values);
-            console.log('reviewText:', values.reviewText);
-            console.log('review_text:', values.review_text);
             return values;
           })()}
           setIsEditing={setIsEditing}

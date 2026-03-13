@@ -1,22 +1,17 @@
 import { useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../context/userProvider";
-import { AdminContext } from "../context/adminProvider";
 import { userLogout } from "../helper";
 
-// Custom hook to share login/logout behavior between nav components.
-// Note: Hooks are allowed here because this is itself a custom hook.
+// Full account actions (login/logout + navigate) for components rendered inside Router.
 export const useAccountActions = () => {
   const { user, setUser } = useContext(UserContext);
-  const { isAdmin, logoutAdmin } = useContext(AdminContext);
   const navigate = useNavigate();
+  const isAdmin = !!user?.isAdmin;
 
   const handleAccount = useCallback(
     (afterAction) => {
       if (user) {
-        if (isAdmin) {
-          logoutAdmin();
-        }
         userLogout();
         setUser(null);
         if (afterAction) afterAction("logout");
@@ -25,8 +20,23 @@ export const useAccountActions = () => {
         if (afterAction) afterAction("login");
       }
     },
-    [user, isAdmin, logoutAdmin, navigate, setUser]
+    [user, navigate, setUser]
   );
 
   return { user, isAdmin, handleAccount };
+};
+
+// Account status + logout for components that are NOT under a Router (no useNavigate).
+export const useAccountStatus = () => {
+  const { user, setUser } = useContext(UserContext);
+  const isAdmin = !!user?.isAdmin;
+
+  const logout = useCallback(() => {
+    if (user) {
+      userLogout();
+      setUser(null);
+    }
+  }, [user, setUser]);
+
+  return { user, isAdmin, logout };
 };
