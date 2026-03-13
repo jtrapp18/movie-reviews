@@ -8,6 +8,8 @@ const Wrapper = styled.div`
 const ImageWrapper = styled.div`
   position: relative;
   width: 100%;
+  height: 350px;
+  max-height: 100vh;
   overflow: hidden;
   border-radius: 8px 8px 0 0;
   background: #000;
@@ -111,12 +113,25 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
     );
   }
 
-  // Fallback for text-only header when there is no image
+  // No image: black background with title/subtitle (never substitute with regular movie image)
   return (
     <Wrapper>
-      {(title || subtitle) && (
-        <TextOnlyTitle>{title || subtitle}</TextOnlyTitle>
-      )}
+      <ImageWrapper style={{ minHeight: '200px' }}>
+        <Overlay>
+          <OverlayContent>
+            {title && <Title>{title}</Title>}
+            {subtitle && <Subtitle>{subtitle}</Subtitle>}
+            {hasRating && (
+              <StarsWrapper>
+                <Stars rating={rating} />
+              </StarsWrapper>
+            )}
+            {formattedDate && (
+              <PublishDate>Published on {formattedDate}</PublishDate>
+            )}
+          </OverlayContent>
+        </Overlay>
+      </ImageWrapper>
     </Wrapper>
   );
 }

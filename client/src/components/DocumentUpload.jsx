@@ -243,7 +243,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
               <br />
               <small>Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</small>
               <br />
-              <small style={{color: '#28a745'}}><FaCheck /> File will be uploaded when you submit the review</small>
+              <small><FaCheck /> File will be uploaded when you submit the review</small>
               <DocumentActions>
                 <Button onClick={handlePreviewSelectedFile}><FaEye /> Preview</Button>
                 <Button onClick={clearFile}><FaTimes /> Remove File</Button>
@@ -273,7 +273,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           )}
           
           <CheckboxContainer>
-            <small style={{color: 'var(--cinema-gold)'}}>
+            <small>
               <FaLightbulb /> Document content will be extracted and used as review text
             </small>
           </CheckboxContainer>

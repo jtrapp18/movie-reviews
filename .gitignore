@@ -69,3 +69,5 @@ instance
 
 # Build artifacts
 client/dist/
+
+*.ipynb
