@@ -18,18 +18,15 @@ function App() {
   const [directors, setDirectors] = useState([]);
   const [coreDataLoaded, setCoreDataLoaded] = useState(false);
 
-  // Auto-login
+  // Restore user from session so comments (and any other auth) work after refresh
+  const { setUser } = useContext(UserContext);
   useEffect(() => {
-    console.log('logging check session...')
     const fetchUser = async () => {
-      const user = await getJSON('check_session'); // Wait for the JSON
-      if (JSON.stringify(user) !== JSON.stringify(user)) {
-        setUser(user);
-      }
+      const user = await getJSON('check_session');
+      if (user) setUser(user);
     };
-
     fetchUser();
-  }, []);
+  }, [setUser]);
 
   // Load core data early so Home, Articles, Directors feel instant
   useEffect(() => {

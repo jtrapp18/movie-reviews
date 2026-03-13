@@ -10,6 +10,7 @@ const Section = styled.section`
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);
+  width: 100%;
 `;
 
 const Title = styled.h2`
