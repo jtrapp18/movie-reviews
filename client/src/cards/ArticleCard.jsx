@@ -1,6 +1,15 @@
+import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { MediaCard, CardContent, CardOverlay, Tag, TagContainer, CardDate, CardTitle } from "../styles/cards";
 import { formatDate } from "../utils/formatting";
+
+const LikeCount = styled.span`
+  font-size: 0.8rem;
+  color: var(--font-color-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+`;
 
 const backdrop = "/images/card-backdrop.jpeg";
 
@@ -18,6 +27,9 @@ function ArticleCard({ article }) {
       <img src={backdrop} alt="article backdrop" />
 
       <CardDate>{formatDate(article.dateAdded)}</CardDate>
+      {(article.likeCount ?? 0) > 0 && (
+        <LikeCount aria-label={`${article.likeCount} likes`}>♡ {article.likeCount}</LikeCount>
+      )}
 
       <CardContent>
         <CardTitle>

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import CommentForm from './CommentForm';
+import LikeButton from '../LikeButton';
+import { UserContext } from '../../context/userProvider';
 
 const Wrapper = styled.div`
   margin-bottom: 1rem;
@@ -45,12 +47,18 @@ const Body = styled.p`
   word-break: break-word;
 `;
 
+const Actions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+`;
+
 const ReplyToggle = styled.button`
   background: none;
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  // color: var(--cinema-gold);
   padding: 0;
 
   &:hover {
@@ -79,11 +87,14 @@ function formatDate(isoString) {
 
 const DEFAULT_ICON_COLOR = '#6b7280';
 
-function Comment({ comment, reviewId, onReplySuccess }) {
+function Comment({ comment, reviewId, onReplySuccess, onLikeUpdate }) {
+  const { user } = useContext(UserContext);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const authorName = comment.user?.username ?? comment.user?.firstName ?? 'Anonymous';
   const iconColor = comment.user?.iconColor ?? DEFAULT_ICON_COLOR;
   const replies = comment.replies ?? [];
+  const likeCount = comment.likeCount ?? 0;
+  const likedByMe = comment.likedByMe ?? false;
 
   return (
     <Wrapper>
@@ -93,9 +104,19 @@ function Comment({ comment, reviewId, onReplySuccess }) {
         <Meta>{formatDate(comment.createdAt)}</Meta>
       </Header>
       <Body>{comment.body}</Body>
-      <ReplyToggle type="button" onClick={() => setShowReplyForm((v) => !v)}>
-        {showReplyForm ? 'Cancel' : 'Reply'}
-      </ReplyToggle>
+      <Actions>
+        <LikeButton
+          type="comment"
+          id={comment.id}
+          likeCount={likeCount}
+          likedByMe={likedByMe}
+          disabled={!user}
+          onUpdate={onLikeUpdate}
+        />
+        <ReplyToggle type="button" onClick={() => setShowReplyForm((v) => !v)}>
+          {showReplyForm ? 'Cancel' : 'Reply'}
+        </ReplyToggle>
+      </Actions>
       {showReplyForm && (
         <CommentForm
           reviewId={reviewId}
@@ -115,6 +136,7 @@ function Comment({ comment, reviewId, onReplySuccess }) {
               comment={reply}
               reviewId={reviewId}
               onReplySuccess={onReplySuccess}
+              onLikeUpdate={onLikeUpdate}
             />
           ))}
         </Replies>

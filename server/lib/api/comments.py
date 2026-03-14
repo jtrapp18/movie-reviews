@@ -1,8 +1,9 @@
 from flask import request, session
 from flask_restful import Resource
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 from lib.config import db, api
-from lib.models import Review, ReviewComment
+from lib.models import Review, ReviewComment, CommentLike
 
 
 class ReviewComments(Resource):
@@ -44,8 +45,34 @@ class ReviewComments(Resource):
             .order_by(ReviewComment.created_at)
             .all()
         )
+        current_user_id = session.get('user_id')
+        comment_ids = [c.id for c in comments]
+        counts = {}
+        liked_comment_ids = set()
+        if comment_ids:
+            count_rows = (
+                db.session.query(CommentLike.comment_id, func.count(CommentLike.id))
+                .filter(CommentLike.comment_id.in_(comment_ids))
+                .group_by(CommentLike.comment_id)
+                .all()
+            )
+            counts = {row[0]: row[1] for row in count_rows}
+            if current_user_id:
+                liked_comment_ids = {
+                    row[0]
+                    for row in db.session.query(CommentLike.comment_id).filter(
+                        CommentLike.comment_id.in_(comment_ids),
+                        CommentLike.user_id == current_user_id,
+                    ).all()
+                }
+        out = []
+        for c in comments:
+            d = c.to_dict()
+            d['like_count'] = counts.get(c.id, 0)
+            d['liked_by_me'] = c.id in liked_comment_ids
+            out.append(d)
         return {
-            "comments": [c.to_dict() for c in comments],
+            "comments": out,
             "total": total,
         }, 200
 

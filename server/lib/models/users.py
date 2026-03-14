@@ -33,8 +33,20 @@ class User(db.Model, SerializerMixin):
         cascade='all, delete-orphan',
         lazy='select',
     )
+    comment_likes = db.relationship(
+        'CommentLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
+    review_likes = db.relationship(
+        'ReviewLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-_password_hash', '-review_comments.user')
+    serialize_rules = ('-_password_hash', '-review_comments.user', '-comment_likes', '-review_likes')
     
     @hybrid_property
     def password_hash(self):

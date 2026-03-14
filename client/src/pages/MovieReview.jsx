@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer } from '../styles';
 import CoverHeader from '../components/CoverHeader';
+import LikeButton from '../components/LikeButton';
 import { getJSON, snakeToCamel } from '../helper';
 import ReviewForm from '../forms/ReviewForm';
 import CommentList from '../components/comments/CommentList';
 import SEOHead from '../components/SEOHead';
 import Loading from '../components/ui/Loading';
+import { UserContext } from '../context/userProvider';
 import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 
 const MovieContainer = styled.div`
@@ -15,7 +17,15 @@ const MovieContainer = styled.div`
   width: 100%;
 `;
 
+const LikeBar = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+`;
+
 function MovieReview() {
+  const { user } = useContext(UserContext);
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -101,7 +111,25 @@ function MovieReview() {
             publishDate={review?.dateAdded || review?.date_added}
           />
         </MovieContainer>
-        
+        {review && (
+          <LikeBar>
+            <LikeButton
+              type="review"
+              id={review.id}
+              likeCount={review.likeCount ?? 0}
+              likedByMe={review.likedByMe ?? false}
+              disabled={!user}
+              onUpdate={(liked, likeCount) => {
+                setMovie((prev) => {
+                  if (!prev?.reviews?.length) return prev;
+                  const next = { ...prev, reviews: [...prev.reviews] };
+                  next.reviews[0] = { ...next.reviews[0], likedByMe: liked, likeCount };
+                  return next;
+                });
+              }}
+            />
+          </LikeBar>
+        )}
         <ReviewForm initObj={review} />
         {review && <CommentList reviewId={review.id} />}
       </StyledContainer>
