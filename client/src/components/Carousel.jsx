@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Slider from 'react-slick';
 import { FaSearch } from 'react-icons/fa';
+import MotionWrapper from '../styles/MotionWrapper';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -129,7 +130,11 @@ const Carousel = ({ children, settings = {}, noResultsMessage = "No results foun
     <CarouselContainer>
       <CarouselStyles>
         <Slider {...finalSettings}>
-          {children}
+          {React.Children.map(children, (child, index) => (
+            <MotionWrapper key={child.key ?? index} index={index}>
+              {child}
+            </MotionWrapper>
+          ))}
         </Slider>
       </CarouselStyles>
     </CarouselContainer>
