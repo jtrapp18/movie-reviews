@@ -14,10 +14,19 @@ const Wrapper = styled.div`
 
 const Header = styled.div`
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.35rem;
   flex-wrap: wrap;
+`;
+
+const IconBubble = styled.span`
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: ${(props) => props.$color || 'var(--font-color-3)'};
+  flex-shrink: 0;
 `;
 
 const Author = styled.span`
@@ -68,14 +77,18 @@ function formatDate(isoString) {
   });
 }
 
+const DEFAULT_ICON_COLOR = '#6b7280';
+
 function Comment({ comment, reviewId, onReplySuccess }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const authorName = comment.user?.username ?? comment.user?.firstName ?? 'Anonymous';
+  const iconColor = comment.user?.iconColor ?? DEFAULT_ICON_COLOR;
   const replies = comment.replies ?? [];
 
   return (
     <Wrapper>
       <Header>
+        <IconBubble $color={iconColor} aria-hidden />
         <Author>{authorName}</Author>
         <Meta>{formatDate(comment.createdAt)}</Meta>
       </Header>
