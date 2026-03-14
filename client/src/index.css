@@ -112,6 +112,9 @@ p {
   --rich-text-table-bg: rgba(255, 255, 255, 0.05);
   --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
   --rich-text-table-border: rgba(255, 215, 0, 0.2);
+
+  --success-color: var(--cinema-gold-dark);
+  --error-color: var(--cinema-red);
 }
 
 :root[data-theme='dark'] {
@@ -133,6 +136,9 @@ p {
   --rich-text-table-bg: rgba(255, 255, 255, 0.05);
   --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
   --rich-text-table-border: rgba(255, 215, 0, 0.3);
+
+  --success-color: var(--cinema-gold-dark);
+  --error-color: var(--cinema-red);
 }
 
 #root {

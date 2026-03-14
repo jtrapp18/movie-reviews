@@ -95,7 +95,7 @@ function App() {
         </Suspense>
       </StyledMain>
       <Footer />
-      <ThemeToggle />
+      {/* <ThemeToggle /> */}
     </div>
   );
 }

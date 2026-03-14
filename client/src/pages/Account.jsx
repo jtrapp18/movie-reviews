@@ -4,18 +4,19 @@ import { StyledContainer, StyledForm, Button } from "../styles";
 import { UserContext } from "../context/userProvider";
 import { patchJSONToDb, snakeToCamel } from "../helper";
 import Error from "../styles/Error";
+import LoginMessage from "../components/LoginMessage";
+import { useTheme } from '../context/themeProvider';
+
 
 const Header = styled.div`
   text-align: center;
   margin-bottom: 2rem;
 
   h1 {
-    // font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.5rem;
   }
 
   .subtitle {
-    // font-size: clamp(1.1rem, 3vw, 1.3rem);
     font-style: italic;
   }
 `;
@@ -32,7 +33,7 @@ const ColorBubble = styled.div`
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--border);
-  background: ${(props) => props.$color || "var(--cinema-gold)"};
+  background: ${(props) => props.$color || "blue"};
 `;
 
 const HiddenColorInput = styled.input.attrs({ type: "color" })`
@@ -47,6 +48,34 @@ const HiddenColorInput = styled.input.attrs({ type: "color" })`
   padding: 0;
 `;
 
+const ToggleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const Switch = styled.button`
+  position: relative;
+  width: 48px;
+  height: 26px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: var(--primary);
+  transition: background 0.25s ease;
+`;
+
+const Knob = styled.span`
+  position: absolute;
+  top: 3px;
+  left: ${(p) => (p.$active ? "24px" : "3px")};
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.25s ease;
+`;
+
 function Account() {
   const { user, setUser } = useContext(UserContext);
   const [editing, setEditing] = useState(false);
@@ -54,16 +83,31 @@ function Account() {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [email, setEmail] = useState(user?.email || "");
   const [iconColor, setIconColor] = useState(user?.iconColor || "#0000ff");
+  const [darkMode, setDarkMode] = useState(user?.darkMode || false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const { theme, setTheme } = useTheme();
+
+
+  const handleThemeToggle = async () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+
+    setDarkMode(!darkMode)
+  };
+
+  const resetTheme = async (darkMode) => {
+    const mode = darkMode ? 'light' : 'dark';
+    setTheme(mode);
+  };
 
   if (!user) {
     return (
       <StyledContainer>
         <Header>
           <h1>Account</h1>
-          <div className="subtitle">You need to be logged in to manage your account.</div>
+          <LoginMessage message="manage your account" />
         </Header>
       </StyledContainer>
     );
@@ -74,15 +118,19 @@ function Account() {
     setSaving(true);
     setError(null);
     setSuccess(null);
+
     try {
       const payload = {
         username,
         firstName,
         email,
         iconColor,
+        darkMode,
       };
+
       const updated = await patchJSONToDb("users", user.id, payload);
       const updatedCamel = snakeToCamel(updated);
+
       setUser(updatedCamel);
       setSuccess("Account updated.");
       setEditing(false);
@@ -100,65 +148,48 @@ function Account() {
         <h1>Account Settings</h1>
         <div className="subtitle">View and update your profile details.</div>
       </Header>
+
       {!editing && (
         <>
           <StyledForm as="div">
             <div>
+              <ColorBubble $color={user.iconColor || "#0000ff"} />
+            </div>
+
+            <div>
               <label>Username</label>
               <div>{user.username}</div>
             </div>
+
             <div>
               <label>Name</label>
               <div>{user.firstName}</div>
             </div>
+
             <div>
               <label>Email</label>
               <div>{user.email}</div>
             </div>
+
             <div>
               <label>Mode</label>
               <div>{user.darkMode ? "Dark" : "Light"}</div>
             </div>
-            <div>
-              <Row>
-                <ColorBubble $color={user.iconColor || "#0000ff"} />
-              </Row>
-            </div>
           </StyledForm>
-          <Button variant="outline" color="primary" type="button" onClick={() => setEditing(true)}>
+
+          <Button
+            variant="outline"
+            color="primary"
+            type="button"
+            onClick={() => setEditing(true)}
+          >
             Edit account
           </Button>
         </>
       )}
+
       {editing && (
         <StyledForm onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="firstName">Name</label>
-            <input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
           <div>
             <Row>
               <ColorBubble $color={iconColor} />
@@ -169,12 +200,68 @@ function Account() {
               />
             </Row>
           </div>
+
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="firstName">Name</label>
+            <input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>Mode</label>
+            <ToggleRow>
+              <span>{darkMode ? "Dark" : "Light"}</span>
+
+              <Switch
+                type="button"
+                $active={darkMode}
+                onClick={handleThemeToggle}
+                aria-label="Toggle dark mode"
+              >
+                <Knob $active={darkMode} />
+              </Switch>
+            </ToggleRow>
+          </div>
+
           {error && <Error>{error}</Error>}
-          {success && <div style={{ color: "var(--cinema-gold)" }}>{success}</div>}
+          {success && (
+            <div style={{ color: "var(--success-color)" }}>{success}</div>
+          )}
+
           <div style={{ display: "flex", gap: "0.75rem" }}>
-            <Button variant="fill" color="primary" type="submit" disabled={saving}>
+            <Button
+              variant="fill"
+              color="primary"
+              type="submit"
+              disabled={saving}
+            >
               {saving ? "Saving..." : "Save changes"}
             </Button>
+
             <Button
               variant="outline"
               color="primary"
@@ -187,6 +274,8 @@ function Account() {
                 setFirstName(user.firstName || "");
                 setEmail(user.email || "");
                 setIconColor(user.iconColor || "#0000ff");
+                setDarkMode(user.darkMode || false);
+                resetTheme(user.darkMode ? 'light' : 'dark');
               }}
             >
               Cancel
@@ -199,4 +288,3 @@ function Account() {
 }
 
 export default Account;
-
