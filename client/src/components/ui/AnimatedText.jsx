@@ -20,7 +20,6 @@ const TextContainer = styled.div`
             return props.compact ? '16px' : 'clamp(2.5rem, 5vw, 6rem)';
         }};
         margin: 0;
-        font-weight: 600;
     }
 
     & .dots {

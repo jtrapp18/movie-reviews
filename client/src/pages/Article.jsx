@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getJSON, snakeToCamel } from '../helper';
 import ArticleForm from '../forms/ArticleForm';
+import CommentList from '../components/comments/CommentList';
 import SEOHead from '../components/SEOHead';
 import CoverHeader from '../components/CoverHeader';
+import LikeButton from '../components/LikeButton';
+import { UserContext } from '../context/userProvider';
 import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
 import Loading from '../components/ui/Loading';
 import { StyledContainer } from '../styles';
@@ -30,8 +33,16 @@ const ErrorMessage = styled.div`
   margin: 20px auto;
 `;
 
+const LikeBar = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+`;
+
 function Article() {
   const { id } = useParams();
+  const { user } = useContext(UserContext);
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -120,7 +131,20 @@ function Article() {
           rating={article.rating}
           publishDate={article.dateAdded || article.date_added}
         />
+        <LikeBar>
+          <LikeButton
+            type="review"
+            id={article.id}
+            likeCount={article.likeCount ?? 0}
+            likedByMe={article.likedByMe ?? false}
+            disabled={!user}
+            onUpdate={(liked, likeCount) => {
+              setArticle((prev) => (prev ? { ...prev, likedByMe: liked, likeCount } : prev));
+            }}
+          />
+        </LikeBar>
         <ArticleForm initObj={article} />
+        <CommentList reviewId={article.id} />
       </StyledContainer>
     </>
   );

@@ -6,6 +6,7 @@ import AccountDropdown from "./AccountDropdown";
 const StyledNavBar = styled.nav`
   color: black;
   display: flex;
+  align-items: center;
   height: fit-content;
 
   & > .nav-link {

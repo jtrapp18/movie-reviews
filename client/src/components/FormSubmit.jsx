@@ -15,12 +15,13 @@ const TagsContainer = styled.div`
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
-  margin-bottom: 20px;
+  padding: .5rem;
+  background: var(--background-secondary);
 `;
 
 const Tag = styled.span`
-  background-color: var(--primary);
-  color: var(--font-color-2);
+  background-color: var(--font-color-1);
+  color: var(--background-secondary);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.9rem;

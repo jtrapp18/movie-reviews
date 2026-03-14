@@ -18,11 +18,14 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
-    phone_number = db.Column(db.String, nullable=True)
     email = db.Column(db.String, nullable=False, unique=True)
-    zipcode = db.Column(db.String, nullable=False)
+    first_name = db.Column(db.String, nullable=True)
+    last_name = db.Column(db.String, nullable=True)
+    phone_number = db.Column(db.String, nullable=True)
+    zipcode = db.Column(db.String, nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
+    dark_mode = db.Column(db.Boolean, default=False)
+    icon_color = db.Column(db.String, default='blue')
 
     review_comments = db.relationship(
         'ReviewComment',
@@ -30,8 +33,20 @@ class User(db.Model, SerializerMixin):
         cascade='all, delete-orphan',
         lazy='select',
     )
+    comment_likes = db.relationship(
+        'CommentLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
+    review_likes = db.relationship(
+        'ReviewLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-_password_hash', '-review_comments.user')
+    serialize_rules = ('-_password_hash', '-review_comments.user', '-comment_likes', '-review_likes')
     
     @hybrid_property
     def password_hash(self):

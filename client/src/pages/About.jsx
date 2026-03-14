@@ -8,33 +8,23 @@ import { StyledContainer } from '../styles';
 
 const aboutContent = yaml.load(aboutContentYaml);
 
-const AboutContainer = styled.div`
-  max-width: min(800px, 90vw);
-  margin: 0 auto;
-  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
-  // color: white;
-  line-height: 1.6;
-
-  @media (max-width: 768px) {
-    width: 100vw;
-  }
-`;
-
 const Header = styled.div`
   text-align: center;
-  
-  h1 {
-    // color: var(--cinema-gold);
-    // font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 0.625rem;
-  }
-  
-  .subtitle {
-    // color: var(--cinema-silver);
-    // font-size: clamp(1.1rem, 3vw, 1.5rem);
-    font-style: italic;
-  }
 `;
+
+function Paragraphs({ text }) {
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .map((s) => s.trim().replace(/\n/g, ' '))
+    .filter(Boolean);
+  return (
+    <>
+      {paragraphs.map((para, i) => (
+        <p key={i}>{para}</p>
+      ))}
+    </>
+  );
+}
 
 const ContentType = styled.div`
   background: var(--background-secondary);
@@ -49,29 +39,21 @@ const ContentType = styled.div`
   
   p {
     margin: 0;
-    // color: var(--cinema-silver);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 
 const ContactMethod = styled.div`
   display: flex;
-  align-items: center;
-  margin: clamp(0.5rem, 1.5vw, 0.625rem) 0;
   flex-wrap: wrap;
   gap: 0.5rem;
   
   .type {
-    // color: var(--cinema-gold);
     font-weight: bold;
     min-width: clamp(4rem, 10vw, 5rem);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
   
   .value {
-    // color: var(--cinema-silver);
     margin-left: clamp(0.75rem, 2vw, 0.9375rem);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 
@@ -81,31 +63,23 @@ function About() {
     <StyledContainer>
       <Header>
         <h1>{aboutContent.header.title}</h1>
-        <div className="subtitle">{aboutContent.header.subtitle}</div>
+        <h3><i>{aboutContent.header.subtitle}</i></h3>
       </Header>
 
       <AboutSection>
-        <p>{aboutContent.aboutJames.personalStory}</p>
-        
-        <p>{aboutContent.aboutJames.intro}</p>
-        
-        <h3>Favorite Directors</h3>
+        <Paragraphs text={aboutContent.aboutJames.personalStory} />
+
+        <Paragraphs text={aboutContent.aboutJames.intro} />
+
+        <h4>His favorite filmmakers include:</h4>
         <List items={aboutContent.aboutJames.favoriteDirectors} />
 
-        <h3>Preferred Genres</h3>
-        <List items={aboutContent.aboutJames.preferredGenres} />
+        <Paragraphs text={aboutContent.aboutJames.closing} />
 
-        <h3>Favorite Film Eras</h3>
-        <List items={aboutContent.aboutJames.favoriteEras} />
-
-        <p>{aboutContent.aboutJames.philosophy}</p>
-
-        <h3>Specialties</h3>
-        <List items={aboutContent.aboutJames.specialties} />
       </AboutSection>
 
       <AboutSection title="About This Website">
-        <p>{aboutContent.aboutWebsite.intro}</p>
+        <Paragraphs text={aboutContent.aboutWebsite.intro} />
         
         {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
           <ContentType key={index}>
@@ -116,7 +90,7 @@ function About() {
       </AboutSection>
 
       <AboutSection title="Get in Touch">
-        <p>{aboutContent.contact.intro}</p>
+        <Paragraphs text={aboutContent.contact.intro} />
         
         {aboutContent.contact.methods.map((method, index) => (
           <ContactMethod key={index}>

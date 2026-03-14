@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Slider from 'react-slick';
 import { FaSearch } from 'react-icons/fa';
+import MotionWrapper from '../styles/MotionWrapper';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -25,7 +26,10 @@ const CarouselStyles = styled.div`
   
   /* Dots styling */
   .slick-dots {
-    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
   
   .slick-dots li {
@@ -38,13 +42,13 @@ const CarouselStyles = styled.div`
   }
   
   .slick-dots li button:before {
-    color: var(--cinema-gold);
+    color: var(--primary);
     opacity: 0.5;
   }
   
   .slick-dots li.slick-active button:before {
     opacity: 1;
-    color: var(--cinema-gold);
+    color: var(--primary);
   }
 `;
 
@@ -126,7 +130,11 @@ const Carousel = ({ children, settings = {}, noResultsMessage = "No results foun
     <CarouselContainer>
       <CarouselStyles>
         <Slider {...finalSettings}>
-          {children}
+          {React.Children.map(children, (child, index) => (
+            <MotionWrapper key={child.key ?? index} index={index}>
+              {child}
+            </MotionWrapper>
+          ))}
         </Slider>
       </CarouselStyles>
     </CarouselContainer>

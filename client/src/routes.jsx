@@ -10,9 +10,11 @@ import MovieReview from './pages/MovieReview';
 import Articles from './pages/Articles';
 import Article from './pages/Article';
 import NewArticle from './pages/NewArticle';
-import Admin from './pages/Admin';
 import Director from './pages/Director';
 import DirectorsPage from './pages/DirectorsPage';
+import Account from './pages/Account';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const routes = [
   {
@@ -35,6 +37,14 @@ const routes = [
       {
         path: "login",
         element: <Login />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "reset-password",
+        element: <ResetPassword />,
       },
       {
         path: "search_movies",
@@ -65,9 +75,9 @@ const routes = [
         element: <NewArticle />,
       },
       {
-        path: "admin",
-        element: <Admin />,
-      }
+        path: "account",
+        element: <Account />,
+      },
     ],
   },
 ];

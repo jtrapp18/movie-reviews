@@ -48,7 +48,7 @@ function MovieCard({ movie, rating = null, clickable = true, size = "default" })
 
   const cardStyle =
     size === "small"
-      ? { width: '150px', height: '210px' }
+      ? { zoom: 0.7 }
       : undefined;
 
   return (

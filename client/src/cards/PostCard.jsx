@@ -9,8 +9,8 @@ const StyledCard = styled.article`
   transition: background-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background-color: var(--background-tertiary);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
   }
 
   img {

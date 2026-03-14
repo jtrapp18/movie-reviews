@@ -3,8 +3,8 @@
 import os
 import requests
 import uuid
-from datetime import date
-from datetime import datetime
+import secrets
+from datetime import date, datetime, timedelta
 # from flask_migrate import Migrate
 from flask import request, session, send_file, jsonify, Response
 from flask_restful import  Resource
@@ -12,7 +12,7 @@ from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, Tag, Director
+from lib.models import User, Movie, Review, Tag, Director, PasswordResetToken
 from lib.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
@@ -166,6 +166,80 @@ class UserById(Resource):
         return user.to_dict(), 200
 
 
+class PasswordResetRequest(Resource):
+    def post(self):
+        data = request.get_json() or {}
+        email = data.get('email')
+        username = data.get('username')
+
+        if not email and not username:
+            return {'error': 'Email or username is required.'}, 400
+
+        user = None
+        if email:
+            user = User.query.filter_by(email=email).first()
+        elif username:
+            user = User.query.filter_by(username=username).first()
+
+        # Always return 200 to avoid leaking which accounts exist
+        if not user:
+            return {
+                'message': 'If an account exists for that information, you will receive reset instructions shortly.'
+            }, 200
+
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+
+        reset_token = PasswordResetToken(
+            user_id=user.id,
+            token=token,
+            expires_at=expires_at,
+            used=False,
+        )
+        db.session.add(reset_token)
+        db.session.commit()
+
+        reset_url = f"{request.url_root.rstrip('/')}/#/reset-password?token={token}"
+        print(f"[PasswordReset] Generated reset link for user {user.id}: {reset_url}")
+
+        # NOTE: In production, you would email this link to the user instead of returning the token.
+        return {
+            'message': 'If an account exists for that information, you will receive reset instructions shortly.',
+            'token': token,
+        }, 200
+
+
+class PasswordReset(Resource):
+    def post(self):
+        data = request.get_json() or {}
+        token = data.get('token')
+        new_password = data.get('password')
+
+        if not token or not new_password:
+            return {'error': 'Token and new password are required.'}, 400
+
+        reset_token = PasswordResetToken.query.filter_by(token=token).first()
+        if (
+            not reset_token
+            or reset_token.used
+            or reset_token.expires_at < datetime.utcnow()
+        ):
+            return {'error': 'Invalid or expired reset token.'}, 400
+
+        user = User.query.get(reset_token.user_id)
+        if not user:
+            return {'error': 'User not found.'}, 400
+
+        try:
+            user.password_hash = new_password
+            reset_token.used = True
+            db.session.commit()
+            return {'message': 'Password has been reset.'}, 200
+        except Exception:
+            db.session.rollback()
+            return {'error': 'Failed to reset password.'}, 500
+
+
 class Sitemap(Resource):
     """Generate XML sitemap for SEO"""
     
@@ -231,4 +305,6 @@ def register_routes(api):
     api.add_resource(Login, '/api/login')
     api.add_resource(Logout, '/api/logout')
     api.add_resource(UserById, '/api/users/<int:user_id>')
+    api.add_resource(PasswordResetRequest, '/api/password_reset_request')
+    api.add_resource(PasswordReset, '/api/password_reset')
     api.add_resource(Sitemap, '/sitemap.xml')

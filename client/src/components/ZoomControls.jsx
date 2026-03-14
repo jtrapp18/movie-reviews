@@ -7,14 +7,13 @@ const ZoomControlsContainer = styled.div`
   gap: 0.3rem;
   padding: 0.5rem;
   border-radius: 25px;
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  
+  background: var(--background-tertiary);
+
   ${props => props.floating ? `
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: rgba(26, 26, 26, 0.95);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow);
     backdrop-filter: blur(10px);
     
     @media (max-width: 768px) {
@@ -26,13 +25,13 @@ const ZoomControlsContainer = styled.div`
   ` : `
     justify-content: center;
     margin: 1rem 0;
-    background-color: rgba(255, 215, 0, 0.05);
   `}
 `;
 
 const ZoomButton = styled.button`
-  background: var(--cinema-gold);
-  color: var(--cinema-black);
+  // background: var(--primary);
+  background: var(--background-secondary);
+  // color: var(--background-secondary);
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -46,8 +45,10 @@ const ZoomButton = styled.button`
   justify-content: center;
   
   &:hover {
-    background: var(--cinema-gold-dark);
     transform: scale(1.1);
+    cursor: pointer;
+    background: var(--font-color-1);
+    color: var(--background);
   }
   
   &:active {
@@ -68,15 +69,12 @@ const ZoomButton = styled.button`
 `;
 
 const ZoomLevel = styled.span`
-  color: var(--cinema-gold);
   font-weight: 600;
-  font-size: 0.8rem;
   min-width: 40px;
   text-align: center;
   padding: 0 0.5rem;
   
   @media (max-width: 768px) {
-    font-size: 0.7rem;
     min-width: 35px;
     padding: 0 0.3rem;
   }

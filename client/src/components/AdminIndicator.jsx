@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { AdminContext } from '../context/adminProvider';
+import React from 'react';
+import { useAccountStatus } from '../utils/account';
 import { FaCrown, FaTimes } from 'react-icons/fa';
 import styled from 'styled-components';
 
@@ -27,7 +27,7 @@ const AdminIcon = styled.div`
 `;
 
 function AdminIndicator() {
-  const { isAdmin, logoutAdmin } = useContext(AdminContext);
+  const { user, isAdmin, logout } = useAccountStatus();
 
   if (!isAdmin) return null;
 
@@ -38,7 +38,7 @@ function AdminIndicator() {
       </AdminIcon>
       Admin Mode
       <button 
-        onClick={logoutAdmin}
+        onClick={logout}
         style={{
           background: 'none',
           border: 'none',
