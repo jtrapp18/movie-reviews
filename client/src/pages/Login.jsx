@@ -54,7 +54,7 @@ function Login() {
       <Header>
         <h1>{isLogin ? "Login" : "Sign Up"}</h1>
         <div className="subtitle">
-          {isLogin ? "Sign in to access your account" : "Create a new account"}
+          <h3>{isLogin ? "Sign in to access your account" : "Create a new account"}</h3>
         </div>
       </Header>
 

@@ -9,11 +9,12 @@ const LinkContainer = styled.div`
   top: 100%;
   right: 0;
   z-index: 1000;
-  width: 20%;
+  width: 200px;
   text-decoration: none;
   text-align: right;
   background: var(--background-tertiary);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-bottom: 3px double var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Ensures smooth animation */
@@ -47,7 +48,6 @@ const StyledNavLink = styled(NavLink)`
 
   height: 10vh;
   justify-content: end;
-  font-size: var(--default-font-size);
   align-items: center;
   display: flex;
 
@@ -57,9 +57,8 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &:hover {
-    color: var(--font-color-2);
-    background: var(--background-secondary);
-    // border: 1px solid var(--border);
+    color: var(--background-tertiary);
+    background: var(--font-color-1);
   }
 `
 

@@ -26,7 +26,7 @@ const Section = ({
       </MotionWrapper>
       {subtitle && (
         <MotionWrapper index={2}>
-          <p><i>{subtitle}</i></p>
+          <h3><i>{subtitle}</i></h3>
         </MotionWrapper>
       )}
       {showSearch && (

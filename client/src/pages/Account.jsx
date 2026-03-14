@@ -146,7 +146,9 @@ function Account() {
     <StyledContainer>
       <Header>
         <h1>Account Settings</h1>
-        <div className="subtitle">View and update your profile details.</div>
+        <div className="subtitle">
+          <h3>View and update your profile details.</h3>
+        </div>
       </Header>
 
       {!editing && (
@@ -158,22 +160,22 @@ function Account() {
 
             <div>
               <label>Username</label>
-              <div>{user.username}</div>
+              <p>{user.username}</p>
             </div>
 
             <div>
               <label>Name</label>
-              <div>{user.firstName}</div>
+              <p>{user.firstName}</p>
             </div>
 
             <div>
               <label>Email</label>
-              <div>{user.email}</div>
+              <p>{user.email}</p>
             </div>
 
             <div>
               <label>Mode</label>
-              <div>{user.darkMode ? "Dark" : "Light"}</div>
+              <p>{user.darkMode ? "Dark" : "Light"}</p>
             </div>
           </StyledForm>
 

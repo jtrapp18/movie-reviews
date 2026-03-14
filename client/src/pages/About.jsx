@@ -10,18 +10,6 @@ const aboutContent = yaml.load(aboutContentYaml);
 
 const Header = styled.div`
   text-align: center;
-  
-  h1 {
-    // color: var(--cinema-gold);
-    // font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 0.625rem;
-  }
-  
-  .subtitle {
-    // color: var(--cinema-silver);
-    // font-size: clamp(1.1rem, 3vw, 1.5rem);
-    font-style: italic;
-  }
 `;
 
 function Paragraphs({ text }) {
@@ -51,29 +39,21 @@ const ContentType = styled.div`
   
   p {
     margin: 0;
-    // color: var(--cinema-silver);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 
 const ContactMethod = styled.div`
   display: flex;
-  // align-items: center;
-  // margin: clamp(0.5rem, 1.5vw, 0.625rem) 0;
   flex-wrap: wrap;
   gap: 0.5rem;
   
   .type {
-    // color: var(--cinema-gold);
     font-weight: bold;
     min-width: clamp(4rem, 10vw, 5rem);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
   
   .value {
-    // color: var(--cinema-silver);
     margin-left: clamp(0.75rem, 2vw, 0.9375rem);
-    // font-size: clamp(0.9rem, 2vw, 1rem);
   }
 `;
 
@@ -83,7 +63,7 @@ function About() {
     <StyledContainer>
       <Header>
         <h1>{aboutContent.header.title}</h1>
-        <div className="subtitle">{aboutContent.header.subtitle}</div>
+        <h3><i>{aboutContent.header.subtitle}</i></h3>
       </Header>
 
       <AboutSection>
@@ -91,7 +71,7 @@ function About() {
 
         <Paragraphs text={aboutContent.aboutJames.intro} />
 
-        <h3>His favorite filmmakers include:</h3>
+        <h4>His favorite filmmakers include:</h4>
         <List items={aboutContent.aboutJames.favoriteDirectors} />
 
         <Paragraphs text={aboutContent.aboutJames.closing} />

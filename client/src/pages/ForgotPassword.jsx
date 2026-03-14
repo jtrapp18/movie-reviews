@@ -56,7 +56,7 @@ function ForgotPassword() {
       <Header>
         <h1>Forgot password</h1>
         <div className="subtitle">
-          Enter your email address or username to reset your password.
+          <h3>Enter your email address or username to reset your password.</h3>
         </div>
       </Header>
       <StyledForm onSubmit={handleSubmit}>

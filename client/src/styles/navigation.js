@@ -10,6 +10,7 @@ const StyledMenuItem = css`
   display: flex;
   align-items: center;
   color: var(--font-color-1);
+  white-space: nowrap;
 `;
 
 const StyledNavigation = css`

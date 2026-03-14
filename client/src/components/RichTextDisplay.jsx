@@ -115,16 +115,17 @@ const RichTextContainer = styled.div`
     color: inherit;
   }
   
-  /* Enhanced image styling */
+  /* Enhanced image styling - center images only */
   img {
+    display: block;
     max-width: 100%;
     height: auto;
-
+    margin-left: auto;
+    margin-right: auto;
   }
   
   /* Enhanced link styling */
   a {
-    color: var(--cinema-gold);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: all 0.3s ease;
@@ -132,7 +133,6 @@ const RichTextContainer = styled.div`
   
   a:hover {
     color: var(--rich-text-header);
-    border-bottom: 1px solid var(--cinema-gold);
   }
   
   /* Enhanced table styling */
