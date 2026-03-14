@@ -8,18 +8,6 @@ import { StyledContainer } from '../styles';
 
 const aboutContent = yaml.load(aboutContentYaml);
 
-const AboutContainer = styled.div`
-  max-width: min(800px, 90vw);
-  margin: 0 auto;
-  padding: clamp(2rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.25rem);
-  // color: white;
-  line-height: 1.6;
-
-  @media (max-width: 768px) {
-    width: 100vw;
-  }
-`;
-
 const Header = styled.div`
   text-align: center;
   
@@ -35,6 +23,20 @@ const Header = styled.div`
     font-style: italic;
   }
 `;
+
+function Paragraphs({ text }) {
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .map((s) => s.trim().replace(/\n/g, ' '))
+    .filter(Boolean);
+  return (
+    <>
+      {paragraphs.map((para, i) => (
+        <p key={i}>{para}</p>
+      ))}
+    </>
+  );
+}
 
 const ContentType = styled.div`
   background: var(--background-secondary);
@@ -56,8 +58,8 @@ const ContentType = styled.div`
 
 const ContactMethod = styled.div`
   display: flex;
-  align-items: center;
-  margin: clamp(0.5rem, 1.5vw, 0.625rem) 0;
+  // align-items: center;
+  // margin: clamp(0.5rem, 1.5vw, 0.625rem) 0;
   flex-wrap: wrap;
   gap: 0.5rem;
   
@@ -85,27 +87,19 @@ function About() {
       </Header>
 
       <AboutSection>
-        <p>{aboutContent.aboutJames.personalStory}</p>
-        
-        <p>{aboutContent.aboutJames.intro}</p>
-        
-        <h3>Favorite Directors</h3>
+        <Paragraphs text={aboutContent.aboutJames.personalStory} />
+
+        <Paragraphs text={aboutContent.aboutJames.intro} />
+
+        <h3>His favorite filmmakers include:</h3>
         <List items={aboutContent.aboutJames.favoriteDirectors} />
 
-        <h3>Preferred Genres</h3>
-        <List items={aboutContent.aboutJames.preferredGenres} />
+        <Paragraphs text={aboutContent.aboutJames.closing} />
 
-        <h3>Favorite Film Eras</h3>
-        <List items={aboutContent.aboutJames.favoriteEras} />
-
-        <p>{aboutContent.aboutJames.philosophy}</p>
-
-        <h3>Specialties</h3>
-        <List items={aboutContent.aboutJames.specialties} />
       </AboutSection>
 
       <AboutSection title="About This Website">
-        <p>{aboutContent.aboutWebsite.intro}</p>
+        <Paragraphs text={aboutContent.aboutWebsite.intro} />
         
         {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
           <ContentType key={index}>
@@ -116,7 +110,7 @@ function About() {
       </AboutSection>
 
       <AboutSection title="Get in Touch">
-        <p>{aboutContent.contact.intro}</p>
+        <Paragraphs text={aboutContent.contact.intro} />
         
         {aboutContent.contact.methods.map((method, index) => (
           <ContactMethod key={index}>
