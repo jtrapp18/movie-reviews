@@ -1,0 +1,5 @@
+Metadata-Version: 2.1
+Name: movie-reviews
+Version: 0.1.0
+Summary: Movie reviews Flask backend
+Requires-Python: >=3.8

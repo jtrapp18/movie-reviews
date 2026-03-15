@@ -10,10 +10,10 @@ from flask import request, session, send_file, jsonify, Response
 from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
-from lib.config import app, db, api
+from movie_reviews.config import app, db, api
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, Tag, Director, PasswordResetToken
-from lib.utils.document_processor import DocumentProcessor
+from movie_reviews.models import User, Movie, Review, Tag, Director, PasswordResetToken
+from movie_reviews.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
 

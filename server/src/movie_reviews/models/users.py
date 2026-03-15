@@ -3,8 +3,8 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import CheckConstraint
-from lib.config import db, bcrypt
-from lib.utils import (
+from movie_reviews.config import db, bcrypt
+from movie_reviews.utils import (
     validate_required_string,
     validate_optional_string,
     validate_optional_email,

@@ -2,8 +2,8 @@ from datetime import datetime, date
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from lib.utils import normalize_tag_name
-from lib.config import db
+from movie_reviews.utils import normalize_tag_name
+from movie_reviews.config import db
 
 review_tags = db.Table(
     'review_tags',

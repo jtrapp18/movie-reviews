@@ -5,7 +5,7 @@ Run this script to add performance indexes to the database.
 """
 
 from sqlalchemy import create_engine, text
-from lib.config import db
+from movie_reviews.config import db
 from app import app
 
 def add_rating_indexes():

@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from app import app, db
-from lib.models import Review, Tag
+from movie_reviews.models import Review, Tag
 
 
 def test_database_content():

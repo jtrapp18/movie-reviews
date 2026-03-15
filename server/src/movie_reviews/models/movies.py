@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, Text, Date
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from lib.config import db
-from lib.utils import validate_required_url, validate_required_string
+from movie_reviews.config import db
+from movie_reviews.utils import validate_required_url, validate_required_string
 
 class Movie(db.Model, SerializerMixin):
     __tablename__ = 'movies'

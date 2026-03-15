@@ -31,8 +31,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the built React app from the first stage
 COPY --from=frontend-build /app/client/dist ./client/dist
 
-# Copy the Flask backend
+# Copy the Flask backend and install as editable so movie_reviews is importable
 COPY server ./server
+RUN pip install -e ./server
 
 # Expose the port and set the command to start Gunicorn
 EXPOSE ${PORT}

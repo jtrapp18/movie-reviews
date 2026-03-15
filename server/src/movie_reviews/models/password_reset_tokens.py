@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy_serializer import SerializerMixin
-from lib.config import db
+from movie_reviews.config import db
 
 
 class PasswordResetToken(db.Model, SerializerMixin):

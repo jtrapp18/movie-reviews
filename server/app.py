@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from lib.config import app, api
+from movie_reviews.config import app, api
 from flask_cors import CORS
 
-from lib.api import ROUTE_MODULES
+from movie_reviews.api import ROUTE_MODULES
 
 
 # Enable CORS for all routes

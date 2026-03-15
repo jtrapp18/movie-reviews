@@ -2,8 +2,8 @@ from flask import request, session
 from flask_restful import Resource
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from lib.config import db, api
-from lib.models import Review, ReviewComment, CommentLike
+from movie_reviews.config import db, api
+from movie_reviews.models import Review, ReviewComment, CommentLike
 
 
 class ReviewComments(Resource):

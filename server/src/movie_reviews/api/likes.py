@@ -1,8 +1,8 @@
 """Like toggle endpoints for comments and reviews."""
 from flask import session
 from flask_restful import Resource
-from lib.config import db, api
-from lib.models import ReviewComment, Review, CommentLike, ReviewLike
+from movie_reviews.config import db, api
+from movie_reviews.models import ReviewComment, Review, CommentLike, ReviewLike
 
 
 class CommentLikeToggle(Resource):

@@ -2,13 +2,13 @@ from datetime import date
 from sqlalchemy import Column, Integer, String, Text, Date, ForeignKey, Boolean
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from lib.utils import (
+from movie_reviews.utils import (
     validate_optional_int_in_range,
     validate_required_string,
     validate_date_or_yyyy_mm_dd,
     validate_enum,
 )
-from lib.config import db
+from movie_reviews.config import db
 from .tags import review_tags
 
 class Review(db.Model, SerializerMixin):

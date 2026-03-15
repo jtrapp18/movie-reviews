@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, UniqueConstraint
 from sqlalchemy_serializer import SerializerMixin
-from lib.config import db
+from movie_reviews.config import db
 
 
 class CommentLike(db.Model, SerializerMixin):

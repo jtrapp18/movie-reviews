@@ -22,9 +22,10 @@ if [ -d ".venv" ]; then
   source .venv/bin/activate
 fi
 
-# 3) Install backend dependencies
+# 3) Install backend dependencies and editable server package
 echo "Installing Python dependencies..."
 pip install --no-cache-dir -r requirements.txt
+pip install -e ./server
 
 # 4) Start Gunicorn (same command used in Dockerfile)
 echo "Starting Gunicorn on 0.0.0.0:${PORT}..."

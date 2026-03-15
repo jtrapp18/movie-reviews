@@ -10,11 +10,11 @@ from flask import request, session, send_file, jsonify, Response
 from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
-from lib.config import app, db, api
+from movie_reviews.config import app, db, api
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, ReviewLike, Tag, Director
-from lib.utils.document_processor import DocumentProcessor
+from movie_reviews.models import User, Movie, Review, ReviewLike, Tag, Director
+from movie_reviews.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
 
@@ -628,7 +628,7 @@ class DeleteMovie(Resource):
             for review in reviews:
                 if review.has_document and review.document_path:
                     try:
-                        from lib.utils.s3_client import s3_client
+                        from movie_reviews.utils.s3_client import s3_client
                         s3_client.delete_object(Bucket='movie-reviews-documents', Key=review.document_path)
                     except Exception as e:
                         print(f"Warning: Could not delete S3 document: {e}")
@@ -655,7 +655,7 @@ class DeleteArticle(Resource):
             # Delete associated document if it exists
             if article.has_document and article.document_path:
                 try:
-                    from lib.utils.s3_client import s3_client
+                    from movie_reviews.utils.s3_client import s3_client
                     s3_client.delete_object(Bucket='movie-reviews-documents', Key=article.document_path)
                 except Exception as e:
                     print(f"Warning: Could not delete S3 document: {e}")

@@ -11,13 +11,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Add the server directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Requires movie_reviews to be installed (pip install -e . from server/).
 
 def test_s3_connection():
     """Test S3 connection and basic functionality."""
     try:
-        from lib.utils.s3_client import get_s3_client
+        from movie_reviews.utils.s3_client import get_s3_client
         
         print("🔧 Testing S3/MinIO connection...")
         
