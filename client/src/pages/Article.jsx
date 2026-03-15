@@ -1,16 +1,16 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { getJSON, snakeToCamel } from '../helper';
-import ArticleForm from '../forms/ArticleForm';
-import CommentList from '../components/comments/CommentList';
-import SEOHead from '../components/SEOHead';
-import CoverHeader from '../components/CoverHeader';
-import LikeButton from '../components/LikeButton';
-import { UserContext } from '../context/userProvider';
-import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
-import Loading from '../components/ui/Loading';
-import { StyledContainer } from '../styles';
+import { getJSON, snakeToCamel } from '@helper';
+import ArticleForm from '@forms/ArticleForm';
+import CommentList from '@components/comments/CommentList';
+import SEOHead from '@components/shared-sections/SEOHead';
+import CoverHeader from '@components/shared-sections/CoverHeader';
+import LikeButton from '@components/shared-sections/LikeButton';
+import { UserContext } from '@context/userProvider';
+import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '@utils/seoUtils';
+import Loading from '@components/ui/Loading';
+import { StyledContainer } from '@styles';
 
 const DEFAULT_ARTICLE_BACKDROP = "/images/default-article.jpeg";
 

@@ -1,11 +1,11 @@
-import { getMoviesByGenre, getMovieInfo } from '../helper';
+import { getMoviesByGenre, getMovieInfo } from '@helper';
 import { useState, useEffect, useContext } from 'react';
-import MotionWrapper from '../styles/MotionWrapper';
-import MovieSwimlane from '../components/MovieSwimlane';
-import SearchResultsGrid from '../components/SearchResultsGrid';
+import MotionWrapper from '@styles/MotionWrapper';
+import MovieSwimlane from '@components/shared-sections/MovieSwimlane';
+import SearchResultsGrid from '@components/shared-sections/SearchResultsGrid';
 import { useNavigate } from 'react-router-dom';
-import { AdminContext } from '../context/adminProvider';
-import SearchPageFrame from '../components/SearchPageFrame';
+import { AdminContext } from '@context/adminProvider';
+import SearchPageFrame from '@components/shared-sections/SearchPageFrame';
 
 // Define genres we want to show
 const GENRES = [

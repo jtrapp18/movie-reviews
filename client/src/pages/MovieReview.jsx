@@ -1,16 +1,16 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer } from '../styles';
-import CoverHeader from '../components/CoverHeader';
-import LikeButton from '../components/LikeButton';
-import { getJSON, snakeToCamel } from '../helper';
-import ReviewForm from '../forms/ReviewForm';
-import CommentList from '../components/comments/CommentList';
-import SEOHead from '../components/SEOHead';
-import Loading from '../components/ui/Loading';
-import { UserContext } from '../context/userProvider';
-import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
+import { StyledContainer } from '@styles';
+import CoverHeader from '@components/shared-sections/CoverHeader';
+import LikeButton from '@components/shared-sections/LikeButton';
+import { getJSON, snakeToCamel } from '@helper';
+import ReviewForm from '@forms/ReviewForm';
+import CommentList from '@components/comments/CommentList';
+import SEOHead from '@components/shared-sections/SEOHead';
+import Loading from '@components/ui/Loading';
+import { UserContext } from '@context/userProvider';
+import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '@utils/seoUtils';
 
 const MovieContainer = styled.div`
   margin: 1rem 0 2rem 0;

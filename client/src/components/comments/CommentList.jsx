@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { snakeToCamel } from '../../helper';
-import { UserContext } from '../../context/userProvider';
+import { snakeToCamel } from '@helper';
+import { UserContext } from '@context/userProvider';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
-import Loading from '../ui/Loading';
+import Loading from '@components/ui/Loading';
 
 const COMMENT_PAGE_SIZE = 5;
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import MotionWrapper from '../styles/MotionWrapper';
-import ArticleCard from '../cards/ArticleCard';
-import SearchBar from '../components/SearchBar';
-import PageContainer from '../components/PageContainer';
-import { CardContainer } from '../styles';
+import MotionWrapper from '@styles/MotionWrapper';
+import ArticleCard from '@components/cards/ArticleCard';
+import SearchBar from '@components/shared-sections/SearchBar';
+import PageContainer from '@components/layout/PageContainer';
+import { CardContainer } from '@styles';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';

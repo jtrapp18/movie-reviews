@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer, Button } from '../styles';
-import { getJSON, patchJSONToDb } from '../helper';
-import SEOHead from '../components/SEOHead';
-import Loading from '../components/ui/Loading';
-import DirectorBio from '../components/DirectorBio';
-import DirectorTimeline from '../components/DirectorTimeline';
-import { useAdmin } from '../hooks/useAdmin';
-import BackdropUpload from '../components/BackdropUpload';
+import { StyledContainer, Button } from '@styles';
+import { getJSON, patchJSONToDb } from '@helper';
+import SEOHead from '@components/shared-sections/SEOHead';
+import Loading from '@components/ui/Loading';
+import DirectorBio from '@components/shared-sections/DirectorBio';
+import DirectorTimeline from '@components/shared-sections/DirectorTimeline';
+import { useAdmin } from '@hooks/useAdmin';
+import BackdropUpload from '@components/forms/BackdropUpload';
 
 const DirectorSection = styled.div`
   width: 100%;

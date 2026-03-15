@@ -1,17 +1,17 @@
-import { getJSON, snakeToCamel } from '../helper';
+import { getJSON, snakeToCamel } from '@helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Movies from '../components/Movies';
-import Articles from '../components/Articles';
-import RecentPosts from '../components/RecentPosts';
-import Directors from '../components/Directors';
-import Section from '../components/Section';
-import SearchResultsHeader from '../components/SearchResultsHeader';
-import Loading from '../components/ui/Loading';
-import SearchPageFrame from '../components/SearchPageFrame';
+import Movies from '@components/shared-sections/Movies';
+import Articles from '@components/shared-sections/Articles';
+import RecentPosts from '@components/shared-sections/RecentPosts';
+import Directors from '@components/shared-sections/Directors';
+import Section from '@components/layout/Section';
+import SearchResultsHeader from '@components/shared-sections/SearchResultsHeader';
+import Loading from '@components/ui/Loading';
+import SearchPageFrame from '@components/shared-sections/SearchPageFrame';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import SEOHead from '../components/SEOHead';
-import { generateWebsiteStructuredData } from '../utils/seoUtils';
+import SEOHead from '@components/shared-sections/SEOHead';
+import { generateWebsiteStructuredData } from '@utils/seoUtils';
 
 const StyledContainer = styled.div`
   padding: 0;

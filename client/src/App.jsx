@@ -1,14 +1,14 @@
 import {useState, useEffect, useContext, Suspense } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import Header from '@components/layout/Header';
+import Footer from '@components/layout/Footer';
 import { Outlet } from 'react-router-dom';
-import { getJSON, snakeToCamel } from './helper';
-import { UserContext } from './context/userProvider';
-import { WindowWidthContext } from './context/windowSize'
-import Loading from './components/ui/Loading';
-import { StyledMain } from './styles';
-import ThemeToggle from './components/ThemeToggle';
-import { useTheme } from './context/themeProvider';
+import { getJSON, snakeToCamel } from '@helper';
+import { UserContext } from '@context/userProvider';
+import { WindowWidthContext } from '@context/windowSize';
+import Loading from '@components/ui/Loading';
+import { StyledMain } from '@styles';
+import ThemeToggle from '@components/ui/ThemeToggle';
+import { useTheme } from '@context/themeProvider';
 
 function App() {
 

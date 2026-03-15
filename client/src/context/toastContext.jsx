@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import Toast from '../components/Toast';
+import Toast from '@components/feedback/Toast';
 
 const ToastContext = createContext({
   showToast: () => {},

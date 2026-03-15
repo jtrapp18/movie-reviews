@@ -3,21 +3,21 @@ import { useOutletContext, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import RichTextEditor from "../components/RichTextEditor";
+import RichTextEditor from "@components/forms/RichTextEditor";
 import styled from 'styled-components';
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../styles";
-import Error from "../styles/Error";
-import Stars from "../components/Stars"
-import ContentDisplay from "../components/FormSubmit";
-import DocumentUpload from "../components/DocumentUpload";
-import TagInput from "../components/TagInput";
-import SubmitButton from "../components/SubmitButton";
-import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
-import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
-import { extractTextFromFile } from "../utils/textExtraction";
-import useCrudStateDB from "../hooks/useCrudStateDB";
-import { snakeToCamel, invalidateRatingsCache, getJSON } from "../helper";
-import { useAdmin } from "../hooks/useAdmin";
+import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "@styles";
+import Error from "@styles/Error";
+import Stars from "@components/shared-sections/Stars";
+import ContentDisplay from "@components/forms/FormSubmit";
+import DocumentUpload from "@components/forms/DocumentUpload";
+import TagInput from "@components/forms/TagInput";
+import SubmitButton from "@components/forms/SubmitButton";
+import DeleteConfirmationModal from "@components/feedback/DeleteConfirmationModal";
+import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "@utils/formSubmit";
+import { extractTextFromFile } from "@utils/textExtraction";
+import useCrudStateDB from "@hooks/useCrudStateDB";
+import { snakeToCamel, invalidateRatingsCache, getJSON } from "@helper";
+import { useAdmin } from "@hooks/useAdmin";
 
 const StarsContainer = styled.div`
   display: flex;

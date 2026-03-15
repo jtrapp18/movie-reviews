@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '../../styles';
+import { Button } from '@styles';
 
 const Form = styled.form`
   margin-top: 0.5rem;

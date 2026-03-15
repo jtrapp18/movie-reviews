@@ -2,9 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
-import AboutSection from '../components/AboutSection';
-import List from '../components/List';
-import { StyledContainer } from '../styles';
+import AboutSection from '@components/shared-sections/AboutSection';
+import List from '@components/shared-sections/List';
+import { StyledContainer } from '@styles';
 
 const aboutContent = yaml.load(aboutContentYaml);
 

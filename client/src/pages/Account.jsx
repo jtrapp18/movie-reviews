@@ -4,7 +4,7 @@ import { StyledContainer, StyledForm, Button } from "../styles";
 import { UserContext } from "../context/userProvider";
 import { patchJSONToDb, snakeToCamel } from "../helper";
 import Error from "../styles/Error";
-import LoginMessage from "../components/LoginMessage";
+import LoginMessage from "@components/feedback/LoginMessage";
 import { useTheme } from '../context/themeProvider';
 
 

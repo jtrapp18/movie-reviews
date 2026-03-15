@@ -1,8 +1,8 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import CommentForm from './CommentForm';
-import LikeButton from '../LikeButton';
-import { UserContext } from '../../context/userProvider';
+import LikeButton from '@components/shared-sections/LikeButton';
+import { UserContext } from '@context/userProvider';
 
 const Wrapper = styled.div`
   margin-bottom: 1rem;
