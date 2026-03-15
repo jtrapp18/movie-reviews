@@ -5,11 +5,15 @@ import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
+import { useTheme } from "../context/themeProvider";
+import { useToast } from "../context/toastContext";
 
 function LoginForm() {
 
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { setTheme } = useTheme();
+  const { showToast } = useToast();
 
   const formik = useFormik({
     initialValues: {
@@ -22,8 +26,12 @@ function LoginForm() {
       try {
         const user = await postJSONToDb("login", body);  // Await the promise
         const userTransformed = snakeToCamel(user);
+        console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
-        // Navigate to home page after successful login
+        if (typeof userTransformed.darkMode === 'boolean') {
+          setTheme(userTransformed.darkMode ? 'dark' : 'light');
+        }
+        showToast(`Successfully logged in as ${userTransformed.username}`);
         navigate('/');
       } catch (error) {
         setErrors({ password: error.message });

@@ -8,6 +8,7 @@ import { WindowWidthContext } from './context/windowSize'
 import Loading from './components/ui/Loading';
 import { StyledMain } from './styles';
 import ThemeToggle from './components/ThemeToggle';
+import { useTheme } from './context/themeProvider';
 
 function App() {
 
@@ -18,18 +19,21 @@ function App() {
   const [directors, setDirectors] = useState([]);
   const [coreDataLoaded, setCoreDataLoaded] = useState(false);
 
-  // Auto-login
+  // Restore user from session so comments (and any other auth) work after refresh
+  const { setUser } = useContext(UserContext);
+  const { setTheme } = useTheme();
   useEffect(() => {
-    console.log('logging check session...')
     const fetchUser = async () => {
-      const user = await getJSON('check_session'); // Wait for the JSON
-      if (JSON.stringify(user) !== JSON.stringify(user)) {
+      const user = await getJSON('check_session');
+      if (user) {
         setUser(user);
+        if (typeof user.darkMode === 'boolean') {
+          setTheme(user.darkMode ? 'dark' : 'light');
+        }
       }
     };
-
     fetchUser();
-  }, []);
+  }, [setUser]);
 
   // Load core data early so Home, Articles, Directors feel instant
   useEffect(() => {
@@ -91,7 +95,7 @@ function App() {
         </Suspense>
       </StyledMain>
       <Footer />
-      <ThemeToggle />
+      {/* <ThemeToggle /> */}
     </div>
   );
 }

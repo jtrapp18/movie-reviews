@@ -41,7 +41,6 @@ function Articles({ showArticles, enterSearch }) {
     <CardContainer>
       <Carousel>
         {showArticles.map((article, index) => {
-          console.log(`🎬 RENDERING article ${index}: ID=${article.id}, Title="${article.title}"`);
           return (
             <MotionWrapper key={article.id} index={index}>
               <div style={{ 

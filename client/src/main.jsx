@@ -9,6 +9,7 @@ import { WindowWidthProvider } from './context/windowSize';
 import AdminIndicator from './components/AdminIndicator';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/themeProvider';
+import { ToastProvider } from './context/toastContext';
 
 // Create the hash-based router
 const router = createHashRouter(routes);
@@ -21,12 +22,14 @@ root.render(
     <HelmetProvider>
       <ThemeProvider>
         <WindowWidthProvider>
-          <UserProvider>
-            <AdminProvider>
-              <RouterProvider router={router} />
-              <AdminIndicator />
-            </AdminProvider>
-          </UserProvider>
+          <ToastProvider>
+            <UserProvider>
+              <AdminProvider>
+                <RouterProvider router={router} />
+                <AdminIndicator />
+              </AdminProvider>
+            </UserProvider>
+          </ToastProvider>
         </WindowWidthProvider>
       </ThemeProvider>
     </HelmetProvider>

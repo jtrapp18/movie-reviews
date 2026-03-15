@@ -1,7 +1,7 @@
 import { StyledMenuItem, StyledNavLink } from "../styles";
-import { FaUserAlt } from 'react-icons/fa'; // Import icons
 import styled from "styled-components";
 import { useAdmin } from '../hooks/useAdmin';
+import UserAvatar from './UserAvatar';
 
 const StyledAccountIcon = styled.div`
   ${StyledMenuItem}
@@ -42,15 +42,13 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
       >
         About
       </StyledNavLink>
-      {isAdmin && (
-        <StyledAccountIcon
-          className="nav-link"
-          onMouseOver={()=>setIsMenuOpen(true)}
-          onMouseOut={()=>setIsMenuOpen(false)}
-        >
-          <FaUserAlt />
-        </StyledAccountIcon>
-      )}
+      <StyledAccountIcon
+        className="nav-link"
+        onMouseOver={()=>setIsMenuOpen(true)}
+        onMouseOut={()=>setIsMenuOpen(false)}
+      >
+        <UserAvatar />
+      </StyledAccountIcon>
   </>
   );
 };

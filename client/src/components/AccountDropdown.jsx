@@ -1,21 +1,20 @@
 import styled from "styled-components";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import { scrollToTop } from "../helper";
-import { UserContext } from '../context/userProvider';
-import { AdminContext } from '../context/adminProvider';
 import { NavLink } from "react-router-dom";
-import { userLogout } from "../helper";
+import { useAccountActions } from "../utils/account";
 
 const LinkContainer = styled.div`
   position: absolute;
   top: 100%;
   right: 0;
   z-index: 1000;
-  width: 20%;
+  width: 200px;
   text-decoration: none;
   text-align: right;
   background: var(--background-tertiary);
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-bottom: 3px double var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Ensures smooth animation */
@@ -49,7 +48,6 @@ const StyledNavLink = styled(NavLink)`
 
   height: 10vh;
   justify-content: end;
-  font-size: var(--default-font-size);
   align-items: center;
   display: flex;
 
@@ -59,24 +57,19 @@ const StyledNavLink = styled(NavLink)`
   }
 
   &:hover {
-    color: var(--font-color-2);
-    background: var(--background-secondary);
-    // border: 1px solid var(--border);
+    color: var(--background-tertiary);
+    background: var(--font-color-1);
   }
 `
 
 const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
-  const { user, setUser } = useContext(UserContext);
-  const { isAdmin, logoutAdmin } = useContext(AdminContext);
-
+  const { user, handleAccount } = useAccountActions();
   const cardRef = useRef(null);
 
-  const handleAdminLogout = () => {
-    if (isAdmin) {
-      logoutAdmin();
-      setUser(null);
+  const handleAccountToggle = () => {
+    handleAccount(() => {
       setIsMenuOpen(false);
-    }
+    });
   }
 
   const handleClick = () => {
@@ -84,10 +77,6 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
     setIsMenuOpen(false); // Close menu after navigation
   };
 
-  // Only show dropdown if admin is logged in
-  if (!isAdmin) {
-    return null;
-  }
 
   return (
       <LinkContainer 
@@ -96,12 +85,21 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
         onMouseOut={()=>setIsMenuOpen(false)}
         className={isMenuOpen ? "open" : "closed"}
       >
+        {user && (
+          <StyledNavLink
+            to="/account"
+            className="nav-link"
+            onClick={handleClick}
+          >
+            Account
+          </StyledNavLink>
+        )}
         <StyledNavLink
             as="button"
             className="nav-link"
-            onClick={handleAdminLogout}
+            onClick={handleAccountToggle}
         >
-            Logout Admin
+            {user ? "Logout" : "Login"}
         </StyledNavLink>
       </LinkContainer>
   );

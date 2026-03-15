@@ -4,46 +4,40 @@ header:
 
 aboutJames:
   personalStory: |
-    James's love for cinema began [at age X] when [he first saw/was introduced to] [specific film or experience]. 
-    [Describe the moment or experience that sparked his passion - e.g., "watching his first Hitchcock film", 
-    "seeing a classic film noir on late-night TV", "attending a film festival", etc.]. 
-    This [experience/moment] opened his eyes to the power of film as both entertainment and art, 
-    and he's been captivated by the medium ever since.
+    James developed a love of movies as a kid, watching everything from Adam
+    Sandler comedies to franchise horror movies to Martin Scoresese crime sagas.
+  
+    As a kid he would go into Blockbuster Stores (remember those) with his siblings
+    and spend a ridiculous amount of time looking through the aisles before
+    selecting a handful of movies.
+
+    His interest was taken to another level around 2016 after reading one of Roger
+    Ebert’s reviews which referenced the French film Breathless (1960). After
+    watching it, he got his hands on every French New Wave film he could find. His
+    interest in international cinema skyrocketed from there and has not let up since
+    
+    He enjoys conducting exhaustive 'Director Studies' where he watches and
+    analyzes the entire (or near-entire) filmography of a specific filmmaker.
   
   intro: |
-    James Trapp is a passionate film critic and analyst with a deep love for cinema that spans [X years] 
-    of dedicated study and appreciation. His approach to film criticism combines [academic analysis/personal 
-    reflection/technical expertise] with an accessible writing style that makes complex cinematic concepts 
-    engaging for all readers.
+    His approach to film criticism combines a mix of academic analysis and personal
+    reflection, with an accessible writing style that makes complex cinematic
+    concepts engaging for all readers.
   
   favoriteDirectors:
-    - "Alfred Hitchcock"
-    - "Martin Scorsese"
-    - "Akira Kurosawa"
-    - "[Add more directors]"
+    - Martin Scorsese
+    - Alfred Hitchcock
+    - Akira Kurosawa
+    - Stanley Kubrick
+    - Terence Malick
+    - Jean Pierre Melville
+    - Quentin Tarantino
+    - David Fincher
+    - Park Chan-wook
   
-  preferredGenres:
-    - "Film noir"
-    - "Psychological thrillers"
-    - "International cinema"
-    - "[Add more genres]"
-  
-  favoriteEras:
-    - "Classic Hollywood"
-    - "New Hollywood"
-    - "Contemporary independent cinema"
-    - "[Add more eras]"
-  
-  philosophy: |
-    James's reviews go beyond simple plot summaries, delving into thematic analysis, cinematographic 
-    techniques, and the cultural impact of films. He believes that great cinema has the power to 
-    [inspire/educate/challenge/entertain] audiences, and his writing reflects this philosophy.
-  
-  specialties:
-    - "Thematic analysis"
-    - "Cinematographic techniques"
-    - "Cultural impact studies"
-    - "[Add more specialties]"
+  closing: |
+    Even with an interest in more serious filmmakers, he still loves a hilarious “so
+    bad its good movie” like Mr. Brooks (2007) or Taken (2008) every once in a while.
 
 aboutWebsite:
   intro: |

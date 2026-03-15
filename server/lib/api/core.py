@@ -11,8 +11,9 @@ from flask_restful import  Resource
 from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, Tag, Director
+from lib.models import User, Movie, Review, ReviewLike, Tag, Director
 from lib.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
@@ -149,7 +150,32 @@ class MovieById(Resource):
         movie = Movie.query.get(movie_id)
         if not movie:
             return {'error': 'Movie not found'}, 404
-        return movie.to_dict(), 200
+        out = movie.to_dict()
+        reviews_list = out.get('reviews') or []
+        if reviews_list:
+            review_ids = [r['id'] for r in reviews_list]
+            count_rows = (
+                db.session.query(ReviewLike.review_id, func.count(ReviewLike.id))
+                .filter(ReviewLike.review_id.in_(review_ids))
+                .group_by(ReviewLike.review_id)
+                .all()
+            )
+            counts = {row[0]: row[1] for row in count_rows}
+            user_id = session.get('user_id')
+            liked_ids = set()
+            if user_id:
+                liked_ids = {
+                    row[0]
+                    for row in db.session.query(ReviewLike.review_id).filter(
+                        ReviewLike.review_id.in_(review_ids),
+                        ReviewLike.user_id == user_id,
+                    ).all()
+                }
+            for r in reviews_list:
+                rid = r.get('id')
+                r['like_count'] = counts.get(rid, 0)
+                r['liked_by_me'] = rid in liked_ids
+        return out, 200
 
     def patch(self, movie_id):
         movie = Movie.query.get(movie_id)
@@ -205,12 +231,26 @@ class Reviews(Resource):
         db.session.commit()
         return new_review.to_dict(), 201
 
+def _add_like_fields_to_review_dict(review_dict, like_count, liked_by_me):
+    """Attach like_count and liked_by_me to a review dict."""
+    review_dict['like_count'] = like_count
+    review_dict['liked_by_me'] = liked_by_me
+    return review_dict
+
+
 class ReviewById(Resource):
     def get(self, review_id):
         review = Review.query.get(review_id)
         if not review:
             return {'error': 'Review not found'}, 404
-        return review.to_dict(), 200
+        like_count = ReviewLike.query.filter_by(review_id=review_id).count()
+        user_id = session.get('user_id')
+        liked_by_me = bool(
+            user_id and ReviewLike.query.filter_by(review_id=review_id, user_id=user_id).first()
+        )
+        out = review.to_dict()
+        _add_like_fields_to_review_dict(out, like_count, liked_by_me)
+        return out, 200
 
     def patch(self, review_id):
         review = Review.query.get(review_id)
@@ -273,8 +313,33 @@ class Articles(Resource):
                     Review.tags.any(Tag.name.contains(search_query))
                 )
             )
-        
-        return [article.to_dict() for article in articles.all()], 200
+        articles = articles.all()
+        if not articles:
+            return [], 200
+        review_ids = [a.id for a in articles]
+        count_rows = (
+            db.session.query(ReviewLike.review_id, func.count(ReviewLike.id))
+            .filter(ReviewLike.review_id.in_(review_ids))
+            .group_by(ReviewLike.review_id)
+            .all()
+        )
+        counts = {row[0]: row[1] for row in count_rows}
+        user_id = session.get('user_id')
+        liked_ids = set()
+        if user_id:
+            liked_ids = {
+                row[0]
+                for row in db.session.query(ReviewLike.review_id).filter(
+                    ReviewLike.review_id.in_(review_ids),
+                    ReviewLike.user_id == user_id,
+                ).all()
+            }
+        out = []
+        for a in articles:
+            d = a.to_dict()
+            _add_like_fields_to_review_dict(d, counts.get(a.id, 0), a.id in liked_ids)
+            out.append(d)
+        return out, 200
 
     def post(self):
         data = request.get_json()

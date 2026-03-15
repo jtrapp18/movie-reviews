@@ -17,6 +17,12 @@ class ReviewComment(db.Model, SerializerMixin):
 
     review = db.relationship('Review', back_populates='comments')
     user = db.relationship('User', back_populates='review_comments')
+    likes = db.relationship(
+        'CommentLike',
+        back_populates='comment',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
     replies = db.relationship(
         'ReviewComment',
         backref=db.backref('parent', remote_side=[id]),
@@ -28,6 +34,7 @@ class ReviewComment(db.Model, SerializerMixin):
         '-review.comments',
         '-user.review_comments',
         '-replies.parent',
+        '-likes.comment',
     )
 
     def __repr__(self):

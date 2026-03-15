@@ -51,8 +51,9 @@ p {
   --bright-blue: rgb(40, 203, 215);
   --dark-green: #334F26;
   --light-gray: #f0f0f0;
+  --light-gray-dark: #bdbfc4;
   --dark-gray: #212D40;
-  --gray: #d1d1d1; 
+  --gray: #646469; 
   --navy-blue: #00113d;
   --blue: #022658;
   --yellow: var(--cinema-gold);
@@ -88,7 +89,7 @@ p {
   /* --card-font-size: clamp(0.8rem, 1rem, 1.1rem); */
   --card-font: var(--soft-white);
   --card-font-size: .8rem;
-  --shadow: 0px 4px 8px rgba(0, 0, 0, 0.7);
+  --shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
   --title-font: 'NotoSerif';
   --default-font: 'Rubik';
 }
@@ -96,12 +97,13 @@ p {
 :root[data-theme='light'] {
   --background: var(--light-gray);
   --background-secondary: var(--soft-white);
-  --background-tertiary: var(--gray);
+  --background-tertiary: var(--light-gray-dark);
   --border: var(--navy-blue);
   --primary: var(--blue);
   --secondary: var(--navy-blue);
   --font-color-1: var(--primary);
   --font-color-2: var(--secondary);
+  --font-color-3: var(--gray);
 
   --rich-text-background: var(--background-secondary);
   --rich-text-primary: var(--font-color-2);
@@ -112,6 +114,9 @@ p {
   --rich-text-table-bg: rgba(255, 255, 255, 0.05);
   --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
   --rich-text-table-border: rgba(255, 215, 0, 0.2);
+
+  --success-color: var(--cinema-gold-dark);
+  --error-color: var(--cinema-red);
 }
 
 :root[data-theme='dark'] {
@@ -123,6 +128,7 @@ p {
   --secondary: var(--cinema-gold-dark);
   --font-color-1: var(--cinema-gold-dark);
   --font-color-2: var(--soft-white);
+  --font-color-3: var(--cinema-gold);
 
   --rich-text-background: var(--cinema-gray-dark);
   --rich-text-primary: var(--soft-white);
@@ -133,6 +139,9 @@ p {
   --rich-text-table-bg: rgba(255, 255, 255, 0.05);
   --rich-text-table-header-bg: rgba(255, 215, 0, 0.1);
   --rich-text-table-border: rgba(255, 215, 0, 0.3);
+
+  --success-color: var(--cinema-gold-dark);
+  --error-color: var(--cinema-red);
 }
 
 #root {
@@ -287,14 +296,15 @@ h1 {
   font-weight: bold;
 }
 
-h1, h2 {
+h1, h2, h4 {
   color: var(--font-color-1);
 }
 
 h3, small {
   /* color: var(--cinema-gold); */
-  color: var(--font-color-2);
+  color: var(--font-color-3);
 }
+
 
 h1 {
   font-size: clamp(1.7rem, 4vw, 2rem);
@@ -305,12 +315,12 @@ h2 {
   font-family: var(--default-font)
 }
 
-h3 {
-  font-size: clamp(1.2rem, 1.8vw, 1.8rem);
+h3, h4 {
+  font-size: clamp(1.1rem, 1.2rem, 1.8rem);
   font-family: var(--default-font)
 }
 
-p, label, i, li, a, span, option, select, input, textarea {
+p, label, li, a, span, option, select, input, textarea {
   font-size: var(--default-font-size);
   color: var(--font-color-2);
 }

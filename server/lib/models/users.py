@@ -6,6 +6,7 @@ from sqlalchemy import CheckConstraint
 from lib.config import db, bcrypt
 from lib.utils import (
     validate_required_string,
+    validate_optional_string,
     validate_optional_email,
     validate_optional_phone,
     validate_zipcode,
@@ -18,11 +19,14 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
-    phone_number = db.Column(db.String, nullable=True)
     email = db.Column(db.String, nullable=False, unique=True)
-    zipcode = db.Column(db.String, nullable=False)
+    first_name = db.Column(db.String, nullable=True)
+    last_name = db.Column(db.String, nullable=True)
+    phone_number = db.Column(db.String, nullable=True)
+    zipcode = db.Column(db.String, nullable=True)
+    is_admin = db.Column(db.Boolean, default=False)
+    dark_mode = db.Column(db.Boolean, default=False)
+    icon_color = db.Column(db.String, default='blue')
 
     review_comments = db.relationship(
         'ReviewComment',
@@ -30,8 +34,20 @@ class User(db.Model, SerializerMixin):
         cascade='all, delete-orphan',
         lazy='select',
     )
+    comment_likes = db.relationship(
+        'CommentLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
+    review_likes = db.relationship(
+        'ReviewLike',
+        back_populates='user',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-_password_hash', '-review_comments.user')
+    serialize_rules = ('-_password_hash', '-review_comments.user', '-comment_likes', '-review_likes')
     
     @hybrid_property
     def password_hash(self):
@@ -56,7 +72,7 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Password must include at least one lowercase letter.")
         if not re.search(r'\d', password):
             raise ValueError("Password must include at least one number.")
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>+]', password):
             raise ValueError("Password must include at least one special character.")
         return True
 
@@ -79,11 +95,11 @@ class User(db.Model, SerializerMixin):
 
     @validates('first_name')
     def validate_first_name(self, key, value):
-        return validate_required_string(value, 'First name')
+        return validate_optional_string(value, 'First name')
 
     @validates('last_name')
     def validate_last_name(self, key, value):
-        return validate_required_string(value, 'Last name')
+        return validate_optional_string(value, 'Last name')
 
     @validates('phone_number')
     def validate_phone_number(self, key, value):

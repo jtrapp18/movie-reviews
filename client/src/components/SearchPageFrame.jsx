@@ -20,15 +20,6 @@ const PageHeader = styled.div`
   text-align: center;
 `;
 
-const Title = styled.h1`
-  margin: 0 0 0.25rem 0;
-`;
-
-const Subtitle = styled.p`
-  margin: 0;
-  color: var(--font-color-2);
-`;
-
 const ContentWrapper = styled.div`
   width: 100%;
   margin-top: 1.5rem;
@@ -51,8 +42,8 @@ function SearchPageFrame({
     <Container>
       {showHeader && (
         <PageHeader>
-          {title && <Title>{title}</Title>}
-          {subtitle && <Subtitle>{subtitle}</Subtitle>}
+          {title && <h1>{title}</h1>}
+          {subtitle && <h3><i>{subtitle}</i></h3>}
         </PageHeader>
       )}
 

@@ -33,7 +33,7 @@ const MoviesContainer = styled.div`
   }
   
   &::-webkit-scrollbar-thumb {
-    background: var(--primay);
+    background: var(--primary);
     border-radius: 4px;
   }
   

@@ -10,14 +10,14 @@ function Error({ children }) {
 }
 
 const Alert = styled.span`
-  border: 1px solid red;
+  border: 1px solid var(--error-color);
   height: 30px;
   width: 30px;
   border-radius: 50%;
   font-weight: bold;
   display: grid;
   place-content: center;
-  color: red;
+  color: var(--error-color);
 `;
 
 const Wrapper = styled.div`
@@ -29,7 +29,7 @@ const Wrapper = styled.div`
 
 const Message = styled.p`
   margin: 0;
-  color: red;
+  color: var(--error-color);
 `;
 
 export default Error;

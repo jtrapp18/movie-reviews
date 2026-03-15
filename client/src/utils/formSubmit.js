@@ -18,22 +18,29 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
       }
     });
 
-    console.log('submitFormWithDocument - Form data:', cleanFormData);
-    console.log('submitFormWithDocument - About to send PATCH with data:', JSON.stringify(cleanFormData, null, 2));
+    console.info('submitFormWithDocument - submitting review', {
+      isEdit,
+      id,
+      hasDocument: !!file,
+    });
 
     // All submissions go to reviews table - articles and reviews are the same model
     const result = isEdit 
       ? await patchJSONToDb('reviews', id, cleanFormData)
       : await postJSONToDb('reviews', cleanFormData);
-
-            console.log('Form submitted successfully, ID:', result?.id);
-
-            // Handle document upload if file is provided
-            if (file && result?.id) {
-              try {
-                console.log('Uploading document for ID:', result.id);
-                await uploadDocument(file, result.id, false);
-                console.log('Document uploaded successfully');
+ 
+    console.info('submitFormWithDocument - review saved', {
+      id: result?.id,
+    });
+ 
+    // Handle document upload if file is provided
+    if (file && result?.id) {
+      try {
+        console.info('submitFormWithDocument - uploading document', {
+          id: result.id,
+        });
+        await uploadDocument(file, result.id, false);
+        console.info('submitFormWithDocument - document uploaded');
       } catch (uploadError) {
         console.error('Document upload failed:', uploadError);
         // Don't fail the whole submission if document upload fails

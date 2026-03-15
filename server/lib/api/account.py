@@ -3,8 +3,8 @@
 import os
 import requests
 import uuid
-from datetime import date
-from datetime import datetime
+import secrets
+from datetime import date, datetime, timedelta
 # from flask_migrate import Migrate
 from flask import request, session, send_file, jsonify, Response
 from flask_restful import  Resource
@@ -12,7 +12,7 @@ from collections import Counter
 from urllib.parse import quote_plus
 from lib.config import app, db, api
 from sqlalchemy.orm import joinedload
-from lib.models import User, Movie, Review, Tag, Director
+from lib.models import User, Movie, Review, Tag, Director, PasswordResetToken
 from lib.utils.document_processor import DocumentProcessor
 from flask_cors import CORS
 
@@ -56,14 +56,18 @@ class ClearSession(Resource):
 
 class AccountSignup(Resource):
     def post(self):
+        # DEBUG: If you never see this in the terminal, the request isn't reaching this route (wrong URL, method, or CORS).
+        print('[Sign up] POST /api/account_signup received', flush=True)
+        app.logger.info('Sign up POST received')
         try:
-            json = request.get_json()
+            json = request.get_json() or {}
+            username = json.get('username', '')
 
             # Check if the username already exists in the database
             existing_user = User.query.filter_by(username=json['username']).first()
 
             # Check if the email already exists in the database
-            existing_email = User.query.filter_by(email=json['email']).first()        
+            existing_email = User.query.filter_by(email=json['email']).first()
 
             error_dict = {}
 
@@ -74,27 +78,34 @@ class AccountSignup(Resource):
                 error_dict['email'] = 'Email already registered.'
 
             if existing_user or existing_email:
-                return {'error': error_dict}, 400                
+                app.logger.warning('Sign up rejected: duplicate username or email', extra={
+                    'username': username,
+                    'username_taken': bool(existing_user),
+                    'email_taken': bool(existing_email),
+                })
+                return {'error': error_dict}, 400
 
             user = User(
                 username=json['username'],
-                first_name=json['first_name'],
-                last_name=json['last_name'],
-                phone_number=json['phone_number'],
+                first_name=json.get('first_name'),
+                last_name=json.get('last_name'),
+                phone_number=json.get('phone_number'),
                 email=json['email'],
-                zipcode=json['zipcode']
-                )
-            
+                zipcode=json.get('zipcode'),
+            )
+
             user.password_hash = json['password']
             db.session.add(user)
             db.session.commit()
 
             session['user_id'] = user.id
 
+            app.logger.info('Sign up success', extra={'user_id': user.id, 'username': user.username})
             return user.to_dict(), 201
         except Exception as e:
-            db.session.rollback()  # Rollback any changes made in the transaction
-            return {'error': f'An error occurred: {str(e)}'}, 500
+            db.session.rollback()
+            app.logger.exception('Sign up failed: %s', str(e))
+            return {'error': str(e)}, 500
     
 class CheckSession(Resource):
     def get(self):
@@ -166,6 +177,80 @@ class UserById(Resource):
         return user.to_dict(), 200
 
 
+class PasswordResetRequest(Resource):
+    def post(self):
+        data = request.get_json() or {}
+        email = data.get('email')
+        username = data.get('username')
+
+        if not email and not username:
+            return {'error': 'Email or username is required.'}, 400
+
+        user = None
+        if email:
+            user = User.query.filter_by(email=email).first()
+        elif username:
+            user = User.query.filter_by(username=username).first()
+
+        # Always return 200 to avoid leaking which accounts exist
+        if not user:
+            return {
+                'message': 'If an account exists for that information, you will receive reset instructions shortly.'
+            }, 200
+
+        token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+
+        reset_token = PasswordResetToken(
+            user_id=user.id,
+            token=token,
+            expires_at=expires_at,
+            used=False,
+        )
+        db.session.add(reset_token)
+        db.session.commit()
+
+        reset_url = f"{request.url_root.rstrip('/')}/#/reset-password?token={token}"
+        print(f"[PasswordReset] Generated reset link for user {user.id}: {reset_url}")
+
+        # NOTE: In production, you would email this link to the user instead of returning the token.
+        return {
+            'message': 'If an account exists for that information, you will receive reset instructions shortly.',
+            'token': token,
+        }, 200
+
+
+class PasswordReset(Resource):
+    def post(self):
+        data = request.get_json() or {}
+        token = data.get('token')
+        new_password = data.get('password')
+
+        if not token or not new_password:
+            return {'error': 'Token and new password are required.'}, 400
+
+        reset_token = PasswordResetToken.query.filter_by(token=token).first()
+        if (
+            not reset_token
+            or reset_token.used
+            or reset_token.expires_at < datetime.utcnow()
+        ):
+            return {'error': 'Invalid or expired reset token.'}, 400
+
+        user = User.query.get(reset_token.user_id)
+        if not user:
+            return {'error': 'User not found.'}, 400
+
+        try:
+            user.password_hash = new_password
+            reset_token.used = True
+            db.session.commit()
+            return {'message': 'Password has been reset.'}, 200
+        except Exception:
+            db.session.rollback()
+            return {'error': 'Failed to reset password.'}, 500
+
+
 class Sitemap(Resource):
     """Generate XML sitemap for SEO"""
     
@@ -231,4 +316,6 @@ def register_routes(api):
     api.add_resource(Login, '/api/login')
     api.add_resource(Logout, '/api/logout')
     api.add_resource(UserById, '/api/users/<int:user_id>')
+    api.add_resource(PasswordResetRequest, '/api/password_reset_request')
+    api.add_resource(PasswordReset, '/api/password_reset')
     api.add_resource(Sitemap, '/sitemap.xml')

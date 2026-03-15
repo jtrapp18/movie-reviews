@@ -39,8 +39,14 @@ class Review(db.Model, SerializerMixin):
         cascade='all, delete-orphan',
         lazy='select',
     )
+    likes = db.relationship(
+        'ReviewLike',
+        back_populates='review',
+        cascade='all, delete-orphan',
+        lazy='select',
+    )
 
-    serialize_rules = ('-movie.reviews', '-tags.reviews', '-director.reviews')
+    serialize_rules = ('-movie.reviews', '-tags.reviews', '-director.reviews', '-likes.review')
 
     def __repr__(self):
         return f'<Review {self.id}, Movie ID: {self.movie_id}, Rating: {self.rating}>'

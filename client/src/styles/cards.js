@@ -76,7 +76,6 @@ const MediaCard = styled.article`
   transition: transform .2s ease, box-shadow .2s ease;
 
   &:hover {
-    transform: translateY(-3px);
     box-shadow: 0 10px 28px rgba(0,0,0,.6);
   }
 
