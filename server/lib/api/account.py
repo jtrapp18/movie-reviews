@@ -56,14 +56,18 @@ class ClearSession(Resource):
 
 class AccountSignup(Resource):
     def post(self):
+        # DEBUG: If you never see this in the terminal, the request isn't reaching this route (wrong URL, method, or CORS).
+        print('[Sign up] POST /api/account_signup received', flush=True)
+        app.logger.info('Sign up POST received')
         try:
-            json = request.get_json()
+            json = request.get_json() or {}
+            username = json.get('username', '')
 
             # Check if the username already exists in the database
             existing_user = User.query.filter_by(username=json['username']).first()
 
             # Check if the email already exists in the database
-            existing_email = User.query.filter_by(email=json['email']).first()        
+            existing_email = User.query.filter_by(email=json['email']).first()
 
             error_dict = {}
 
@@ -74,27 +78,34 @@ class AccountSignup(Resource):
                 error_dict['email'] = 'Email already registered.'
 
             if existing_user or existing_email:
-                return {'error': error_dict}, 400                
+                app.logger.warning('Sign up rejected: duplicate username or email', extra={
+                    'username': username,
+                    'username_taken': bool(existing_user),
+                    'email_taken': bool(existing_email),
+                })
+                return {'error': error_dict}, 400
 
             user = User(
                 username=json['username'],
-                first_name=json['first_name'],
-                last_name=json['last_name'],
-                phone_number=json['phone_number'],
+                first_name=json.get('first_name'),
+                last_name=json.get('last_name'),
+                phone_number=json.get('phone_number'),
                 email=json['email'],
-                zipcode=json['zipcode']
-                )
-            
+                zipcode=json.get('zipcode'),
+            )
+
             user.password_hash = json['password']
             db.session.add(user)
             db.session.commit()
 
             session['user_id'] = user.id
 
+            app.logger.info('Sign up success', extra={'user_id': user.id, 'username': user.username})
             return user.to_dict(), 201
         except Exception as e:
-            db.session.rollback()  # Rollback any changes made in the transaction
-            return {'error': f'An error occurred: {str(e)}'}, 500
+            db.session.rollback()
+            app.logger.exception('Sign up failed: %s', str(e))
+            return {'error': str(e)}, 500
     
 class CheckSession(Resource):
     def get(self):

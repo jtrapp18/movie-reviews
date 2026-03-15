@@ -14,6 +14,20 @@ def validate_required_string(value: str, field_name: str, min_length: int = 1, m
     return result.lower() if to_lower else result
 
 
+def validate_optional_string(value: Optional[str], field_name: str, min_length: int = 1, max_length: Optional[int] = None, strip: bool = True) -> Optional[str]:
+    """Allow None or empty; if provided, validate length and return stripped string."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if not isinstance(value, str):
+        raise ValueError(f"{field_name} must be a string or empty.")
+    result = value.strip() if strip else value
+    if len(result) < min_length:
+        raise ValueError(f"{field_name} must be at least {min_length} characters long, or empty.")
+    if max_length is not None and len(result) > max_length:
+        raise ValueError(f"{field_name} must be {max_length} characters or fewer.")
+    return result
+
+
 def validate_required_url(value: str, empty_error_message: str, invalid_error_message: str) -> str:
     if not value or not isinstance(value, str) or not value.strip():
         raise ValueError(empty_error_message)
@@ -73,9 +87,12 @@ def validate_optional_phone(value: Optional[str], field_name: str = 'Phone numbe
     return value
 
 
-def validate_zipcode(value: str) -> str:
-    if isinstance(value, str) and value.isdigit() and len(value) in [5, 9]:
-        return value
+def validate_zipcode(value: Optional[str]) -> Optional[str]:
+    """Allow None or empty; if provided, must be 5 or 9 digits."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if isinstance(value, str) and value.strip().isdigit() and len(value.strip()) in [5, 9]:
+        return value.strip()
     raise ValueError("Invalid zipcode format")
 
 

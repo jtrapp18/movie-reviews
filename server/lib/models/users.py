@@ -6,6 +6,7 @@ from sqlalchemy import CheckConstraint
 from lib.config import db, bcrypt
 from lib.utils import (
     validate_required_string,
+    validate_optional_string,
     validate_optional_email,
     validate_optional_phone,
     validate_zipcode,
@@ -71,7 +72,7 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Password must include at least one lowercase letter.")
         if not re.search(r'\d', password):
             raise ValueError("Password must include at least one number.")
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>+]', password):
             raise ValueError("Password must include at least one special character.")
         return True
 
@@ -94,11 +95,11 @@ class User(db.Model, SerializerMixin):
 
     @validates('first_name')
     def validate_first_name(self, key, value):
-        return validate_required_string(value, 'First name')
+        return validate_optional_string(value, 'First name')
 
     @validates('last_name')
     def validate_last_name(self, key, value):
-        return validate_required_string(value, 'Last name')
+        return validate_optional_string(value, 'Last name')
 
     @validates('phone_number')
     def validate_phone_number(self, key, value):
