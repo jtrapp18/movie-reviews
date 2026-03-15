@@ -8,6 +8,7 @@ import * as yup from 'yup';
 import Error from "../styles/Error";
 import { StyledForm, Button } from "../styles";
 import { useTheme } from "../context/themeProvider";
+import { useToast } from "../context/toastContext";
 
 const validationSchema = yup.object({
   firstName: yup.string(),
@@ -85,6 +86,7 @@ function SignUpForm({ setShowConfirm }) {
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
   const { setTheme } = useTheme();
+  const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -123,7 +125,8 @@ function SignUpForm({ setShowConfirm }) {
             setTheme(userTransformed.darkMode ? 'dark' : 'light');
           }
           setShowConfirm(true);
-          console.info('[Sign up] Success:', userTransformed.username ?? userTransformed.email);
+          showToast(`Successfully created account for ${userTransformed.username}`);
+          console.info('[Sign up] Success:', userTransformed.username);
           navigate('/');
         }
       } catch (error) {
