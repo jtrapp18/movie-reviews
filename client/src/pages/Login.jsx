@@ -38,8 +38,6 @@ const InlineToggle = styled.p`
 const ConfirmText = styled.div`
   margin-top: 0.75rem;
   text-align: center;
-  color: var(--cinema-gold);
-  font-size: 0.95rem;
 `;
 
 function Login() {

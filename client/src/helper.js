@@ -24,66 +24,70 @@ function userLogout() {
     const endpoint = Id ? `/api/${dbKey}/${Id}` : `/api/${dbKey}`;
 
     try {
-      const res = await fetch(endpoint);
-  
+      const res = await fetch(endpoint, { credentials: 'include' });
+
       if (!res.ok) {
         console.error(`Error fetching ${dbKey} information! Status: ${res.status}`);
-        return null;  // Return null on error
+        return null;
       }
-  
-      const data = await res.json();
-  
-      // Ensure 'results' exists before attempting to transform it
+
+      // 204 No Content or empty body (e.g. check_session when not logged in)
+      const contentType = res.headers.get('content-type') || '';
+      const contentLength = res.headers.get('content-length');
+      if (res.status === 204 || contentLength === '0') {
+        return null;
+      }
+      const text = await res.text();
+      if (!text || !text.trim()) {
+        return null;
+      }
+      const data = JSON.parse(text);
       const camelData = snakeToCamel(data);
-      
       return camelData;
     } catch (err) {
       console.error('Request failed', err);
-      return null;  // Return null if an error occurs
+      return null;
     }
   }  
 
   function postJSONToDb(dbKey, jsonObj) {
     const snake_object = camelToSnake(jsonObj);
-  
-    return fetch(`/api/${dbKey}`, {
+    const url = `/api/${dbKey}`;
+    console.log('[postJSONToDb] POST', url);
+    return fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(snake_object),
     })
       .then(async (res) => {
         if (!res.ok) {
           let errorData = {};
           try {
-            // Attempt to parse JSON if the response is not OK
             errorData = await res.json();
           } catch (err) {
-            // If there is no JSON or invalid JSON, set a default error message
             errorData = { error: `HTTP error! Status: ${res.status}` };
           }
-  
-          // If the error response contains an error message, flatten it
-          const errorMessages = [];
-  
-          // Check for specific error fields like username or email
-          if (errorData.error.username) {
-            errorMessages.push(errorData.error.username);
+
+          const errPayload = errorData.error;
+          const err = new Error(
+            typeof errPayload === 'string'
+              ? errPayload
+              : typeof errPayload === 'object' && errPayload !== null
+                ? Object.values(errPayload).filter(Boolean).join(' ') || 'An error occurred'
+                : 'An error occurred'
+          );
+          if (typeof errPayload === 'object' && errPayload !== null && !Array.isArray(errPayload)) {
+            err.serverErrors = errPayload;
           }
-          if (errorData.error.email) {
-            errorMessages.push(errorData.error.email);
-          }
-  
-          // If no specific error, use a generic error message
-          if (errorMessages.length > 0) {
-            // If there are multiple error messages, join them into one string
-            throw new Error(errorMessages.join(', '));
-          } else {
-            throw new Error(errorData.error || 'An error occurred');
-          }
+          console.log('[postJSONToDb] Error response', res.status, errPayload);
+          throw err;
         }
-        return res.json(); // Return the JSON if response is OK
+        const data = await res.json();
+        console.log('[postJSONToDb] Success', res.status, url);
+        return data;
       });
   }
 
