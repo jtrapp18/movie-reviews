@@ -10,7 +10,8 @@
       "@context/*": ["src/context/*"],
       "@utils/*": ["src/utils/*"],
       "@styles/*": ["src/styles/*"],
-      "@helper": ["src/helper.js"]
+      "@helper": ["src/helper.js"],
+      "@features/*": ["src/features/*"]
     }
   },
   "include": ["src"]

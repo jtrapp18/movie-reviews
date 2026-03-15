@@ -5,8 +5,7 @@ import { StyledContainer, Button } from '@styles';
 import { getJSON, patchJSONToDb } from '@helper';
 import SEOHead from '@components/shared-sections/SEOHead';
 import Loading from '@components/ui/Loading';
-import DirectorBio from '@components/shared-sections/DirectorBio';
-import DirectorTimeline from '@components/shared-sections/DirectorTimeline';
+import { DirectorBio, DirectorTimeline } from '@features/directors';
 import { useAdmin } from '@hooks/useAdmin';
 import BackdropUpload from '@components/forms/BackdropUpload';
 

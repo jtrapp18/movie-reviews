@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavLinks from "./NavLinks"
 import styled from "styled-components";
-import AccountDropdown from "./AccountDropdown";
+import { AccountDropdown } from '@features/auth';
 
 const StyledNavBar = styled.nav`
   color: black;

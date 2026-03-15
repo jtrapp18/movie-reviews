@@ -2,7 +2,7 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import { MediaCard, CardContent, CardOverlay, CardDate, CardTitle } from "@styles/cards";
 import { useAdmin } from "@hooks/useAdmin";
 import useCrudStateDB from "@hooks/useCrudStateDB";
-import StarRatingOverlay from "@components/shared-sections/StarRatingOverlay";
+import { StarRatingOverlay } from '@features/reviews';
 import styled from "styled-components";
 
 const MetadataContainer = styled.div`

@@ -1,14 +1,12 @@
 import { getJSON, snakeToCamel } from '@helper';
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Movies from '@components/shared-sections/Movies';
-import Articles from '@components/shared-sections/Articles';
-import RecentPosts from '@components/shared-sections/RecentPosts';
-import Directors from '@components/shared-sections/Directors';
+import { Movies } from '@features/movies';
+import { Articles, RecentPosts } from '@features/articles';
+import { Directors } from '@features/directors';
 import Section from '@components/layout/Section';
-import SearchResultsHeader from '@components/shared-sections/SearchResultsHeader';
+import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import Loading from '@components/ui/Loading';
-import SearchPageFrame from '@components/shared-sections/SearchPageFrame';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';

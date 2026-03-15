@@ -6,7 +6,7 @@ import { AdminProvider } from './context/adminProvider';
 import { createHashRouter, RouterProvider } from 'react-router-dom'; // Import HashRouter
 import routes from './routes'; // Import your routes configuration
 import { WindowWidthProvider } from './context/windowSize';
-import AdminIndicator from '@components/layout/AdminIndicator';
+import { AdminIndicator } from '@features/auth';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/themeProvider';
 import { ToastProvider } from './context/toastContext';

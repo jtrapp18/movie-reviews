@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import CommentForm from './CommentForm';
-import LikeButton from '@components/shared-sections/LikeButton';
+import { LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
 
 const Wrapper = styled.div`

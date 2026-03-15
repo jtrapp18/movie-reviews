@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import DirectorCard from '@components/cards/DirectorCard';
-import SearchPageFrame from '@components/shared-sections/SearchPageFrame';
+import { SearchPageFrame } from '@features/movies';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 

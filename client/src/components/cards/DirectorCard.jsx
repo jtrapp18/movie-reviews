@@ -1,7 +1,7 @@
 import { MediaCard, CardContent, CardOverlay, CardTitle } from "@styles/cards";
 import MotionWrapper from "@styles/MotionWrapper";
 import { Button } from "@styles";
-import Movies from "@components/shared-sections/Movies";
+import { Movies } from '@features/movies';
 import styled from "styled-components";
 
 const FALLBACK_PHOTO = "https://via.placeholder.com/300x450.png?text=Director";

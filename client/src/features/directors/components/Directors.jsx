@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardContainer } from '@styles';
-import Carousel from './Carousel';
+import Carousel from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';
 import DirectorCard from '@components/cards/DirectorCard';
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CardContainer } from '@styles';
 import MovieCard from '@components/cards/MovieCard';
 import MotionWrapper from '@styles/MotionWrapper';
-import Carousel from './Carousel';
+import Carousel from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { getMovieRatings } from '@helper';
 

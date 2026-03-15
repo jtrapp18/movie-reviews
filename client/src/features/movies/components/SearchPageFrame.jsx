@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import SearchBar from './SearchBar';
+import SearchBar from '@components/shared-sections/SearchBar';
 import Loading from '@components/ui/Loading';
 import { StyledContainer } from '@styles';
 

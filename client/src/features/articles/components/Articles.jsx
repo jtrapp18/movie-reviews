@@ -3,7 +3,7 @@ import { CardContainer, Button } from '@styles';
 import ArticleCard from '@components/cards/ArticleCard';
 import styled from 'styled-components';
 import MotionWrapper from '@styles/MotionWrapper';
-import Carousel from './Carousel';
+import Carousel from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@hooks/useAdmin';

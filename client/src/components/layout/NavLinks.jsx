@@ -1,7 +1,7 @@
 import { StyledMenuItem, StyledNavLink } from "@styles";
 import styled from "styled-components";
 import { useAdmin } from '@hooks/useAdmin';
-import UserAvatar from './UserAvatar';
+import { UserAvatar } from '@features/auth';
 
 const StyledAccountIcon = styled.div`
   ${StyledMenuItem}

@@ -7,7 +7,7 @@ import RichTextEditor from "@components/forms/RichTextEditor";
 import styled from 'styled-components';
 import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "@styles";
 import Error from "@styles/Error";
-import Stars from "@components/shared-sections/Stars";
+import { Stars } from '@features/reviews';
 import ContentDisplay from "@components/forms/FormSubmit";
 import DocumentUpload from "@components/forms/DocumentUpload";
 import TagInput from "@components/forms/TagInput";
