@@ -22,7 +22,7 @@ function LoginForm() {
     },
     onSubmit: async (values, { setErrors }) => {
       const body = { username: values.username, password: values.password };
-  
+
       try {
         const user = await postJSONToDb("login", body);  // Await the promise
         const userTransformed = snakeToCamel(user);
@@ -43,7 +43,7 @@ function LoginForm() {
         errors.username = 'Username is required';
       }
       if (!values.password) {
-        errors.password = 'Password is required';
+        errors.password = 'Password is required'; // pragma: allowlist secret
       }
       return errors;
     }

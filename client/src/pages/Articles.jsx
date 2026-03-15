@@ -42,10 +42,10 @@ function Articles() {
       if (searchText) {
         url += `?search=${encodeURIComponent(searchText)}`;
       }
-      
+
       const response = await fetch(url);
       const data = await response.json();
-      
+
       setArticles(data);
       setFilteredArticles(data);
     } catch (error) {
@@ -88,10 +88,10 @@ function Articles() {
       <MotionWrapper index={2}>
         <h3>Browse theme-based articles and essays</h3>
       </MotionWrapper>
-      
+
       <CardContainer>
         <MotionWrapper index={0}>
-          <SearchBar 
+          <SearchBar
             key="articles-search"
             enterSearch={handleSearch}
             placeholder={isSearching ? "Searching..." : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."}
@@ -105,7 +105,7 @@ function Articles() {
               .slick-slide > div {
                 margin: 0 6px;
               }
-              
+
               /* Arrow styles */
               .slick-prev,
               .slick-next {
@@ -117,15 +117,15 @@ function Articles() {
                 border-radius: 50%;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
               }
-              
+
               .slick-prev {
                 left: 10px;
               }
-              
+
               .slick-next {
                 right: 10px;
               }
-              
+
               .slick-prev:hover,
               .slick-next:hover {
                 background-color: #007bff !important;
@@ -133,19 +133,19 @@ function Articles() {
                 box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
                 transition: all 0.2s ease;
               }
-              
+
               .slick-prev:before,
               .slick-next:before {
                 font-size: 18px;
                 color: #333;
                 font-weight: bold;
               }
-              
+
               .slick-prev:hover:before,
               .slick-next:hover:before {
                 color: white;
               }
-              
+
               .slick-disabled {
                 opacity: 0.3;
               }
@@ -154,7 +154,7 @@ function Articles() {
           <Slider {...settings}>
             {filteredArticles.map((article, index) => (
               <MotionWrapper key={article.id} index={index}>
-                <div style={{ 
+                <div style={{
                   margin: '0',
                   width: '200px',
                   height: '100%',

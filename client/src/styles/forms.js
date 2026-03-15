@@ -35,7 +35,7 @@ const StyledForm = styled.form`
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    
+
     /* Styled form inputs */
     width: 100%;
     padding: 12px 16px;
@@ -48,12 +48,12 @@ const StyledForm = styled.form`
     font-size: 1rem;
     transition: all 0.3s ease;
     box-sizing: border-box;
-    
+
     &::placeholder {
       // color: rgba(255, 255, 255, 0.6);
       color: var(--font-color-2);
     }
-    
+
     &:focus {
       outline: none;
       // border-color: var(--cinema-gold-dark);
@@ -89,7 +89,7 @@ const StyledForm = styled.form`
     margin-bottom: 1rem;
     text-align: center;
   }
-  
+
   .error-message {
     color: var(--cinema-red);
     // background: rgba(220, 20, 60, 0.1);

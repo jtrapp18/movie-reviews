@@ -17,13 +17,13 @@ const CarouselStyles = styled.div`
   .slick-slide > div {
     margin: 0 6px;
   }
-  
+
   /* Hide arrows */
   .slick-prev,
   .slick-next {
     display: none;
   }
-  
+
   /* Dots styling */
   .slick-dots {
     display: flex;
@@ -31,7 +31,7 @@ const CarouselStyles = styled.div`
     align-items: center;
     width: 100%;
   }
-  
+
   .slick-dots li {
     position: relative;
     width: 20px;
@@ -40,12 +40,12 @@ const CarouselStyles = styled.div`
     padding: 0;
     cursor: pointer;
   }
-  
+
   .slick-dots li button:before {
     color: var(--primary);
     opacity: 0.5;
   }
-  
+
   .slick-dots li.slick-active button:before {
     opacity: 1;
     color: var(--primary);
@@ -60,7 +60,7 @@ const NoResultsPlaceholder = styled.div`
   padding: 40px 20px;
   text-align: center;
   height: 200px;
-  
+
   .icon {
     width: 48px;
     height: 48px;
@@ -74,14 +74,14 @@ const NoResultsPlaceholder = styled.div`
     font-size: 20px;
     color: #999;
   }
-  
+
   h3 {
     margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
     color: #444;
   }
-  
+
   p {
     margin: 0;
     font-size: 14px;

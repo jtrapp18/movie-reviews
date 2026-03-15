@@ -1,0 +1,61 @@
+# Pre-commit hooks: https://pre-commit.com
+# Install: pip install -r requirements-dev.txt && pre-commit install
+# Run manually: pre-commit run --all-files
+#
+# This config starts with backend (Python) only. Add frontend (ESLint, Prettier) in a later commit.
+
+default_language_version:
+  python: python3
+
+repos:
+  # General-purpose hooks (trailing whitespace, YAML/JSON, large files, etc.)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+
+  # --- Backend (Python) ---
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        name: black (format)
+        files: ^server/
+        language_version: python3
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        files: ^server/
+        args: [--fix]
+
+  # Secret detection: fails if new secrets appear. Excludes migrations (revision IDs),
+  # build artifacts, and lockfiles. To allowlist more: detect-secrets scan --update .secrets.baseline
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: "package-lock\\.json|\\.secrets\\.baseline|server/migrations/|client/\\.vite/|client/node_modules/"
+
+  # --- Frontend (add in a later commit) ---
+  # - repo: https://github.com/pre-commit/mirrors-eslint
+  #   rev: v9.x.x
+  #   hooks:
+  #     - id: eslint
+  #       files: ^client/
+  #       types_or: [javascript, jsx, ts, tsx]
+  # - repo: https://github.com/pre-commit/mirrors-prettier
+  #   ...

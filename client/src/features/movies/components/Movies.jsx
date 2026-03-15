@@ -33,7 +33,7 @@ function Movies({ showMovies, enterSearch, cardSize = "default" }) {
           // Get rating for this movie
           let rating = null;
           let movieWithCorrectId = movie;
-          
+
           if (movie.externalId) {
             // External movie - look up by external ID
             const movieData = ratingsMap[movie.externalId];
@@ -47,7 +47,7 @@ function Movies({ showMovies, enterSearch, cardSize = "default" }) {
             const localData = ratingsMap[movie.id];
             rating = localData?.rating || null;
           }
-          
+
           return (
             <MotionWrapper key={movie.title} index={index}>
               <div

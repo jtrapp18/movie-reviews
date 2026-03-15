@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FaUserAlt } from 'react-icons/fa';
 import { UserContext } from '@context/userProvider';
 
-const Bubble = styled.span` 
+const Bubble = styled.span`
   display: inline-flex;
   align-items: center;
   justify-content: center;

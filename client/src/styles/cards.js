@@ -10,7 +10,7 @@ const BorderGlow = styled.span`
 
   /* Radial gradient for glow */
   background: radial-gradient(
-    circle, 
+    circle,
     rgba(0, 0, 0, 0) 5%,
     rgba(0, 0, 0, 0.9) 60%,
     rgba(0, 0, 0, 1) 100%
@@ -38,28 +38,28 @@ const TagContainer = styled.div`
 const DocumentContent = styled.div`
   padding: 20px;
   line-height: 1.6;
-  
+
   img {
     max-width: 100%;
     height: auto;
     margin: 10px 0;
   }
-  
+
   table {
     width: 100%;
     border-collapse: collapse;
     margin: 10px 0;
   }
-  
+
   table, th, td {
     border: 1px solid #ddd;
   }
-  
+
   th, td {
     padding: 8px;
     text-align: left;
   }
-  
+
   p {
     margin: 10px 0;
   }
@@ -125,7 +125,7 @@ const CardOverlay = styled.div`
   flex-direction: column;
   justify-content: center;
   transition: opacity .25s ease;
-  
+
   p {
     font-size: var(--card-font-size);
     color: var(--card-font);

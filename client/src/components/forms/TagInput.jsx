@@ -38,7 +38,7 @@ const Input = styled.input`
 
   &::placeholder {
     // color: var(--cinema-gray);
-    color: var(--font-color-2); 
+    color: var(--font-color-2);
   }
 `;
 
@@ -49,11 +49,11 @@ const AddButton = styled(Button)`
   font-size: 0.8rem;
 `;
 
-const TagInput = ({ 
-  tags = [], 
-  onTagsChange, 
+const TagInput = ({
+  tags = [],
+  onTagsChange,
   placeholder = "Add tags...",
-  maxTags = 10 
+  maxTags = 10
 }) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -112,7 +112,7 @@ const TagInput = ({
               onKeyPress={handleKeyPress}
               placeholder={placeholder}
             />
-            <Button 
+            <Button
               onClick={handleAddTag}
               disabled={!inputValue.trim() || tags.length >= maxTags}
             >
@@ -120,14 +120,14 @@ const TagInput = ({
             </Button>
           </>
         )}
-        
+
         {tags.length >= maxTags && (
           <span>
             Maximum {maxTags} tags reached
           </span>
         )}
       </InputRow>
-      
+
       <TagsDisplay>
         {tags.map(tag => (
           <Tag

@@ -17,13 +17,13 @@ const StyledNavBar = styled.nav`
 
 function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   return (
     <StyledNavBar>
         <NavLinks
           setIsMenuOpen={setIsMenuOpen}
         />
-        <AccountDropdown 
+        <AccountDropdown
           isMenuOpen={isMenuOpen}
           setIsMenuOpen={setIsMenuOpen}
         />

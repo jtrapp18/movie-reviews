@@ -9,13 +9,13 @@ const aboutContent = yaml.load(aboutContentYaml);
 const Header = styled.div`
   text-align: center;
   margin-bottom: 2rem;
-  
+
   h1 {
     // color: var(--cinema-gold-dark);
     // font-size: clamp(2rem, 6vw, 3rem);
     margin-bottom: 0.5rem;
   }
-  
+
   .subtitle {
     // color: var(--cinema-silver);
     // font-size: clamp(1.1rem, 3vw, 1.3rem);
@@ -35,9 +35,9 @@ function Contact() {
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   // Check if all required fields are filled
-  const isFormValid = formData.name.trim() && 
-                     formData.email.trim() && 
-                     formData.subject.trim() && 
+  const isFormValid = formData.name.trim() &&
+                     formData.email.trim() &&
+                     formData.subject.trim() &&
                      formData.message.trim();
 
   const handleChange = (e) => {
@@ -63,10 +63,10 @@ function Contact() {
         `Subject: ${formData.subject}\n\n` +
         `Message:\n${formData.message}`
       );
-      
+
       // Open email client
       window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-      
+
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
@@ -89,7 +89,7 @@ function Contact() {
             Your email client should open with a pre-filled message to James. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
           </div>
         )}
-        
+
         {submitStatus === 'error' && (
           <div className="error-message">
             Sorry, there was an error sending your message. Please try again.
@@ -148,10 +148,10 @@ function Contact() {
         </div>
 
         <div className="submit-section">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting || !isFormValid}
-            style={{ 
+            style={{
               minWidth: '200px',
               opacity: !isFormValid ? 0.6 : 1,
               cursor: !isFormValid ? 'not-allowed' : 'pointer'
@@ -160,9 +160,9 @@ function Contact() {
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>
           {!isFormValid && (
-            <p style={{ 
-              color: 'var(--cinema-silver)', 
-              fontSize: '0.9rem', 
+            <p style={{
+              color: 'var(--cinema-silver)',
+              fontSize: '0.9rem',
               marginTop: '0.5rem',
               fontStyle: 'italic'
             }}>

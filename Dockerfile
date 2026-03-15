@@ -25,7 +25,7 @@ ENV PORT=8000
 WORKDIR /app
 
 # Install Python dependencies
-COPY requirements.txt ./ 
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the built React app from the first stage

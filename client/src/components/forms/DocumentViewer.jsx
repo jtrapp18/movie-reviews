@@ -50,7 +50,7 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
 
   useEffect(() => {
     console.log('DocumentViewer useEffect - documentUrl:', documentUrl, 'documentType:', documentType);
-    
+
     if (documentUrl && documentType) {
       console.log('DocumentViewer - calling loadDocument()');
       loadDocument();
@@ -88,10 +88,10 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     try {
       const response = await fetch(documentUrl);
       const arrayBuffer = await response.arrayBuffer();
-      
+
       const result = await mammoth.convertToHtml({ arrayBuffer });
       setWordContent(result.value);
-      
+
       // Log any conversion messages
       if (result.messages.length > 0) {
         console.log('Document conversion messages:', result.messages);

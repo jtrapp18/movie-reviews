@@ -37,7 +37,7 @@ const LinkContainer = styled.div`
   position: fixed;
   top: calc(var(--height-header) + 3px);
   height: 100vh;
-  
+
   left: 0;
   z-index: 9999;
   width: 100vw;
@@ -89,7 +89,7 @@ const HamburgerButton = styled.button`
       transform: rotate(45deg) translate(5px, 5px);
       width: 30px;
     }
-    
+
     span:last-child {
       transform: rotate(-45deg) translate(4px, -4px);
       width: 30px;
@@ -143,7 +143,7 @@ const MobileNavBar = () => {
     <StyledDiv
       ref={cardRef}
     >
-      <LinkContainer 
+      <LinkContainer
         className={isMenuOpen ? "open" : "closed"}
       >
         <StyledMobileLink
@@ -191,8 +191,8 @@ const MobileNavBar = () => {
           {user ? "Logout" : "Login"}
         </StyledMobileMenu>
       </LinkContainer>
-      <HamburgerButton 
-        className={isMenuOpen ? "open" : ""} 
+      <HamburgerButton
+        className={isMenuOpen ? "open" : ""}
         onClick={toggleMenu}
         aria-label="Toggle Menu"
       >

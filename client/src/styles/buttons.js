@@ -7,7 +7,7 @@ const Button = styled.button.attrs(props => ({
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  
+
   /* Button styling */
   width: fit-content;
   margin: 5px;

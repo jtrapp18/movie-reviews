@@ -1,0 +1,23 @@
+# Development and pre-commit tooling (BE-focused first; add FE deps in a later commit)
+# Install: pip install -r requirements-dev.txt
+# Then: pre-commit install
+
+# Pre-commit framework (runs hooks before each commit)
+# 3.6+ requires Python >=3.9; use 3.5.x if you're on Python 3.8
+pre-commit>=3.0.0,<4
+
+# --- Python (backend) ---
+# Formatting
+black>=24.0.0,<25
+
+# Linting (PEP 8, import order, etc. — fast, replaces flake8/isort/pycodestyle)
+ruff>=0.4.0,<0.6
+
+# Secret detection (run manually or via pre-commit; baseline at repo root)
+detect-secrets>=1.5.0,<2
+
+# Optional: security-focused linting (e.g. hardcoded passwords, unsafe APIs)
+# bandit>=1.7.0,<2
+
+# --- Frontend (add in a later commit) ---
+# eslint, eslint-plugin-react, prettier, etc.

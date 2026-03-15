@@ -5,7 +5,7 @@ const StyledList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
-  
+
   li {
     // background: var(--cinema-gray-dark);
     background: var(--background-secondary);
@@ -14,7 +14,7 @@ const StyledList = styled.ul`
     border-left: 4px solid var(--border);
     border-radius: 4px;
     transition: all 0.3s ease;
-    
+
     &:hover {
       // background: var(--cinema-light-gray);
       transform: translateX(0.3rem);

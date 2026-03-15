@@ -24,12 +24,12 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
         setLoading(false);
         return;
       }
-      
+
       const ratings = await getMovieRatings(movies);
       setRatingsMap(ratings);
       setLoading(false);
     };
-    
+
     fetchRatings();
   }, [movies]);
 

@@ -148,4 +148,3 @@ function DirectorsPage() {
 }
 
 export default DirectorsPage;
-

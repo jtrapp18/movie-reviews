@@ -48,7 +48,7 @@ function userLogout() {
       console.error('Request failed', err);
       return null;
     }
-  }  
+  }
 
   function postJSONToDb(dbKey, jsonObj) {
     const snake_object = camelToSnake(jsonObj);
@@ -165,7 +165,7 @@ async function getMoviesByGenre(genreId, searchQuery=null) {
   if (searchQuery) {
     params.append('search', searchQuery);
   }
-  
+
   const imgUrl = "https://image.tmdb.org/t/p/w1280"
   const url = `/api/discover_movies?${params.toString()}`;
 
@@ -277,10 +277,10 @@ async function getLocalMovieRatings() {
       console.error(`Error fetching local movies! Status: ${res.status}`);
       return {};
     }
-    
+
     const movies = await res.json();
     const ratingsMap = {};
-    
+
     movies.forEach(movie => {
       if (movie.reviews && movie.reviews.length > 0) {
         // Get the first review's rating (assuming one review per movie)
@@ -291,7 +291,7 @@ async function getLocalMovieRatings() {
             rating: rating,
             localId: movie.id
           };
-          
+
           // Also store by external ID if it exists (for search results)
           if (movie.externalId) {
             ratingsMap[movie.externalId] = {
@@ -302,7 +302,7 @@ async function getLocalMovieRatings() {
         }
       }
     });
-    
+
     return ratingsMap;
   } catch (err) {
     console.error('Error fetching local movie ratings:', err);
@@ -319,12 +319,12 @@ async function getMovieRatingsByExternalIds(externalIds) {
       },
       body: JSON.stringify({ external_ids: externalIds })
     });
-    
+
     if (!res.ok) {
       console.error(`Error fetching movie ratings! Status: ${res.status}`);
       return {};
     }
-    
+
     const ratingsMap = await res.json();
     return ratingsMap;
   } catch (err) {
@@ -340,7 +340,7 @@ async function getIdFromExternalId(externalId) {
       console.error(`Error fetching local movies! Status: ${res.status}`);
       return null;
     }
-    
+
     const movies = await res.json();
     const movie = movies.find(m => m.external_id === externalId);
     return movie ? movie.id : null;
@@ -373,7 +373,7 @@ function invalidateRatingsCache() {
 // Optimized function to get ratings for a list of movies (handles both local and external)
 async function getMovieRatings(movies) {
   if (!movies || movies.length === 0) return {};
-  
+
   // Check cache first
   const cacheKey = generateCacheKey(movies);
   const cached = ratingsCache.get(cacheKey);
@@ -381,13 +381,13 @@ async function getMovieRatings(movies) {
     console.log('Using cached ratings for', movies.length, 'movies');
     return cached.data;
   }
-  
+
   // Separate local and external movies
   const localMovies = movies.filter(movie => !movie.externalId);
   const externalMovies = movies.filter(movie => movie.externalId);
-  
+
   let ratingsMap = {};
-  
+
   // Use the new bulk endpoint if we have both types of movies
   if (localMovies.length > 0 && externalMovies.length > 0) {
     const localIds = localMovies.map(movie => movie.id);
@@ -402,13 +402,13 @@ async function getMovieRatings(movies) {
     const externalIds = externalMovies.map(movie => movie.externalId);
     ratingsMap = await getMovieRatingsByExternalIds(externalIds);
   }
-  
+
   // Cache the results
   ratingsCache.set(cacheKey, {
     data: ratingsMap,
     timestamp: Date.now()
   });
-  
+
   console.log('Fetched fresh ratings for', movies.length, 'movies');
   return ratingsMap;
 }
@@ -421,17 +421,17 @@ async function getMovieRatingsBulk(localIds, externalIds) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         local_ids: localIds,
-        external_ids: externalIds 
+        external_ids: externalIds
       })
     });
-    
+
     if (!res.ok) {
       console.error(`Error fetching bulk movie ratings! Status: ${res.status}`);
       return {};
     }
-    
+
     const ratingsMap = await res.json();
     return ratingsMap;
   } catch (err) {
@@ -440,5 +440,5 @@ async function getMovieRatingsBulk(localIds, externalIds) {
   }
 }
 
-export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb, 
+export {userLogout, getJSON, postJSONToDb, patchJSONToDb, deleteJSONFromDb,
   getMovieInfo, getMoviesByGenre, getLocalMovieRatings, getMovieRatingsByExternalIds, getMovieRatings, getMovieRatingsBulk, invalidateRatingsCache, getIdFromExternalId, snakeToCamel, camelToProperCase, formattedTime, scrollToTop};

@@ -24,9 +24,9 @@ const StyledContainer = styled.div`
 const BackButton = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     // Extract the first segment of the URL (e.g., 'forums' from '/forums/123/thread/456')
-    const basePath = location.pathname.split("/")[1]; 
+    const basePath = location.pathname.split("/")[1];
 
     return (
         <StyledContainer>

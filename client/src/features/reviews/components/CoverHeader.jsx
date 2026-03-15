@@ -137,4 +137,3 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
 }
 
 export default CoverHeader;
-

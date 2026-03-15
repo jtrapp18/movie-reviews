@@ -29,23 +29,23 @@ const TagContainer = styled.div`
     margin-left: 6px;
     color: ${props => props.textColor || 'white'};
     cursor: pointer;
-    
+
     &:hover {
       opacity: 1;
     }
   }
 `;
 
-const Tag = ({ 
-  children, 
-  backgroundColor, 
-  textColor, 
+const Tag = ({
+  children,
+  backgroundColor,
+  textColor,
   borderColor,
-  clickable = false, 
-  onRemove, 
+  clickable = false,
+  onRemove,
   onClick,
   size = 'normal',
-  ...props 
+  ...props
 }) => {
   const handleClick = (e) => {
     if (clickable && onClick) {

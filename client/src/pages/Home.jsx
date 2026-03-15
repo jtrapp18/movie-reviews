@@ -58,14 +58,14 @@ function Home() {
 
     setIsSearching(true);
     setSearchQuery(text);
-    
+
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
       const data = await response.json();
-      
+
       // Convert snake_case to camelCase for frontend compatibility
       const camelData = snakeToCamel(data);
-      
+
       setShowMovies(camelData.movies || []);
       setShowArticles(camelData.articles || []);
       setShowDirectors(camelData.directors || []);
@@ -134,7 +134,7 @@ function Home() {
             >
               <Directors directors={showDirectors} />
             </Section>
-            
+
             <Section
               title={searchQuery ? 'Movies' : 'Movie Reviews'}
               subtitle={searchQuery ? '' : 'Click movie to view review'}
@@ -145,7 +145,7 @@ function Home() {
                 enterSearch={unifiedSearch}
               />
             </Section>
-            
+
             <Section
               title={searchQuery ? 'Articles' : 'Articles'}
               subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}

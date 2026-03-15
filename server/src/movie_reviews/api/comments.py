@@ -2,8 +2,9 @@ from flask import request, session
 from flask_restful import Resource
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from movie_reviews.config import db, api
-from movie_reviews.models import Review, ReviewComment, CommentLike
+
+from movie_reviews.config import db
+from movie_reviews.models import CommentLike, Review, ReviewComment
 
 
 class ReviewComments(Resource):
@@ -21,9 +22,7 @@ class ReviewComments(Resource):
         ).count()
         # Page of top-level comments (newest first)
         top_level = (
-            ReviewComment.query.filter_by(
-                review_id=review_id, parent_comment_id=None
-            )
+            ReviewComment.query.filter_by(review_id=review_id, parent_comment_id=None)
             .order_by(ReviewComment.created_at.desc())
             .offset(offset)
             .limit(limit)
@@ -45,7 +44,7 @@ class ReviewComments(Resource):
             .order_by(ReviewComment.created_at)
             .all()
         )
-        current_user_id = session.get('user_id')
+        current_user_id = session.get("user_id")
         comment_ids = [c.id for c in comments]
         counts = {}
         liked_comment_ids = set()
@@ -60,16 +59,18 @@ class ReviewComments(Resource):
             if current_user_id:
                 liked_comment_ids = {
                     row[0]
-                    for row in db.session.query(CommentLike.comment_id).filter(
+                    for row in db.session.query(CommentLike.comment_id)
+                    .filter(
                         CommentLike.comment_id.in_(comment_ids),
                         CommentLike.user_id == current_user_id,
-                    ).all()
+                    )
+                    .all()
                 }
         out = []
         for c in comments:
             d = c.to_dict()
-            d['like_count'] = counts.get(c.id, 0)
-            d['liked_by_me'] = c.id in liked_comment_ids
+            d["like_count"] = counts.get(c.id, 0)
+            d["liked_by_me"] = c.id in liked_comment_ids
             out.append(d)
         return {
             "comments": out,

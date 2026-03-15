@@ -43,7 +43,7 @@ function Articles({ showArticles, enterSearch }) {
         {showArticles.map((article, index) => {
           return (
             <MotionWrapper key={article.id} index={index}>
-              <div style={{ 
+              <div style={{
                 margin: '0',
                 width: '200px',
                 height: '100%',
@@ -55,7 +55,7 @@ function Articles({ showArticles, enterSearch }) {
           );
         })}
       </Carousel>
-      
+
       {isAdmin && (
         <AddButtonContainer>
           <Button onClick={handleAddNew}>

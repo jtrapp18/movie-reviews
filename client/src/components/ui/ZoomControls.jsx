@@ -15,7 +15,7 @@ const ZoomControlsContainer = styled.div`
     right: 20px;
     box-shadow: var(--shadow);
     backdrop-filter: blur(10px);
-    
+
     @media (max-width: 768px) {
       bottom: 10px;
       right: 10px;
@@ -43,24 +43,24 @@ const ZoomButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     transform: scale(1.1);
     cursor: pointer;
     background: var(--font-color-1);
     color: var(--background);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
-  
+
   &:disabled {
     background: rgba(255, 215, 0, 0.3);
     cursor: not-allowed;
     transform: none;
   }
-  
+
   @media (max-width: 768px) {
     width: 32px;
     height: 32px;
@@ -73,19 +73,19 @@ const ZoomLevel = styled.span`
   min-width: 40px;
   text-align: center;
   padding: 0 0.5rem;
-  
+
   @media (max-width: 768px) {
     min-width: 35px;
     padding: 0 0.3rem;
   }
 `;
 
-const ZoomControls = ({ 
-  zoomLevel = 1, 
-  onZoomIn, 
-  onZoomOut, 
-  onReset, 
-  minZoom = 0.7, 
+const ZoomControls = ({
+  zoomLevel = 1,
+  onZoomIn,
+  onZoomOut,
+  onReset,
+  minZoom = 0.7,
   maxZoom = 2,
   showReset = true,
   style = 'floating' // 'floating' or 'inline'
@@ -94,7 +94,7 @@ const ZoomControls = ({
 
   return (
     <ZoomControlsContainer floating={style === 'floating'}>
-      <ZoomButton 
+      <ZoomButton
         onClick={onZoomOut}
         disabled={zoomLevel <= minZoom}
         title="Zoom Out"
@@ -102,7 +102,7 @@ const ZoomControls = ({
         −
       </ZoomButton>
       <ZoomLevel>{zoomPercentage}%</ZoomLevel>
-      <ZoomButton 
+      <ZoomButton
         onClick={onZoomIn}
         disabled={zoomLevel >= maxZoom}
         title="Zoom In"
@@ -110,7 +110,7 @@ const ZoomControls = ({
         +
       </ZoomButton>
       {showReset && (
-        <ZoomButton 
+        <ZoomButton
           onClick={onReset}
           title="Reset Zoom"
         >

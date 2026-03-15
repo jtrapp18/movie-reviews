@@ -23,20 +23,20 @@ const MoviesContainer = styled.div`
   gap: 15px;
   scrollbar-width: thin;
   scrollbar-color: var(--primary) transparent;
-  
+
   &::-webkit-scrollbar {
     height: 8px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: var(--primary);
     border-radius: 4px;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: var(--cinema-gold-dark);
   }
@@ -77,7 +77,7 @@ const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
           // Get rating for this movie
           let rating = null;
           let movieWithCorrectId = movie;
-          
+
           if (movie.externalId) {
             // External movie - look up by external ID
             const movieData = ratingsMap[movie.externalId];
@@ -91,7 +91,7 @@ const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
             const localData = ratingsMap[movie.id];
             rating = localData?.rating || null;
           }
-          
+
           return (
             <MovieCardWrapper key={movie.externalId || movie.id}>
               <MovieCard

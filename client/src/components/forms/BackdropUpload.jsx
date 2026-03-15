@@ -194,4 +194,3 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
 }
 
 export default BackdropUpload;
-

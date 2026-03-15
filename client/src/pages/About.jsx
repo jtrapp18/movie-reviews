@@ -32,11 +32,11 @@ const ContentType = styled.div`
   margin: clamp(0.75rem, 2vw, 0.9375rem) 0;
   border-radius: 0.5rem;
   border-left: 4px solid var(--border);
-  
+
   h4 {
     margin: 0 0 0.625rem 0;
   }
-  
+
   p {
     margin: 0;
   }
@@ -46,12 +46,12 @@ const ContactMethod = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  
+
   .type {
     font-weight: bold;
     min-width: clamp(4rem, 10vw, 5rem);
   }
-  
+
   .value {
     margin-left: clamp(0.75rem, 2vw, 0.9375rem);
   }
@@ -80,7 +80,7 @@ function About() {
 
       <AboutSection title="About This Website">
         <Paragraphs text={aboutContent.aboutWebsite.intro} />
-        
+
         {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
           <ContentType key={index}>
             <h4>{type.title}</h4>
@@ -91,7 +91,7 @@ function About() {
 
       <AboutSection title="Get in Touch">
         <Paragraphs text={aboutContent.contact.intro} />
-        
+
         {aboutContent.contact.methods.map((method, index) => (
           <ContactMethod key={index}>
             <span className="type">{method.type}:</span>

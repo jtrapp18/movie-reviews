@@ -34,7 +34,7 @@ function SearchMovies() {
           movies: movies
         };
       });
-      
+
       const results = await Promise.all(promises);
       // Filter out empty genres (no movies found)
       const nonEmptyResults = results.filter(genre => genre.movies.length > 0);
@@ -60,7 +60,7 @@ function SearchMovies() {
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchAllGenres();
   }, []);
 

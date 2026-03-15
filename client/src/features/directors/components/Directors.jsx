@@ -40,4 +40,3 @@ function Directors({ directors }) {
 }
 
 export default Directors;
-

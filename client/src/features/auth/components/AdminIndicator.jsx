@@ -37,7 +37,7 @@ function AdminIndicator() {
         <FaCrown />
       </AdminIcon>
       Admin Mode
-      <button 
+      <button
         onClick={logout}
         style={{
           background: 'none',

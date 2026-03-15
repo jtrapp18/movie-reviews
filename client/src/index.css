@@ -38,7 +38,7 @@ p {
   --cinema-gray-dark: #1f2126;
   --cinema-blue: #007bff;
   --cinema-blue-dark: #0056b3;
-  
+
   /* Legacy colors (keeping for compatibility) */
   --green: #4E7839;
   --light-yellow: #fbf4a4;
@@ -53,7 +53,7 @@ p {
   --light-gray: #f0f0f0;
   --light-gray-dark: #bdbfc4;
   --dark-gray: #212D40;
-  --gray: #646469; 
+  --gray: #646469;
   --navy-blue: #00113d;
   --blue: #022658;
   --yellow: var(--cinema-gold);
@@ -160,7 +160,7 @@ p {
 }
 
 div.star-ratings{
-  display: flex;  
+  display: flex;
 }
 
 @font-face {

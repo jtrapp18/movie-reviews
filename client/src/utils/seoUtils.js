@@ -5,12 +5,12 @@ export const generateMovieReviewStructuredData = (movie, review) => {
 
   const baseUrl = window.location.origin;
   const reviewUrl = `${baseUrl}/#/movies/${movie.id}`;
-  
+
   // Calculate average rating if multiple reviews exist
   const reviews = movie.reviews || [];
   const ratings = reviews.filter(r => r.rating).map(r => r.rating);
-  const averageRating = ratings.length > 0 ? 
-    (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1) : 
+  const averageRating = ratings.length > 0 ?
+    (ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length).toFixed(1) :
     review.rating;
 
   const structuredData = {
@@ -97,7 +97,7 @@ export const generateArticleStructuredData = (article) => {
 
 export const generateWebsiteStructuredData = () => {
   const baseUrl = window.location.origin;
-  
+
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",

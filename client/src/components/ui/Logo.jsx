@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-const LogoContainer = styled.div` 
+const LogoContainer = styled.div`
   height: fit-content;
   display: flex;
   align-items: end;

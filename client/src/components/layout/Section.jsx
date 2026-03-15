@@ -11,13 +11,13 @@ const SectionContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const Section = ({ 
-  title, 
-  subtitle, 
-  searchPlaceholder, 
-  onSearch, 
+const Section = ({
+  title,
+  subtitle,
+  searchPlaceholder,
+  onSearch,
   showSearch = true,
-  children 
+  children
 }) => {
   return (
     <SectionContainer>
@@ -31,8 +31,8 @@ const Section = ({
       )}
       {showSearch && (
         <MotionWrapper index={3}>
-          <SearchBar 
-            enterSearch={onSearch} 
+          <SearchBar
+            enterSearch={onSearch}
             placeholder={searchPlaceholder}
           />
         </MotionWrapper>

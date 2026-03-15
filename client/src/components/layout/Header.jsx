@@ -41,7 +41,7 @@ const HeaderTitle = styled.div`
   align-items: flex-start;
   justify-content: flex-end;
   z-index: 1;
-  
+
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
     font-size: 1.4rem;
@@ -52,7 +52,7 @@ const HeaderTitle = styled.div`
     transform: rotate(-1deg);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   }
-  
+
   .subtitle {
     font-family: inherit;
     font-size: 0.75rem;
@@ -77,12 +77,12 @@ const VintagePhotoRoll = styled.img`
 const Header = () => {
   const { isMobile } = useContext(WindowWidthContext);
   const { user } = useContext(UserContext);
-    
+
     return (
         <Headroom>
           <StyledHeader>
             {/* <VintagePhotoRoll
-              src={vintagePhotoRoll} 
+              src={vintagePhotoRoll}
               alt="Vintage film strip background"
             /> */}
             <LeftSection>

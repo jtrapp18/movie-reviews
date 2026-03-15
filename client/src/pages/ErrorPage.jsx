@@ -37,7 +37,7 @@ const StyledContainer = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
+    background-image:
       radial-gradient(circle at 20% 50%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%),
       radial-gradient(circle at 80% 20%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%),
       radial-gradient(circle at 40% 40%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%);
@@ -132,7 +132,7 @@ function ErrorPage() {
     <StyledContainer>
       <div className="film-strip"></div>
       <div className="film-strip"></div>
-      
+
       <div className="content">
         <div className="spotlight"></div>
         <h3>404: Scene Not Found</h3>

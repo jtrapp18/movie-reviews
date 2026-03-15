@@ -67,7 +67,7 @@ const ArticleForm = ({ initObj }) => {
 
   const handleDelete = async () => {
     if (!initObj || !initObj.id) return;
-    
+
     setIsDeleting(true);
     try {
       // Call the API directly to ensure it completes before updating state
@@ -81,7 +81,7 @@ const ArticleForm = ({ initObj }) => {
       if (response.ok) {
         // Use the CRUD hook to update the frontend state
         deleteItem(initObj.id);
-        
+
         // Navigate back to the articles list
         navigate('/#/articles');
       } else {
@@ -120,10 +120,10 @@ const ArticleForm = ({ initObj }) => {
     validationSchema,
     onSubmit: async (values) => {
       if (isSubmitting) return; // Prevent double submission
-      
+
       setIsSubmitting(true);
       setSubmitError(null);
-      
+
       try {
         // Only send the fields we want to update - no document fields
         const formData = {
@@ -140,20 +140,20 @@ const ArticleForm = ({ initObj }) => {
 
         // Submit the main form data first
         const result = await submitFormWithDocument(formData, selectedFile, isEdit, id);
-        
+
         console.log('ArticleForm - Submission completed, success:', result.success);
-        
+
         if (result.success) {
           console.log('ArticleForm - API response ID:', result.result?.id);
           console.log('ArticleForm - Tags count:', result.result?.tags?.length || 0);
-          
+
           // Store the created article data for new articles
           if (!isEdit) {
             setCreatedArticle(result.result);
             // Navigate to the new article's detail page
             navigate(`/articles/${result.result.id}`);
           }
-          
+
           // Update the articles context with the new/updated article
           if (isEdit) {
             // Don't call updateItem - the form submission already updated the database
@@ -168,7 +168,7 @@ const ArticleForm = ({ initObj }) => {
         } else {
           setSubmitError(result.error);
         }
-        
+
       } catch (error) {
         console.error('Error submitting article:', error);
         setSubmitError(error.message || 'Failed to submit article');
@@ -181,16 +181,16 @@ const ArticleForm = ({ initObj }) => {
 
   const handleDocumentUploadSuccess = (result) => {
     setHasDocument(true);
-    
+
     // Convert snake_case to camelCase
     const review = snakeToCamel(result.review);
-    
+
     if (review && review.reviewText) {
       formik.setFieldValue("reviewText", review.reviewText);
     }
-    
+
     formik.setFieldTouched("reviewText", false);
-    
+
     if (initObj && review) {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
@@ -217,7 +217,7 @@ const ArticleForm = ({ initObj }) => {
   const handleFileSelect = (file, replaceTextOption) => {
     setSelectedFile(file);
     setReplaceText(replaceTextOption);
-    
+
     if (file) {
       setHasDocument(true);
     } else {
@@ -305,7 +305,7 @@ const ArticleForm = ({ initObj }) => {
                 }
               }}
             />
-            
+
             {/* Extract Text Button - show if document is uploaded */}
             {hasDocument && selectedFile && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
@@ -344,13 +344,13 @@ const ArticleForm = ({ initObj }) => {
               maxTags={8}
             />
           </div>
-          
-          <div style={{ 
-            marginTop: '30px', 
-            marginBottom: '20px', 
-            display: 'flex', 
+
+          <div style={{
+            marginTop: '30px',
+            marginBottom: '20px',
+            display: 'flex',
             flexWrap: 'wrap',
-            gap: '10px', 
+            gap: '10px',
             justifyContent: 'center',
             alignItems: 'center'
           }}>
@@ -363,15 +363,15 @@ const ArticleForm = ({ initObj }) => {
                 navigate(-1);
               }
             }}>Cancel</CancelButton>
-            <SubmitButton 
+            <SubmitButton
               isSubmitting={isSubmitting}
               isEdit={isEdit}
               editText="Save Changes"
               createText="Create Article"
             />
             {isAdmin && initObj && (
-              <DeleteButton 
-                type="button" 
+              <DeleteButton
+                type="button"
                 onClick={() => setShowDeleteModal(true)}
                 disabled={isDeleting}
               >
@@ -414,7 +414,7 @@ const ArticleForm = ({ initObj }) => {
           reviewId={createdArticle?.id || initObj?.id}
         />
       )}
-      
+
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

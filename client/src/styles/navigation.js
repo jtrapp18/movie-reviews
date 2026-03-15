@@ -15,7 +15,7 @@ const StyledMenuItem = css`
 
 const StyledNavigation = css`
   ${StyledMenuItem}
-  
+
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;

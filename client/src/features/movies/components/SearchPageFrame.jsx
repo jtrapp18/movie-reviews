@@ -59,4 +59,3 @@ function SearchPageFrame({
 }
 
 export default SearchPageFrame;
-

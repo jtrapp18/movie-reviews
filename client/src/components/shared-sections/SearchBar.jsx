@@ -96,12 +96,12 @@ const SearchContainer = styled.div`
     @media (max-width: 768px) {
         margin: 1.5rem auto;
         padding: 0 1rem;
-        
+
         input {
             font-size: 16px;
             padding: 14px 18px;
             padding-right: 45px;
-            
+
             &::placeholder {
                 font-size: 16px;
             }
@@ -114,7 +114,7 @@ const SearchContainer = styled.div`
                 padding-right: 50px;
             }
         }
-        
+
         span {
             right: 14px;
             font-size: 14px;
@@ -136,7 +136,7 @@ const SearchContainer = styled.div`
 const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     const [searchInput, setSearchInput] = useState('');
     const [isExpanded, setIsExpanded] = useState(false);
-    
+
     const handleChangeSearch = (event) => {
         setSearchInput(event.target.value);
     }
@@ -168,7 +168,7 @@ const SearchBar = ({enterSearch, placeholder = "Search movies..."}) => {
     return (
         <SearchContainer $isExpanded={isExpanded} className="search-bar">
             <div>
-                <input 
+                <input
                     value={searchInput}
                     type="text"
                     id="search"

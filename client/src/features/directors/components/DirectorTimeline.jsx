@@ -158,4 +158,3 @@ function DirectorTimeline({ movies }) {
 }
 
 export default DirectorTimeline;
-

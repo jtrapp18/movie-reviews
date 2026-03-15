@@ -1,11 +1,11 @@
 import { snakeToCamel, postJSONToDb, patchJSONToDb, deleteJSONFromDb } from "../helper";
 import useCrudState from "./useCrudState";
- 
+
 const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
 
-    const {addToState, updateState, deleteFromState, 
-      addToKeyInState, updateKeyInState, deleteFromKeyInState, 
-      addNestedToKeyInState, updateNestedKeyInState, deleteNestedKeyInState} = 
+    const {addToState, updateState, deleteFromState,
+      addToKeyInState, updateKeyInState, deleteFromKeyInState,
+      addNestedToKeyInState, updateNestedKeyInState, deleteNestedKeyInState} =
     useCrudState(setState, optionalFunc, addFunc);
 
     const addItem = async (item) => {
@@ -13,7 +13,7 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
         const json = await postJSONToDb(dbKey, item); // Wait for the response
         const jsonTransformed = snakeToCamel(json); // Transform the response
         addToState(jsonTransformed); // Add the transformed item to state
-    
+
         const newId = jsonTransformed.id; // Extract the new ID
         console.info('useCrudStateDB - item added', { dbKey, id: newId });
         return newId; // Return the new ID
@@ -21,7 +21,7 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
         console.error('Error adding item:', error);
       }
     };
-    
+
     const updateItem = (item, itemId) => {
       patchJSONToDb(dbKey, itemId, item)
       .then(json => {
@@ -30,14 +30,14 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
         console.info('useCrudStateDB - item updated', { dbKey, id: itemId });
       })
       .catch(e => console.error(e));
-      
+
     }
-      
+
     const deleteItem = (itemId) => {
       deleteJSONFromDb(dbKey, itemId)
       deleteFromState(itemId)
     };
-    
+
     const addToKey = async (arrayKey, body, itemId=null) => {
       try {
         const json = await postJSONToDb(arrayKey, body);
@@ -63,7 +63,7 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
       deleteJSONFromDb(arrayKey, arrayId);
       deleteFromKeyInState(arrayKey, arrayId, itemId);
     };
-    
+
     const addNestedKey = (arrayKey, arrayId, nestedKey, body, itemId=null) => {
       postJSONToDb(nestedKey, body)
       .then(json => {
@@ -85,7 +85,7 @@ const useCrudStateDB = (setState, dbKey, optionalFunc=null, addFunc=null) => {
       deleteNestedKeyInState(arrayKey, arrayId, nestedKey, nestedId, itemId);
     };
 
-  return {addItem, updateItem, deleteItem, 
+  return {addItem, updateItem, deleteItem,
     addToKey, updateKey, deleteFromKey,
     addNestedKey, updateNestedKey, deleteNestedKey
   }

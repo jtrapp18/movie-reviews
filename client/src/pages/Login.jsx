@@ -8,11 +8,11 @@ import { useNavigate } from "react-router-dom";
 const Header = styled.div`
   text-align: center;
   margin-bottom: 1.5rem;
-  
+
   h1 {
     margin-bottom: 0.5rem;
   }
-  
+
   .subtitle {
     font-style: italic;
   }

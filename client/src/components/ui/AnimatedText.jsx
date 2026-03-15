@@ -12,7 +12,7 @@ const TextContainer = styled.div`
         return props.compact ? '20px' : '40px';
     }};
     text-align: center;
-    
+
     & p {
         font-size: ${props => {
             if (props.size === 'small') return '12px';
@@ -67,8 +67,8 @@ const TextContainer = styled.div`
     }
 `;
 
-const AnimatedText = ({ 
-    text = "Loading", 
+const AnimatedText = ({
+    text = "Loading",
     compact = false,
     size = 'medium', // 'small', 'medium', 'large'
     showDots = true, // Always show dots by default

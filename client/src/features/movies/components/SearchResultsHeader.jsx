@@ -23,12 +23,12 @@ const SearchQuery = styled.span`
   font-weight: 600;
 `;
 
-const SearchResultsHeader = ({ 
-  searchQuery, 
-  movieCount = 0, 
-  articleCount = 0, 
+const SearchResultsHeader = ({
+  searchQuery,
+  movieCount = 0,
+  articleCount = 0,
   isLoading = false,
-  showNoResults = false 
+  showNoResults = false
 }) => {
   if (isLoading) {
     return (

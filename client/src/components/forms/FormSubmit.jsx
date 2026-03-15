@@ -48,9 +48,9 @@ const ContentDisplay = ({
   const { isAdmin } = useAdmin();
   const hasContent = formValues.reviewText && formValues.reviewText.trim();
   const hasDocument = formValues.hasDocument && formValues.documentFilename && reviewId;
-  
+
   // Check if document is a Word document
-  const isWordDocument = hasDocument && formValues.documentType && 
+  const isWordDocument = hasDocument && formValues.documentType &&
     (formValues.documentType.toLowerCase() === 'docx' || formValues.documentType.toLowerCase() === 'doc');
 
   // Determine if there's any content to display
@@ -68,7 +68,7 @@ const ContentDisplay = ({
             ))}
           </TagsContainer>
         )}
-      
+
       {hasAnyContent ? (
         <ZoomableContent>
           <ContentBody className="content-body">
@@ -110,8 +110,8 @@ const ContentDisplay = ({
       )}
 
       {isAdmin && (
-        <Button 
-          type="button" 
+        <Button
+          type="button"
           onClick={() => setIsEditing(true)}
         >
           Edit

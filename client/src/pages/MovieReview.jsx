@@ -44,7 +44,7 @@ function MovieReview() {
         setLoading(false);
       }
     };
-    
+
     if (movieId) {
       fetchMovie();
     }
@@ -78,10 +78,10 @@ function MovieReview() {
 
   // Generate SEO data
   const seoTitle = review ? `${movie.title} Review - ${review.rating}/10` : `${movie.title} - Movie Review`;
-  const seoDescription = review 
-    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...` 
+  const seoDescription = review
+    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...`
     : `Read our detailed review of ${movie.title} (${movie.releaseDate}). ${movie.overview.substring(0, 100)}...`;
-  
+
   const structuredData = generateMovieReviewStructuredData(movie, review);
   const breadcrumbData = generateBreadcrumbStructuredData([
     { name: 'Home', url: window.location.origin + '/#/' },

@@ -27,12 +27,12 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
         setLoading(false);
         return;
       }
-      
+
       const ratings = await getMovieRatings(movies);
       setRatingsMap(ratings);
       setLoading(false);
     };
-    
+
     fetchRatings();
   }, [movies]);
 
@@ -43,13 +43,13 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
         const movieData = ratingsMap[movie.externalId];
         const rating = movieData?.rating || null;
         const localId = movieData?.local_id;
-        
+
         // If we have a local ID, use it for navigation
         // Otherwise, keep the external ID for creating new movies
-        const movieWithCorrectId = localId 
+        const movieWithCorrectId = localId
         ? { ...movie, id: localId }
         : movie;
-        
+
         return (
         <MovieCardWrapper key={movie.externalId || movie.id}>
             <MovieCard

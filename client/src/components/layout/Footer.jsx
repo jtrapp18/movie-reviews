@@ -62,7 +62,7 @@ const StyledFooter = styled.footer`
             text-decoration: none;
             transition: all 0.3s ease;
             font-weight: 600;
-            
+
             &:hover {
                 color: var(--soft-white);
             }
@@ -89,7 +89,7 @@ const Footer = () => {
                     <p><strong>Film Analysis & Reviews by James Trapp</strong></p>
                     <p><em>Exploring cinema through critical analysis and thematic essays</em></p>
                     <p>
-                        <a href="/#/about">ABOUT THE AUTHOR</a> • 
+                        <a href="/#/about">ABOUT THE AUTHOR</a> •
                         <a href="/#/contact">CONTACT</a>
                     </p>
                     <p id='data-caveat'>© 2025 James Trapp</p>

@@ -30,16 +30,16 @@ export const extractTextFromFile = async (
     const formData = new FormData();
     formData.append('document', selectedFile);
     formData.append('extract_only', 'true'); // Flag to indicate we only want text extraction
-    
+
     const uploadResponse = await fetch('/api/extract_text', {
       method: 'POST',
       body: formData,
     });
-    
+
     if (uploadResponse.ok) {
       const extractResult = await uploadResponse.json();
       console.log('Text extraction successful:', extractResult);
-      
+
       if (extractResult.text) {
         console.log('Setting reviewText to:', extractResult.text);
         formikSetFieldValue("reviewText", extractResult.text);

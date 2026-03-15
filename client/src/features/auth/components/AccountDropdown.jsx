@@ -79,7 +79,7 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
 
 
   return (
-      <LinkContainer 
+      <LinkContainer
         ref={cardRef}
         onMouseOver={()=>setIsMenuOpen(true)}
         onMouseOut={()=>setIsMenuOpen(false)}

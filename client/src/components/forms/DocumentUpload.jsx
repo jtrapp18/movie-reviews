@@ -16,7 +16,7 @@ const UploadContainer = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  
+
   &.drag-over {
     border-color: var(--border);
     background-color: var(--background-tertiary);
@@ -91,7 +91,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileSelect(files[0]);
@@ -100,22 +100,22 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
 
   const handleFileSelect = (file) => {
     setError(null);
-    
+
     // Check file type
     const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
       setError(`Please select a PDF or Word document (.pdf, .docx, .doc)`);
       return;
     }
-    
+
     // Check file size
     if (file.size > maxFileSize) {
       setError(`File size must be less than 10MB`);
       return;
     }
-    
+
     setSelectedFile(file);
-    
+
     // Notify parent component about file selection
     if (onFileSelect) {
       onFileSelect(file, replaceText);
@@ -141,9 +141,9 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
 
   const handlePreviewSelectedFile = () => {
     if (!selectedFile) return;
-    
+
     const fileExtension = '.' + selectedFile.name.split('.').pop().toLowerCase();
-    
+
     if (fileExtension === '.pdf') {
       // For PDFs, create an object URL for preview
       const url = URL.createObjectURL(selectedFile);
@@ -164,7 +164,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
     setSelectedFile(null);
     setError(null);
     setShowSelectedFilePreview(false);
-    
+
     // Notify parent component that file was cleared
     if (onFileSelect) {
       onFileSelect(null, replaceText);
@@ -180,7 +180,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
     >
       <h4><FaFileUpload /> Document Upload</h4>
       <p>Upload a PDF or Word document to attach to your review</p>
-      
+
       {existingDocument && !selectedFile && (
         <FileInfo>
           <strong><FaPaperclip /> Attached Document:</strong> {existingDocument.documentFilename}
@@ -188,7 +188,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
             <Button onClick={handlePreview}><FaEye /> Preview</Button>
             <Button onClick={handleDownload}><FaDownload /> Download</Button>
             {onRemoveDocument && (
-              <Button 
+              <Button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -201,11 +201,11 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           </DocumentActions>
         </FileInfo>
       )}
-      
+
       {showPreview && existingDocument && !selectedFile && (
-        <div style={{ 
-          marginTop: '10px', 
-          border: '1px solid var(--cinema-gold)', 
+        <div style={{
+          marginTop: '10px',
+          border: '1px solid var(--cinema-gold)',
           borderRadius: '8px',
           overflow: 'hidden'
         }}>
@@ -222,7 +222,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           />
         </div>
       )}
-      
+
       {(!existingDocument || selectedFile) && (
         <>
           <FileInput
@@ -234,9 +234,9 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           <Button onClick={() => document.getElementById('document-upload').click()}>
             <FaFileAlt /> Choose File
           </Button>
-          
+
           <p>or drag and drop your file here</p>
-          
+
           {selectedFile && (
             <FileInfo className="selected-file">
               <strong><FaFileAlt /> Selected File:</strong> {selectedFile.name}
@@ -250,11 +250,11 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
               </DocumentActions>
             </FileInfo>
           )}
-          
+
           {showSelectedFilePreview && selectedFile && selectedFilePreviewUrl && (
-            <div style={{ 
-              marginTop: '10px', 
-              border: '1px solid var(--cinema-gold)', 
+            <div style={{
+              marginTop: '10px',
+              border: '1px solid var(--cinema-gold)',
               borderRadius: '8px',
               overflow: 'hidden'
             }}>
@@ -271,7 +271,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
               />
             </div>
           )}
-          
+
           <CheckboxContainer>
             <small>
               <FaLightbulb /> Document content will be extracted and used as review text
@@ -279,7 +279,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
           </CheckboxContainer>
         </>
       )}
-      
+
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </UploadContainer>
   );

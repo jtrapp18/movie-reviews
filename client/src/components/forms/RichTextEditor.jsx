@@ -9,11 +9,11 @@ const OptionalText = styled.p`
   font-family: var(--default-font);
 `;
 
-const RichTextEditor = ({ 
-  value, 
-  onChange, 
-  onBlur, 
-  placeholder, 
+const RichTextEditor = ({
+  value,
+  onChange,
+  onBlur,
+  placeholder,
   hasDocument = false,
   label = "Content",
   error,

@@ -63,7 +63,7 @@ const ReviewForm = ({ initObj }) => {
 
   const handleDelete = async () => {
     if (!movieId) return;
-    
+
     setIsDeleting(true);
     try {
       // Call the API directly to ensure it completes before updating state
@@ -77,14 +77,14 @@ const ReviewForm = ({ initObj }) => {
       if (response.ok) {
         // Use the CRUD hook to update the frontend state
         deleteItem(movieId);
-        
+
         // Invalidate the ratings cache so the UI updates properly
         invalidateRatingsCache();
-        
+
         // Refresh the movies data to ensure UI is up to date
         const movies = await getJSON('movies');
         setMovies(movies);
-        
+
         // Navigate back to the movie list or home
         navigate('/#/search_movies');
       } else {
@@ -128,7 +128,7 @@ const ReviewForm = ({ initObj }) => {
       if (isSubmitting) return; // Prevent double submission
       setIsSubmitting(true);
       setSubmitError(null);
-      
+
       try {
         // Prepare the form data for submission
         const formData = {
@@ -138,26 +138,26 @@ const ReviewForm = ({ initObj }) => {
           movieId: movieId,
           tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
         };
-        
+
         console.info('ReviewForm - submitting review', {
           movieId,
           isEdit,
           hasDocument,
           tagCount: tags.length,
         });
-        
+
         // Submit the review
         const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id);
-        
+
         if (result.success) {
           console.info('ReviewForm - review submitted successfully', {
             id: result.result?.id,
             tagCount: result.result?.tags?.length || 0,
           });
-          
+
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
-          
+
           // Update the movies context with the new/updated review
           if (isEdit) {
             // For edits, update the existing review in state
@@ -168,10 +168,10 @@ const ReviewForm = ({ initObj }) => {
             // For new reviews, just store the result - no need to call addToKey since we already submitted
             setUpdatedReview(camelCaseResult);
           }
-          
+
           // Invalidate ratings cache since ratings may have changed
           invalidateRatingsCache();
-          
+
           // Switch to non-editing mode to show the saved review
           setIsEditing(false);
         } else {
@@ -193,13 +193,13 @@ const ReviewForm = ({ initObj }) => {
 
   const handleDocumentUploadSuccess = (result) => {
     setHasDocument(true);
-    
+
     // Convert snake_case to camelCase
     const review = snakeToCamel(result.review);
-    
+
     // Don't automatically extract text - let user choose
     formik.setFieldTouched("reviewText", false);
-    
+
     if (initObj && review) {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
@@ -225,7 +225,7 @@ const ReviewForm = ({ initObj }) => {
   const handleFileSelect = (file, replaceTextOption) => {
     setSelectedFile(file);
     setReplaceText(replaceTextOption);
-    
+
     if (file) {
       setHasDocument(true);
     } else {
@@ -238,7 +238,7 @@ const ReviewForm = ({ initObj }) => {
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
-          
+
           {/* Rating Stars */}
           <StarsContainer>
             <Stars rating={formik.values.rating} handleStarClick={updateRating} />
@@ -246,7 +246,7 @@ const ReviewForm = ({ initObj }) => {
               <Error>{formik.errors.rating}</Error>
             )}
           </StarsContainer>
-          
+
           {/* Title Input */}
           <div>
             <label htmlFor="title">Review Title:</label>
@@ -283,7 +283,7 @@ const ReviewForm = ({ initObj }) => {
                 }
               }}
             />
-            
+
             {/* Extract Text Button - show if document is uploaded */}
             {hasDocument && selectedFile && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
@@ -312,7 +312,7 @@ const ReviewForm = ({ initObj }) => {
             error={formik.errors.reviewText}
             touched={formik.touched.reviewText}
           />
-          
+
           {/* Tags Input */}
           <div>
             <label htmlFor="tags">Tags (optional):</label>
@@ -322,21 +322,21 @@ const ReviewForm = ({ initObj }) => {
               placeholder="Add tags to categorize your review..."
             />
           </div>
-          
+
           {submitError && <Error>{submitError}</Error>}
-          
+
           {/* Display validation errors */}
           {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
           {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
-          
-          <div style={{ 
-            display: 'flex', 
+
+          <div style={{
+            display: 'flex',
             flexWrap: 'wrap',
-            gap: '10px', 
+            gap: '10px',
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: '20px' 
+            marginTop: '20px'
           }}>
             <CancelButton type="button" onClick={() => {
               if (initObj) {
@@ -347,15 +347,15 @@ const ReviewForm = ({ initObj }) => {
                 navigate(-1);
               }
             }}>Cancel</CancelButton>
-            <SubmitButton 
+            <SubmitButton
               isSubmitting={isSubmitting}
               isEdit={isEdit}
               editText="Save Changes"
               createText="Submit Review"
             />
             {isAdmin && initObj && (
-              <DeleteButton 
-                type="button" 
+              <DeleteButton
+                type="button"
                 onClick={() => setShowDeleteModal(true)}
                 disabled={isDeleting}
               >
@@ -369,7 +369,7 @@ const ReviewForm = ({ initObj }) => {
           formValues={(() => {
             // Use updatedReview if available, otherwise fall back to initObj
             const reviewData = updatedReview || initObj;
-            
+
             const values = {
               ...formik.values,
               ...initObj, // Include all review data
@@ -392,7 +392,7 @@ const ReviewForm = ({ initObj }) => {
           reviewId={initObj?.id}
         />
       )}
-      
+
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

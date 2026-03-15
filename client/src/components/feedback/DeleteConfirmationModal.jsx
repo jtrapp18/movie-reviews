@@ -43,11 +43,11 @@ const ButtonContainer = styled.div`
   justify-content: center;
 `;
 
-const DeleteConfirmationModal = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm, 
-  title, 
+const DeleteConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
   message,
   itemType = "item"
 }) => {
