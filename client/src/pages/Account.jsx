@@ -80,7 +80,6 @@ function Account() {
   const { user, setUser } = useContext(UserContext);
   const [editing, setEditing] = useState(false);
   const [username, setUsername] = useState(user?.username || "");
-  const [firstName, setFirstName] = useState(user?.firstName || "");
   const [email, setEmail] = useState(user?.email || "");
   const [iconColor, setIconColor] = useState(user?.iconColor || "#0000ff");
   const [darkMode, setDarkMode] = useState(user?.darkMode || false);
@@ -122,7 +121,6 @@ function Account() {
     try {
       const payload = {
         username,
-        firstName,
         email,
         iconColor,
         darkMode,
@@ -161,11 +159,6 @@ function Account() {
             <div>
               <label>Username</label>
               <p>{user.username}</p>
-            </div>
-
-            <div>
-              <label>Name</label>
-              <p>{user.firstName}</p>
             </div>
 
             <div>
@@ -210,16 +203,6 @@ function Account() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="firstName">Name</label>
-            <input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
             />
           </div>
 
@@ -273,7 +256,6 @@ function Account() {
                 setError(null);
                 setSuccess(null);
                 setUsername(user.username || "");
-                setFirstName(user.firstName || "");
                 setEmail(user.email || "");
                 setIconColor(user.iconColor || "#0000ff");
                 setDarkMode(user.darkMode || false);

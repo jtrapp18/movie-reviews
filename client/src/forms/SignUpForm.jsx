@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { snakeToCamel, postJSONToDb } from '../helper';
 import styled from "styled-components";
 import { UserContext } from '../context/userProvider';
@@ -81,6 +82,7 @@ const EyeClosed = () => (
 );
 
 function SignUpForm({ setShowConfirm }) {
+  const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
   const { setTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
@@ -122,6 +124,7 @@ function SignUpForm({ setShowConfirm }) {
           }
           setShowConfirm(true);
           console.info('[Sign up] Success:', userTransformed.username ?? userTransformed.email);
+          navigate('/');
         }
       } catch (error) {
           console.error('[Sign up] Failure:', error.message, error.serverErrors ?? '');
