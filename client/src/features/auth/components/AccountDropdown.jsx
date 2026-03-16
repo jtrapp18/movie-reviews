@@ -3,32 +3,14 @@ import { useRef } from 'react';
 import { scrollToTop } from '@helper';
 import { NavLink } from 'react-router-dom';
 import { useAccountActions } from '@utils/account';
+import DropdownPanel from '@components/ui/DropdownPanel';
 
-const LinkContainer = styled.div`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 1000;
+const LinkContainer = styled(DropdownPanel)`
   width: 200px;
   text-decoration: none;
   text-align: right;
-  background: var(--background-tertiary);
-  border: 1px solid var(--border);
-  border-bottom: 3px double var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Ensures smooth animation */
-  transform-origin: top; /* Animation starts at the top */
-  transform: scaleY(0); /* Initially collapsed */
-  transition: transform 0.3s ease-in-out; /* Smooth fold-out animation */
-
-  &.open {
-    transform: scaleY(1); /* Fully expanded */
-  }
-
-  &.closed {
-    transform: scaleY(0); /* Fully collapsed */
-  }
 
   #exit {
     background: var(--gray);

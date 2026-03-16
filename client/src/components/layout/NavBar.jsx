@@ -15,12 +15,15 @@ const StyledNavBar = styled.nav`
 `;
 
 function NavBar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   return (
     <StyledNavBar>
-      <NavLinks setIsMenuOpen={setIsMenuOpen} />
-      <AccountDropdown isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+      <NavLinks setIsMenuOpen={setIsAccountMenuOpen} />
+      <AccountDropdown
+        isMenuOpen={isAccountMenuOpen}
+        setIsMenuOpen={setIsAccountMenuOpen}
+      />
     </StyledNavBar>
   );
 }

@@ -3,44 +3,47 @@ import { Link } from 'react-router-dom';
 
 const Row = styled(Link)`
   display: block;
+  width: 100%;
   padding: 0.75rem 1rem;
   text-decoration: none;
   color: inherit;
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--background-tertiary);
   transition: background 0.15s ease;
 
   &:last-child {
     border-bottom: none;
   }
 
-  &:hover {
-    background: var(--background-secondary, rgba(0, 0, 0, 0.03));
+  &.unread {
+    background: var(--background-tertiary);
   }
 
-  &.unread {
-    background: var(--background-secondary, rgba(0, 0, 0, 0.04));
+  &:hover {
+    background: var(--background-secondary);
+  }
+
+  &.unread p {
+    font-weight: bold;
   }
 `;
 
-const Text = styled.span`
-  font-size: 0.95rem;
+const Text = styled.p`
+  font-size: .95rem;
+  margin: 0;
 `;
 
 const Actor = styled.span`
   font-weight: 600;
-  color: var(--font-color);
 `;
 
 const ReviewRef = styled.span`
-  font-size: 0.9rem;
-  color: var(--font-color-2);
+  font-size: .9rem;
   display: block;
-  margin-top: 0.25rem;
+  margin: 0.25rem 0;
 `;
 
 const Time = styled.span`
-  font-size: 0.8rem;
-  color: var(--font-color-2);
+  font-size: .8rem;
   display: block;
   margin-top: 0.2rem;
 `;

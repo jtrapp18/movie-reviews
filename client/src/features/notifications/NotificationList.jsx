@@ -5,6 +5,7 @@ const List = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
+  width: 100%;
 `;
 
 const LoadMoreWrap = styled.div`
