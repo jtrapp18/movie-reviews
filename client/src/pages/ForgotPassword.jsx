@@ -1,7 +1,7 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { StyledContainer, StyledForm, Button } from "../styles";
-import { postJSONToDb } from "../helper";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { StyledContainer, StyledForm, Button } from '../styles';
+import { postJSONToDb } from '../helper';
 
 const Header = styled.div`
   text-align: center;
@@ -20,32 +20,31 @@ const Message = styled.p`
   margin-top: 0.75rem;
   text-align: center;
   // font-size: 0.95rem;
-  color: ${(props) => (props.$error ? "var(--error-color)" : "var(--success-color)")};
+  color: ${(props) => (props.$error ? 'var(--error-color)' : 'var(--success-color)')};
 `;
 
 function ForgotPassword() {
-  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setMessage("");
-    setError("");
+    setMessage('');
+    setError('');
     try {
-      const body =
-        emailOrUsername.includes("@")
-          ? { email: emailOrUsername }
-          : { username: emailOrUsername };
-      await postJSONToDb("password_reset_request", body);
+      const body = emailOrUsername.includes('@')
+        ? { email: emailOrUsername }
+        : { username: emailOrUsername };
+      await postJSONToDb('password_reset_request', body);
       setMessage(
-        "If an account exists for that information, you will receive reset instructions shortly."
+        'If an account exists for that information, you will receive reset instructions shortly.'
       );
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Please try again.");
+      setError('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -72,7 +71,7 @@ function ForgotPassword() {
         </div>
         <div>
           <Button type="submit" variant="fill" color="primary" disabled={submitting}>
-            {submitting ? "Sending..." : "Send reset link"}
+            {submitting ? 'Sending...' : 'Send reset link'}
           </Button>
         </div>
       </StyledForm>
@@ -83,4 +82,3 @@ function ForgotPassword() {
 }
 
 export default ForgotPassword;
-

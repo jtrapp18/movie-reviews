@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer, Button } from '../styles';
-import { getJSON, patchJSONToDb } from '../helper';
-import SEOHead from '../components/SEOHead';
-import Loading from '../components/ui/Loading';
-import DirectorBio from '../components/DirectorBio';
-import DirectorTimeline from '../components/DirectorTimeline';
-import { useAdmin } from '../hooks/useAdmin';
-import BackdropUpload from '../components/BackdropUpload';
+import { StyledContainer, Button } from '@styles';
+import { getJSON, patchJSONToDb } from '@helper';
+import SEOHead from '@components/shared-sections/SEOHead';
+import Loading from '@components/ui/Loading';
+import { DirectorBio, DirectorTimeline } from '@features/directors';
+import { useAdmin } from '@hooks/useAdmin';
+import BackdropUpload from '@components/forms/BackdropUpload';
 
 const DirectorSection = styled.div`
   width: 100%;
@@ -29,7 +28,6 @@ const MoviesHeader = styled.h2`
 
 function Director() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [director, setDirector] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,9 +138,7 @@ function Director() {
               onEdit={handleStartEdit}
             />
             <MoviesSection>
-              <MoviesHeader>
-                Movies by {director.name}
-              </MoviesHeader>
+              <MoviesHeader>Movies by {director.name}</MoviesHeader>
               <DirectorTimeline movies={movies} />
             </MoviesSection>
           </DirectorSection>
@@ -153,7 +149,9 @@ function Director() {
             <h1>{director.name}</h1>
 
             <div style={{ marginTop: '0.5rem' }}>
-              <label><strong>Cover / backdrop image</strong></label>
+              <label>
+                <strong>Cover / backdrop image</strong>
+              </label>
               <BackdropUpload
                 uploadUrl={`/api/directors/${director.id}/backdrop`}
                 currentUrl={
@@ -169,8 +167,17 @@ function Director() {
               />
             </div>
 
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label htmlFor="director-bio"><strong>Biography</strong></label>
+            <div
+              style={{
+                marginTop: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+              }}
+            >
+              <label htmlFor="director-bio">
+                <strong>Biography</strong>
+              </label>
               <textarea
                 id="director-bio"
                 value={bioDraft}
@@ -195,4 +202,3 @@ function Director() {
 }
 
 export default Director;
-

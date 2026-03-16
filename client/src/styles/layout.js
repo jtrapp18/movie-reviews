@@ -9,7 +9,8 @@ const StyledMain = styled.main`
   flex: 1;
 
   /* Background image */
-  // background-image: ${(props) => props.isMobile ? 'none' : `url('/images/grid_left.png')`};
+  // background-image: ${(props) =>
+    props.isMobile ? 'none' : `url('/images/grid_left.png')`};
   background-size: auto 40vh;
   background-position: top left;
   background-repeat: no-repeat;

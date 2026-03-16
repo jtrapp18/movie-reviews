@@ -1,20 +1,18 @@
-import { getMoviesByGenre, getMovieInfo } from '../helper';
+import { getMoviesByGenre, getMovieInfo } from '@helper';
 import { useState, useEffect, useContext } from 'react';
-import MotionWrapper from '../styles/MotionWrapper';
-import MovieSwimlane from '../components/MovieSwimlane';
-import SearchResultsGrid from '../components/SearchResultsGrid';
+import MotionWrapper from '@styles/MotionWrapper';
+import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate } from 'react-router-dom';
-import { AdminContext } from '../context/adminProvider';
-import SearchPageFrame from '../components/SearchPageFrame';
+import { AdminContext } from '@context/adminProvider';
 
 // Define genres we want to show
 const GENRES = [
-  { id: 28, name: "Action", emoji: "🎬" },
-  { id: 35, name: "Comedy", emoji: "😂" },
-  { id: 18, name: "Drama", emoji: "🎭" },
-  { id: 27, name: "Horror", emoji: "👻" },
-  { id: 878, name: "Sci-Fi", emoji: "🚀" },
-  { id: 16, name: "Animation", emoji: "🎨" }
+  { id: 28, name: 'Action', emoji: '🎬' },
+  { id: 35, name: 'Comedy', emoji: '😂' },
+  { id: 18, name: 'Drama', emoji: '🎭' },
+  { id: 27, name: 'Horror', emoji: '👻' },
+  { id: 878, name: 'Sci-Fi', emoji: '🚀' },
+  { id: 16, name: 'Animation', emoji: '🎨' },
 ];
 
 function SearchMovies() {
@@ -33,13 +31,13 @@ function SearchMovies() {
         const movies = await getMoviesByGenre(genre.id);
         return {
           ...genre,
-          movies: movies
+          movies: movies,
         };
       });
-      
+
       const results = await Promise.all(promises);
       // Filter out empty genres (no movies found)
-      const nonEmptyResults = results.filter(genre => genre.movies.length > 0);
+      const nonEmptyResults = results.filter((genre) => genre.movies.length > 0);
       setGenreData(nonEmptyResults);
     } catch (error) {
       console.error('Error fetching movies by genre:', error);
@@ -62,7 +60,7 @@ function SearchMovies() {
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchAllGenres();
   }, []);
 
@@ -75,7 +73,7 @@ function SearchMovies() {
       setIsSearchMode(false);
       setSearchResults([]);
     }
-  }
+  };
 
   const handleMovieClick = (movie) => {
     // Navigate to movie review page - MovieReview will handle creating the movie if needed

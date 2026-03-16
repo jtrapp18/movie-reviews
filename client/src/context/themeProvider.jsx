@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext({
@@ -37,4 +38,3 @@ export function ThemeProvider({ children }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
-

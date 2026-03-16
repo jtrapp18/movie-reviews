@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import RichTextEditor from "../components/RichTextEditor";
+import { useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "../styles";
-import Error from "../styles/Error";
-import Stars from "../components/Stars"
-import ContentDisplay from "../components/FormSubmit";
-import DocumentUpload from "../components/DocumentUpload";
-import TagInput from "../components/TagInput";
-import SubmitButton from "../components/SubmitButton";
-import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
-import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "../utils/formSubmit";
-import { extractTextFromFile } from "../utils/textExtraction";
-import useCrudStateDB from "../hooks/useCrudStateDB";
-import { snakeToCamel, invalidateRatingsCache, getJSON } from "../helper";
-import { useAdmin } from "../hooks/useAdmin";
+import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import Error from '@styles/Error';
+import { Stars } from '@features/reviews';
+import ContentDisplay from '@components/forms/FormSubmit';
+import DocumentUpload from '@components/forms/DocumentUpload';
+import TagInput from '@components/forms/TagInput';
+import SubmitButton from '@components/forms/SubmitButton';
+import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
+import { submitFormWithDocument } from '@utils/formSubmit';
+import { extractTextFromFile } from '@utils/textExtraction';
+import useCrudStateDB from '@hooks/useCrudStateDB';
+import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
+import { useAdmin } from '@hooks/useAdmin';
 
 const StarsContainer = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ const ReviewForm = ({ initObj }) => {
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [replaceText, setReplaceText] = useState(true);
+  const [, setReplaceText] = useState(true);
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -41,29 +41,30 @@ const ReviewForm = ({ initObj }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { setMovies } = useOutletContext();
-  const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, "movies");
+  const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, 'movies');
   const { isAdmin } = useAdmin();
   const movieId = parseInt(id);
 
   const initialValues = initObj
     ? {
-        rating: initObj.rating || "",
-        reviewText: initObj.reviewText || "",
-        title: initObj.title || "",
+        rating: initObj.rating || '',
+        reviewText: initObj.reviewText || '',
+        title: initObj.title || '',
       }
     : {
         rating: 0,
-        reviewText: "",
-        title: "",
+        reviewText: '',
+        title: '',
       };
 
-  const submitToDB = initObj
-    ? (body) => updateKey("reviews", initObj.id, body, movieId)
-    : (body) => addToKey("reviews", body, movieId);
+  const _submitToDB = initObj
+    ? (body) => updateKey('reviews', initObj.id, body, movieId)
+    : (body) => addToKey('reviews', body, movieId);
+  void _submitToDB;
 
   const handleDelete = async () => {
     if (!movieId) return;
-    
+
     setIsDeleting(true);
     try {
       // Call the API directly to ensure it completes before updating state
@@ -77,14 +78,14 @@ const ReviewForm = ({ initObj }) => {
       if (response.ok) {
         // Use the CRUD hook to update the frontend state
         deleteItem(movieId);
-        
+
         // Invalidate the ratings cache so the UI updates properly
         invalidateRatingsCache();
-        
+
         // Refresh the movies data to ensure UI is up to date
         const movies = await getJSON('movies');
         setMovies(movies);
-        
+
         // Navigate back to the movie list or home
         navigate('/#/search_movies');
       } else {
@@ -99,25 +100,29 @@ const ReviewForm = ({ initObj }) => {
     }
   };
 
-
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("Review title is required")
-      .min(3, "Title must be at least 3 characters")
-      .max(100, "Title must be less than 100 characters"),
+      .required('Review title is required')
+      .min(3, 'Title must be at least 3 characters')
+      .max(100, 'Title must be less than 100 characters'),
     rating: Yup.number()
-      .required("Rating is required.")
-      .min(1, "Rating must be at least 1.")
-      .max(10, "Rating must be at most 10."),
+      .required('Rating is required.')
+      .min(1, 'Rating must be at least 1.')
+      .max(10, 'Rating must be at most 10.'),
     reviewText: Yup.string()
-      .test('review-or-document', 'Either review text or a document is required.', function(value) {
-        const hasReviewText = value && value.trim().length >= 10;
-        return hasDocument || hasReviewText;
-      })
+      .test(
+        'review-or-document',
+        'Either review text or a document is required.',
+        function (value) {
+          const hasReviewText = value && value.trim().length >= 10;
+          return hasDocument || hasReviewText;
+        }
+      )
       .when([], {
         is: () => hasDocument,
         then: (schema) => schema.optional(),
-        otherwise: (schema) => schema.required("Review text is required when no document is uploaded.")
+        otherwise: (schema) =>
+          schema.required('Review text is required when no document is uploaded.'),
       }),
   });
 
@@ -128,7 +133,7 @@ const ReviewForm = ({ initObj }) => {
       if (isSubmitting) return; // Prevent double submission
       setIsSubmitting(true);
       setSubmitError(null);
-      
+
       try {
         // Prepare the form data for submission
         const formData = {
@@ -136,28 +141,33 @@ const ReviewForm = ({ initObj }) => {
           rating: values.rating,
           reviewText: values.reviewText,
           movieId: movieId,
-          tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
+          tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
-        
+
         console.info('ReviewForm - submitting review', {
           movieId,
           isEdit,
           hasDocument,
           tagCount: tags.length,
         });
-        
+
         // Submit the review
-        const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id);
-        
+        const result = await submitFormWithDocument(
+          formData,
+          selectedFile,
+          isEdit,
+          initObj?.id
+        );
+
         if (result.success) {
           console.info('ReviewForm - review submitted successfully', {
             id: result.result?.id,
             tagCount: result.result?.tags?.length || 0,
           });
-          
+
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
-          
+
           // Update the movies context with the new/updated review
           if (isEdit) {
             // For edits, update the existing review in state
@@ -168,10 +178,10 @@ const ReviewForm = ({ initObj }) => {
             // For new reviews, just store the result - no need to call addToKey since we already submitted
             setUpdatedReview(camelCaseResult);
           }
-          
+
           // Invalidate ratings cache since ratings may have changed
           invalidateRatingsCache();
-          
+
           // Switch to non-editing mode to show the saved review
           setIsEditing(false);
         } else {
@@ -186,20 +196,19 @@ const ReviewForm = ({ initObj }) => {
     },
   });
 
-
   const updateRating = (rating) => {
-    formik.setFieldValue("rating", rating);
+    formik.setFieldValue('rating', rating);
   };
 
   const handleDocumentUploadSuccess = (result) => {
     setHasDocument(true);
-    
+
     // Convert snake_case to camelCase
     const review = snakeToCamel(result.review);
-    
+
     // Don't automatically extract text - let user choose
-    formik.setFieldTouched("reviewText", false);
-    
+    formik.setFieldTouched('reviewText', false);
+
     if (initObj && review) {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
@@ -221,11 +230,10 @@ const ReviewForm = ({ initObj }) => {
     setSubmitError(`Document upload failed: ${error}`);
   };
 
-
   const handleFileSelect = (file, replaceTextOption) => {
     setSelectedFile(file);
     setReplaceText(replaceTextOption);
-    
+
     if (file) {
       setHasDocument(true);
     } else {
@@ -237,8 +245,8 @@ const ReviewForm = ({ initObj }) => {
     <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
-          <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
-          
+          <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
+
           {/* Rating Stars */}
           <StarsContainer>
             <Stars rating={formik.values.rating} handleStarClick={updateRating} />
@@ -246,7 +254,7 @@ const ReviewForm = ({ initObj }) => {
               <Error>{formik.errors.rating}</Error>
             )}
           </StarsContainer>
-          
+
           {/* Title Input */}
           <div>
             <label htmlFor="title">Review Title:</label>
@@ -283,7 +291,7 @@ const ReviewForm = ({ initObj }) => {
                 }
               }}
             />
-            
+
             {/* Extract Text Button - show if document is uploaded */}
             {hasDocument && selectedFile && (
               <div style={{ marginTop: '10px', textAlign: 'center' }}>
@@ -296,7 +304,8 @@ const ReviewForm = ({ initObj }) => {
                   {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
                 </ExtractButton>
                 <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the uploaded document into the review field below
+                  Click to extract text from the uploaded document into the review field
+                  below
                 </p>
               </div>
             )}
@@ -304,15 +313,19 @@ const ReviewForm = ({ initObj }) => {
 
           <RichTextEditor
             value={formik.values.reviewText}
-            onChange={(value) => formik.setFieldValue("reviewText", value)}
-            onBlur={() => formik.setFieldTouched("reviewText", true)}
-            placeholder={hasDocument ? "Add additional review text (optional)..." : "Write your review here..."}
+            onChange={(value) => formik.setFieldValue('reviewText', value)}
+            onBlur={() => formik.setFieldTouched('reviewText', true)}
+            placeholder={
+              hasDocument
+                ? 'Add additional review text (optional)...'
+                : 'Write your review here...'
+            }
             hasDocument={hasDocument}
             label="Review"
             error={formik.errors.reviewText}
             touched={formik.touched.reviewText}
           />
-          
+
           {/* Tags Input */}
           <div>
             <label htmlFor="tags">Tags (optional):</label>
@@ -322,40 +335,49 @@ const ReviewForm = ({ initObj }) => {
               placeholder="Add tags to categorize your review..."
             />
           </div>
-          
+
           {submitError && <Error>{submitError}</Error>}
-          
+
           {/* Display validation errors */}
           {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
-          {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
-          
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap',
-            gap: '10px', 
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '20px' 
-          }}>
-            <CancelButton type="button" onClick={() => {
-              if (initObj) {
-                // If editing existing review, just exit edit mode
-                setIsEditing(false);
-              } else {
-                // If creating new review, navigate back
-                navigate(-1);
-              }
-            }}>Cancel</CancelButton>
-            <SubmitButton 
+          {formik.errors.reviewText && (
+            <Error>Review: {formik.errors.reviewText}</Error>
+          )}
+
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '20px',
+            }}
+          >
+            <CancelButton
+              type="button"
+              onClick={() => {
+                if (initObj) {
+                  // If editing existing review, just exit edit mode
+                  setIsEditing(false);
+                } else {
+                  // If creating new review, navigate back
+                  navigate(-1);
+                }
+              }}
+            >
+              Cancel
+            </CancelButton>
+            <SubmitButton
               isSubmitting={isSubmitting}
               isEdit={isEdit}
               editText="Save Changes"
               createText="Submit Review"
             />
             {isAdmin && initObj && (
-              <DeleteButton 
-                type="button" 
+              <DeleteButton
+                type="button"
                 onClick={() => setShowDeleteModal(true)}
                 disabled={isDeleting}
               >
@@ -369,7 +391,7 @@ const ReviewForm = ({ initObj }) => {
           formValues={(() => {
             // Use updatedReview if available, otherwise fall back to initObj
             const reviewData = updatedReview || initObj;
-            
+
             const values = {
               ...formik.values,
               ...initObj, // Include all review data
@@ -392,7 +414,7 @@ const ReviewForm = ({ initObj }) => {
           reviewId={initObj?.id}
         />
       )}
-      
+
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

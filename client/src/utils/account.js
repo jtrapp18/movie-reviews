@@ -1,8 +1,8 @@
-import { useContext, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../context/userProvider";
-import { useToast } from "../context/toastContext";
-import { userLogout } from "../helper";
+import { useContext, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/userProvider';
+import { useToast } from '../context/toastContext';
+import { userLogout } from '../helper';
 
 // Full account actions (login/logout + navigate) for components rendered inside Router.
 export const useAccountActions = () => {
@@ -17,10 +17,10 @@ export const useAccountActions = () => {
         showToast(`${user.username} signed out`);
         userLogout();
         setUser(null);
-        if (afterAction) afterAction("logout");
+        if (afterAction) afterAction('logout');
       } else {
-        navigate("/login");
-        if (afterAction) afterAction("login");
+        navigate('/login');
+        if (afterAction) afterAction('login');
       }
     },
     [user, navigate, setUser, showToast]

@@ -1,6 +1,6 @@
-import { NavLink } from "react-router-dom";
-import styled, { css } from "styled-components";
-import { Link } from "react-scroll";
+import { NavLink } from 'react-router-dom';
+import styled, { css } from 'styled-components';
+import { Link } from 'react-scroll';
 
 const StyledMenuItem = css`
   text-decoration: none;
@@ -15,7 +15,7 @@ const StyledMenuItem = css`
 
 const StyledNavigation = css`
   ${StyledMenuItem}
-  
+
   &.active {
     text-decoration: overline;
     text-decoration-thickness: 2px;

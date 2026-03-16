@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import DirectorCard from '../cards/DirectorCard';
-import SearchPageFrame from '../components/SearchPageFrame';
+import DirectorCard from '@components/cards/DirectorCard';
+import { SearchPageFrame } from '@features/movies';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 
@@ -81,16 +81,15 @@ function DirectorsPage() {
     let list = directors;
 
     if (letterFilter) {
-      list = list.filter((d) =>
-        (d.name || '').toUpperCase().startsWith(letterFilter)
-      );
+      list = list.filter((d) => (d.name || '').toUpperCase().startsWith(letterFilter));
     }
 
     if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return list.filter((d) =>
-      (d.name || '').toLowerCase().includes(q) ||
-      (d.biography || '').toLowerCase().includes(q)
+    return list.filter(
+      (d) =>
+        (d.name || '').toLowerCase().includes(q) ||
+        (d.biography || '').toLowerCase().includes(q)
     );
   }, [directors, searchQuery, letterFilter]);
 
@@ -138,9 +137,7 @@ function DirectorsPage() {
               onViewPage={() => navigate(`/directors/${director.id}`)}
             />
           ))}
-          {!filteredDirectors.length && (
-            <p>No directors match your search.</p>
-          )}
+          {!filteredDirectors.length && <p>No directors match your search.</p>}
         </AccordionContainer>
       </Layout>
     </SearchPageFrame>
@@ -148,4 +145,3 @@ function DirectorsPage() {
 }
 
 export default DirectorsPage;
-

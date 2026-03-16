@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { UserProvider } from './context/userProvider';
@@ -6,7 +6,7 @@ import { AdminProvider } from './context/adminProvider';
 import { createHashRouter, RouterProvider } from 'react-router-dom'; // Import HashRouter
 import routes from './routes'; // Import your routes configuration
 import { WindowWidthProvider } from './context/windowSize';
-import AdminIndicator from './components/AdminIndicator';
+import { AdminIndicator } from '@features/auth';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/themeProvider';
 import { ToastProvider } from './context/toastContext';
@@ -33,5 +33,5 @@ root.render(
         </WindowWidthProvider>
       </ThemeProvider>
     </HelmetProvider>
-  </StrictMode>,
+  </StrictMode>
 );

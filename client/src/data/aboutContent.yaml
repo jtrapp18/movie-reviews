@@ -1,12 +1,12 @@
 header:
-  title: "About James Trapp"
-  subtitle: "Film Critic & Cinematic Analyst"
+  title: 'About James Trapp'
+  subtitle: 'Film Critic & Cinematic Analyst'
 
 aboutJames:
   personalStory: |
     James developed a love of movies as a kid, watching everything from Adam
     Sandler comedies to franchise horror movies to Martin Scoresese crime sagas.
-  
+
     As a kid he would go into Blockbuster Stores (remember those) with his siblings
     and spend a ridiculous amount of time looking through the aisles before
     selecting a handful of movies.
@@ -15,15 +15,15 @@ aboutJames:
     Ebert’s reviews which referenced the French film Breathless (1960). After
     watching it, he got his hands on every French New Wave film he could find. His
     interest in international cinema skyrocketed from there and has not let up since
-    
+
     He enjoys conducting exhaustive 'Director Studies' where he watches and
     analyzes the entire (or near-entire) filmography of a specific filmmaker.
-  
+
   intro: |
     His approach to film criticism combines a mix of academic analysis and personal
     reflection, with an accessible writing style that makes complex cinematic
     concepts engaging for all readers.
-  
+
   favoriteDirectors:
     - Martin Scorsese
     - Alfred Hitchcock
@@ -34,28 +34,28 @@ aboutJames:
     - Quentin Tarantino
     - David Fincher
     - Park Chan-wook
-  
+
   closing: |
     Even with an interest in more serious filmmakers, he still loves a hilarious “so
     bad its good movie” like Mr. Brooks (2007) or Taken (2008) every once in a while.
 
 aboutWebsite:
   intro: |
-    This site serves as James's personal collection of film reviews, critical essays, and thematic analysis. 
+    This site serves as James's personal collection of film reviews, critical essays, and thematic analysis.
     Here, you'll find:
-  
+
   contentTypes:
-    - title: "Individual Film Reviews"
-      description: "Detailed analysis of specific movies, examining everything from narrative structure to visual storytelling"
-    - title: "Thematic Essays"
-      description: "Explorations of recurring themes across multiple films, directors, or genres"
-    - title: "Director Spotlights"
-      description: "In-depth looks at the work and style of particular filmmakers"
-    - title: "Genre Studies"
-      description: "Analysis of how different genres evolve and what makes them compelling"
+    - title: 'Individual Film Reviews'
+      description: 'Detailed analysis of specific movies, examining everything from narrative structure to visual storytelling'
+    - title: 'Thematic Essays'
+      description: 'Explorations of recurring themes across multiple films, directors, or genres'
+    - title: 'Director Spotlights'
+      description: 'In-depth looks at the work and style of particular filmmakers'
+    - title: 'Genre Studies'
+      description: 'Analysis of how different genres evolve and what makes them compelling'
 
 contact:
-  intro: "James welcomes feedback, discussion, and recommendations from fellow film enthusiasts."
+  intro: 'James welcomes feedback, discussion, and recommendations from fellow film enthusiasts.'
   methods:
-    - type: "Email"
-      value: "jamie@moviereviews.com"
+    - type: 'Email'
+      value: 'jamie@moviereviews.com'

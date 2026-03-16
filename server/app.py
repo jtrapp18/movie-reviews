@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-from lib.config import app, api
 from flask_cors import CORS
-
-from lib.api import ROUTE_MODULES
-
+from movie_reviews.api import ROUTE_MODULES
+from movie_reviews.config import api, app
 
 # Enable CORS for all routes
 CORS(app)
@@ -14,11 +12,11 @@ for register in ROUTE_MODULES:
     register(api)
 
 
-@app.route('/')
+@app.route("/")
 def index():
-    return app.send_static_file('index.html')
+    return app.send_static_file("index.html")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Development server (not used in Docker/Railway)
     app.run(port=5555, debug=True)
