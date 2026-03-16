@@ -16,14 +16,14 @@ function LoginForm() {
 
   const formik = useFormik({
     initialValues: {
-      username: '',
+      email: '',
       password: '',
     },
     onSubmit: async (values, { setErrors }) => {
-      const body = { username: values.username, password: values.password };
+      const body = { email: values.email, password: values.password };
 
       try {
-        const user = await postJSONToDb('login', body); // Await the promise
+        const user = await postJSONToDb('login', body);
         const userTransformed = snakeToCamel(user);
         console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
@@ -38,8 +38,8 @@ function LoginForm() {
     },
     validate: (values) => {
       const errors = {};
-      if (!values.username) {
-        errors.username = 'Username is required';
+      if (!values.email) {
+        errors.email = 'Email is required';
       }
       if (!values.password) {
         errors.password = 'Password is required'; // pragma: allowlist secret
@@ -51,18 +51,18 @@ function LoginForm() {
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
       <div>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="email">Email</label>
         <input
-          type="text"
-          id="username"
-          name="username"
-          autoComplete="off"
-          value={formik.values.username}
+          type="email"
+          id="email"
+          name="email"
+          autoComplete="email"
+          value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
-        {formik.touched.username && formik.errors.username ? (
-          <Error>{formik.errors.username}</Error>
+        {formik.touched.email && formik.errors.email ? (
+          <Error>{formik.errors.email}</Error>
         ) : null}
       </div>
       <div>
