@@ -1,6 +1,22 @@
 //****************************************************************************************************
 // JSON-server CRUD functionality
 
+const JSON_CACHE_TTL = 60 * 1000; // 60 seconds
+const jsonCache = new Map(); // key -> { data, timestamp }
+
+function makeJsonCacheKey(dbKey, Id) {
+  return `${dbKey}:${Id != null ? Id : 'all'}`;
+}
+
+function invalidateJsonCache(dbKey) {
+  if (!dbKey) return;
+  for (const key of jsonCache.keys()) {
+    if (key.startsWith(`${dbKey}:`)) {
+      jsonCache.delete(key);
+    }
+  }
+}
+
 function userLogout() {
   fetch(`/api/logout`, {
     method: 'DELETE',
@@ -22,6 +38,12 @@ async function getJSON(dbKey, Id = null) {
   const endpoint = Id ? `/api/${dbKey}/${Id}` : `/api/${dbKey}`;
 
   try {
+    const cacheKey = makeJsonCacheKey(dbKey, Id);
+    const cached = jsonCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < JSON_CACHE_TTL) {
+      return cached.data;
+    }
+
     const res = await fetch(endpoint, { credentials: 'include' });
 
     if (!res.ok) {
@@ -40,6 +62,12 @@ async function getJSON(dbKey, Id = null) {
     }
     const data = JSON.parse(text);
     const camelData = snakeToCamel(data);
+
+    jsonCache.set(cacheKey, {
+      data: camelData,
+      timestamp: Date.now(),
+    });
+
     return camelData;
   } catch (err) {
     console.error('Request failed', err);
@@ -87,6 +115,7 @@ function postJSONToDb(dbKey, jsonObj) {
     }
     const data = await res.json();
     console.log('[postJSONToDb] Success', res.status, url);
+    invalidateJsonCache(dbKey);
     return data;
   });
 }
@@ -104,6 +133,7 @@ function patchJSONToDb(dbKey, Id, jsonObj) {
     if (!res.ok) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
+    invalidateJsonCache(dbKey);
     return res.json();
   });
 }
@@ -119,6 +149,7 @@ function deleteJSONFromDb(dbKey, Id) {
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       }
+      invalidateJsonCache(dbKey);
     })
     .catch((e) => console.error(e));
 }
