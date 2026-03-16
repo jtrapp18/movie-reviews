@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAccountStatus } from '@utils/account';
 import { FaCrown, FaTimes } from 'react-icons/fa';
 import styled from 'styled-components';
@@ -27,7 +26,7 @@ const AdminIcon = styled.div`
 `;
 
 function AdminIndicator() {
-  const { user, isAdmin, logout } = useAccountStatus();
+  const { isAdmin, logout } = useAccountStatus();
 
   if (!isAdmin) return null;
 
@@ -47,7 +46,7 @@ function AdminIndicator() {
           fontSize: '1rem',
           marginLeft: '8px',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
         title="Logout Admin"
       >

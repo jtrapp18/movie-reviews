@@ -1,15 +1,14 @@
-import React, { useContext } from "react";
-import { snakeToCamel, postJSONToDb } from "../helper";
+import { useContext } from 'react';
+import { snakeToCamel, postJSONToDb } from '../helper';
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import Error from "../styles/Error";
-import { StyledForm, Button } from "../styles";
-import { useTheme } from "../context/themeProvider";
-import { useToast } from "../context/toastContext";
+import Error from '../styles/Error';
+import { StyledForm, Button } from '../styles';
+import { useTheme } from '../context/themeProvider';
+import { useToast } from '../context/toastContext';
 
 function LoginForm() {
-
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { setTheme } = useTheme();
@@ -18,13 +17,13 @@ function LoginForm() {
   const formik = useFormik({
     initialValues: {
       username: '',
-      password: ''
+      password: '',
     },
     onSubmit: async (values, { setErrors }) => {
       const body = { username: values.username, password: values.password };
 
       try {
-        const user = await postJSONToDb("login", body);  // Await the promise
+        const user = await postJSONToDb('login', body); // Await the promise
         const userTransformed = snakeToCamel(user);
         console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
@@ -46,7 +45,7 @@ function LoginForm() {
         errors.password = 'Password is required'; // pragma: allowlist secret
       }
       return errors;
-    }
+    },
   });
 
   return (

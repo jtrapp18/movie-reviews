@@ -21,7 +21,9 @@ const FloatingToggle = styled.button`
   svg {
     width: 20px;
     height: 20px;
-    transition: transform 0.15s ease, color 0.15s ease;
+    transition:
+      transform 0.15s ease,
+      color 0.15s ease;
   }
 
   &:hover svg {
@@ -41,7 +43,9 @@ export default function ThemeToggle() {
     if (user) {
       const nextDarkMode = next === 'dark';
       try {
-        const updated = await patchJSONToDb('users', user.id, { darkMode: nextDarkMode });
+        await patchJSONToDb('users', user.id, {
+          darkMode: nextDarkMode,
+        });
         // updated is snake_case from API; we only care to keep local user in sync
         setUser({
           ...user,
@@ -54,11 +58,7 @@ export default function ThemeToggle() {
   };
 
   return (
-    <FloatingToggle
-      type="button"
-      onClick={handleClick}
-      aria-label="Toggle color theme"
-    >
+    <FloatingToggle type="button" onClick={handleClick} aria-label="Toggle color theme">
       {theme === 'dark' ? <FaMoon /> : <FaSun />}
     </FloatingToggle>
   );

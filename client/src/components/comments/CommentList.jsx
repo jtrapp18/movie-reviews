@@ -173,12 +173,8 @@ function CommentList({ reviewId }) {
               ))}
             </>
           )}
-          {!user && tree.length > 0 && (
-            <LoginPrompt>Log in to comment.</LoginPrompt>
-          )}
-          {user && (
-            <CommentForm reviewId={reviewId} onSuccess={fetchComments} />
-          )}
+          {!user && tree.length > 0 && <LoginPrompt>Log in to comment.</LoginPrompt>}
+          {user && <CommentForm reviewId={reviewId} onSuccess={fetchComments} />}
         </>
       )}
     </Section>

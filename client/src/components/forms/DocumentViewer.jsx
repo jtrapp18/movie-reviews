@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mammoth from 'mammoth';
 import RichTextDisplay from './RichTextDisplay';
@@ -36,29 +36,6 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
   const [error, setError] = useState(null);
   const [wordContent, setWordContent] = useState('');
 
-  // Debug logging
-  console.log('DocumentViewer - documentUrl:', documentUrl);
-  console.log('DocumentViewer - documentType:', documentType);
-  console.log('DocumentViewer - filename:', filename);
-  console.log('DocumentViewer - hasDocument:', hasDocument);
-
-  // If no document is attached, don't render anything
-  if (!hasDocument || !documentUrl || !documentType) {
-    console.log('DocumentViewer - no document attached, not rendering');
-    return null;
-  }
-
-  useEffect(() => {
-    console.log('DocumentViewer useEffect - documentUrl:', documentUrl, 'documentType:', documentType);
-
-    if (documentUrl && documentType) {
-      console.log('DocumentViewer - calling loadDocument()');
-      loadDocument();
-    } else {
-      console.log('DocumentViewer - missing documentUrl or documentType');
-    }
-  }, [documentUrl, documentType]);
-
   const loadDocument = async () => {
     console.log('DocumentViewer - loadDocument called');
     setLoading(true);
@@ -92,7 +69,6 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
       const result = await mammoth.convertToHtml({ arrayBuffer });
       setWordContent(result.value);
 
-      // Log any conversion messages
       if (result.messages.length > 0) {
         console.log('Document conversion messages:', result.messages);
       }
@@ -101,9 +77,18 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     }
   };
 
-  console.log('DocumentViewer render - loading:', loading, 'error:', error, 'documentType:', documentType);
+  useEffect(() => {
+    if (documentUrl && documentType && hasDocument) {
+      loadDocument();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadDocument is stable for these deps
+  }, [documentUrl, documentType, hasDocument]);
 
-  if (loading) return <Loading text="Loading document, please wait" size="small" />
+  if (!hasDocument || !documentUrl || !documentType) {
+    return null;
+  }
+
+  if (loading) return <Loading text="Loading document, please wait" size="small" />;
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;
@@ -116,9 +101,7 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     />
   ) : (
     <WordDocumentContainer>
-      <RichTextDisplay
-        content={wordContent}
-      />
+      <RichTextDisplay content={wordContent} />
     </WordDocumentContainer>
   );
 };

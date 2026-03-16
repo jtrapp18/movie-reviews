@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '@components/cards/MovieCard';
 import { getMovieRatings } from '@helper';

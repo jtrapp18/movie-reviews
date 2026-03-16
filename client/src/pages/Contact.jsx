@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Button, StyledContainer, StyledForm } from '../styles';
 import yaml from 'js-yaml';
@@ -23,28 +23,28 @@ const Header = styled.div`
   }
 `;
 
-
 function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     subject: '',
-    message: ''
+    message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', or null
 
   // Check if all required fields are filled
-  const isFormValid = formData.name.trim() &&
-                     formData.email.trim() &&
-                     formData.subject.trim() &&
-                     formData.message.trim();
+  const isFormValid =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.subject.trim() &&
+    formData.message.trim();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -59,9 +59,9 @@ function Contact() {
       const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
       const body = encodeURIComponent(
         `Name: ${formData.name}\n` +
-        `Email: ${formData.email}\n` +
-        `Subject: ${formData.subject}\n\n` +
-        `Message:\n${formData.message}`
+          `Email: ${formData.email}\n` +
+          `Subject: ${formData.subject}\n\n` +
+          `Message:\n${formData.message}`
       );
 
       // Open email client
@@ -80,13 +80,17 @@ function Contact() {
     <StyledContainer>
       <Header>
         <h1>Contact James</h1>
-        <div className="subtitle">Get in touch about film reviews, suggestions, or feedback</div>
+        <div className="subtitle">
+          Get in touch about film reviews, suggestions, or feedback
+        </div>
       </Header>
 
       <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
           <div className="success-message">
-            Your email client should open with a pre-filled message to James. If it doesn't open, you can email him directly at {aboutContent.contact.methods[0].value}
+            Your email client should open with a pre-filled message to James. If it
+            doesn&apos;t open, you can email him directly at{' '}
+            {aboutContent.contact.methods[0].value}
           </div>
         )}
 
@@ -154,24 +158,25 @@ function Contact() {
             style={{
               minWidth: '200px',
               opacity: !isFormValid ? 0.6 : 1,
-              cursor: !isFormValid ? 'not-allowed' : 'pointer'
+              cursor: !isFormValid ? 'not-allowed' : 'pointer',
             }}
           >
             {isSubmitting ? 'Sending...' : 'Send Message'}
           </Button>
           {!isFormValid && (
-            <p style={{
-              color: 'var(--cinema-silver)',
-              fontSize: '0.9rem',
-              marginTop: '0.5rem',
-              fontStyle: 'italic'
-            }}>
+            <p
+              style={{
+                color: 'var(--cinema-silver)',
+                fontSize: '0.9rem',
+                marginTop: '0.5rem',
+                fontStyle: 'italic',
+              }}
+            >
               Please fill in all fields to send your message
             </p>
           )}
         </div>
       </StyledForm>
-
     </StyledContainer>
   );
 }

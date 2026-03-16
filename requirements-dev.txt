@@ -19,5 +19,5 @@ detect-secrets>=1.5.0,<2
 # Optional: security-focused linting (e.g. hardcoded passwords, unsafe APIs)
 # bandit>=1.7.0,<2
 
-# --- Frontend (add in a later commit) ---
-# eslint, eslint-plugin-react, prettier, etc.
+# --- Frontend ---
+# ESLint + Prettier live in client/package.json (devDependencies). Pre-commit runs them via local hooks.

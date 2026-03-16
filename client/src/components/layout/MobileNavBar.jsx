@@ -1,9 +1,8 @@
-import styled from "styled-components";
-import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { StyledNavLink, StyledNavigation, StyledLink } from "@styles";
-import { scrollToTop } from "@helper";
-import { useAccountActions } from "@utils/account";
+import styled from 'styled-components';
+import { useState, useRef } from 'react';
+import { StyledNavLink, StyledLink } from '@styles';
+import { scrollToTop } from '@helper';
+import { useAccountActions } from '@utils/account';
 
 // const StyledMobileMenu = styled(StyledLink)`
 //   color: var(--cinema-gold-dark);
@@ -14,7 +13,7 @@ const StyledMobileMenu = styled(StyledLink)`
   &:hover {
     color: var(--background-tertiary);
   }
-`
+`;
 
 const StyledMobileLink = styled(StyledNavLink)`
   color: var(--background-secondary);
@@ -26,13 +25,13 @@ const StyledMobileLink = styled(StyledNavLink)`
   &:hover {
     color: var(--background-tertiary);
   }
-`
+`;
 const StyledDiv = styled.div`
-    height: var(--height-header);
-    position: relative;
-    background: white;
-    display: flex;
-`
+  height: var(--height-header);
+  position: relative;
+  background: white;
+  display: flex;
+`;
 const LinkContainer = styled.div`
   position: fixed;
   top: calc(var(--height-header) + 3px);
@@ -119,10 +118,9 @@ const HamburgerButton = styled.button`
 
 // MobileNavBar Component
 const MobileNavBar = () => {
-  const { user, isAdmin, handleAccount } = useAccountActions();
+  const { user, handleAccount } = useAccountActions();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const cardRef = useRef(null); // Create a reference to the card element
-  const navigate = useNavigate();
+  const cardRef = useRef(null);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -140,17 +138,9 @@ const MobileNavBar = () => {
   };
 
   return (
-    <StyledDiv
-      ref={cardRef}
-    >
-      <LinkContainer
-        className={isMenuOpen ? "open" : "closed"}
-      >
-        <StyledMobileLink
-          to="/"
-          className="nav-link"
-          onClick={handleClick}
-        >
+    <StyledDiv ref={cardRef}>
+      <LinkContainer className={isMenuOpen ? 'open' : 'closed'}>
+        <StyledMobileLink to="/" className="nav-link" onClick={handleClick}>
           Home
         </StyledMobileLink>
         <StyledMobileLink
@@ -160,39 +150,23 @@ const MobileNavBar = () => {
         >
           Search Movies
         </StyledMobileLink>
-        <StyledMobileLink
-          to="/directors"
-          className="nav-link"
-          onClick={handleClick}
-        >
+        <StyledMobileLink to="/directors" className="nav-link" onClick={handleClick}>
           Directors
         </StyledMobileLink>
-        <StyledMobileLink
-          to="/about"
-          className="nav-link"
-          onClick={handleClick}
-        >
+        <StyledMobileLink to="/about" className="nav-link" onClick={handleClick}>
           About
         </StyledMobileLink>
         {user && (
-          <StyledMobileLink
-            to="/account"
-            className="nav-link"
-            onClick={handleClick}
-          >
+          <StyledMobileLink to="/account" className="nav-link" onClick={handleClick}>
             Account
           </StyledMobileLink>
         )}
-        <StyledMobileMenu
-          to="/"
-          className="nav-link"
-          onClick={handleAccountClick}
-        >
-          {user ? "Logout" : "Login"}
+        <StyledMobileMenu to="/" className="nav-link" onClick={handleAccountClick}>
+          {user ? 'Logout' : 'Login'}
         </StyledMobileMenu>
       </LinkContainer>
       <HamburgerButton
-        className={isMenuOpen ? "open" : ""}
+        className={isMenuOpen ? 'open' : ''}
         onClick={toggleMenu}
         aria-label="Toggle Menu"
       >

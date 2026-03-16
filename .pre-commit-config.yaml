@@ -50,12 +50,21 @@ repos:
         args: ["--baseline", ".secrets.baseline"]
         exclude: "package-lock\\.json|\\.secrets\\.baseline|server/migrations/|client/\\.vite/|client/node_modules/"
 
-  # --- Frontend (add in a later commit) ---
-  # - repo: https://github.com/pre-commit/mirrors-eslint
-  #   rev: v9.x.x
-  #   hooks:
-  #     - id: eslint
-  #       files: ^client/
-  #       types_or: [javascript, jsx, ts, tsx]
-  # - repo: https://github.com/pre-commit/mirrors-prettier
-  #   ...
+  # --- Frontend (JS/JSX only; no TS) ---
+  # Prettier and ESLint run from client/ using project's node_modules (local hooks).
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier (client)
+        entry: bash -c 'cd client && files=(); for f in "$@"; do r="${f#client/}"; case "$r" in *.js|*.jsx|*.css|*.scss|*.json|*.md|*.html|*.yaml|*.yml) [ -f "$r" ] && files+=("$r");; esac; done; [ ${#files[@]} -eq 0 ] || npx prettier --write "${files[@]}"'
+        language: system
+        files: ^client/
+        pass_filenames: true
+        exclude: "client/(dist|node_modules|\\.vite)/"
+
+      - id: eslint
+        name: eslint (client)
+        entry: bash -c 'cd client && npx eslint . --max-warnings 0'
+        language: system
+        files: ^client/
+        pass_filenames: false

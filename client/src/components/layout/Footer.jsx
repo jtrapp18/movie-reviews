@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const StyledFooter = styled.footer`
@@ -73,30 +72,32 @@ const StyledFooter = styled.footer`
         color: #ffffff;
         font-size: 0.9em;
     }
-`
+`;
 
 const Footer = () => {
-
-    return (
-        <StyledFooter id="footer">
-            <div
-                id='photo-roll'
-                role='img'
-                aria-label='Film photo roll spanning the footer'
-            />
-            <section>
-                <div>
-                    <p><strong>Film Analysis & Reviews by James Trapp</strong></p>
-                    <p><em>Exploring cinema through critical analysis and thematic essays</em></p>
-                    <p>
-                        <a href="/#/about">ABOUT THE AUTHOR</a> •
-                        <a href="/#/contact">CONTACT</a>
-                    </p>
-                    <p id='data-caveat'>© 2025 James Trapp</p>
-                </div>
-            </section>
-        </StyledFooter>
-    );
-}
+  return (
+    <StyledFooter id="footer">
+      <div
+        id="photo-roll"
+        role="img"
+        aria-label="Film photo roll spanning the footer"
+      />
+      <section>
+        <div>
+          <p>
+            <strong>Film Analysis & Reviews by James Trapp</strong>
+          </p>
+          <p>
+            <em>Exploring cinema through critical analysis and thematic essays</em>
+          </p>
+          <p>
+            <a href="/#/about">ABOUT THE AUTHOR</a> •<a href="/#/contact">CONTACT</a>
+          </p>
+          <p id="data-caveat">© 2025 James Trapp</p>
+        </div>
+      </section>
+    </StyledFooter>
+  );
+};
 
 export default Footer;

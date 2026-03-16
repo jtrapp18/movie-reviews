@@ -1,13 +1,11 @@
-import React, { useContext } from 'react';
-import NavBar from "./NavBar"
+import { useContext } from 'react';
+import NavBar from './NavBar';
 import MobileNavBar from './MobileNavBar';
 import { WindowWidthContext } from '@context/windowSize';
 import Headroom from 'react-headroom';
 import styled from 'styled-components';
 import Logo from '@components/ui/Logo';
 import { UserContext } from '@context/userProvider';
-// Import image from public directory
-const vintagePhotoRoll = '/images/vintage-photo-roll.jpg';
 
 const StyledHeader = styled.div`
   width: 100%;
@@ -61,43 +59,30 @@ const HeaderTitle = styled.div`
     font-weight: 400;
     font-style: italic;
   }
-`
-
-const VintagePhotoRoll = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  opacity: 0.4;
-  z-index: 0;
 `;
 
 const Header = () => {
   const { isMobile } = useContext(WindowWidthContext);
-  const { user } = useContext(UserContext);
+  useContext(UserContext);
 
-    return (
-        <Headroom>
-          <StyledHeader>
-            {/* <VintagePhotoRoll
+  return (
+    <Headroom>
+      <StyledHeader>
+        {/* <VintagePhotoRoll
               src={vintagePhotoRoll}
               alt="Vintage film strip background"
             /> */}
-            <LeftSection>
-              <Logo />
-              <HeaderTitle>
-                <h1>James Trapp</h1>
-                <div className="subtitle">Film Criticism & Analysis</div>
-              </HeaderTitle>
-            </LeftSection>
-            <RightSection>
-              {isMobile ? <MobileNavBar /> : <NavBar />}
-            </RightSection>
-          </StyledHeader>
-        </Headroom>
-    );
-}
+        <LeftSection>
+          <Logo />
+          <HeaderTitle>
+            <h1>James Trapp</h1>
+            <div className="subtitle">Film Criticism & Analysis</div>
+          </HeaderTitle>
+        </LeftSection>
+        <RightSection>{isMobile ? <MobileNavBar /> : <NavBar />}</RightSection>
+      </StyledHeader>
+    </Headroom>
+  );
+};
 
 export default Header;

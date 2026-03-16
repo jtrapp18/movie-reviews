@@ -1,22 +1,28 @@
-import React from 'react';
 import styled from 'styled-components';
 import DOMPurify from 'dompurify';
 
 const RichTextContainer = styled.div`
   /* Enhanced typography for better readability */
-  font-family: 'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   font-size: calc(clamp(1rem, 2.2vw, 1.2rem) * var(--zoom-multiplier, 1));
   line-height: 1.7;
   color: var(--rich-text-primary);
   max-width: 100%;
 
   /* Enhanced spacing and typography for headers */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     margin: 1.8em 0 0.8em 0;
     line-height: 1.3;
     font-weight: 400;
     color: var(--rich-text-header);
-    font-family: 'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family:
+      'NotoSerif', 'Calibri', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
   }
 
   h1 {
@@ -36,12 +42,16 @@ const RichTextContainer = styled.div`
     color: var(--rich-text-primary);
   }
 
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     font-size: calc(clamp(1rem, 2.2vw, 1.2rem) * var(--zoom-multiplier, 1));
     color: var(--rich-text-primary);
   }
 
-  h1:first-child, h2:first-child, h3:first-child {
+  h1:first-child,
+  h2:first-child,
+  h3:first-child {
     margin-top: 0;
   }
 
@@ -64,7 +74,8 @@ const RichTextContainer = styled.div`
   }
 
   /* Enhanced list styling */
-  ul, ol {
+  ul,
+  ol {
     margin: 1.2em 0;
     padding-left: 2.2em;
     color: var(--rich-text-primary);
@@ -145,7 +156,8 @@ const RichTextContainer = styled.div`
     overflow: hidden;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0.8em 1em;
     text-align: left;
     border-bottom: 1px solid var(--rich-text-table-border);
@@ -159,12 +171,14 @@ const RichTextContainer = styled.div`
   }
 
   /* Enhanced emphasis styling */
-  strong, b {
+  strong,
+  b {
     color: var(--rich-text-header);
     font-weight: 600;
   }
 
-  em, i {
+  em,
+  i {
     color: var(--rich-text-primary);
     font-style: italic;
   }
@@ -194,18 +208,34 @@ const RichTextDisplay = ({ content }) => {
   // Sanitize HTML content using DOMPurify for security
   const sanitizedContent = DOMPurify.sanitize(content, {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a', 'img', 'span', 'div'
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      's',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'code',
+      'pre',
+      'a',
+      'img',
+      'span',
+      'div',
     ],
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style'],
-    ALLOW_DATA_ATTR: false
+    ALLOW_DATA_ATTR: false,
   });
 
-  return (
-    <RichTextContainer
-      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-    />
-  );
+  return <RichTextContainer dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
 };
 
 export default RichTextDisplay;

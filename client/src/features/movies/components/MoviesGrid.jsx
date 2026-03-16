@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '@components/cards/MovieCard';
 import { getMovieRatings } from '@helper';
-
 
 const Grid = styled.div`
   display: grid;
@@ -19,7 +18,7 @@ const MovieCardWrapper = styled.div`
 
 const MoviesGrid = ({ movies, onMovieClick }) => {
   const [ratingsMap, setRatingsMap] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchRatings = async () => {
@@ -36,30 +35,27 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
     fetchRatings();
   }, [movies]);
 
-
   return (
     <Grid>
-    {movies.map((movie) => {
+      {movies.map((movie) => {
         const movieData = ratingsMap[movie.externalId];
         const rating = movieData?.rating || null;
         const localId = movieData?.local_id;
 
         // If we have a local ID, use it for navigation
         // Otherwise, keep the external ID for creating new movies
-        const movieWithCorrectId = localId
-        ? { ...movie, id: localId }
-        : movie;
+        const movieWithCorrectId = localId ? { ...movie, id: localId } : movie;
 
         return (
-        <MovieCardWrapper key={movie.externalId || movie.id}>
+          <MovieCardWrapper key={movie.externalId || movie.id}>
             <MovieCard
-            movie={movieWithCorrectId}
-            rating={rating}
-            onClick={() => onMovieClick(movie)}
+              movie={movieWithCorrectId}
+              rating={rating}
+              onClick={() => onMovieClick(movie)}
             />
-        </MovieCardWrapper>
+          </MovieCardWrapper>
         );
-    })}
+      })}
     </Grid>
   );
 };

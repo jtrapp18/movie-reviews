@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import MovieCard from '@components/cards/MovieCard';
 import { getMovieRatings } from '@helper';
@@ -45,13 +45,6 @@ const MoviesContainer = styled.div`
 const MovieCardWrapper = styled.div`
   flex-shrink: 0;
   width: 200px;
-`;
-
-const EmptyMessage = styled.div`
-  color: #666;
-  font-style: italic;
-  text-align: center;
-  padding: 20px;
 `;
 
 const MovieSwimlane = ({ genre, movies, onMovieClick }) => {

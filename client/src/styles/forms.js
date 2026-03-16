@@ -30,7 +30,10 @@ const StyledForm = styled.form`
     font-size: 1rem;
   }
 
-  input, textarea, select, option {
+  input,
+  textarea,
+  select,
+  option {
     /* Reset browser defaults */
     appearance: none;
     -webkit-appearance: none;
@@ -81,7 +84,7 @@ const StyledForm = styled.form`
   }
 
   .success-message {
-    color: #4CAF50;
+    color: #4caf50;
     // background: rgba(76, 175, 80, 0.1);
     padding: 1rem;
     border-radius: 8px;

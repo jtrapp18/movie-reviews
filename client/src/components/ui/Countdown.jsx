@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const TenorEmbedWrap = styled.div`
@@ -19,7 +19,7 @@ function Countdown() {
 
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = "https://tenor.com/embed.js";
+    script.src = 'https://tenor.com/embed.js';
     script.async = true;
 
     document.body.appendChild(script);

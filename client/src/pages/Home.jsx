@@ -1,13 +1,12 @@
-import { getJSON, snakeToCamel } from '@helper';
 import { useState, useEffect } from 'react';
+import { snakeToCamel } from '@helper';
 import styled from 'styled-components';
 import { Movies } from '@features/movies';
 import { Articles, RecentPosts } from '@features/articles';
 import { Directors } from '@features/directors';
 import Section from '@components/layout/Section';
 import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
-import Loading from '@components/ui/Loading';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
 
@@ -22,10 +21,8 @@ const StyledContainer = styled.div`
   min-height: 100vh;
 `;
 
-
 function Home() {
   const { movies, articles, posts, directors } = useOutletContext();
-  const navigate = useNavigate();
 
   const [showMovies, setShowMovies] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
@@ -50,7 +47,7 @@ function Home() {
       // If empty search, show all content
       setShowMovies(movies);
       setShowArticles(articles);
-       setShowDirectors(directors);
+      setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
       return;
@@ -78,7 +75,6 @@ function Home() {
       setIsSearching(false);
     }
   };
-
 
   const structuredData = generateWebsiteStructuredData();
 
@@ -110,9 +106,7 @@ function Home() {
                 articleCount={showArticles.length}
                 isLoading={isSearching}
                 showNoResults={
-                  !isSearching &&
-                  showMovies.length === 0 &&
-                  showArticles.length === 0
+                  !isSearching && showMovies.length === 0 && showArticles.length === 0
                 }
               />
             )}
@@ -140,10 +134,7 @@ function Home() {
               subtitle={searchQuery ? '' : 'Click movie to view review'}
               showSearch={false}
             >
-              <Movies
-                showMovies={showMovies}
-                enterSearch={unifiedSearch}
-              />
+              <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
             </Section>
 
             <Section
@@ -151,10 +142,7 @@ function Home() {
               subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
               showSearch={false}
             >
-              <Articles
-                showArticles={showArticles}
-                enterSearch={unifiedSearch}
-              />
+              <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
             </Section>
           </>
         </SearchPageFrame>

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- context file exports provider + hook */
 import { createContext, useContext, useState, useCallback } from 'react';
 import Toast from '@components/feedback/Toast';
 

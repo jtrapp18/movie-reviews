@@ -81,16 +81,15 @@ function DirectorsPage() {
     let list = directors;
 
     if (letterFilter) {
-      list = list.filter((d) =>
-        (d.name || '').toUpperCase().startsWith(letterFilter)
-      );
+      list = list.filter((d) => (d.name || '').toUpperCase().startsWith(letterFilter));
     }
 
     if (!searchQuery.trim()) return list;
     const q = searchQuery.toLowerCase();
-    return list.filter((d) =>
-      (d.name || '').toLowerCase().includes(q) ||
-      (d.biography || '').toLowerCase().includes(q)
+    return list.filter(
+      (d) =>
+        (d.name || '').toLowerCase().includes(q) ||
+        (d.biography || '').toLowerCase().includes(q)
     );
   }, [directors, searchQuery, letterFilter]);
 
@@ -138,9 +137,7 @@ function DirectorsPage() {
               onViewPage={() => navigate(`/directors/${director.id}`)}
             />
           ))}
-          {!filteredDirectors.length && (
-            <p>No directors match your search.</p>
-          )}
+          {!filteredDirectors.length && <p>No directors match your search.</p>}
         </AccordionContainer>
       </Layout>
     </SearchPageFrame>

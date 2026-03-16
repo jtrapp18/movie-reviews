@@ -1,13 +1,12 @@
-import { MediaCard, CardContent, CardOverlay, CardTitle } from "@styles/cards";
-import MotionWrapper from "@styles/MotionWrapper";
-import { Button } from "@styles";
+import { MediaCard, CardContent, CardOverlay, CardTitle } from '@styles/cards';
+import MotionWrapper from '@styles/MotionWrapper';
+import { Button } from '@styles';
 import { Movies } from '@features/movies';
-import styled from "styled-components";
+import styled from 'styled-components';
 
-const FALLBACK_PHOTO = "https://via.placeholder.com/300x450.png?text=Director";
+const FALLBACK_PHOTO = 'https://via.placeholder.com/300x450.png?text=Director';
 const MAX_BIO_LENGTH = 140;
 const ACCORDION_BIO_LENGTH = 220;
-
 
 const SummaryRow = styled.summary`
   list-style: none;
@@ -69,7 +68,7 @@ const Toggle = styled.span`
   span {
     display: inline-block;
     transition: transform 0.25s ease;
-    transform: ${props => props.isExpanded ? "rotate(180deg)" : "rotate(0deg)"};
+    transform: ${(props) => (props.isExpanded ? 'rotate(180deg)' : 'rotate(0deg)')};
   }
 
   &:hover {
@@ -81,7 +80,7 @@ function SmallDirectorCard({ director, index = 0, onClick = () => {} }) {
   const { name, coverPhoto, biography } = director;
 
   const getShortBio = (bio, maxLen = MAX_BIO_LENGTH) => {
-    if (!bio) return "Director biography coming soon.";
+    if (!bio) return 'Director biography coming soon.';
     return bio.length > maxLen ? `${bio.slice(0, maxLen)}…` : bio;
   };
 
@@ -105,7 +104,7 @@ function DirectorCard({
   director,
   index = 0,
   onClick = () => {},
-  variant = "default",
+  variant = 'default',
   movies = [],
   isExpanded,
   onToggle,
@@ -114,11 +113,11 @@ function DirectorCard({
   const { name, coverPhoto, biography } = director;
 
   const getShortBio = (bio, maxLen = MAX_BIO_LENGTH) => {
-    if (!bio) return "Director biography coming soon.";
+    if (!bio) return 'Director biography coming soon.';
     return bio.length > maxLen ? `${bio.slice(0, maxLen)}…` : bio;
   };
 
-  if (variant === "detail") {
+  if (variant === 'detail') {
     const shortBio = getShortBio(biography, ACCORDION_BIO_LENGTH);
     return (
       <MotionWrapper index={index}>
@@ -142,33 +141,33 @@ function DirectorCard({
             <div
               style={{
                 flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}
             >
               <p
                 style={{
                   margin: 0,
-                  color: "var(--font-color-2)",
-                  fontSize: "0.95rem",
+                  color: 'var(--font-color-2)',
+                  fontSize: '0.95rem',
                 }}
               >
                 {shortBio}
               </p>
               <div
                 style={{
-                  marginTop: "0.5rem",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  flexWrap: "wrap",
+                  marginTop: '0.5rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap',
                 }}
               >
                 <Toggle isExpanded={isExpanded}>
-                  {isExpanded ? "Hide movies" : "Show movies"}
-                  <span>{isExpanded ? "▲" : "▼"}</span>
+                  {isExpanded ? 'Hide movies' : 'Show movies'}
+                  <span>{isExpanded ? '▲' : '▼'}</span>
                 </Toggle>
                 <Button
                   onClick={(e) => {
@@ -183,11 +182,9 @@ function DirectorCard({
             </div>
           </SummaryRow>
 
-          <AccordionBody className={isExpanded ? "is-open" : ""}>
+          <AccordionBody className={isExpanded ? 'is-open' : ''}>
             <hr />
-            <h3 style={{ marginBottom: "0.75rem" }}>
-              Reviews for Movies by {name}
-            </h3>
+            <h3 style={{ marginBottom: '0.75rem' }}>Reviews for Movies by {name}</h3>
             <Movies showMovies={movies} cardSize="small" />
           </AccordionBody>
         </AccordionDetails>

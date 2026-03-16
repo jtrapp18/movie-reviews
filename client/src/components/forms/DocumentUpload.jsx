@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { FaFileUpload, FaFileAlt, FaPaperclip, FaCheck, FaLightbulb, FaEye, FaDownload, FaTimes } from 'react-icons/fa';
+import {
+  FaFileUpload,
+  FaFileAlt,
+  FaPaperclip,
+  FaCheck,
+  FaLightbulb,
+  FaEye,
+  FaDownload,
+  FaTimes,
+} from 'react-icons/fa';
 import { Button } from '@styles';
 
 const UploadContainer = styled.div`
@@ -66,11 +75,16 @@ const CheckboxContainer = styled.div`
   gap: 8px;
 `;
 
-const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocument, onFileSelect, onRemoveDocument }) => {
+const DocumentUpload = ({
+  reviewId,
+  existingDocument,
+  onFileSelect,
+  onRemoveDocument,
+}) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState(null);
-  const [replaceText, setReplaceText] = useState(false);
+  const replaceText = false;
   const [showPreview, setShowPreview] = useState(false);
   const [showSelectedFilePreview, setShowSelectedFilePreview] = useState(false);
   const [selectedFilePreviewUrl, setSelectedFilePreviewUrl] = useState(null);
@@ -128,10 +142,12 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
     }
   };
 
-
   const handleDownload = () => {
     if (existingDocument) {
-      window.open(`/api/download_document/${reviewId}?v=${existingDocument?.documentFilename || 'unknown'}`, '_blank');
+      window.open(
+        `/api/download_document/${reviewId}?v=${existingDocument?.documentFilename || 'unknown'}`,
+        '_blank'
+      );
     }
   };
 
@@ -178,15 +194,24 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <h4><FaFileUpload /> Document Upload</h4>
+      <h4>
+        <FaFileUpload /> Document Upload
+      </h4>
       <p>Upload a PDF or Word document to attach to your review</p>
 
       {existingDocument && !selectedFile && (
         <FileInfo>
-          <strong><FaPaperclip /> Attached Document:</strong> {existingDocument.documentFilename}
+          <strong>
+            <FaPaperclip /> Attached Document:
+          </strong>{' '}
+          {existingDocument.documentFilename}
           <DocumentActions>
-            <Button onClick={handlePreview}><FaEye /> Preview</Button>
-            <Button onClick={handleDownload}><FaDownload /> Download</Button>
+            <Button onClick={handlePreview}>
+              <FaEye /> Preview
+            </Button>
+            <Button onClick={handleDownload}>
+              <FaDownload /> Download
+            </Button>
             {onRemoveDocument && (
               <Button
                 onClick={(e) => {
@@ -203,12 +228,14 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
       )}
 
       {showPreview && existingDocument && !selectedFile && (
-        <div style={{
-          marginTop: '10px',
-          border: '1px solid var(--cinema-gold)',
-          borderRadius: '8px',
-          overflow: 'hidden'
-        }}>
+        <div
+          style={{
+            marginTop: '10px',
+            border: '1px solid var(--cinema-gold)',
+            borderRadius: '8px',
+            overflow: 'hidden',
+          }}
+        >
           <iframe
             src={`/api/view_document/${reviewId}?v=${existingDocument?.documentFilename || 'unknown'}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&statusbar=0&messages=0`}
             width="100%"
@@ -216,7 +243,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
             style={{
               border: 'none',
               display: 'block',
-              backgroundColor: 'var(--cinema-black)'
+              backgroundColor: 'var(--cinema-black)',
             }}
             title="Document Preview"
           />
@@ -239,25 +266,36 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
 
           {selectedFile && (
             <FileInfo className="selected-file">
-              <strong><FaFileAlt /> Selected File:</strong> {selectedFile.name}
+              <strong>
+                <FaFileAlt /> Selected File:
+              </strong>{' '}
+              {selectedFile.name}
               <br />
               <small>Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</small>
               <br />
-              <small><FaCheck /> File will be uploaded when you submit the review</small>
+              <small>
+                <FaCheck /> File will be uploaded when you submit the review
+              </small>
               <DocumentActions>
-                <Button onClick={handlePreviewSelectedFile}><FaEye /> Preview</Button>
-                <Button onClick={clearFile}><FaTimes /> Remove File</Button>
+                <Button onClick={handlePreviewSelectedFile}>
+                  <FaEye /> Preview
+                </Button>
+                <Button onClick={clearFile}>
+                  <FaTimes /> Remove File
+                </Button>
               </DocumentActions>
             </FileInfo>
           )}
 
           {showSelectedFilePreview && selectedFile && selectedFilePreviewUrl && (
-            <div style={{
-              marginTop: '10px',
-              border: '1px solid var(--cinema-gold)',
-              borderRadius: '8px',
-              overflow: 'hidden'
-            }}>
+            <div
+              style={{
+                marginTop: '10px',
+                border: '1px solid var(--cinema-gold)',
+                borderRadius: '8px',
+                overflow: 'hidden',
+              }}
+            >
               <iframe
                 src={selectedFilePreviewUrl}
                 width="100%"
@@ -265,7 +303,7 @@ const DocumentUpload = ({ reviewId, onUploadSuccess, onUploadError, existingDocu
                 style={{
                   border: 'none',
                   display: 'block',
-                  backgroundColor: 'var(--cinema-black)'
+                  backgroundColor: 'var(--cinema-black)',
                 }}
                 title="Selected File Preview"
               />

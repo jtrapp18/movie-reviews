@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const ZoomControlsContainer = styled.div`
@@ -9,7 +8,9 @@ const ZoomControlsContainer = styled.div`
   border-radius: 25px;
   background: var(--background-tertiary);
 
-  ${props => props.floating ? `
+  ${(props) =>
+    props.floating
+      ? `
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -22,7 +23,8 @@ const ZoomControlsContainer = styled.div`
       padding: 0.4rem;
       gap: 0.2rem;
     }
-  ` : `
+  `
+      : `
     justify-content: center;
     margin: 1rem 0;
   `}
@@ -88,32 +90,21 @@ const ZoomControls = ({
   minZoom = 0.7,
   maxZoom = 2,
   showReset = true,
-  style = 'floating' // 'floating' or 'inline'
+  style = 'floating', // 'floating' or 'inline'
 }) => {
   const zoomPercentage = Math.round(zoomLevel * 100);
 
   return (
     <ZoomControlsContainer floating={style === 'floating'}>
-      <ZoomButton
-        onClick={onZoomOut}
-        disabled={zoomLevel <= minZoom}
-        title="Zoom Out"
-      >
+      <ZoomButton onClick={onZoomOut} disabled={zoomLevel <= minZoom} title="Zoom Out">
         −
       </ZoomButton>
       <ZoomLevel>{zoomPercentage}%</ZoomLevel>
-      <ZoomButton
-        onClick={onZoomIn}
-        disabled={zoomLevel >= maxZoom}
-        title="Zoom In"
-      >
+      <ZoomButton onClick={onZoomIn} disabled={zoomLevel >= maxZoom} title="Zoom In">
         +
       </ZoomButton>
       {showReset && (
-        <ZoomButton
-          onClick={onReset}
-          title="Reset Zoom"
-        >
+        <ZoomButton onClick={onReset} title="Reset Zoom">
           ↺
         </ZoomButton>
       )}

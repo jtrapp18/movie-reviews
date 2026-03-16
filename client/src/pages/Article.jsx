@@ -7,18 +7,14 @@ import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
-import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '@utils/seoUtils';
+import {
+  generateArticleStructuredData,
+  generateBreadcrumbStructuredData,
+} from '@utils/seoUtils';
 import Loading from '@components/ui/Loading';
 import { StyledContainer } from '@styles';
 
-const DEFAULT_ARTICLE_BACKDROP = "/images/default-article.jpeg";
-
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 50px;
-  font-size: 1.2rem;
-  color: #666;
-`;
+const DEFAULT_ARTICLE_BACKDROP = '/images/default-article.jpeg';
 
 const ErrorMessage = styled.div`
   text-align: center;
@@ -70,7 +66,6 @@ function Article() {
     }
   }, [id]);
 
-
   if (loading) {
     return (
       <StyledContainer>
@@ -102,15 +97,14 @@ function Article() {
   const breadcrumbData = generateBreadcrumbStructuredData([
     { name: 'Home', url: window.location.origin + '/#/' },
     { name: 'Articles', url: window.location.origin + '/#/articles' },
-    { name: article.title, url: window.location.href }
+    { name: article.title, url: window.location.href },
   ]);
 
-  const coverImageUrl =
-    article.backdrop
-      ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
-          article.backdrop
-        )}`
-      : DEFAULT_ARTICLE_BACKDROP;
+  const coverImageUrl = article.backdrop
+    ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
+        article.backdrop
+      )}`
+    : DEFAULT_ARTICLE_BACKDROP;
 
   return (
     <>
@@ -138,7 +132,9 @@ function Article() {
             likedByMe={article.likedByMe ?? false}
             disabled={!user}
             onUpdate={(liked, likeCount) => {
-              setArticle((prev) => (prev ? { ...prev, likedByMe: liked, likeCount } : prev));
+              setArticle((prev) =>
+                prev ? { ...prev, likedByMe: liked, likeCount } : prev
+              );
             }}
           />
         </LikeBar>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CardContainer, Button } from '@styles';
 import ArticleCard from '@components/cards/ArticleCard';
 import styled from 'styled-components';
@@ -17,11 +16,9 @@ const AddButtonContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-
-function Articles({ showArticles, enterSearch }) {
+function Articles({ showArticles }) {
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
-
 
   // Handle null or undefined showArticles
   if (!showArticles || !Array.isArray(showArticles)) {
@@ -36,19 +33,20 @@ function Articles({ showArticles, enterSearch }) {
     navigate('/articles/new');
   };
 
-
   return (
     <CardContainer>
       <Carousel>
         {showArticles.map((article, index) => {
           return (
             <MotionWrapper key={article.id} index={index}>
-              <div style={{
-                margin: '0',
-                width: '200px',
-                height: '100%',
-                flexShrink: 0
-              }}>
+              <div
+                style={{
+                  margin: '0',
+                  width: '200px',
+                  height: '100%',
+                  flexShrink: 0,
+                }}
+              >
                 <ArticleCard article={article} />
               </div>
             </MotionWrapper>
@@ -58,9 +56,7 @@ function Articles({ showArticles, enterSearch }) {
 
       {isAdmin && (
         <AddButtonContainer>
-          <Button onClick={handleAddNew}>
-            + Add New Article
-          </Button>
+          <Button onClick={handleAddNew}>+ Add New Article</Button>
         </AddButtonContainer>
       )}
     </CardContainer>

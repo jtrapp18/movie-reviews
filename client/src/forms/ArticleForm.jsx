@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import RichTextEditor from "@components/forms/RichTextEditor";
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "@styles";
-import Error from "@styles/Error";
-import ContentDisplay from "@components/forms/FormSubmit";
-import DocumentUpload from "@components/forms/DocumentUpload";
-import BackdropUpload from "@components/forms/BackdropUpload";
-import TagInput from "@components/forms/TagInput";
-import SubmitButton from "@components/forms/SubmitButton";
-import DeleteConfirmationModal from "@components/feedback/DeleteConfirmationModal";
-import { patchJSONToDb, postJSONToDb, snakeToCamel } from "@helper";
-import { handleFormSubmit, submitFormWithDocument } from "@utils/formSubmit";
-import { extractTextFromFile } from "@utils/textExtraction";
-import useCrudStateDB from "@hooks/useCrudStateDB";
-import { useAdmin } from "@hooks/useAdmin";
+import { useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import RichTextEditor from '@components/forms/RichTextEditor';
+import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import Error from '@styles/Error';
+import ContentDisplay from '@components/forms/FormSubmit';
+import DocumentUpload from '@components/forms/DocumentUpload';
+import BackdropUpload from '@components/forms/BackdropUpload';
+import TagInput from '@components/forms/TagInput';
+import SubmitButton from '@components/forms/SubmitButton';
+import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
+import { snakeToCamel } from '@helper';
+import { submitFormWithDocument } from '@utils/formSubmit';
+import { extractTextFromFile } from '@utils/textExtraction';
+import useCrudStateDB from '@hooks/useCrudStateDB';
+import { useAdmin } from '@hooks/useAdmin';
 
 const ArticleForm = ({ initObj }) => {
   const { id } = useParams();
@@ -27,43 +27,33 @@ const ArticleForm = ({ initObj }) => {
   const isEdit = !!initObj; // True if we have an existing article to edit
 
   const [submitError, setSubmitError] = useState(null);
-  const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || initObj?.has_document || false);
+  const [hasDocument, setHasDocument] = useState(
+    initObj?.hasDocument || initObj?.has_document || false
+  );
   const [selectedFile, setSelectedFile] = useState(null);
-  const [replaceText, setReplaceText] = useState(false);
+  const [, setReplaceText] = useState(false);
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setMovies, setArticles } = useOutletContext();
-  const { addItem, updateItem, deleteItem } = useCrudStateDB(setArticles, "reviews");
+  const { setArticles } = useOutletContext();
+  const { deleteItem } = useCrudStateDB(setArticles, 'reviews');
   const { isAdmin } = useAdmin();
   const [backdropKey, setBackdropKey] = useState(initObj?.backdrop || null);
 
   const initialValues = initObj
     ? {
-        title: initObj.title || "",
-        description: initObj.description || "",
-        reviewText: initObj.reviewText || "",
+        title: initObj.title || '',
+        description: initObj.description || '',
+        reviewText: initObj.reviewText || '',
       }
     : {
-        title: "",
-        description: "",
-        reviewText: "",
+        title: '',
+        description: '',
+        reviewText: '',
       };
-
-  const submitToDB = async (body) => {
-    if (initObj && initObj.id) {
-      // Update existing article
-      const response = await patchJSONToDb("articles", initObj.id, body);
-      return snakeToCamel(response);
-    } else {
-      // Create new article
-      const response = await postJSONToDb("articles", body);
-      return snakeToCamel(response);
-    }
-  };
 
   const handleDelete = async () => {
     if (!initObj || !initObj.id) return;
@@ -98,20 +88,24 @@ const ArticleForm = ({ initObj }) => {
 
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("Article title is required")
-      .min(5, "Title must be at least 5 characters")
-      .max(200, "Title must be less than 200 characters"),
-    description: Yup.string()
-      .max(500, "Description must be less than 500 characters"),
+      .required('Article title is required')
+      .min(5, 'Title must be at least 5 characters')
+      .max(200, 'Title must be less than 200 characters'),
+    description: Yup.string().max(500, 'Description must be less than 500 characters'),
     reviewText: Yup.string()
-      .test('content-or-document', 'Either article content or a document is required.', function(value) {
-        const hasContent = value && value.trim().length >= 10;
-        return hasDocument || hasContent;
-      })
+      .test(
+        'content-or-document',
+        'Either article content or a document is required.',
+        function (value) {
+          const hasContent = value && value.trim().length >= 10;
+          return hasDocument || hasContent;
+        }
+      )
       .when([], {
         is: () => hasDocument,
         then: (schema) => schema.optional(),
-        otherwise: (schema) => schema.required("Article content is required when no document is uploaded")
+        otherwise: (schema) =>
+          schema.required('Article content is required when no document is uploaded'),
       }),
   });
 
@@ -168,7 +162,6 @@ const ArticleForm = ({ initObj }) => {
         } else {
           setSubmitError(result.error);
         }
-
       } catch (error) {
         console.error('Error submitting article:', error);
         setSubmitError(error.message || 'Failed to submit article');
@@ -178,7 +171,6 @@ const ArticleForm = ({ initObj }) => {
     },
   });
 
-
   const handleDocumentUploadSuccess = (result) => {
     setHasDocument(true);
 
@@ -186,10 +178,10 @@ const ArticleForm = ({ initObj }) => {
     const review = snakeToCamel(result.review);
 
     if (review && review.reviewText) {
-      formik.setFieldValue("reviewText", review.reviewText);
+      formik.setFieldValue('reviewText', review.reviewText);
     }
 
-    formik.setFieldTouched("reviewText", false);
+    formik.setFieldTouched('reviewText', false);
 
     if (initObj && review) {
       initObj.hasDocument = review.hasDocument;
@@ -225,12 +217,11 @@ const ArticleForm = ({ initObj }) => {
     }
   };
 
-
   return (
     <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
-          <h1>{initObj ? "Edit Article" : "Create New Article"}</h1>
+          <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
           {submitError && <Error>{submitError}</Error>}
           {/* Backdrop Image Upload (for existing articles) */}
           {initObj?.id && (
@@ -318,7 +309,8 @@ const ArticleForm = ({ initObj }) => {
                   {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
                 </ExtractButton>
                 <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the selected document into the article content field below
+                  Click to extract text from the selected document into the article
+                  content field below
                 </p>
               </div>
             )}
@@ -326,9 +318,13 @@ const ArticleForm = ({ initObj }) => {
 
           <RichTextEditor
             value={formik.values.reviewText}
-            onChange={(value) => formik.setFieldValue("reviewText", value)}
-            onBlur={() => formik.setFieldTouched("reviewText", true)}
-            placeholder={hasDocument ? "Optional: Add additional content here..." : "Write your article content here..."}
+            onChange={(value) => formik.setFieldValue('reviewText', value)}
+            onBlur={() => formik.setFieldTouched('reviewText', true)}
+            placeholder={
+              hasDocument
+                ? 'Optional: Add additional content here...'
+                : 'Write your article content here...'
+            }
             hasDocument={hasDocument}
             label="Article Content"
             error={formik.errors.reviewText}
@@ -345,24 +341,31 @@ const ArticleForm = ({ initObj }) => {
             />
           </div>
 
-          <div style={{
-            marginTop: '30px',
-            marginBottom: '20px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <CancelButton type="button" onClick={() => {
-              if (initObj) {
-                // If editing existing article, just exit edit mode
-                setIsEditing(false);
-              } else {
-                // If creating new article, navigate back
-                navigate(-1);
-              }
-            }}>Cancel</CancelButton>
+          <div
+            style={{
+              marginTop: '30px',
+              marginBottom: '20px',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <CancelButton
+              type="button"
+              onClick={() => {
+                if (initObj) {
+                  // If editing existing article, just exit edit mode
+                  setIsEditing(false);
+                } else {
+                  // If creating new article, navigate back
+                  navigate(-1);
+                }
+              }}
+            >
+              Cancel
+            </CancelButton>
             <SubmitButton
               isSubmitting={isSubmitting}
               isEdit={isEdit}
@@ -393,10 +396,7 @@ const ArticleForm = ({ initObj }) => {
                 initObj?.review_text ||
                 '',
               hasDocument:
-                hasDocument ||
-                initObj?.hasDocument ||
-                initObj?.has_document ||
-                false,
+                hasDocument || initObj?.hasDocument || initObj?.has_document || false,
               documentFilename:
                 selectedFile?.name ||
                 initObj?.documentFilename ||
@@ -404,9 +404,7 @@ const ArticleForm = ({ initObj }) => {
                 null,
               documentType: selectedFile
                 ? selectedFile.name.split('.').pop().toLowerCase()
-                : initObj?.documentType ||
-                  initObj?.document_type ||
-                  null,
+                : initObj?.documentType || initObj?.document_type || null,
             };
             return values;
           })()}

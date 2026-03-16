@@ -6,7 +6,9 @@ const StyledCard = styled.article`
   border-radius: 8px 8px 0 0;
   background-color: var(--background-secondary);
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -26,7 +28,7 @@ const StyledCard = styled.article`
   .content {
     display: flex;
     flex-direction: column;
-    padding: .5rem;
+    padding: 0.5rem;
     gap: 4px;
   }
 
@@ -35,10 +37,9 @@ const StyledCard = styled.article`
     font-family: var(--title-font);
     font-weight: bold;
   }
-
 `;
 
-const DEFAULT_POST_IMAGE = "/images/default-article.jpeg";
+const DEFAULT_POST_IMAGE = '/images/default-article.jpeg';
 
 function PostCard({ photo, title, description, date, onClick }) {
   return (

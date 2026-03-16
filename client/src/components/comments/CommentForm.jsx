@@ -93,7 +93,16 @@ function CommentForm({ reviewId, parentCommentId = null, onSuccess, onCancel }) 
           {submitting ? 'Posting…' : parentCommentId ? 'Reply' : 'Comment'}
         </Button>
         {onCancel && (
-          <button type="button" onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--font-color-2)' }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--font-color-2)',
+            }}
+          >
             Cancel
           </button>
         )}

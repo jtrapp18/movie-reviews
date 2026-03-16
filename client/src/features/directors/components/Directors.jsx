@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardContainer } from '@styles';
 import Carousel from '@components/shared-sections/Carousel';

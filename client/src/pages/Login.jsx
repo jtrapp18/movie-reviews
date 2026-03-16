@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from 'react';
 import styled from 'styled-components';
 import LoginForm from '../forms/LoginForm';
 import SignUpForm from '../forms/SignUpForm';
-import { StyledContainer } from "../styles";
-import { useNavigate } from "react-router-dom";
+import { StyledContainer } from '../styles';
+import { useNavigate } from 'react-router-dom';
 
 const Header = styled.div`
   text-align: center;
@@ -41,18 +41,18 @@ const ConfirmText = styled.div`
 `;
 
 function Login() {
-  const [mode, setMode] = useState("login"); // 'login' | 'signup'
+  const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
-  const isLogin = mode === "login";
+  const isLogin = mode === 'login';
 
   return (
     <StyledContainer>
       <Header>
-        <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+        <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
         <div className="subtitle">
-          <h3>{isLogin ? "Sign in to access your account" : "Create a new account"}</h3>
+          <h3>{isLogin ? 'Sign in to access your account' : 'Create a new account'}</h3>
         </div>
       </Header>
 
@@ -60,14 +60,20 @@ function Login() {
         <>
           <LoginForm />
           <InlineToggle>
-            Forgot your password?{" "}
-            <button type="button" onClick={() => navigate("/forgot-password")}>
+            Forgot your password?{' '}
+            <button type="button" onClick={() => navigate('/forgot-password')}>
               Reset your password
             </button>
           </InlineToggle>
           <InlineToggle>
-            Don&apos;t have an account?{" "}
-            <button type="button" onClick={() => { setMode("signup"); setShowConfirm(false); }}>
+            Don&apos;t have an account?{' '}
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signup');
+                setShowConfirm(false);
+              }}
+            >
               Sign up
             </button>
           </InlineToggle>
@@ -81,8 +87,8 @@ function Login() {
             </ConfirmText>
           )}
           <InlineToggle>
-            Already have an account?{" "}
-            <button type="button" onClick={() => setMode("login")}>
+            Already have an account?{' '}
+            <button type="button" onClick={() => setMode('login')}>
               Log in
             </button>
           </InlineToggle>

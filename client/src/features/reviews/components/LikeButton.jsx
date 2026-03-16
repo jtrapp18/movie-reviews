@@ -35,15 +35,20 @@ const Count = styled.span`
  * @param {boolean} disabled - e.g. when not logged in
  * @param {function} onUpdate - (liked, likeCount) => void after toggle
  */
-function LikeButton({ type, id, likeCount = 0, likedByMe = false, disabled = false, onUpdate }) {
+function LikeButton({
+  type,
+  id,
+  likeCount = 0,
+  likedByMe = false,
+  disabled = false,
+  onUpdate,
+}) {
   const [liked, setLiked] = useState(likedByMe);
   const [count, setCount] = useState(likeCount);
   const [loading, setLoading] = useState(false);
 
   const endpoint =
-    type === 'comment'
-      ? `/api/comments/${id}/like`
-      : `/api/reviews/${id}/like`;
+    type === 'comment' ? `/api/comments/${id}/like` : `/api/reviews/${id}/like`;
 
   const handleClick = async () => {
     if (disabled || loading) return;

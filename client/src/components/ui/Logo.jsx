@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { NavLink } from "react-router-dom";
+import styled from 'styled-components';
+import { NavLink } from 'react-router-dom';
 
 const LogoContainer = styled.div`
   height: fit-content;
@@ -15,21 +15,16 @@ const LogoContainer = styled.div`
       transform: rotate(-15deg);
     }
   }
-`
+`;
 
 function Logo() {
-
-
   return (
-      <LogoContainer>
-        <NavLink
-          to="/"
-          className="home"
-        >
-          <img src={`images/clapperboard.png`} alt="clapperboard"/>
-        </NavLink>
-      </LogoContainer>
+    <LogoContainer>
+      <NavLink to="/" className="home">
+        <img src={`images/clapperboard.png`} alt="clapperboard" />
+      </NavLink>
+    </LogoContainer>
   );
-};
+}
 
 export default Logo;

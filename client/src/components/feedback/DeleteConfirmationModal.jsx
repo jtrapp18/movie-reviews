@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import { CancelButton, DeleteButton } from '@styles';
 
@@ -47,9 +46,8 @@ const DeleteConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
-  title,
   message,
-  itemType = "item"
+  itemType = "item",
 }) => {
   if (!isOpen) return null;
 

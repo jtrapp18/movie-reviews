@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CardContainer } from '@styles';
 import MovieCard from '@components/cards/MovieCard';
 import MotionWrapper from '@styles/MotionWrapper';
@@ -6,7 +6,7 @@ import Carousel from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { getMovieRatings } from '@helper';
 
-function Movies({ showMovies, enterSearch, cardSize = "default" }) {
+function Movies({ showMovies, cardSize = 'default' }) {
   const [ratingsMap, setRatingsMap] = useState({});
 
   useEffect(() => {
@@ -58,11 +58,7 @@ function Movies({ showMovies, enterSearch, cardSize = "default" }) {
                   flexShrink: 0,
                 }}
               >
-                <MovieCard
-                  movie={movieWithCorrectId}
-                  rating={rating}
-                  size={cardSize}
-                />
+                <MovieCard movie={movieWithCorrectId} rating={rating} size={cardSize} />
               </div>
             </MotionWrapper>
           );

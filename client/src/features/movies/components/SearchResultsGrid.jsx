@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import SearchResultsHeader from './SearchResultsHeader';
 import { getMovieRatings } from '@helper';
@@ -9,13 +9,7 @@ const GridContainer = styled.div`
   padding: 0 20px;
 `;
 
-const MovieCardWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
 const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
-  const [ratingsMap, setRatingsMap] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,9 +18,7 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
         setLoading(false);
         return;
       }
-
-      const ratings = await getMovieRatings(movies);
-      setRatingsMap(ratings);
+      await getMovieRatings(movies);
       setLoading(false);
     };
 
@@ -48,24 +40,15 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
   if (loading) {
     return (
       <GridContainer>
-        <SearchResultsHeader
-          searchQuery={searchQuery}
-          isLoading={true}
-        />
+        <SearchResultsHeader searchQuery={searchQuery} isLoading={true} />
       </GridContainer>
     );
   }
 
   return (
     <GridContainer>
-      <SearchResultsHeader
-        searchQuery={searchQuery}
-        movieCount={movies.length}
-      />
-      <MoviesGrid
-        movies={movies}
-        onMovieClick={onMovieClick}
-      />
+      <SearchResultsHeader searchQuery={searchQuery} movieCount={movies.length} />
+      <MoviesGrid movies={movies} onMovieClick={onMovieClick} />
     </GridContainer>
   );
 };

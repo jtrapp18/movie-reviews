@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const HeaderContainer = styled.div`
@@ -28,7 +27,7 @@ const SearchResultsHeader = ({
   movieCount = 0,
   articleCount = 0,
   isLoading = false,
-  showNoResults = false
+  showNoResults = false,
 }) => {
   if (isLoading) {
     return (
@@ -47,7 +46,6 @@ const SearchResultsHeader = ({
     );
   }
 
-  const totalResults = movieCount + articleCount;
   const movieText = movieCount === 1 ? 'movie' : 'movies';
   const articleText = articleCount === 1 ? 'article' : 'articles';
 
@@ -63,7 +61,7 @@ const SearchResultsHeader = ({
   return (
     <HeaderContainer>
       <Title>
-        Results for <SearchQuery>"{searchQuery}"</SearchQuery>
+        Results for <SearchQuery>&quot;{searchQuery}&quot;</SearchQuery>
       </Title>
       <ResultsCount>{resultsText}</ResultsCount>
     </HeaderContainer>

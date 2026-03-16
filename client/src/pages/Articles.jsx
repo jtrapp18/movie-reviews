@@ -9,7 +9,6 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-
 function Articles() {
   const { articles, setArticles, coreDataLoaded } = useOutletContext();
   const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
@@ -94,12 +93,23 @@ function Articles() {
           <SearchBar
             key="articles-search"
             enterSearch={handleSearch}
-            placeholder={isSearching ? "Searching..." : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."}
+            placeholder={
+              isSearching
+                ? 'Searching...'
+                : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
+            }
           />
         </MotionWrapper>
 
         {/* Articles Carousel */}
-        <div style={{ width: '100%', margin: '0 auto', height: '300px', overflow: 'hidden' }}>
+        <div
+          style={{
+            width: '100%',
+            margin: '0 auto',
+            height: '300px',
+            overflow: 'hidden',
+          }}
+        >
           <style>
             {`
               .slick-slide > div {
@@ -154,12 +164,14 @@ function Articles() {
           <Slider {...settings}>
             {filteredArticles.map((article, index) => (
               <MotionWrapper key={article.id} index={index}>
-                <div style={{
-                  margin: '0',
-                  width: '200px',
-                  height: '100%',
-                  flexShrink: 0
-                }}>
+                <div
+                  style={{
+                    margin: '0',
+                    width: '200px',
+                    height: '100%',
+                    flexShrink: 0,
+                  }}
+                >
                   <ArticleCard article={article} />
                 </div>
               </MotionWrapper>

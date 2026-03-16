@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components';
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 
 const filmStripMove = keyframes`
   0% { transform: translateX(-100px); }
@@ -10,7 +10,6 @@ const spotlight = keyframes`
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.8; }
 `;
-
 
 const StyledContainer = styled.div`
   height: 100vh;
@@ -38,10 +37,31 @@ const StyledContainer = styled.div`
     right: 0;
     bottom: 0;
     background-image:
-      radial-gradient(circle at 20% 50%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%),
-      radial-gradient(circle at 80% 20%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%),
-      radial-gradient(circle at 40% 40%, transparent 20%, rgba(0,0,0,0.1) 21%, rgba(0,0,0,0.1) 34%, transparent 35%);
-    background-size: 3px 3px, 2px 2px, 4px 4px;
+      radial-gradient(
+        circle at 20% 50%,
+        transparent 20%,
+        rgba(0, 0, 0, 0.1) 21%,
+        rgba(0, 0, 0, 0.1) 34%,
+        transparent 35%
+      ),
+      radial-gradient(
+        circle at 80% 20%,
+        transparent 20%,
+        rgba(0, 0, 0, 0.1) 21%,
+        rgba(0, 0, 0, 0.1) 34%,
+        transparent 35%
+      ),
+      radial-gradient(
+        circle at 40% 40%,
+        transparent 20%,
+        rgba(0, 0, 0, 0.1) 21%,
+        rgba(0, 0, 0, 0.1) 34%,
+        transparent 35%
+      );
+    background-size:
+      3px 3px,
+      2px 2px,
+      4px 4px;
     opacity: 0.3;
     pointer-events: none;
   }
@@ -68,7 +88,6 @@ const StyledContainer = styled.div`
     animation-delay: 2s;
   }
 
-
   .content {
     padding: 2%;
     text-align: center;
@@ -81,14 +100,14 @@ const StyledContainer = styled.div`
       left: -50%;
       right: -50%;
       bottom: -50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
       animation: ${spotlight} 3s ease-in-out infinite;
       pointer-events: none;
     }
 
     h3 {
       font-size: clamp(3.5rem, 5vw, 5.5rem);
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
       margin-bottom: 20px;
       background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
       background-size: 200% 200%;
@@ -101,28 +120,28 @@ const StyledContainer = styled.div`
     .subtitle {
       font-size: clamp(1.2rem, 2vw, 1.8rem);
       color: #ccc;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
       margin-bottom: 30px;
       font-style: italic;
     }
 
     a {
       font-size: clamp(2rem, 2.5vw, 3rem);
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-      color: #0096FF;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      color: #0096ff;
       text-decoration: none;
       padding: 15px 30px;
-      border: 2px solid #0096FF;
+      border: 2px solid #0096ff;
       border-radius: 8px;
       transition: all 0.3s ease;
       display: inline-block;
     }
 
     a:hover {
-      background-color: #0096FF;
+      background-color: #0096ff;
       color: white;
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,150,255,0.3);
+      box-shadow: 0 4px 8px rgba(0, 150, 255, 0.3);
     }
   }
 `;

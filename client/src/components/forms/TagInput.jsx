@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import Tag from '@components/ui/Tag';
 import { Button } from '@styles';
@@ -42,18 +42,11 @@ const Input = styled.input`
   }
 `;
 
-const AddButton = styled(Button)`
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-`;
-
 const TagInput = ({
   tags = [],
   onTagsChange,
-  placeholder = "Add tags...",
-  maxTags = 10
+  placeholder = 'Add tags...',
+  maxTags = 10,
 }) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -67,7 +60,7 @@ const TagInput = ({
     { bg: '#20c997', text: '#ffffff' },
     { bg: '#e83e8c', text: '#ffffff' },
     { bg: '#6c757d', text: '#ffffff' },
-    { bg: '#17a2b8', text: '#ffffff' }
+    { bg: '#17a2b8', text: '#ffffff' },
   ];
 
   const getRandomColor = () => {
@@ -76,13 +69,17 @@ const TagInput = ({
 
   const handleAddTag = () => {
     const trimmedValue = inputValue.trim();
-    if (trimmedValue && tags.length < maxTags && !tags.some(tag => tag.name === trimmedValue)) {
+    if (
+      trimmedValue &&
+      tags.length < maxTags &&
+      !tags.some((tag) => tag.name === trimmedValue)
+    ) {
       const color = getRandomColor();
       const newTag = {
         id: Date.now(), // Simple ID generation
         name: trimmedValue,
         backgroundColor: color.bg,
-        textColor: color.text
+        textColor: color.text,
       };
       onTagsChange([...tags, newTag]);
       setInputValue('');
@@ -90,7 +87,7 @@ const TagInput = ({
   };
 
   const handleRemoveTag = (tagId) => {
-    onTagsChange(tags.filter(tag => tag.id !== tagId));
+    onTagsChange(tags.filter((tag) => tag.id !== tagId));
   };
 
   const handleKeyPress = (e) => {
@@ -121,15 +118,11 @@ const TagInput = ({
           </>
         )}
 
-        {tags.length >= maxTags && (
-          <span>
-            Maximum {maxTags} tags reached
-          </span>
-        )}
+        {tags.length >= maxTags && <span>Maximum {maxTags} tags reached</span>}
       </InputRow>
 
       <TagsDisplay>
-        {tags.map(tag => (
+        {tags.map((tag) => (
           <Tag
             key={tag.id}
             backgroundColor={tag.backgroundColor}

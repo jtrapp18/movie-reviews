@@ -1,7 +1,6 @@
 import StarRatings from 'react-star-ratings';
 
-const Stars = ({rating, handleStarClick}) => {
-
+const Stars = ({ rating, handleStarClick }) => {
   return (
     <StarRatings
       rating={rating}

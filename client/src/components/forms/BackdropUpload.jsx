@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@styles';
 import { FaImage, FaEdit } from 'react-icons/fa';
@@ -165,9 +165,7 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
         />
         <Button
           type="button"
-          onClick={() =>
-            document.getElementById('backdrop-upload-input').click()
-          }
+          onClick={() => document.getElementById('backdrop-upload-input').click()}
         >
           <FaEdit style={{ marginRight: 6 }} />
           {displayUrl ? 'Change Image' : 'Choose Image'}
@@ -186,9 +184,7 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
         )}
       </Controls>
 
-      {error && (
-        <p style={{ color: '#f44336', marginTop: '8px' }}>{error}</p>
-      )}
+      {error && <p style={{ color: '#f44336', marginTop: '8px' }}>{error}</p>}
     </Container>
   );
 }

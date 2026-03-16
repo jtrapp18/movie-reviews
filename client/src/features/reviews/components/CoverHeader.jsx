@@ -32,11 +32,7 @@ const CoverImage = styled.img`
 const Overlay = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.25),
-    rgba(0, 0, 0, 0.75)
-  );
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.75));
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -71,11 +67,6 @@ const PublishDate = styled.span`
   color: var(--soft-white);
 `;
 
-const TextOnlyTitle = styled.h1`
-  margin: 0.75rem 0 0 0;
-  text-align: left;
-`;
-
 function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
   if (!imageUrl && !title && !subtitle) return null;
 
@@ -103,9 +94,7 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
                   <Stars rating={rating} />
                 </StarsWrapper>
               )}
-              {formattedDate && (
-                <PublishDate>Published on {formattedDate}</PublishDate>
-              )}
+              {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
             </OverlayContent>
           </Overlay>
         </ImageWrapper>
@@ -126,9 +115,7 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
                 <Stars rating={rating} />
               </StarsWrapper>
             )}
-            {formattedDate && (
-              <PublishDate>Published on {formattedDate}</PublishDate>
-            )}
+            {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
           </OverlayContent>
         </Overlay>
       </ImageWrapper>

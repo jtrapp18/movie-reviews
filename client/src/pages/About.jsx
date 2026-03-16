@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
@@ -57,13 +56,14 @@ const ContactMethod = styled.div`
   }
 `;
 
-
 function About() {
   return (
     <StyledContainer>
       <Header>
         <h1>{aboutContent.header.title}</h1>
-        <h3><i>{aboutContent.header.subtitle}</i></h3>
+        <h3>
+          <i>{aboutContent.header.subtitle}</i>
+        </h3>
       </Header>
 
       <AboutSection>
@@ -75,7 +75,6 @@ function About() {
         <List items={aboutContent.aboutJames.favoriteDirectors} />
 
         <Paragraphs text={aboutContent.aboutJames.closing} />
-
       </AboutSection>
 
       <AboutSection title="About This Website">

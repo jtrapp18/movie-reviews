@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import RichTextEditor from "@components/forms/RichTextEditor";
+import { useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm, Button, DeleteButton, CancelButton, ExtractButton } from "@styles";
-import Error from "@styles/Error";
+import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import Error from '@styles/Error';
 import { Stars } from '@features/reviews';
-import ContentDisplay from "@components/forms/FormSubmit";
-import DocumentUpload from "@components/forms/DocumentUpload";
-import TagInput from "@components/forms/TagInput";
-import SubmitButton from "@components/forms/SubmitButton";
-import DeleteConfirmationModal from "@components/feedback/DeleteConfirmationModal";
-import { handleFormSubmit, submitFormWithDocument, uploadDocument } from "@utils/formSubmit";
-import { extractTextFromFile } from "@utils/textExtraction";
-import useCrudStateDB from "@hooks/useCrudStateDB";
-import { snakeToCamel, invalidateRatingsCache, getJSON } from "@helper";
-import { useAdmin } from "@hooks/useAdmin";
+import ContentDisplay from '@components/forms/FormSubmit';
+import DocumentUpload from '@components/forms/DocumentUpload';
+import TagInput from '@components/forms/TagInput';
+import SubmitButton from '@components/forms/SubmitButton';
+import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
+import { submitFormWithDocument } from '@utils/formSubmit';
+import { extractTextFromFile } from '@utils/textExtraction';
+import useCrudStateDB from '@hooks/useCrudStateDB';
+import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
+import { useAdmin } from '@hooks/useAdmin';
 
 const StarsContainer = styled.div`
   display: flex;
@@ -33,7 +33,7 @@ const ReviewForm = ({ initObj }) => {
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [replaceText, setReplaceText] = useState(true);
+  const [, setReplaceText] = useState(true);
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -41,25 +41,26 @@ const ReviewForm = ({ initObj }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { setMovies } = useOutletContext();
-  const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, "movies");
+  const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, 'movies');
   const { isAdmin } = useAdmin();
   const movieId = parseInt(id);
 
   const initialValues = initObj
     ? {
-        rating: initObj.rating || "",
-        reviewText: initObj.reviewText || "",
-        title: initObj.title || "",
+        rating: initObj.rating || '',
+        reviewText: initObj.reviewText || '',
+        title: initObj.title || '',
       }
     : {
         rating: 0,
-        reviewText: "",
-        title: "",
+        reviewText: '',
+        title: '',
       };
 
-  const submitToDB = initObj
-    ? (body) => updateKey("reviews", initObj.id, body, movieId)
-    : (body) => addToKey("reviews", body, movieId);
+  const _submitToDB = initObj
+    ? (body) => updateKey('reviews', initObj.id, body, movieId)
+    : (body) => addToKey('reviews', body, movieId);
+  void _submitToDB;
 
   const handleDelete = async () => {
     if (!movieId) return;
@@ -99,25 +100,29 @@ const ReviewForm = ({ initObj }) => {
     }
   };
 
-
   const validationSchema = Yup.object({
     title: Yup.string()
-      .required("Review title is required")
-      .min(3, "Title must be at least 3 characters")
-      .max(100, "Title must be less than 100 characters"),
+      .required('Review title is required')
+      .min(3, 'Title must be at least 3 characters')
+      .max(100, 'Title must be less than 100 characters'),
     rating: Yup.number()
-      .required("Rating is required.")
-      .min(1, "Rating must be at least 1.")
-      .max(10, "Rating must be at most 10."),
+      .required('Rating is required.')
+      .min(1, 'Rating must be at least 1.')
+      .max(10, 'Rating must be at most 10.'),
     reviewText: Yup.string()
-      .test('review-or-document', 'Either review text or a document is required.', function(value) {
-        const hasReviewText = value && value.trim().length >= 10;
-        return hasDocument || hasReviewText;
-      })
+      .test(
+        'review-or-document',
+        'Either review text or a document is required.',
+        function (value) {
+          const hasReviewText = value && value.trim().length >= 10;
+          return hasDocument || hasReviewText;
+        }
+      )
       .when([], {
         is: () => hasDocument,
         then: (schema) => schema.optional(),
-        otherwise: (schema) => schema.required("Review text is required when no document is uploaded.")
+        otherwise: (schema) =>
+          schema.required('Review text is required when no document is uploaded.'),
       }),
   });
 
@@ -136,7 +141,7 @@ const ReviewForm = ({ initObj }) => {
           rating: values.rating,
           reviewText: values.reviewText,
           movieId: movieId,
-          tags: tags.map(tag => ({ name: typeof tag === 'string' ? tag : tag.name }))
+          tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
         console.info('ReviewForm - submitting review', {
@@ -147,7 +152,12 @@ const ReviewForm = ({ initObj }) => {
         });
 
         // Submit the review
-        const result = await submitFormWithDocument(formData, selectedFile, isEdit, initObj?.id);
+        const result = await submitFormWithDocument(
+          formData,
+          selectedFile,
+          isEdit,
+          initObj?.id
+        );
 
         if (result.success) {
           console.info('ReviewForm - review submitted successfully', {
@@ -186,9 +196,8 @@ const ReviewForm = ({ initObj }) => {
     },
   });
 
-
   const updateRating = (rating) => {
-    formik.setFieldValue("rating", rating);
+    formik.setFieldValue('rating', rating);
   };
 
   const handleDocumentUploadSuccess = (result) => {
@@ -198,7 +207,7 @@ const ReviewForm = ({ initObj }) => {
     const review = snakeToCamel(result.review);
 
     // Don't automatically extract text - let user choose
-    formik.setFieldTouched("reviewText", false);
+    formik.setFieldTouched('reviewText', false);
 
     if (initObj && review) {
       initObj.hasDocument = review.hasDocument;
@@ -221,7 +230,6 @@ const ReviewForm = ({ initObj }) => {
     setSubmitError(`Document upload failed: ${error}`);
   };
 
-
   const handleFileSelect = (file, replaceTextOption) => {
     setSelectedFile(file);
     setReplaceText(replaceTextOption);
@@ -237,7 +245,7 @@ const ReviewForm = ({ initObj }) => {
     <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
-          <h2>{initObj ? "Update Review" : "Leave a Review"}</h2>
+          <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
           {/* Rating Stars */}
           <StarsContainer>
@@ -296,7 +304,8 @@ const ReviewForm = ({ initObj }) => {
                   {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
                 </ExtractButton>
                 <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the uploaded document into the review field below
+                  Click to extract text from the uploaded document into the review field
+                  below
                 </p>
               </div>
             )}
@@ -304,9 +313,13 @@ const ReviewForm = ({ initObj }) => {
 
           <RichTextEditor
             value={formik.values.reviewText}
-            onChange={(value) => formik.setFieldValue("reviewText", value)}
-            onBlur={() => formik.setFieldTouched("reviewText", true)}
-            placeholder={hasDocument ? "Add additional review text (optional)..." : "Write your review here..."}
+            onChange={(value) => formik.setFieldValue('reviewText', value)}
+            onBlur={() => formik.setFieldTouched('reviewText', true)}
+            placeholder={
+              hasDocument
+                ? 'Add additional review text (optional)...'
+                : 'Write your review here...'
+            }
             hasDocument={hasDocument}
             label="Review"
             error={formik.errors.reviewText}
@@ -328,25 +341,34 @@ const ReviewForm = ({ initObj }) => {
           {/* Display validation errors */}
           {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
           {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
-          {formik.errors.reviewText && <Error>Review: {formik.errors.reviewText}</Error>}
+          {formik.errors.reviewText && (
+            <Error>Review: {formik.errors.reviewText}</Error>
+          )}
 
-          <div style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '20px'
-          }}>
-            <CancelButton type="button" onClick={() => {
-              if (initObj) {
-                // If editing existing review, just exit edit mode
-                setIsEditing(false);
-              } else {
-                // If creating new review, navigate back
-                navigate(-1);
-              }
-            }}>Cancel</CancelButton>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '20px',
+            }}
+          >
+            <CancelButton
+              type="button"
+              onClick={() => {
+                if (initObj) {
+                  // If editing existing review, just exit edit mode
+                  setIsEditing(false);
+                } else {
+                  // If creating new review, navigate back
+                  navigate(-1);
+                }
+              }}
+            >
+              Cancel
+            </CancelButton>
             <SubmitButton
               isSubmitting={isSubmitting}
               isEdit={isEdit}

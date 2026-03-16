@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer, Button } from '@styles';
 import { getJSON, patchJSONToDb } from '@helper';
@@ -28,7 +28,6 @@ const MoviesHeader = styled.h2`
 
 function Director() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [director, setDirector] = useState(null);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,9 +138,7 @@ function Director() {
               onEdit={handleStartEdit}
             />
             <MoviesSection>
-              <MoviesHeader>
-                Movies by {director.name}
-              </MoviesHeader>
+              <MoviesHeader>Movies by {director.name}</MoviesHeader>
               <DirectorTimeline movies={movies} />
             </MoviesSection>
           </DirectorSection>
@@ -152,7 +149,9 @@ function Director() {
             <h1>{director.name}</h1>
 
             <div style={{ marginTop: '0.5rem' }}>
-              <label><strong>Cover / backdrop image</strong></label>
+              <label>
+                <strong>Cover / backdrop image</strong>
+              </label>
               <BackdropUpload
                 uploadUrl={`/api/directors/${director.id}/backdrop`}
                 currentUrl={
@@ -168,8 +167,17 @@ function Director() {
               />
             </div>
 
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label htmlFor="director-bio"><strong>Biography</strong></label>
+            <div
+              style={{
+                marginTop: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+              }}
+            >
+              <label htmlFor="director-bio">
+                <strong>Biography</strong>
+              </label>
               <textarea
                 id="director-bio"
                 value={bioDraft}

@@ -7,23 +7,42 @@ const SEOHead = ({
   image,
   url,
   type = 'website',
-  structuredData
+  structuredData,
 }) => {
   const siteName = 'James Trapp Movie Articles';
   const siteUrl = window.location.origin;
   const fullUrl = url ? `${siteUrl}${url}` : window.location.href;
-  const fullImage = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : `${siteUrl}/default-og-image.jpg`;
+  const fullImage = image
+    ? image.startsWith('http')
+      ? image
+      : `${siteUrl}${image}`
+    : `${siteUrl}/default-og-image.jpg`;
 
   return (
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{title ? `${title} | ${siteName}` : siteName}</title>
-      <meta name="description" content={description || 'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'} />
-      <meta name="keywords" content={keywords || 'movie reviews, film analysis, cinema, ratings, movies'} />
+      <meta
+        name="description"
+        content={
+          description ||
+          'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'
+        }
+      />
+      <meta
+        name="keywords"
+        content={keywords || 'movie reviews, film analysis, cinema, ratings, movies'}
+      />
 
       {/* Open Graph Meta Tags */}
       <meta property="og:title" content={title || siteName} />
-      <meta property="og:description" content={description || 'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'} />
+      <meta
+        property="og:description"
+        content={
+          description ||
+          'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'
+        }
+      />
       <meta property="og:image" content={fullImage} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:type" content={type} />
@@ -32,7 +51,13 @@ const SEOHead = ({
       {/* Twitter Card Meta Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title || siteName} />
-      <meta name="twitter:description" content={description || 'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'} />
+      <meta
+        name="twitter:description"
+        content={
+          description ||
+          'Discover detailed movie reviews, ratings, and insights from our comprehensive movie database.'
+        }
+      />
       <meta name="twitter:image" content={fullImage} />
 
       {/* Additional SEO Meta Tags */}
@@ -42,9 +67,7 @@ const SEOHead = ({
 
       {/* Structured Data */}
       {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       )}
     </Helmet>
   );

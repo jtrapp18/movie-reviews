@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import SearchBar from '@components/shared-sections/SearchBar';
 import Loading from '@components/ui/Loading';
@@ -43,7 +42,11 @@ function SearchPageFrame({
       {showHeader && (
         <PageHeader>
           {title && <h1>{title}</h1>}
-          {subtitle && <h3><i>{subtitle}</i></h3>}
+          {subtitle && (
+            <h3>
+              <i>{subtitle}</i>
+            </h3>
+          )}
         </PageHeader>
       )}
 

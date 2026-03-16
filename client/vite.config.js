@@ -30,10 +30,10 @@ export default defineConfig({
   plugins: [
     react(),
     Inspect(),
-    visualizer({ open: true })  // Visualizer opens automatically after build
+    visualizer({ open: true }), // Visualizer opens automatically after build
   ],
   build: {
-    target: 'esnext',  // Target modern browsers for tree shaking
+    target: 'esnext', // Target modern browsers for tree shaking
   },
   server: {
     proxy: {

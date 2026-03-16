@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styled from 'styled-components';
@@ -15,39 +14,54 @@ const RichTextEditor = ({
   onBlur,
   placeholder,
   hasDocument = false,
-  label = "Content",
+  label = 'Content',
   error,
   touched,
-  id = "reviewText",
-  name = "reviewText"
+  id = 'reviewText',
+  name = 'reviewText',
 }) => {
   // Standard toolbar configuration for both articles and reviews
   const modules = {
     toolbar: [
-      [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
+      [{ header: '1' }, { header: '2' }, { font: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
       ['bold', 'italic', 'underline', 'strike'],
       ['blockquote', 'code-block'],
       ['link', 'image'],
-      [{ 'color': [] }, { 'background': [] }],
-      ['clean']
+      [{ color: [] }, { background: [] }],
+      ['clean'],
     ],
   };
 
   const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
-    'link', 'image', 'video',
-    'color', 'background',
-    'align', 'code-block'
+    'header',
+    'font',
+    'size',
+    'bold',
+    'italic',
+    'underline',
+    'strike',
+    'blockquote',
+    'list',
+    'bullet',
+    'indent',
+    'link',
+    'image',
+    'video',
+    'color',
+    'background',
+    'align',
+    'code-block',
   ];
 
   return (
     <div>
       <label htmlFor={id}>
-        {label}: {hasDocument && <OptionalText>(Document uploaded - content optional)</OptionalText>}
+        {label}:{' '}
+        {hasDocument && (
+          <OptionalText>(Document uploaded - content optional)</OptionalText>
+        )}
       </label>
       <ReactQuill
         id={id}

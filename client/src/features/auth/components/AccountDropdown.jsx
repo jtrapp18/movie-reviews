@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import { useRef } from "react";
-import { scrollToTop } from "@helper";
-import { NavLink } from "react-router-dom";
-import { useAccountActions } from "@utils/account";
+import styled from 'styled-components';
+import { useRef } from 'react';
+import { scrollToTop } from '@helper';
+import { NavLink } from 'react-router-dom';
+import { useAccountActions } from '@utils/account';
 
 const LinkContainer = styled.div`
   position: absolute;
@@ -60,9 +60,9 @@ const StyledNavLink = styled(NavLink)`
     color: var(--background-tertiary);
     background: var(--font-color-1);
   }
-`
+`;
 
-const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
+const AccountDropdown = ({ isMenuOpen, setIsMenuOpen }) => {
   const { user, handleAccount } = useAccountActions();
   const cardRef = useRef(null);
 
@@ -70,38 +70,29 @@ const AccountDropdown = ({isMenuOpen, setIsMenuOpen}) => {
     handleAccount(() => {
       setIsMenuOpen(false);
     });
-  }
+  };
 
   const handleClick = () => {
     scrollToTop();
     setIsMenuOpen(false); // Close menu after navigation
   };
 
-
   return (
-      <LinkContainer
-        ref={cardRef}
-        onMouseOver={()=>setIsMenuOpen(true)}
-        onMouseOut={()=>setIsMenuOpen(false)}
-        className={isMenuOpen ? "open" : "closed"}
-      >
-        {user && (
-          <StyledNavLink
-            to="/account"
-            className="nav-link"
-            onClick={handleClick}
-          >
-            Account
-          </StyledNavLink>
-        )}
-        <StyledNavLink
-            as="button"
-            className="nav-link"
-            onClick={handleAccountToggle}
-        >
-            {user ? "Logout" : "Login"}
+    <LinkContainer
+      ref={cardRef}
+      onMouseOver={() => setIsMenuOpen(true)}
+      onMouseOut={() => setIsMenuOpen(false)}
+      className={isMenuOpen ? 'open' : 'closed'}
+    >
+      {user && (
+        <StyledNavLink to="/account" className="nav-link" onClick={handleClick}>
+          Account
         </StyledNavLink>
-      </LinkContainer>
+      )}
+      <StyledNavLink as="button" className="nav-link" onClick={handleAccountToggle}>
+        {user ? 'Logout' : 'Login'}
+      </StyledNavLink>
+    </LinkContainer>
   );
 };
 

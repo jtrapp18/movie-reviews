@@ -1,25 +1,26 @@
-import React from 'react';
 import styled from 'styled-components';
 
 const TagContainer = styled.div`
   display: inline-flex;
   align-items: center;
-  background-color: ${props => props.backgroundColor || '#007bff'};
-  color: ${props => props.textColor || '#ffffff'};
-  padding: ${props => props.size === 'small' ? '2px 6px' : '4px 12px'};
-  border-radius: ${props => props.size === 'small' ? '12px' : '20px'};
-  font-size: ${props => props.size === 'small' ? '0.7rem' : '0.85rem'};
+  background-color: ${(props) => props.backgroundColor || '#007bff'};
+  color: ${(props) => props.textColor || '#ffffff'};
+  padding: ${(props) => (props.size === 'small' ? '2px 6px' : '4px 12px')};
+  border-radius: ${(props) => (props.size === 'small' ? '12px' : '20px')};
+  font-size: ${(props) => (props.size === 'small' ? '0.7rem' : '0.85rem')};
   font-weight: 500;
   margin: 2px;
-  cursor: ${props => props.clickable ? 'pointer' : 'default'};
+  cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
   transition: all 0.2s ease;
-  border: 1px solid ${props => props.borderColor || 'transparent'};
-  height: ${props => props.size === 'small' ? '20px' : '28px'};
+  border: 1px solid ${(props) => props.borderColor || 'transparent'};
+  height: ${(props) => (props.size === 'small' ? '20px' : '28px')};
   line-height: 1;
   white-space: nowrap;
 
   &:hover {
-    ${props => props.clickable && `
+    ${(props) =>
+      props.clickable &&
+      `
       transform: translateY(-1px);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     `}
@@ -27,7 +28,7 @@ const TagContainer = styled.div`
 
   .tag-remove {
     margin-left: 6px;
-    color: ${props => props.textColor || 'white'};
+    color: ${(props) => props.textColor || 'white'};
     cursor: pointer;
 
     &:hover {

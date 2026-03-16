@@ -42,7 +42,7 @@ export const extractTextFromFile = async (
 
       if (extractResult.text) {
         console.log('Setting reviewText to:', extractResult.text);
-        formikSetFieldValue("reviewText", extractResult.text);
+        formikSetFieldValue('reviewText', extractResult.text);
         // Also update the initObj so it's available in the non-editing view
         if (initObj) {
           initObj.reviewText = extractResult.text;

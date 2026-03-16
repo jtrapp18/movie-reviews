@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
-const Button = styled.button.attrs(props => ({
-  type: props.type || 'button'
+const Button = styled.button.attrs((props) => ({
+  type: props.type || 'button',
 }))`
   /* Reset browser defaults */
   appearance: none;
@@ -75,8 +75,8 @@ const ExtractButton = styled(Button)`
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
-  cursor: ${props => props.isExtracting ? 'not-allowed' : 'pointer'};
-  opacity: ${props => props.isExtracting ? 0.6 : 1};
+  cursor: ${(props) => (props.isExtracting ? 'not-allowed' : 'pointer')};
+  opacity: ${(props) => (props.isExtracting ? 0.6 : 1)};
 
   &:hover {
     background-color: var(--cinema-blue-dark);

@@ -1,9 +1,15 @@
-import { useNavigate, useOutletContext } from "react-router-dom";
-import { MediaCard, CardContent, CardOverlay, CardDate, CardTitle } from "@styles/cards";
-import { useAdmin } from "@hooks/useAdmin";
-import useCrudStateDB from "@hooks/useCrudStateDB";
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import {
+  MediaCard,
+  CardContent,
+  CardOverlay,
+  CardDate,
+  CardTitle,
+} from '@styles/cards';
+import { useAdmin } from '@hooks/useAdmin';
+import useCrudStateDB from '@hooks/useCrudStateDB';
 import { StarRatingOverlay } from '@features/reviews';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const MetadataContainer = styled.div`
   display: flex;
@@ -11,19 +17,14 @@ const MetadataContainer = styled.div`
   gap: 4px;
 `;
 
-function MovieCard({ movie, rating = null, clickable = true, size = "default" }) {
-  const {
-    originalLanguage,
-    originalTitle,
-    overview,
-    title,
-    releaseDate,
-    coverPhoto,
-  } = movie;
+function MovieCard({ movie, rating = null, clickable = true, size = 'default' }) {
+  const { originalLanguage, originalTitle, overview, title, releaseDate, coverPhoto } =
+    movie;
 
   const navigate = useNavigate();
   const { setMovies } = useOutletContext();
   const { isAdmin } = useAdmin();
+  const { addItem } = useCrudStateDB(setMovies, 'movies');
 
   const handleClick = async () => {
     if (rating) {
@@ -36,26 +37,17 @@ function MovieCard({ movie, rating = null, clickable = true, size = "default" })
       return;
     }
 
-    const confirmed = window.confirm(
-      `Do you want to add a review for "${title}"?`
-    );
+    const confirmed = window.confirm(`Do you want to add a review for "${title}"?`);
     if (confirmed) {
-      const { addItem } = useCrudStateDB(setMovies, "movies");
       const newId = await addItem({ ...movie });
       navigate(`/movies/${newId}`);
     }
   };
 
-  const cardStyle =
-    size === "small"
-      ? { zoom: 0.7 }
-      : undefined;
+  const cardStyle = size === 'small' ? { zoom: 0.7 } : undefined;
 
   return (
-    <MediaCard
-      onClick={clickable ? handleClick : undefined}
-      style={cardStyle}
-    >
+    <MediaCard onClick={clickable ? handleClick : undefined} style={cardStyle}>
       <img src={coverPhoto} alt={`${title} poster`} />
 
       <CardDate>{releaseDate}</CardDate>
@@ -69,10 +61,14 @@ function MovieCard({ movie, rating = null, clickable = true, size = "default" })
 
       <CardOverlay>
         <MetadataContainer>
-          <p><b>Original Title:</b> {originalTitle}</p>
-          <p><b>Original Language:</b> {originalLanguage}</p>
+          <p>
+            <b>Original Title:</b> {originalTitle}
+          </p>
+          <p>
+            <b>Original Language:</b> {originalLanguage}
+          </p>
         </MetadataContainer>
-        <p>{overview || "No overview available"}</p>
+        <p>{overview || 'No overview available'}</p>
       </CardOverlay>
     </MediaCard>
   );

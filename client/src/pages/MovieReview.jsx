@@ -9,7 +9,10 @@ import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
 import Loading from '@components/ui/Loading';
 import { UserContext } from '@context/userProvider';
-import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '@utils/seoUtils';
+import {
+  generateMovieReviewStructuredData,
+  generateBreadcrumbStructuredData,
+} from '@utils/seoUtils';
 
 const MovieContainer = styled.div`
   margin: 1rem 0 2rem 0;
@@ -53,7 +56,7 @@ function MovieReview() {
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading movie details" size='large' />
+        <Loading text="Loading movie details" size="large" />
       </StyledContainer>
     );
   }
@@ -77,7 +80,9 @@ function MovieReview() {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
 
   // Generate SEO data
-  const seoTitle = review ? `${movie.title} Review - ${review.rating}/10` : `${movie.title} - Movie Review`;
+  const seoTitle = review
+    ? `${movie.title} Review - ${review.rating}/10`
+    : `${movie.title} - Movie Review`;
   const seoDescription = review
     ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...`
     : `Read our detailed review of ${movie.title} (${movie.releaseDate}). ${movie.overview.substring(0, 100)}...`;
@@ -86,7 +91,7 @@ function MovieReview() {
   const breadcrumbData = generateBreadcrumbStructuredData([
     { name: 'Home', url: window.location.origin + '/#/' },
     { name: 'Movies', url: window.location.origin + '/#/search_movies' },
-    { name: movie.title, url: window.location.href }
+    { name: movie.title, url: window.location.href },
   ]);
 
   return (

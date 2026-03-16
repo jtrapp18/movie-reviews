@@ -37,7 +37,11 @@ function UserAvatar() {
   if (user?.username) {
     const letter = user.username.trim().charAt(0) || '?';
     const color = user.iconColor ?? DEFAULT_ICON_COLOR;
-    return <Bubble $color={color} aria-hidden>{letter}</Bubble>;
+    return (
+      <Bubble $color={color} aria-hidden>
+        {letter}
+      </Bubble>
+    );
   }
   return (
     <IconWrap aria-hidden>

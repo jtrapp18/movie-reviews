@@ -12,7 +12,7 @@ export const theme = {
     cinemaGray: 'var(--cinema-gray)',
     cinemaGrayDark: 'var(--cinema-gray-dark)',
     cinemaGrayLight: 'var(--cinema-gray-light)',
-  }
+  },
 };
 
 // Common CSS variables that can be used across components

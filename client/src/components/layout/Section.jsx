@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from 'styled-components';
 import MotionWrapper from '@styles/MotionWrapper';
 import SearchBar from '@components/shared-sections/SearchBar';
@@ -17,7 +16,7 @@ const Section = ({
   searchPlaceholder,
   onSearch,
   showSearch = true,
-  children
+  children,
 }) => {
   return (
     <SectionContainer>
@@ -26,15 +25,14 @@ const Section = ({
       </MotionWrapper>
       {subtitle && (
         <MotionWrapper index={2}>
-          <h3><i>{subtitle}</i></h3>
+          <h3>
+            <i>{subtitle}</i>
+          </h3>
         </MotionWrapper>
       )}
       {showSearch && (
         <MotionWrapper index={3}>
-          <SearchBar
-            enterSearch={onSearch}
-            placeholder={searchPlaceholder}
-          />
+          <SearchBar enterSearch={onSearch} placeholder={searchPlaceholder} />
         </MotionWrapper>
       )}
       {children}

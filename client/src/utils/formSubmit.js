@@ -8,11 +8,16 @@ import { postJSONToDb, patchJSONToDb } from '../helper';
  * Submit form with optional document upload
  * All submissions go to the reviews table (articles and reviews use the same model)
  */
-export const submitFormWithDocument = async (formData, file, isEdit = false, id = null) => {
+export const submitFormWithDocument = async (
+  formData,
+  file,
+  isEdit = false,
+  id = null
+) => {
   try {
     // Clean up the form data - remove empty values
     const cleanFormData = { ...formData };
-    Object.keys(cleanFormData).forEach(key => {
+    Object.keys(cleanFormData).forEach((key) => {
       if (cleanFormData[key] === '' || cleanFormData[key] === null) {
         delete cleanFormData[key];
       }
