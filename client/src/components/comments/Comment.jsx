@@ -90,11 +90,13 @@ const DEFAULT_ICON_COLOR = '#6b7280';
 function Comment({ comment, reviewId, onReplySuccess, onLikeUpdate }) {
   const { user } = useContext(UserContext);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showReplies, setShowReplies] = useState(true);
   const authorName = comment.user?.username ?? comment.user?.firstName ?? 'Anonymous';
   const iconColor = comment.user?.iconColor ?? DEFAULT_ICON_COLOR;
   const replies = comment.replies ?? [];
   const likeCount = comment.likeCount ?? 0;
   const likedByMe = comment.likedByMe ?? false;
+  const isTopLevel = comment.parentCommentId == null;
 
   return (
     <Wrapper>
@@ -113,11 +115,20 @@ function Comment({ comment, reviewId, onReplySuccess, onLikeUpdate }) {
           disabled={!user}
           onUpdate={onLikeUpdate}
         />
-        <ReplyToggle type="button" onClick={() => setShowReplyForm((v) => !v)}>
-          {showReplyForm ? 'Cancel' : 'Reply'}
-        </ReplyToggle>
+        {isTopLevel && (
+          <ReplyToggle type="button" onClick={() => setShowReplyForm((v) => !v)}>
+            {showReplyForm ? 'Cancel' : 'Reply'}
+          </ReplyToggle>
+        )}
+        {replies.length > 0 && (
+          <ReplyToggle type="button" onClick={() => setShowReplies((v) => !v)}>
+            {showReplies
+              ? `Hide replies (${replies.length})`
+              : `Show replies (${replies.length})`}
+          </ReplyToggle>
+        )}
       </Actions>
-      {showReplyForm && (
+      {isTopLevel && showReplyForm && (
         <CommentForm
           reviewId={reviewId}
           parentCommentId={comment.id}
@@ -128,7 +139,7 @@ function Comment({ comment, reviewId, onReplySuccess, onLikeUpdate }) {
           onCancel={() => setShowReplyForm(false)}
         />
       )}
-      {replies.length > 0 && (
+      {replies.length > 0 && showReplies && (
         <Replies>
           {replies.map((reply) => (
             <Comment

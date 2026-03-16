@@ -14,9 +14,9 @@ const TextContainer = styled.div`
 
   & p {
     font-size: ${(props) => {
-      if (props.size === 'small') return '12px';
+      if (props.size === 'small') return 'var(--default-font-size)';
       if (props.size === 'large') return '20px';
-      return props.compact ? '16px' : 'clamp(2.5rem, 5vw, 6rem)';
+      return props.compact ? '16px' : 'clamp(1.7rem, 4vw, 2rem)';
     }};
     margin: 0;
   }

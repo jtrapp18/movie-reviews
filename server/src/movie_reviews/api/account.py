@@ -126,21 +126,25 @@ class CheckSession(Resource):
 class Login(Resource):
     def post(self):
         try:
-            json = request.get_json()
+            json = request.get_json() or {}
+            email = json.get("email")
+            password = json.get("password")
 
-            username = json["username"]
-            user = User.query.filter_by(username=username).first()
+            if not email:
+                return {"error": "Email is required"}, 400
+            if not password:
+                return {"error": "Invalid email or password"}, 401
+
+            user = User.query.filter_by(email=email).first()
 
             if not user:
-                return {"error": "Invalid username or password"}, 401
-
-            password = json["password"]
+                return {"error": "Invalid email or password"}, 401
 
             if user.authenticate(password):
                 session["user_id"] = user.id
                 return user.to_dict(), 200
 
-            return {"error": "Invalid username or password"}, 401
+            return {"error": "Invalid email or password"}, 401
         except Exception as e:
             return {"error": f"An error occurred: {str(e)}"}, 500
 

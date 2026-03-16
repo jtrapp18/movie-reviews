@@ -35,7 +35,7 @@ const StyledDiv = styled.div`
 const LinkContainer = styled.div`
   position: fixed;
   top: calc(var(--height-header) + 3px);
-  height: 100vh;
+  height: calc(100vh - var(--height-header) - 3px);
 
   left: 0;
   z-index: 9999;

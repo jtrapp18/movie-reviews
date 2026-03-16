@@ -2,6 +2,7 @@ import { StyledMenuItem, StyledNavLink } from '@styles';
 import styled from 'styled-components';
 import { useAdmin } from '@hooks/useAdmin';
 import { UserAvatar } from '@features/auth';
+import { NotificationBell } from '@features/notifications';
 
 const StyledAccountIcon = styled.div`
   ${StyledMenuItem}
@@ -26,6 +27,7 @@ function NavLinks({ handleClick, setIsMenuOpen }) {
       <StyledNavLink to="/about" className="nav-link" onClick={handleClick}>
         About
       </StyledNavLink>
+      <NotificationBell />
       <StyledAccountIcon
         className="nav-link"
         onMouseOver={() => setIsMenuOpen(true)}

@@ -31,8 +31,17 @@ const ErrorMessage = styled.div`
 const LikeBar = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
+`;
+
+const ArticleContainer = styled.div`
+  margin: 1rem 0 2rem 0;
+  width: 100%;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  overflow: hidden;
 `;
 
 function Article() {
@@ -117,28 +126,30 @@ function Article() {
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
       />
       <StyledContainer>
-        <CoverHeader
-          imageUrl={coverImageUrl}
-          title={article.movie?.title || article.title}
-          subtitle={article.movie?.title ? article.title : undefined}
-          rating={article.rating}
-          publishDate={article.dateAdded || article.date_added}
-        />
-        <LikeBar>
-          <LikeButton
-            type="review"
-            id={article.id}
-            likeCount={article.likeCount ?? 0}
-            likedByMe={article.likedByMe ?? false}
-            disabled={!user}
-            onUpdate={(liked, likeCount) => {
-              setArticle((prev) =>
-                prev ? { ...prev, likedByMe: liked, likeCount } : prev
-              );
-            }}
+        <ArticleContainer>
+          <CoverHeader
+            imageUrl={coverImageUrl}
+            title={article.movie?.title || article.title}
+            subtitle={article.movie?.title ? article.title : undefined}
+            rating={article.rating}
+            publishDate={article.dateAdded || article.date_added}
           />
-        </LikeBar>
-        <ArticleForm initObj={article} />
+          <LikeBar>
+            <LikeButton
+              type="review"
+              id={article.id}
+              likeCount={article.likeCount ?? 0}
+              likedByMe={article.likedByMe ?? false}
+              disabled={!user}
+              onUpdate={(liked, likeCount) => {
+                setArticle((prev) =>
+                  prev ? { ...prev, likedByMe: liked, likeCount } : prev
+                );
+              }}
+            />
+          </LikeBar>
+          <ArticleForm initObj={article} />
+        </ArticleContainer>
         <CommentList reviewId={article.id} />
       </StyledContainer>
     </>

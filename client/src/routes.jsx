@@ -15,6 +15,7 @@ import DirectorsPage from './pages/DirectorsPage';
 import Account from './pages/Account';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Notifications from './pages/Notifications';
 
 const routes = [
   {
@@ -77,6 +78,10 @@ const routes = [
       {
         path: 'account',
         element: <Account />,
+      },
+      {
+        path: 'notifications',
+        element: <Notifications />,
       },
     ],
   },
