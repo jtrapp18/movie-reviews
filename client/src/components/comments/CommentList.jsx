@@ -7,6 +7,8 @@ import CommentForm from './CommentForm';
 import Loading from '@components/ui/Loading';
 
 const COMMENT_PAGE_SIZE = 5;
+const COMMENT_CACHE_TTL = 60 * 1000; // 60 seconds
+const commentCache = new Map();
 
 const Section = styled.section`
   margin-top: 2rem;
@@ -110,6 +112,11 @@ function CommentList({ reviewId }) {
           setFlatComments(nextFlat);
         }
         setTotal(nextTotal);
+        commentCache.set(reviewId, {
+          flatComments: nextFlat,
+          total: nextTotal,
+          timestamp: Date.now(),
+        });
       } catch (err) {
         console.error(err);
         setError('Failed to load comments');
@@ -121,9 +128,25 @@ function CommentList({ reviewId }) {
     [reviewId]
   );
 
-  const fetchComments = useCallback(() => {
-    fetchPage(0, false);
-  }, [fetchPage]);
+  const handleNewComment = useCallback(
+    (rawComment) => {
+      if (!rawComment) return;
+      const camelComment = snakeToCamel(rawComment);
+      setFlatComments((prev) => {
+        const existingIndex = prev.findIndex((c) => c.id === camelComment.id);
+        if (existingIndex !== -1) {
+          const next = [...prev];
+          next[existingIndex] = { ...next[existingIndex], ...camelComment };
+          return next;
+        }
+        return [...prev, camelComment];
+      });
+      if (camelComment.parentCommentId == null) {
+        setTotal((t) => t + 1);
+      }
+    },
+    []
+  );
 
   const loadMore = () => {
     const topLevelLoaded = flatComments.filter((c) => c.parentCommentId == null).length;
@@ -132,8 +155,28 @@ function CommentList({ reviewId }) {
   };
 
   useEffect(() => {
-    fetchPage(0, false);
-  }, [fetchPage]);
+    if (!reviewId) return;
+    const cached = commentCache.get(reviewId);
+    const now = Date.now();
+    if (cached && now - cached.timestamp < COMMENT_CACHE_TTL) {
+      setFlatComments(cached.flatComments);
+      setTotal(cached.total);
+      setLoading(false);
+      // Background refresh
+      fetchPage(0, false);
+    } else {
+      fetchPage(0, false);
+    }
+  }, [reviewId, fetchPage]);
+
+  useEffect(() => {
+    if (!reviewId) return;
+    commentCache.set(reviewId, {
+      flatComments,
+      total,
+      timestamp: Date.now(),
+    });
+  }, [reviewId, flatComments, total]);
 
   const tree = buildCommentTree(flatComments);
   const topLevelLoaded = flatComments.filter((c) => c.parentCommentId == null).length;
@@ -168,13 +211,13 @@ function CommentList({ reviewId }) {
                   key={comment.id}
                   comment={comment}
                   reviewId={reviewId}
-                  onReplySuccess={fetchComments}
+                  onReplySuccess={handleNewComment}
                 />
               ))}
             </>
           )}
           {!user && tree.length > 0 && <LoginPrompt>Log in to comment.</LoginPrompt>}
-          {user && <CommentForm reviewId={reviewId} onSuccess={fetchComments} />}
+          {user && <CommentForm reviewId={reviewId} onSuccess={handleNewComment} />}
         </>
       )}
     </Section>

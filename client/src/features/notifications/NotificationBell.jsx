@@ -80,10 +80,10 @@ function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Load a small page of notifications once the bell mounts
+    if (!user) return;
+    // Load a small page of notifications once the bell mounts for logged-in users
     fetchPage(0, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user, fetchPage]);
 
   const unreadItems = items.filter((i) => !i.read);
 
