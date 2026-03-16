@@ -3,6 +3,7 @@ from .comments import register_routes as comments_routes
 from .core import register_routes as core_routes
 from .documents import register_routes as document_routes
 from .likes import register_routes as likes_routes
+from .notifications import register_routes as notifications_routes
 
 ROUTE_MODULES = [
     account_routes,
@@ -10,4 +11,5 @@ ROUTE_MODULES = [
     core_routes,
     comments_routes,
     likes_routes,
+    notifications_routes,
 ]

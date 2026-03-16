@@ -56,7 +56,7 @@ class User(db.Model, SerializerMixin):
 
     serialize_rules = (
         "-_password_hash",
-        "-review_comments.user",
+        "-review_comments",
         "-comment_likes",
         "-review_likes",
         "-notification_reads",

@@ -85,9 +85,14 @@ const AccountDropdown = ({ isMenuOpen, setIsMenuOpen }) => {
       className={isMenuOpen ? 'open' : 'closed'}
     >
       {user && (
-        <StyledNavLink to="/account" className="nav-link" onClick={handleClick}>
-          Account
-        </StyledNavLink>
+        <>
+          <StyledNavLink to="/account" className="nav-link" onClick={handleClick}>
+            Account
+          </StyledNavLink>
+          <StyledNavLink to="/notifications" className="nav-link" onClick={handleClick}>
+            Notifications
+          </StyledNavLink>
+        </>
       )}
       <StyledNavLink as="button" className="nav-link" onClick={handleAccountToggle}>
         {user ? 'Logout' : 'Login'}
