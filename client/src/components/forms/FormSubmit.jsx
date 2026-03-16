@@ -16,7 +16,6 @@ const TagsContainer = styled.div`
   gap: 8px;
   justify-content: center;
   padding: 0.5rem;
-  background: var(--background-secondary);
 `;
 
 const Tag = styled.span`
@@ -32,7 +31,6 @@ const ContentBody = styled.div`
   width: 100%;
   padding: 2rem 1rem;
   margin-bottom: 2rem;
-  background: var(--background-secondary);
 
   @media (max-width: 768px) {
     padding: 1rem 0rem;
