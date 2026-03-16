@@ -47,12 +47,19 @@ class User(db.Model, SerializerMixin):
         cascade="all, delete-orphan",
         lazy="select",
     )
+    notification_reads = db.relationship(
+        "NotificationRead",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        lazy="select",
+    )
 
     serialize_rules = (
         "-_password_hash",
         "-review_comments.user",
         "-comment_likes",
         "-review_likes",
+        "-notification_reads",
     )
 
     @hybrid_property

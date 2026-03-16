@@ -1,4 +1,6 @@
-from sqlalchemy import Column, ForeignKey, Integer, UniqueConstraint
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, UniqueConstraint
 from sqlalchemy_serializer import SerializerMixin
 
 from movie_reviews.config import db
@@ -10,6 +12,7 @@ class CommentLike(db.Model, SerializerMixin):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     comment_id = Column(Integer, ForeignKey("review_comments.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     __table_args__ = (
         UniqueConstraint("user_id", "comment_id", name="uq_comment_like_user_comment"),
