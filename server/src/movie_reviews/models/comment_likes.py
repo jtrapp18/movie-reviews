@@ -16,6 +16,8 @@ class CommentLike(db.Model, SerializerMixin):
 
     __table_args__ = (
         UniqueConstraint("user_id", "comment_id", name="uq_comment_like_user_comment"),
+        db.Index("ix_comment_likes_comment_id", "comment_id"),
+        db.Index("ix_comment_likes_user_comment", "user_id", "comment_id"),
     )
 
     user = db.relationship("User", back_populates="comment_likes")

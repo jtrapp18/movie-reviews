@@ -8,6 +8,11 @@ from movie_reviews.config import db
 
 class ReviewComment(db.Model, SerializerMixin):
     __tablename__ = "review_comments"
+    __table_args__ = (
+        db.Index("ix_review_comments_review_id", "review_id"),
+        db.Index("ix_review_comments_review_parent", "review_id", "parent_comment_id"),
+        db.Index("ix_review_comments_review_created", "review_id", "created_at"),
+    )
 
     id = Column(Integer, primary_key=True)
     review_id = Column(Integer, ForeignKey("reviews.id"), nullable=False)

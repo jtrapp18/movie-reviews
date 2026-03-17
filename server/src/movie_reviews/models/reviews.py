@@ -35,6 +35,12 @@ class Review(db.Model, SerializerMixin):
     document_path = Column(String(500), nullable=True)
     document_type = Column(String(10), nullable=True)  # 'pdf', 'docx', etc.
 
+    __table_args__ = (
+        db.Index("ix_reviews_movie_id", "movie_id"),
+        db.Index("ix_reviews_director_id", "director_id"),
+        db.Index("ix_reviews_content_type_date", "content_type", "date_added"),
+    )
+
     movie = db.relationship("Movie", back_populates="reviews")
     director = db.relationship("Director", back_populates="reviews")
     tags = db.relationship("Tag", secondary=review_tags, back_populates="reviews")

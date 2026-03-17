@@ -29,6 +29,7 @@ class NotificationRead(db.Model, SerializerMixin):
         UniqueConstraint(
             "user_id", "event_type", "event_id", name="uq_notification_read_user_event"
         ),
+        db.Index("ix_notification_reads_user_id", "user_id"),
     )
 
     user = db.relationship("User", back_populates="notification_reads")

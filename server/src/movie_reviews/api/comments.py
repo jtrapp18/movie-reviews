@@ -1,3 +1,5 @@
+import time
+
 from flask import request, session
 from flask_restful import Resource
 from sqlalchemy import func
@@ -5,6 +7,11 @@ from sqlalchemy.orm import joinedload
 
 from movie_reviews.config import db
 from movie_reviews.models import CommentLike, Review, ReviewComment
+
+COMMENT_CACHE_TTL = 10  # seconds
+_comment_cache = (
+    {}
+)  # (review_id, limit, offset, user_id or None) -> (expires_at, response)
 
 
 class ReviewComments(Resource):
@@ -16,6 +23,11 @@ class ReviewComments(Resource):
             return {"error": "Review not found"}, 404
         limit = min(int(request.args.get("limit", 5)), 50)
         offset = max(int(request.args.get("offset", 0)), 0)
+        cache_key = (review_id, limit, offset, session.get("user_id"))
+        now = time.time()
+        cached = _comment_cache.get(cache_key)
+        if cached and cached[0] > now:
+            return cached[1]
         # Total = count of top-level comments only
         total = ReviewComment.query.filter_by(
             review_id=review_id, parent_comment_id=None
@@ -72,10 +84,15 @@ class ReviewComments(Resource):
             d["like_count"] = counts.get(c.id, 0)
             d["liked_by_me"] = c.id in liked_comment_ids
             out.append(d)
-        return {
-            "comments": out,
-            "total": total,
-        }, 200
+        response = (
+            {
+                "comments": out,
+                "total": total,
+            },
+            200,
+        )
+        _comment_cache[cache_key] = (time.time() + COMMENT_CACHE_TTL, response)
+        return response
 
     def post(self, review_id):
         user_id = session.get("user_id")
@@ -101,6 +118,10 @@ class ReviewComments(Resource):
         )
         db.session.add(comment)
         db.session.commit()
+        # Invalidate cached pages for this review so fresh comments are visible
+        for key in list(_comment_cache.keys()):
+            if key[0] == review_id:
+                _comment_cache.pop(key, None)
         return comment.to_dict(), 201
 
 
