@@ -26,11 +26,13 @@ const GradingModal = ({ isOpen, onClose }) => {
   const content = gradingContent.grading;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <h2>{content.title}</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={content.title}
+      subtitle={content.systemTitle}
+    >
       <Paragraphs text={content.intro} />
-
-      <h3>{content.systemTitle}</h3>
 
       <StyledTable>
         <thead>
