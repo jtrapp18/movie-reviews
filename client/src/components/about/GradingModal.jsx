@@ -1,9 +1,11 @@
 import yaml from 'js-yaml';
 import gradingYaml from '../../data/gradingSystem.yaml?raw';
+import gradingTiersYaml from '../../data/gradingTiers.yaml?raw';
 import Modal from '@components/shared/Modal';
 import { StyledTable } from '@styles';
 
 const gradingContent = yaml.load(gradingYaml);
+const gradingTiers = yaml.load(gradingTiersYaml).tiers;
 
 function Paragraphs({ text }) {
   if (!text) return null;
@@ -43,7 +45,7 @@ const GradingModal = ({ isOpen, onClose }) => {
           </tr>
         </thead>
         <tbody>
-          {content.table.rows.map((row, index) => (
+          {gradingTiers.map((row, index) => (
             <tr key={index}>
               <td>
                 {row.grade} (Tier {row.tier})

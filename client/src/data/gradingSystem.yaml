@@ -15,28 +15,6 @@ grading:
     headers:
       - 'Grade Tier'
       - 'Definition'
-    rows:
-      - grade: 'Magnum Opus'
-        tier: 7
-        definition: 'Top 75 film of all time'
-      - grade: 'Masterpiece'
-        tier: 6
-        definition: 'Top 300 film of all time'
-      - grade: 'Must See'
-        tier: 5
-        definition: 'Among the best films of the decade'
-      - grade: 'Highly Recommended'
-        tier: 4
-        definition: 'Worth seeking out and viewing multiple times'
-      - grade: 'Recommended'
-        tier: 3
-        definition: 'Worth seeking out and viewing at least once'
-      - grade: 'Passable'
-        tier: 2
-        definition: 'Has at least one redeemable quality but not worth seeking out'
-      - grade: 'Unredeemable'
-        tier: 1
-        definition: 'Nothing going for it artistically or even as entertainment'
 
   notes: |
     Keep in mind that the exact number of Masterpieces or Magnum Opus level films
