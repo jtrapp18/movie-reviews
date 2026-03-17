@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import DirectorCard from '@components/cards/DirectorCard';
 import { SearchPageFrame } from '@features/movies';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useDirectorsList } from '@features/directors/useDirectorsList';
 
 const Layout = styled.div`
   width: 100%;
@@ -70,12 +71,12 @@ const AccordionContainer = styled.div`
 `;
 
 function DirectorsPage() {
-  const { directors = [], coreDataLoaded } = useOutletContext();
+  const { directors: contextDirectors = [] } = useOutletContext();
+  const { directors, loading, setDirectors } = useDirectorsList(contextDirectors);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState(null);
   const [letterFilter, setLetterFilter] = useState(null);
   const navigate = useNavigate();
-  const loading = !coreDataLoaded;
 
   const filteredDirectors = useMemo(() => {
     let list = directors;
@@ -92,6 +93,13 @@ function DirectorsPage() {
         (d.biography || '').toLowerCase().includes(q)
     );
   }, [directors, searchQuery, letterFilter]);
+
+  // Keep outlet context in sync once list is loaded
+  useEffect(() => {
+    if (!loading && directors && directors.length) {
+      setDirectors(directors);
+    }
+  }, [directors, loading, setDirectors]);
 
   return (
     <SearchPageFrame

@@ -3,6 +3,7 @@ import MotionWrapper from '@styles/MotionWrapper';
 import { Button } from '@styles';
 import { Movies } from '@features/movies';
 import styled from 'styled-components';
+import { prefetchEntity } from '@features/cache/prefetchEntity';
 
 const FALLBACK_PHOTO = 'https://via.placeholder.com/300x450.png?text=Director';
 const MAX_BIO_LENGTH = 140;
@@ -194,7 +195,14 @@ function DirectorCard({
 
   return (
     <MotionWrapper index={index}>
-      <MediaCard onClick={onClick}>
+      <MediaCard
+        onClick={onClick}
+        onMouseEnter={() => {
+          if (director?.id != null) {
+            prefetchEntity('director', 'directors', director.id);
+          }
+        }}
+      >
         <img src={coverPhoto || FALLBACK_PHOTO} alt={`Photo of ${name}`} />
         <CardContent>
           <CardTitle>{name}</CardTitle>
