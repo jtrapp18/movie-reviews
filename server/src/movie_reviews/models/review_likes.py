@@ -16,6 +16,8 @@ class ReviewLike(db.Model, SerializerMixin):
 
     __table_args__ = (
         UniqueConstraint("user_id", "review_id", name="uq_review_like_user_review"),
+        db.Index("ix_review_likes_review_id", "review_id"),
+        db.Index("ix_review_likes_user_review", "user_id", "review_id"),
     )
 
     user = db.relationship("User", back_populates="review_likes")

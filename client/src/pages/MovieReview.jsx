@@ -1,9 +1,9 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer } from '@styles';
 import { CoverHeader, LikeButton } from '@features/reviews';
-import { getJSON, snakeToCamel } from '@helper';
+import { useMovieReview } from '@features/reviews/useMovieReview';
 import ReviewForm from '@forms/ReviewForm';
 import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
@@ -32,30 +32,9 @@ const LikeBar = styled.div`
 
 function MovieReview() {
   const { user } = useContext(UserContext);
-  const [movie, setMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { id } = useParams();
   const movieId = parseInt(id);
-
-  useEffect(() => {
-    const fetchMovie = async () => {
-      try {
-        setLoading(true);
-        const movieData = await getJSON('movies', movieId);
-        setMovie(snakeToCamel(movieData));
-      } catch (err) {
-        console.error('Error fetching movie:', err);
-        setError('Failed to load movie details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (movieId) {
-      fetchMovie();
-    }
-  }, [movieId]);
+  const { movie, loading, error } = useMovieReview(movieId);
 
   if (loading) {
     return (
@@ -127,16 +106,13 @@ function MovieReview() {
                 likedByMe={review.likedByMe ?? false}
                 disabled={!user}
                 onUpdate={(liked, likeCount) => {
-                  setMovie((prev) => {
-                    if (!prev?.reviews?.length) return prev;
-                    const next = { ...prev, reviews: [...prev.reviews] };
-                    next.reviews[0] = {
-                      ...next.reviews[0],
-                      likedByMe: liked,
-                      likeCount,
-                    };
-                    return next;
-                  });
+                  // Optimistically update the local movie state returned by the hook
+                  if (!movie?.reviews?.length) return;
+                  movie.reviews[0] = {
+                    ...movie.reviews[0],
+                    likedByMe: liked,
+                    likeCount,
+                  };
                 }}
               />
             </LikeBar>

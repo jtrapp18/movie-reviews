@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer, Button } from '@styles';
-import { getJSON, patchJSONToDb } from '@helper';
+import { patchJSONToDb } from '@helper';
 import SEOHead from '@components/shared-sections/SEOHead';
 import Loading from '@components/ui/Loading';
 import { DirectorBio, DirectorTimeline } from '@features/directors';
+import { useDirector } from '@features/directors/useDirector';
 import { useAdmin } from '@hooks/useAdmin';
 import BackdropUpload from '@components/forms/BackdropUpload';
 
@@ -28,39 +29,19 @@ const MoviesHeader = styled.h2`
 
 function Director() {
   const { id } = useParams();
-  const [director, setDirector] = useState(null);
+  const { director, loading, error, setDirector } = useDirector(id);
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [bioDraft, setBioDraft] = useState('');
   const [saving, setSaving] = useState(false);
   const { isAdmin } = useAdmin();
 
+  // Sync movies and bio when director changes
   useEffect(() => {
-    const fetchDirector = async () => {
-      try {
-        setLoading(true);
-        const data = await getJSON('directors', id);
-        if (data && !data.error) {
-          setDirector(data);
-          setMovies(data.movies || []);
-          setBioDraft(data.biography || '');
-        } else {
-          setError(data?.error || 'Director not found');
-        }
-      } catch (err) {
-        console.error('Error fetching director:', err);
-        setError('Failed to load director details');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchDirector();
-    }
-  }, [id]);
+    if (!director) return;
+    setMovies(director.movies || []);
+    setBioDraft(director.biography || '');
+  }, [director]);
 
   if (loading) {
     return (

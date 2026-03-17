@@ -20,6 +20,11 @@ class Movie(db.Model, SerializerMixin):
     backdrop = Column(String(500), nullable=True)  # URL to backdrop photo
     director_id = db.Column(db.Integer, db.ForeignKey("directors.id"), nullable=True)
 
+    __table_args__ = (
+        db.Index("ix_movies_director_id", "director_id"),
+        db.Index("ix_movies_release_date", "release_date"),
+    )
+
     reviews = db.relationship("Review", back_populates="movie", cascade="all")
     director = db.relationship("Director", back_populates="movies")
 

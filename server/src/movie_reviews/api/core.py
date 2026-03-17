@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 from datetime import date
 from urllib.parse import quote_plus
 
@@ -13,6 +14,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from movie_reviews.config import db
+from movie_reviews.logging import logger
 from movie_reviews.models import Director, Movie, Review, ReviewLike, Tag
 
 
@@ -152,6 +154,7 @@ class Movies(Resource):
 
 class MovieById(Resource):
     def get(self, movie_id):
+        start = time.perf_counter()
         movie = Movie.query.get(movie_id)
         if not movie:
             return {"error": "Movie not found"}, 404
@@ -182,6 +185,18 @@ class MovieById(Resource):
                 rid = r.get("id")
                 r["like_count"] = counts.get(rid, 0)
                 r["liked_by_me"] = rid in liked_ids
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        log = logger.warning if elapsed_ms > 300 else logger.info
+        log(
+            f"movies.get.by_id elapsed_ms={elapsed_ms:.2f}ms movie_id={movie_id} "
+            f"reviews_count={len(reviews_list)}",
+            extra={
+                "endpoint": "/api/movies/<id>",
+                "movie_id": movie_id,
+                "elapsed_ms": round(elapsed_ms, 2),
+                "reviews_count": len(reviews_list),
+            },
+        )
         return out, 200
 
     def patch(self, movie_id):
@@ -317,6 +332,7 @@ class ReviewById(Resource):
 
 class Articles(Resource):
     def get(self):
+        start = time.perf_counter()
         search_query = request.args.get("search", "")
         articles = Review.query.filter_by(movie_id=None)
 
@@ -356,6 +372,18 @@ class Articles(Resource):
             d = a.to_dict()
             _add_like_fields_to_review_dict(d, counts.get(a.id, 0), a.id in liked_ids)
             out.append(d)
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        log = logger.warning if elapsed_ms > 300 else logger.info
+        log(
+            f"articles.get.list elapsed_ms={elapsed_ms:.2f}ms "
+            f"search='{search_query}' count={len(out)}",
+            extra={
+                "endpoint": "/api/articles",
+                "search_query": search_query,
+                "elapsed_ms": round(elapsed_ms, 2),
+                "articles_count": len(out),
+            },
+        )
         return out, 200
 
     def post(self):
@@ -479,10 +507,24 @@ class Directors(Resource):
 class DirectorById(Resource):
     def get(self, director_id):
         """Return a single director (with movies) by ID."""
+        start = time.perf_counter()
         director = Director.query.get(director_id)
         if not director:
             return {"error": "Director not found"}, 404
-        return director.to_dict(), 200
+        out = director.to_dict()
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        log = logger.warning if elapsed_ms > 300 else logger.info
+        log(
+            f"directors.get.by_id elapsed_ms={elapsed_ms:.2f}ms "
+            f"director_id={director_id} movies_count={len(out.get('movies') or [])}",
+            extra={
+                "endpoint": "/api/directors/<id>",
+                "director_id": director_id,
+                "elapsed_ms": round(elapsed_ms, 2),
+                "movies_count": len(out.get("movies") or []),
+            },
+        )
+        return out, 200
 
     def patch(self, director_id):
         """Update editable fields on a director (e.g., biography, cover photo)."""

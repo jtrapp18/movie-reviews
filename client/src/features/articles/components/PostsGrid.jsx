@@ -5,6 +5,7 @@ import PostCard from '@components/cards/PostCard';
 import { Button } from '@styles';
 import { formatDate } from '@utils/formatting';
 import MotionWrapper from '@styles/MotionWrapper';
+import { prefetchEntity } from '@features/cache/prefetchEntity';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -86,6 +87,13 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
                 date={date}
                 description={description}
                 onClick={() => handleCardClick(post)}
+                onMouseEnter={() => {
+                  if (post.movieId) {
+                    prefetchEntity('movieReview', 'movies', post.movieId);
+                  } else {
+                    prefetchEntity('article', 'articles', post.id);
+                  }
+                }}
               />
             </MotionWrapper>
           );

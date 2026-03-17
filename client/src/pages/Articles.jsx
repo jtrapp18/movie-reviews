@@ -8,9 +8,12 @@ import { CardContainer } from '@styles';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { useArticlesList } from '@features/articles/useArticlesList';
 
 function Articles() {
-  const { articles, setArticles, coreDataLoaded } = useOutletContext();
+  const { articles: contextArticles, setArticles: setContextArticles, coreDataLoaded } =
+    useOutletContext();
+  const { articles, loading, fetchArticles } = useArticlesList(contextArticles);
   const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -34,38 +37,27 @@ function Articles() {
     arrows: true,
   };
 
-  const fetchArticles = async (searchText = null) => {
-    try {
-      setIsSearching(true);
-      let url = '/api/articles';
-      if (searchText) {
-        url += `?search=${encodeURIComponent(searchText)}`;
-      }
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      setArticles(data);
-      setFilteredArticles(data);
-    } catch (error) {
-      console.error('Error fetching articles:', error);
-      setArticles([]);
-      setFilteredArticles([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
   const handleSearch = async (searchText) => {
     if (!searchText.trim()) {
       setFilteredArticles(articles);
     } else {
       // Use backend search which includes tags
-      await fetchArticles(searchText);
+      setIsSearching(true);
+      const data = await fetchArticles(searchText);
+      setFilteredArticles(data);
+      setIsSearching(false);
     }
   };
 
-  const isLoading = !coreDataLoaded && (!articles || articles.length === 0);
+  useEffect(() => {
+    // keep outlet context in sync with cached list (base list only)
+    if (!loading && articles && articles.length && setContextArticles) {
+      setContextArticles(articles);
+    }
+  }, [articles, loading, setContextArticles]);
+
+  const isLoading =
+    (!coreDataLoaded && (!articles || articles.length === 0)) || loading;
   if (!filteredArticles || !Array.isArray(filteredArticles) || isLoading) {
     return (
       <PageContainer fullHeight>

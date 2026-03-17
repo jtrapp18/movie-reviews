@@ -9,6 +9,7 @@ import {
 import { useAdmin } from '@hooks/useAdmin';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { StarRatingOverlay } from '@features/reviews';
+import { prefetchEntity } from '@features/cache/prefetchEntity';
 import styled from 'styled-components';
 
 const MetadataContainer = styled.div`
@@ -47,7 +48,15 @@ function MovieCard({ movie, rating = null, clickable = true, size = 'default' })
   const cardStyle = size === 'small' ? { zoom: 0.7 } : undefined;
 
   return (
-    <MediaCard onClick={clickable ? handleClick : undefined} style={cardStyle}>
+    <MediaCard
+      onClick={clickable ? handleClick : undefined}
+      onMouseEnter={() => {
+        if (movie?.id != null) {
+          prefetchEntity('movieReview', 'movies', movie.id);
+        }
+      }}
+      style={cardStyle}
+    >
       <img src={coverPhoto} alt={`${title} poster`} />
 
       <CardDate>{releaseDate}</CardDate>
