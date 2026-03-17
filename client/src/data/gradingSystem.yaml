@@ -1,0 +1,69 @@
+grading:
+  title: "James Trapp's Approach to Grading Films"
+
+  intro: |
+    The table below is a grading system I use to place films. I understand the appeal
+    of a simple thumbs up/thumbs down approach for a casual viewer. I can also see why
+    some might prefer a very specific grading rubric using numbers such as 1 to 10
+    or even more extreme scales like 0–100 with various categories and a formula.
+
+    I prefer to use categories or tiers.
+
+  systemTitle: 'Film Rating System'
+
+  table:
+    headers:
+      - 'Grade Tier'
+      - 'Definition'
+    rows:
+      - grade: 'Magnum Opus'
+        tier: 7
+        definition: 'Top 75 film of all time'
+      - grade: 'Masterpiece'
+        tier: 6
+        definition: 'Top 300 film of all time'
+      - grade: 'Must See'
+        tier: 5
+        definition: 'Among the best films of the decade'
+      - grade: 'Highly Recommended'
+        tier: 4
+        definition: 'Worth seeking out and viewing multiple times'
+      - grade: 'Recommended'
+        tier: 3
+        definition: 'Worth seeking out and viewing at least once'
+      - grade: 'Passable'
+        tier: 2
+        definition: 'Has at least one redeemable quality but not worth seeking out'
+      - grade: 'Unredeemable'
+        tier: 1
+        definition: 'Nothing going for it artistically or even as entertainment'
+
+  notes: |
+    Keep in mind that the exact number of Masterpieces or Magnum Opus level films
+    might be higher or lower than the number in the above table. This “n” is an
+    approximation, as there might be more than 300 or a few less Masterpieces. My
+    goal is to assess the quality of films based on several elements. Attempting to
+    create an advanced mathematical formula would feel against the spirit of cinema.
+
+    The why is more important than the ranking.
+
+  sections:
+    - title: '1. Creating lists is great fun'
+      body: |
+        Some actors, actresses, directors, movie fanatics, and even critics are opposed
+        to the idea of ranking movies, although perhaps not as much as in the past. I do
+        understand why some cinema fanatics may be opposed to the idea of rankings,
+        but I would defend them for two main reasons.
+
+        Let’s be honest, making lists has become a national pastime. I cannot speak for
+        people from other countries, but I can say with complete confidence that in the
+        U.S. making lists has morphed into an obsession. Americans love making lists
+        whether it relates to movies, sports, TV shows, music, restaurants, cars,
+        vacation destinations, along with hundreds of other categories.
+
+    - title: '2. The actual rankings and lists are secondary in importance'
+      body: |
+        It might sound ridiculous considering that I now have a website that focuses on
+        movie rankings and gradings, but the actual rankings are in fact less important
+        than the reasons for those rankings. The lists serve as a catalyst for creating
+        fun debate and engagement, and that is what I truly value.

@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
-import { StyledContainer } from '@styles';
+import { StyledContainer, Button } from '@styles';
+import GradingModal from '@components/about/GradingModal';
 
 const aboutContent = yaml.load(aboutContentYaml);
 
@@ -56,45 +58,55 @@ const ContactMethod = styled.div`
 `;
 
 function About() {
+  const [isGradingOpen, setIsGradingOpen] = useState(false);
+
   return (
-    <StyledContainer>
-      <Header>
-        <h1>{aboutContent.header.title}</h1>
-        <h3>
-          <i>{aboutContent.header.subtitle}</i>
-        </h3>
-      </Header>
+    <>
+      <StyledContainer>
+        <Header>
+          <h1>{aboutContent.header.title}</h1>
+          <h3>
+            <i>{aboutContent.header.subtitle}</i>
+          </h3>
+        </Header>
 
-      <AboutSection>
-        <Paragraphs text={aboutContent.aboutJames.personalStory} />
+        <AboutSection>
+          <Paragraphs text={aboutContent.aboutJames.personalStory} />
 
-        <Paragraphs text={aboutContent.aboutJames.intro} />
+          <Paragraphs text={aboutContent.aboutJames.intro} />
 
-        <Paragraphs text={aboutContent.aboutJames.closing} />
-      </AboutSection>
+          <Paragraphs text={aboutContent.aboutJames.closing} />
 
-      <AboutSection title="About This Website">
-        <Paragraphs text={aboutContent.aboutWebsite.intro} />
+          <Button onClick={() => setIsGradingOpen(true)}>
+            View James&apos;s Film Grading System
+          </Button>
+        </AboutSection>
 
-        {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
-          <ContentType key={index}>
-            <h4>{type.title}</h4>
-            <p>{type.description}</p>
-          </ContentType>
-        ))}
-      </AboutSection>
+        <AboutSection title="About This Website">
+          <Paragraphs text={aboutContent.aboutWebsite.intro} />
 
-      <AboutSection title="Get in Touch">
-        <Paragraphs text={aboutContent.contact.intro} />
+          {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
+            <ContentType key={index}>
+              <h4>{type.title}</h4>
+              <p>{type.description}</p>
+            </ContentType>
+          ))}
+        </AboutSection>
 
-        {aboutContent.contact.methods.map((method, index) => (
-          <ContactMethod key={index}>
-            <span className="type">{method.type}:</span>
-            <span className="value">{method.value}</span>
-          </ContactMethod>
-        ))}
-      </AboutSection>
-    </StyledContainer>
+        <AboutSection title="Get in Touch">
+          <Paragraphs text={aboutContent.contact.intro} />
+
+          {aboutContent.contact.methods.map((method, index) => (
+            <ContactMethod key={index}>
+              <span className="type">{method.type}:</span>
+              <span className="value">{method.value}</span>
+            </ContactMethod>
+          ))}
+        </AboutSection>
+      </StyledContainer>
+
+      <GradingModal isOpen={isGradingOpen} onClose={() => setIsGradingOpen(false)} />
+    </>
   );
 }
 
