@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { getJSON, snakeToCamel } from '@helper';
+import { useArticle } from '@features/articles/useArticle';
 import ArticleForm from '@forms/ArticleForm';
 import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
@@ -47,33 +47,8 @@ const ArticleContainer = styled.div`
 function Article() {
   const { id } = useParams();
   const { user } = useContext(UserContext);
-  const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        setLoading(true);
-        const data = await getJSON(`reviews/${id}`);
-        if (data.error) {
-          setError(data.error);
-        } else {
-          const transformedData = snakeToCamel(data);
-          setArticle(transformedData);
-        }
-      } catch (err) {
-        setError('Failed to load article');
-        console.error('Error fetching article:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchArticle();
-    }
-  }, [id]);
+  const reviewId = id ? parseInt(id, 10) : null;
+  const { article, loading, error, setArticle } = useArticle(reviewId);
 
   if (loading) {
     return (
