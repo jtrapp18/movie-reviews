@@ -5,10 +5,9 @@ import { UserContext } from '@context/userProvider';
 import Comment from './Comment';
 import CommentForm from './CommentForm';
 import Loading from '@components/ui/Loading';
+import { getCachedComments, setCachedComments } from '@features/comments/commentsStore';
 
 const COMMENT_PAGE_SIZE = 5;
-const COMMENT_CACHE_TTL = 60 * 1000; // 60 seconds
-const commentCache = new Map();
 
 const Section = styled.section`
   margin-top: 2rem;
@@ -112,11 +111,7 @@ function CommentList({ reviewId }) {
           setFlatComments(nextFlat);
         }
         setTotal(nextTotal);
-        commentCache.set(reviewId, {
-          flatComments: nextFlat,
-          total: nextTotal,
-          timestamp: Date.now(),
-        });
+        setCachedComments(reviewId, nextFlat, nextTotal);
       } catch (err) {
         console.error(err);
         setError('Failed to load comments');
@@ -156,13 +151,12 @@ function CommentList({ reviewId }) {
 
   useEffect(() => {
     if (!reviewId) return;
-    const cached = commentCache.get(reviewId);
-    const now = Date.now();
-    if (cached && now - cached.timestamp < COMMENT_CACHE_TTL) {
-      setFlatComments(cached.flatComments);
-      setTotal(cached.total);
+    const cached = getCachedComments(reviewId);
+    if (cached) {
+      setFlatComments(cached.flatComments || []);
+      setTotal(cached.total ?? 0);
       setLoading(false);
-      // Background refresh
+      // Always revalidate in the background
       fetchPage(0, false);
     } else {
       fetchPage(0, false);
@@ -171,11 +165,7 @@ function CommentList({ reviewId }) {
 
   useEffect(() => {
     if (!reviewId) return;
-    commentCache.set(reviewId, {
-      flatComments,
-      total,
-      timestamp: Date.now(),
-    });
+    setCachedComments(reviewId, flatComments, total);
   }, [reviewId, flatComments, total]);
 
   const tree = buildCommentTree(flatComments);
