@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
-import List from '@components/shared-sections/List';
 import { StyledContainer } from '@styles';
 
 const aboutContent = yaml.load(aboutContentYaml);
@@ -70,9 +69,6 @@ function About() {
         <Paragraphs text={aboutContent.aboutJames.personalStory} />
 
         <Paragraphs text={aboutContent.aboutJames.intro} />
-
-        <h4>His favorite filmmakers include:</h4>
-        <List items={aboutContent.aboutJames.favoriteDirectors} />
 
         <Paragraphs text={aboutContent.aboutJames.closing} />
       </AboutSection>
