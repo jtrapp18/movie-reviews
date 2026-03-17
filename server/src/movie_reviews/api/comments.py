@@ -6,6 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from movie_reviews.config import db
+from movie_reviews.logging import logger
 from movie_reviews.models import CommentLike, Review, ReviewComment
 
 COMMENT_CACHE_TTL = 10  # seconds
@@ -18,6 +19,7 @@ class ReviewComments(Resource):
     """GET comments for a review (paginated by top-level). POST a new comment (requires session)."""
 
     def get(self, review_id):
+        start = time.perf_counter()
         review = Review.query.get(review_id)
         if not review:
             return {"error": "Review not found"}, 404
@@ -84,6 +86,24 @@ class ReviewComments(Resource):
             d["like_count"] = counts.get(c.id, 0)
             d["liked_by_me"] = c.id in liked_comment_ids
             out.append(d)
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        log = logger.warning if elapsed_ms > 300 else logger.info
+        log(
+            f"comments.get.review elapsed_ms={elapsed_ms:.2f}ms "
+            f"review_id={review_id} count={len(out)} top_level={len(top_level)} total_top={total} "
+            f"cache_hit={bool(cached and cached[0] > now)}",
+            extra={
+                "endpoint": "/api/reviews/<id>/comments",
+                "review_id": review_id,
+                "limit": limit,
+                "offset": offset,
+                "elapsed_ms": round(elapsed_ms, 2),
+                "comment_count": len(out),
+                "top_level_count": len(top_level),
+                "total_top_level": total,
+                "cache_hit": bool(cached and cached[0] > now),
+            },
+        )
         response = (
             {
                 "comments": out,
