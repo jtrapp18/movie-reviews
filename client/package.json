@@ -7,6 +7,7 @@
     "dev": "vite",
     "start": "node server.js",
     "predeploy": "npm run build",
+    "prebuild": "node scripts/write-version.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "format": "prettier --write .",

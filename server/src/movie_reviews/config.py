@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -19,11 +20,26 @@ if is_dev:
     # In development, Flask doesn't need to serve static files
     app = Flask(__name__)  # No need to set static_folder or template_folder
 else:
-    # Get the absolute path to the project root (capstone)
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-    # Path to the dist folder inside client
-    dist_path = os.path.join(project_root, "client", "dist")
+    def _find_frontend_dist_dir() -> str:
+        """
+        Locate the Vite build output directory (client/dist) without assuming a fixed
+        repo folder depth. Allows explicit override via FRONTEND_DIST_DIR.
+        """
+        override = os.getenv("FRONTEND_DIST_DIR")
+        if override:
+            return str(Path(override).expanduser().resolve())
+
+        here = Path(__file__).resolve()
+        for parent in (here.parent, *here.parents):
+            candidate = parent / "client" / "dist"
+            if candidate.is_dir():
+                return str(candidate)
+
+        # Fall back to the historical assumption (repo root is 3 levels up from this file)
+        return str((here.parents[2] / "client" / "dist").resolve())
+
+    dist_path = _find_frontend_dist_dir()
 
     app = Flask(
         __name__,
