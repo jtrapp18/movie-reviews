@@ -1,13 +1,14 @@
 import json
 import os
 from pathlib import Path
+from typing import Optional
 
 from flask_restful import Resource
 
 from movie_reviews.config import app
 
 
-def _first_env(*keys: str) -> str | None:
+def _first_env(*keys: str) -> Optional[str]:
     for k in keys:
         v = os.getenv(k)
         if v and str(v).strip():
