@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { getGradingLabel } from '@utils/gradingTiers';
 
 const InlineRatingContainer = styled.span`
   color: var(--cinema-gold);
@@ -26,13 +27,13 @@ const RatingNumber = styled.span`
 const StarRatingOverlay = ({ rating }) => {
   if (!rating || rating <= 0) return null;
 
-  const stars = '★'.repeat(Math.round(rating));
-  const displayRating = rating.toFixed(1);
+  const label = getGradingLabel(rating);
+  const displayTier = Math.round(rating);
 
   return (
     <InlineRatingContainer>
-      <Star>{stars}</Star>
-      <RatingNumber>{displayRating}</RatingNumber>
+      <Star>{label || 'Tier'}</Star>
+      <RatingNumber>Tier {displayTier}</RatingNumber>
     </InlineRatingContainer>
   );
 };

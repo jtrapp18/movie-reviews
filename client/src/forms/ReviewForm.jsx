@@ -52,7 +52,7 @@ const ReviewForm = ({ initObj }) => {
         title: initObj.title || '',
       }
     : {
-        rating: 0,
+        rating: '',
         reviewText: '',
         title: '',
       };
@@ -108,7 +108,7 @@ const ReviewForm = ({ initObj }) => {
     rating: Yup.number()
       .required('Rating is required.')
       .min(1, 'Rating must be at least 1.')
-      .max(10, 'Rating must be at most 10.'),
+      .max(7, 'Rating must be at most 7.'),
     reviewText: Yup.string()
       .test(
         'review-or-document',
