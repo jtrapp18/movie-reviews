@@ -1,5 +1,7 @@
 /* Global CSS Reset (replacing Bootstrap) */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -11,7 +13,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-top: 0;
   margin-bottom: 0.5rem;
   font-weight: 500;
@@ -25,35 +32,40 @@ p {
 
 :root {
   /* Movie-themed colors - Updated 2025 */
-  --cinema-gold: #FFD700;
-  --cinema-gold-dark: #B8860B;
-  --cinema-gold-ultra-light: rgba(255, 248, 220, 0.25); /* Very light warm gold background */
-  --cinema-red: #DC143C;
-  --cinema-red-dark: #B22222;
+  --cinema-gold: #ffd700;
+  --cinema-gold-dark: #b8860b;
+  --cinema-gold-ultra-light: rgba(
+    255,
+    248,
+    220,
+    0.25
+  ); /* Very light warm gold background */
+  --cinema-red: #dc143c;
+  --cinema-red-dark: #b22222;
   --cinema-maroon: #800020;
-  --cinema-silver: #C0C0C0;
-  --cinema-black: #0C0C13;
+  --cinema-silver: #c0c0c0;
+  --cinema-black: #0c0c13;
   --cinema-gray: #4a4d5a;
   --cinema-gray-light: #9c9b9b;
   --cinema-gray-dark: #1f2126;
   --cinema-blue: #007bff;
   --cinema-blue-dark: #0056b3;
-  
+
   /* Legacy colors (keeping for compatibility) */
-  --green: #4E7839;
+  --green: #4e7839;
   --light-yellow: #fbf4a4;
   --honey: var(--cinema-gold);
-  --brown: #6B4226;
+  --brown: #6b4226;
   --dark-purple: #301934;
-  --light-green: #9DC183;
+  --light-green: #9dc183;
   --light-peach: #fae9d8;
   --light-orange: rgb(247, 216, 160);
   --bright-blue: rgb(40, 203, 215);
-  --dark-green: #334F26;
+  --dark-green: #334f26;
   --light-gray: #f0f0f0;
   --light-gray-dark: #bdbfc4;
-  --dark-gray: #212D40;
-  --gray: #646469; 
+  --dark-gray: #212d40;
+  --gray: #646469;
   --navy-blue: #00113d;
   --blue: #022658;
   --yellow: var(--cinema-gold);
@@ -69,7 +81,9 @@ p {
   --font-color-2: var(--secondary);
 
   /* Rich text display colors */
-  --rich-text-background: var(--background-secondary); /* Dark background from mobile theme */
+  --rich-text-background: var(
+    --background-secondary
+  ); /* Dark background from mobile theme */
   --rich-text-primary: var(--font-color-2); /* Soft white for main text */
   --rich-text-header: var(--font-color-1); /* Pure white for headers */
   --rich-text-code-bg: rgba(255, 215, 0, 0.15); /* Gold tint for code */
@@ -80,7 +94,13 @@ p {
   --rich-text-table-border: rgba(255, 215, 0, 0.2);
 
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
-  --striped: repeating-linear-gradient(-45deg, white, white 3px, var(--light-peach) 3px, var(--light-peach) 6px);
+  --striped: repeating-linear-gradient(
+    -45deg,
+    white,
+    white 3px,
+    var(--light-peach) 3px,
+    var(--light-peach) 6px
+  );
   --padding-top: 75px;
   --height-header: clamp(4rem, 10vw, 6rem);
   --size-body: calc(100vh - var(--height-header) - 4px);
@@ -88,7 +108,7 @@ p {
   --default-font-size: clamp(0.8rem, 1.5vw, 1.1rem);
   /* --card-font-size: clamp(0.8rem, 1rem, 1.1rem); */
   --card-font: var(--soft-white);
-  --card-font-size: .8rem;
+  --card-font-size: 0.8rem;
   --shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
   --title-font: 'NotoSerif';
   --default-font: 'Rubik';
@@ -152,15 +172,14 @@ p {
   font-family: var(--default-font);
   font-size: var(--default-font-size);
   box-sizing: border-box;
-
 }
 
 .no-scroll {
   overflow-y: hidden;
 }
 
-div.star-ratings{
-  display: flex;  
+div.star-ratings {
+  display: flex;
 }
 
 @font-face {
@@ -296,15 +315,17 @@ h1 {
   font-weight: bold;
 }
 
-h1, h2, h4 {
+h1,
+h2,
+h4 {
   color: var(--font-color-1);
 }
 
-h3, small {
+h3,
+small {
   /* color: var(--cinema-gold); */
   color: var(--font-color-3);
 }
-
 
 h1 {
   font-size: clamp(1.7rem, 4vw, 2rem);
@@ -312,15 +333,24 @@ h1 {
 
 h2 {
   font-size: clamp(1.3rem, 2vw, 1.5rem);
-  font-family: var(--default-font)
+  font-family: var(--default-font);
 }
 
-h3, h4 {
+h3,
+h4 {
   font-size: clamp(1.1rem, 1.2rem, 1.8rem);
-  font-family: var(--default-font)
+  font-family: var(--default-font);
 }
 
-p, label, li, a, span, option, select, input, textarea {
+p,
+label,
+li,
+a,
+span,
+option,
+select,
+input,
+textarea {
   font-size: var(--default-font-size);
   color: var(--font-color-2);
 }
@@ -346,7 +376,9 @@ button {
 }
 
 /* Input reset to ensure styled-components take precedence */
-input, textarea, select {
+input,
+textarea,
+select {
   font-size: var(--default-font-size);
   color: var(--font-color-2);
   /* Reset browser defaults that might interfere */
@@ -454,14 +486,14 @@ div {
 
 @keyframes pop {
   0% {
-      transform: scale(1);
+    transform: scale(1);
   }
   50% {
-      transform: scale(1);
-      color: var(--green);
+    transform: scale(1);
+    color: var(--green);
   }
   100% {
-      transform: scale(1);
+    transform: scale(1);
   }
 }
 
@@ -470,7 +502,7 @@ div {
     opacity: 1;
   }
   50% {
-    opacity: .2;
+    opacity: 0.2;
   }
   100% {
     opacity: 1;

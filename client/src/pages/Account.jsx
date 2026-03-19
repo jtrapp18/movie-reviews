@@ -1,12 +1,11 @@
-import { useContext, useState } from "react";
-import styled from "styled-components";
-import { StyledContainer, StyledForm, Button } from "../styles";
-import { UserContext } from "../context/userProvider";
-import { patchJSONToDb, snakeToCamel } from "../helper";
-import Error from "../styles/Error";
-import LoginMessage from "../components/LoginMessage";
+import { useContext, useState } from 'react';
+import styled from 'styled-components';
+import { StyledContainer, StyledForm, Button } from '../styles';
+import { UserContext } from '../context/userProvider';
+import { patchJSONToDb, snakeToCamel } from '../helper';
+import Error from '../styles/Error';
+import LoginMessage from '@components/feedback/LoginMessage';
 import { useTheme } from '../context/themeProvider';
-
 
 const Header = styled.div`
   text-align: center;
@@ -33,10 +32,10 @@ const ColorBubble = styled.div`
   height: 32px;
   border-radius: 50%;
   border: 2px solid var(--border);
-  background: ${(props) => props.$color || "blue"};
+  background: ${(props) => props.$color || 'blue'};
 `;
 
-const HiddenColorInput = styled.input.attrs({ type: "color" })`
+const HiddenColorInput = styled.input.attrs({ type: 'color' })`
   position: absolute;
   top: 0;
   left: 0;
@@ -68,7 +67,7 @@ const Switch = styled.button`
 const Knob = styled.span`
   position: absolute;
   top: 3px;
-  left: ${(p) => (p.$active ? "24px" : "3px")};
+  left: ${(p) => (p.$active ? '24px' : '3px')};
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -79,21 +78,20 @@ const Knob = styled.span`
 function Account() {
   const { user, setUser } = useContext(UserContext);
   const [editing, setEditing] = useState(false);
-  const [username, setUsername] = useState(user?.username || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [iconColor, setIconColor] = useState(user?.iconColor || "#0000ff");
+  const [username, setUsername] = useState(user?.username || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [iconColor, setIconColor] = useState(user?.iconColor || '#0000ff');
   const [darkMode, setDarkMode] = useState(user?.darkMode || false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const { theme, setTheme } = useTheme();
 
-
   const handleThemeToggle = async () => {
     const next = theme === 'light' ? 'dark' : 'light';
     setTheme(next);
 
-    setDarkMode(!darkMode)
+    setDarkMode(!darkMode);
   };
 
   const resetTheme = async (darkMode) => {
@@ -126,15 +124,15 @@ function Account() {
         darkMode,
       };
 
-      const updated = await patchJSONToDb("users", user.id, payload);
+      const updated = await patchJSONToDb('users', user.id, payload);
       const updatedCamel = snakeToCamel(updated);
 
       setUser(updatedCamel);
-      setSuccess("Account updated.");
+      setSuccess('Account updated.');
       setEditing(false);
     } catch (err) {
       console.error(err);
-      setError("Failed to update account.");
+      setError('Failed to update account.');
     } finally {
       setSaving(false);
     }
@@ -153,7 +151,7 @@ function Account() {
         <>
           <StyledForm as="div">
             <div>
-              <ColorBubble $color={user.iconColor || "#0000ff"} />
+              <ColorBubble $color={user.iconColor || '#0000ff'} />
             </div>
 
             <div>
@@ -168,7 +166,7 @@ function Account() {
 
             <div>
               <label>Mode</label>
-              <p>{user.darkMode ? "Dark" : "Light"}</p>
+              <p>{user.darkMode ? 'Dark' : 'Light'}</p>
             </div>
           </StyledForm>
 
@@ -219,7 +217,7 @@ function Account() {
           <div>
             <label>Mode</label>
             <ToggleRow>
-              <span>{darkMode ? "Dark" : "Light"}</span>
+              <span>{darkMode ? 'Dark' : 'Light'}</span>
 
               <Switch
                 type="button"
@@ -233,18 +231,11 @@ function Account() {
           </div>
 
           {error && <Error>{error}</Error>}
-          {success && (
-            <div style={{ color: "var(--success-color)" }}>{success}</div>
-          )}
+          {success && <div style={{ color: 'var(--success-color)' }}>{success}</div>}
 
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <Button
-              variant="fill"
-              color="primary"
-              type="submit"
-              disabled={saving}
-            >
-              {saving ? "Saving..." : "Save changes"}
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <Button variant="fill" color="primary" type="submit" disabled={saving}>
+              {saving ? 'Saving...' : 'Save changes'}
             </Button>
 
             <Button
@@ -255,9 +246,9 @@ function Account() {
                 setEditing(false);
                 setError(null);
                 setSuccess(null);
-                setUsername(user.username || "");
-                setEmail(user.email || "");
-                setIconColor(user.iconColor || "#0000ff");
+                setUsername(user.username || '');
+                setEmail(user.email || '');
+                setIconColor(user.iconColor || '#0000ff');
                 setDarkMode(user.darkMode || false);
                 resetTheme(user.darkMode ? 'light' : 'dark');
               }}

@@ -5,3 +5,4 @@ export * from './forms';
 export * from './navigation';
 export * from './layout';
 export * from './cards';
+export * from './tables';

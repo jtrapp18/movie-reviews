@@ -20,4 +20,3 @@ else
 fi
 
 npm run build
-

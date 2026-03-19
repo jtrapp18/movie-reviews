@@ -10,7 +10,7 @@ const BorderGlow = styled.span`
 
   /* Radial gradient for glow */
   background: radial-gradient(
-    circle, 
+    circle,
     rgba(0, 0, 0, 0) 5%,
     rgba(0, 0, 0, 0.9) 60%,
     rgba(0, 0, 0, 1) 100%
@@ -38,28 +38,31 @@ const TagContainer = styled.div`
 const DocumentContent = styled.div`
   padding: 20px;
   line-height: 1.6;
-  
+
   img {
     max-width: 100%;
     height: auto;
     margin: 10px 0;
   }
-  
+
   table {
     width: 100%;
     border-collapse: collapse;
     margin: 10px 0;
   }
-  
-  table, th, td {
+
+  table,
+  th,
+  td {
     border: 1px solid #ddd;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 8px;
     text-align: left;
   }
-  
+
   p {
     margin: 10px 0;
   }
@@ -72,11 +75,13 @@ const MediaCard = styled.article`
   overflow: hidden;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(0,0,0,.4);
-  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: 0 10px 28px rgba(0,0,0,.6);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
   }
 
   img {
@@ -91,13 +96,13 @@ const MediaCard = styled.article`
 
   /* readability gradient */
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(0,0,0,.85),
-      rgba(0,0,0,.3),
+      rgba(0, 0, 0, 0.85),
+      rgba(0, 0, 0, 0.3),
       transparent
     );
     z-index: 1;
@@ -118,14 +123,14 @@ const CardOverlay = styled.div`
   position: absolute;
   inset: 0;
   z-index: 3;
-  background: rgba(0,0,0,.85);
+  background: rgba(0, 0, 0, 0.85);
   opacity: 0;
   padding: 5%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: opacity .25s ease;
-  
+  transition: opacity 0.25s ease;
+
   p {
     font-size: var(--card-font-size);
     color: var(--card-font);
@@ -164,4 +169,14 @@ const CardTitle = styled.h2`
   // padding: 10% 5%;
 `;
 
-export { BorderGlow, Tag, TagContainer, DocumentContent, MediaCard, CardContent, CardOverlay, CardDate, CardTitle };
+export {
+  BorderGlow,
+  Tag,
+  TagContainer,
+  DocumentContent,
+  MediaCard,
+  CardContent,
+  CardOverlay,
+  CardDate,
+  CardTitle,
+};

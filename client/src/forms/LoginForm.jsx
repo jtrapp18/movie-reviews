@@ -1,15 +1,14 @@
-import React, { useContext } from "react";
-import { snakeToCamel, postJSONToDb } from "../helper";
+import { useContext } from 'react';
+import { snakeToCamel, postJSONToDb } from '../helper';
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import Error from "../styles/Error";
-import { StyledForm, Button } from "../styles";
-import { useTheme } from "../context/themeProvider";
-import { useToast } from "../context/toastContext";
+import Error from '../styles/Error';
+import { StyledForm, Button } from '../styles';
+import { useTheme } from '../context/themeProvider';
+import { useToast } from '../context/toastContext';
 
 function LoginForm() {
-
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { setTheme } = useTheme();
@@ -17,14 +16,14 @@ function LoginForm() {
 
   const formik = useFormik({
     initialValues: {
-      username: '',
-      password: ''
+      email: '',
+      password: '',
     },
     onSubmit: async (values, { setErrors }) => {
-      const body = { username: values.username, password: values.password };
-  
+      const body = { email: values.email, password: values.password };
+
       try {
-        const user = await postJSONToDb("login", body);  // Await the promise
+        const user = await postJSONToDb('login', body);
         const userTransformed = snakeToCamel(user);
         console.info('Login success - user payload:', userTransformed);
         setUser(userTransformed);
@@ -39,31 +38,31 @@ function LoginForm() {
     },
     validate: (values) => {
       const errors = {};
-      if (!values.username) {
-        errors.username = 'Username is required';
+      if (!values.email) {
+        errors.email = 'Email is required';
       }
       if (!values.password) {
-        errors.password = 'Password is required';
+        errors.password = 'Password is required'; // pragma: allowlist secret
       }
       return errors;
-    }
+    },
   });
 
   return (
     <StyledForm onSubmit={formik.handleSubmit}>
       <div>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="email">Email</label>
         <input
-          type="text"
-          id="username"
-          name="username"
-          autoComplete="off"
-          value={formik.values.username}
+          type="email"
+          id="email"
+          name="email"
+          autoComplete="email"
+          value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
         />
-        {formik.touched.username && formik.errors.username ? (
-          <Error>{formik.errors.username}</Error>
+        {formik.touched.email && formik.errors.email ? (
+          <Error>{formik.errors.email}</Error>
         ) : null}
       </div>
       <div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { Button } from '../../styles';
+import { Button } from '@styles';
 
 const Form = styled.form`
   margin-top: 0.5rem;
@@ -93,7 +93,16 @@ function CommentForm({ reviewId, parentCommentId = null, onSuccess, onCancel }) 
           {submitting ? 'Posting…' : parentCommentId ? 'Reply' : 'Comment'}
         </Button>
         {onCancel && (
-          <button type="button" onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--font-color-2)' }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--font-color-2)',
+            }}
+          >
             Cancel
           </button>
         )}

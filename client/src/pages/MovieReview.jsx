@@ -1,60 +1,45 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer } from '../styles';
-import CoverHeader from '../components/CoverHeader';
-import LikeButton from '../components/LikeButton';
-import { getJSON, snakeToCamel } from '../helper';
-import ReviewForm from '../forms/ReviewForm';
-import CommentList from '../components/comments/CommentList';
-import SEOHead from '../components/SEOHead';
-import Loading from '../components/ui/Loading';
-import { UserContext } from '../context/userProvider';
-import { generateMovieReviewStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
+import { StyledContainer } from '@styles';
+import { CoverHeader, LikeButton } from '@features/reviews';
+import { useMovieReview } from '@features/reviews/useMovieReview';
+import ReviewForm from '@forms/ReviewForm';
+import CommentList from '@components/comments/CommentList';
+import SEOHead from '@components/shared-sections/SEOHead';
+import Loading from '@components/ui/Loading';
+import { UserContext } from '@context/userProvider';
+import {
+  generateMovieReviewStructuredData,
+  generateBreadcrumbStructuredData,
+} from '@utils/seoUtils';
 
 const MovieContainer = styled.div`
   margin: 1rem 0 2rem 0;
   width: 100%;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  overflow: hidden;
 `;
 
 const LikeBar = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
 `;
 
 function MovieReview() {
   const { user } = useContext(UserContext);
-  const [movie, setMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { id } = useParams();
   const movieId = parseInt(id);
-
-  useEffect(() => {
-    const fetchMovie = async () => {
-      try {
-        setLoading(true);
-        const movieData = await getJSON('movies', movieId);
-        setMovie(snakeToCamel(movieData));
-      } catch (err) {
-        console.error('Error fetching movie:', err);
-        setError('Failed to load movie details');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (movieId) {
-      fetchMovie();
-    }
-  }, [movieId]);
+  const { movie, loading, error } = useMovieReview(movieId);
 
   if (loading) {
     return (
       <StyledContainer>
-        <Loading text="Loading movie details" size='large' />
+        <Loading text="Loading movie details" size="large" />
       </StyledContainer>
     );
   }
@@ -78,16 +63,18 @@ function MovieReview() {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
 
   // Generate SEO data
-  const seoTitle = review ? `${movie.title} Review - ${review.rating}/10` : `${movie.title} - Movie Review`;
-  const seoDescription = review 
-    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...` 
+  const seoTitle = review
+    ? `${movie.title} Review - ${review.rating}/10`
+    : `${movie.title} - Movie Review`;
+  const seoDescription = review
+    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...`
     : `Read our detailed review of ${movie.title} (${movie.releaseDate}). ${movie.overview.substring(0, 100)}...`;
-  
+
   const structuredData = generateMovieReviewStructuredData(movie, review);
   const breadcrumbData = generateBreadcrumbStructuredData([
     { name: 'Home', url: window.location.origin + '/#/' },
     { name: 'Movies', url: window.location.origin + '/#/search_movies' },
-    { name: movie.title, url: window.location.href }
+    { name: movie.title, url: window.location.href },
   ]);
 
   return (
@@ -110,27 +97,28 @@ function MovieReview() {
             rating={review?.rating}
             publishDate={review?.dateAdded || review?.date_added}
           />
+          {review && (
+            <LikeBar>
+              <LikeButton
+                type="review"
+                id={review.id}
+                likeCount={review.likeCount ?? 0}
+                likedByMe={review.likedByMe ?? false}
+                disabled={!user}
+                onUpdate={(liked, likeCount) => {
+                  // Optimistically update the local movie state returned by the hook
+                  if (!movie?.reviews?.length) return;
+                  movie.reviews[0] = {
+                    ...movie.reviews[0],
+                    likedByMe: liked,
+                    likeCount,
+                  };
+                }}
+              />
+            </LikeBar>
+          )}
+          <ReviewForm initObj={review} />
         </MovieContainer>
-        {review && (
-          <LikeBar>
-            <LikeButton
-              type="review"
-              id={review.id}
-              likeCount={review.likeCount ?? 0}
-              likedByMe={review.likedByMe ?? false}
-              disabled={!user}
-              onUpdate={(liked, likeCount) => {
-                setMovie((prev) => {
-                  if (!prev?.reviews?.length) return prev;
-                  const next = { ...prev, reviews: [...prev.reviews] };
-                  next.reviews[0] = { ...next.reviews[0], likedByMe: liked, likeCount };
-                  return next;
-                });
-              }}
-            />
-          </LikeBar>
-        )}
-        <ReviewForm initObj={review} />
         {review && <CommentList reviewId={review.id} />}
       </StyledContainer>
     </>

@@ -1,25 +1,20 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { getJSON, snakeToCamel } from '../helper';
-import ArticleForm from '../forms/ArticleForm';
-import CommentList from '../components/comments/CommentList';
-import SEOHead from '../components/SEOHead';
-import CoverHeader from '../components/CoverHeader';
-import LikeButton from '../components/LikeButton';
-import { UserContext } from '../context/userProvider';
-import { generateArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/seoUtils';
-import Loading from '../components/ui/Loading';
-import { StyledContainer } from '../styles';
+import { useArticle } from '@features/articles/useArticle';
+import ArticleForm from '@forms/ArticleForm';
+import CommentList from '@components/comments/CommentList';
+import SEOHead from '@components/shared-sections/SEOHead';
+import { CoverHeader, LikeButton } from '@features/reviews';
+import { UserContext } from '@context/userProvider';
+import {
+  generateArticleStructuredData,
+  generateBreadcrumbStructuredData,
+} from '@utils/seoUtils';
+import Loading from '@components/ui/Loading';
+import { StyledContainer } from '@styles';
 
-const DEFAULT_ARTICLE_BACKDROP = "/images/default-article.jpeg";
-
-const LoadingMessage = styled.div`
-  text-align: center;
-  padding: 50px;
-  font-size: 1.2rem;
-  color: #666;
-`;
+const DEFAULT_ARTICLE_BACKDROP = '/images/default-article.jpeg';
 
 const ErrorMessage = styled.div`
   text-align: center;
@@ -36,41 +31,24 @@ const ErrorMessage = styled.div`
 const LikeBar = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
+`;
+
+const ArticleContainer = styled.div`
+  margin: 1rem 0 2rem 0;
+  width: 100%;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  overflow: hidden;
 `;
 
 function Article() {
   const { id } = useParams();
   const { user } = useContext(UserContext);
-  const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        setLoading(true);
-        const data = await getJSON(`reviews/${id}`);
-        if (data.error) {
-          setError(data.error);
-        } else {
-          const transformedData = snakeToCamel(data);
-          setArticle(transformedData);
-        }
-      } catch (err) {
-        setError('Failed to load article');
-        console.error('Error fetching article:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchArticle();
-    }
-  }, [id]);
-
+  const reviewId = id ? parseInt(id, 10) : null;
+  const { article, loading, error, setArticle } = useArticle(reviewId);
 
   if (loading) {
     return (
@@ -103,15 +81,14 @@ function Article() {
   const breadcrumbData = generateBreadcrumbStructuredData([
     { name: 'Home', url: window.location.origin + '/#/' },
     { name: 'Articles', url: window.location.origin + '/#/articles' },
-    { name: article.title, url: window.location.href }
+    { name: article.title, url: window.location.href },
   ]);
 
-  const coverImageUrl =
-    article.backdrop
-      ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
-          article.backdrop
-        )}`
-      : DEFAULT_ARTICLE_BACKDROP;
+  const coverImageUrl = article.backdrop
+    ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
+        article.backdrop
+      )}`
+    : DEFAULT_ARTICLE_BACKDROP;
 
   return (
     <>
@@ -124,26 +101,30 @@ function Article() {
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
       />
       <StyledContainer>
-        <CoverHeader
-          imageUrl={coverImageUrl}
-          title={article.movie?.title || article.title}
-          subtitle={article.movie?.title ? article.title : undefined}
-          rating={article.rating}
-          publishDate={article.dateAdded || article.date_added}
-        />
-        <LikeBar>
-          <LikeButton
-            type="review"
-            id={article.id}
-            likeCount={article.likeCount ?? 0}
-            likedByMe={article.likedByMe ?? false}
-            disabled={!user}
-            onUpdate={(liked, likeCount) => {
-              setArticle((prev) => (prev ? { ...prev, likedByMe: liked, likeCount } : prev));
-            }}
+        <ArticleContainer>
+          <CoverHeader
+            imageUrl={coverImageUrl}
+            title={article.movie?.title || article.title}
+            subtitle={article.movie?.title ? article.title : undefined}
+            rating={article.rating}
+            publishDate={article.dateAdded || article.date_added}
           />
-        </LikeBar>
-        <ArticleForm initObj={article} />
+          <LikeBar>
+            <LikeButton
+              type="review"
+              id={article.id}
+              likeCount={article.likeCount ?? 0}
+              likedByMe={article.likedByMe ?? false}
+              disabled={!user}
+              onUpdate={(liked, likeCount) => {
+                setArticle((prev) =>
+                  prev ? { ...prev, likedByMe: liked, likeCount } : prev
+                );
+              }}
+            />
+          </LikeBar>
+          <ArticleForm initObj={article} />
+        </ArticleContainer>
         <CommentList reviewId={article.id} />
       </StyledContainer>
     </>

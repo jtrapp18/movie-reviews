@@ -1,17 +1,15 @@
-import {useState, useEffect, useContext, Suspense } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import { useState, useEffect, useContext, Suspense } from 'react';
+import Header from '@components/layout/Header';
+import Footer from '@components/layout/Footer';
 import { Outlet } from 'react-router-dom';
-import { getJSON, snakeToCamel } from './helper';
-import { UserContext } from './context/userProvider';
-import { WindowWidthContext } from './context/windowSize'
-import Loading from './components/ui/Loading';
-import { StyledMain } from './styles';
-import ThemeToggle from './components/ThemeToggle';
-import { useTheme } from './context/themeProvider';
+import { getJSON } from '@helper';
+import { UserContext } from '@context/userProvider';
+import { WindowWidthContext } from '@context/windowSize';
+import Loading from '@components/ui/Loading';
+import { StyledMain } from '@styles';
+import { useTheme } from '@context/themeProvider';
 
 function App() {
-
   const { isMobile } = useContext(WindowWidthContext);
   const [movies, setMovies] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -33,7 +31,7 @@ function App() {
       }
     };
     fetchUser();
-  }, [setUser]);
+  }, [setUser, setTheme]);
 
   // Load core data early so Home, Articles, Directors feel instant
   useEffect(() => {
@@ -62,7 +60,8 @@ function App() {
             )
           );
         }
-        if (articlesData != null) setArticles(Array.isArray(articlesData) ? articlesData : []);
+        if (articlesData != null)
+          setArticles(Array.isArray(articlesData) ? articlesData : []);
         if (Array.isArray(directorsData)) setDirectors(directorsData);
       } catch (err) {
         console.error('Error loading app data:', err);
@@ -73,25 +72,25 @@ function App() {
 
     loadAll();
   }, []);
-  
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Header/>
+      <Header />
       <StyledMain isMobile={isMobile} style={{ flex: 1 }}>
         <Suspense fallback={<Loading />}>
           <Outlet
-              context={{
-                movies,
-                setMovies,
-                articles,
-                setArticles,
-                posts,
-                setPosts,
-                directors,
-                setDirectors,
-                coreDataLoaded,
-              }}
-            />
+            context={{
+              movies,
+              setMovies,
+              articles,
+              setArticles,
+              posts,
+              setPosts,
+              directors,
+              setDirectors,
+              coreDataLoaded,
+            }}
+          />
         </Suspense>
       </StyledMain>
       <Footer />

@@ -8,11 +8,16 @@ import { postJSONToDb, patchJSONToDb } from '../helper';
  * Submit form with optional document upload
  * All submissions go to the reviews table (articles and reviews use the same model)
  */
-export const submitFormWithDocument = async (formData, file, isEdit = false, id = null) => {
+export const submitFormWithDocument = async (
+  formData,
+  file,
+  isEdit = false,
+  id = null
+) => {
   try {
     // Clean up the form data - remove empty values
     const cleanFormData = { ...formData };
-    Object.keys(cleanFormData).forEach(key => {
+    Object.keys(cleanFormData).forEach((key) => {
       if (cleanFormData[key] === '' || cleanFormData[key] === null) {
         delete cleanFormData[key];
       }
@@ -25,14 +30,14 @@ export const submitFormWithDocument = async (formData, file, isEdit = false, id 
     });
 
     // All submissions go to reviews table - articles and reviews are the same model
-    const result = isEdit 
+    const result = isEdit
       ? await patchJSONToDb('reviews', id, cleanFormData)
       : await postJSONToDb('reviews', cleanFormData);
- 
+
     console.info('submitFormWithDocument - review saved', {
       id: result?.id,
     });
- 
+
     // Handle document upload if file is provided
     if (file && result?.id) {
       try {
@@ -66,7 +71,7 @@ export const uploadDocument = async (file, reviewId, replaceText = true) => {
   const response = await fetch('/api/upload_document', {
     method: 'POST',
     body: formData,
-  }); 
+  });
 
   if (!response.ok) {
     const errorData = await response.json();
@@ -83,4 +88,3 @@ export const handleFormSubmit = async (formData, file, isEdit = false, id = null
   const result = await submitFormWithDocument(formData, file, isEdit, id);
   return result;
 };
-

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 function Error({ children }) {
   return (
@@ -23,8 +23,8 @@ const Alert = styled.span`
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: .5rem;
-  margin-top: .5rem;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 `;
 
 const Message = styled.p`

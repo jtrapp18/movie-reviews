@@ -52,7 +52,7 @@
   Index('idx_review_text_gin', Review.review_text, postgresql_using='gin', postgresql_ops={'review_text': 'gin_trgm_ops'})
   Index('idx_review_title_gin', Review.title, postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
   Index('idx_tag_name_gin', Tag.name, postgresql_using='gin', postgresql_ops={'name': 'gin_trgm_ops'})
-  
+
   # Foreign key indexes (if not already present)
   Index('idx_review_movie_id', Review.movie_id)
   Index('idx_review_content_type', Review.content_type)
@@ -77,10 +77,10 @@
 - [ ] **Add full-text search columns** - Create TSVECTOR columns for Movie and Review
   ```python
   from sqlalchemy.dialects.postgresql import TSVECTOR
-  
+
   class Movie(db.Model):
       search_vector = Column(TSVECTOR)
-  
+
   class Review(db.Model):
       search_vector = Column(TSVECTOR)
   ```
@@ -103,7 +103,7 @@
   import redis
   import json
   import hashlib
-  
+
   def cached_search(search_query, cache_ttl=300):  # 5 minutes
       cache_key = f"search:{hashlib.md5(search_query.encode()).hexdigest()}"
       # Implementation details...
@@ -184,7 +184,7 @@ def get_document(review_id):
             return serve_from_cache(review_id)
         else:
             delete_from_cache(review_id)
-    
+
     # Download from S3 and cache
     s3_file = download_from_s3(review_id)
     cache_file_locally(review_id, s3_file)

@@ -30,12 +30,15 @@ const StyledForm = styled.form`
     font-size: 1rem;
   }
 
-  input, textarea, select, option {
+  input,
+  textarea,
+  select,
+  option {
     /* Reset browser defaults */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    
+
     /* Styled form inputs */
     width: 100%;
     padding: 12px 16px;
@@ -48,12 +51,12 @@ const StyledForm = styled.form`
     font-size: 1rem;
     transition: all 0.3s ease;
     box-sizing: border-box;
-    
+
     &::placeholder {
       // color: rgba(255, 255, 255, 0.6);
       color: var(--font-color-2);
     }
-    
+
     &:focus {
       outline: none;
       // border-color: var(--cinema-gold-dark);
@@ -81,7 +84,7 @@ const StyledForm = styled.form`
   }
 
   .success-message {
-    color: #4CAF50;
+    color: #4caf50;
     // background: rgba(76, 175, 80, 0.1);
     padding: 1rem;
     border-radius: 8px;
@@ -89,7 +92,7 @@ const StyledForm = styled.form`
     margin-bottom: 1rem;
     text-align: center;
   }
-  
+
   .error-message {
     color: var(--cinema-red);
     // background: rgba(220, 20, 60, 0.1);

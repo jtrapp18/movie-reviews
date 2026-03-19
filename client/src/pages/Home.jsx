@@ -1,17 +1,14 @@
-import { getJSON, snakeToCamel } from '../helper';
 import { useState, useEffect } from 'react';
+import { snakeToCamel } from '@helper';
 import styled from 'styled-components';
-import Movies from '../components/Movies';
-import Articles from '../components/Articles';
-import RecentPosts from '../components/RecentPosts';
-import Directors from '../components/Directors';
-import Section from '../components/Section';
-import SearchResultsHeader from '../components/SearchResultsHeader';
-import Loading from '../components/ui/Loading';
-import SearchPageFrame from '../components/SearchPageFrame';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import SEOHead from '../components/SEOHead';
-import { generateWebsiteStructuredData } from '../utils/seoUtils';
+import { Movies } from '@features/movies';
+import { Articles, RecentPosts } from '@features/articles';
+import { Directors } from '@features/directors';
+import Section from '@components/layout/Section';
+import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
+import { useOutletContext } from 'react-router-dom';
+import SEOHead from '@components/shared-sections/SEOHead';
+import { generateWebsiteStructuredData } from '@utils/seoUtils';
 
 const StyledContainer = styled.div`
   padding: 0;
@@ -24,10 +21,8 @@ const StyledContainer = styled.div`
   min-height: 100vh;
 `;
 
-
 function Home() {
   const { movies, articles, posts, directors } = useOutletContext();
-  const navigate = useNavigate();
 
   const [showMovies, setShowMovies] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
@@ -52,7 +47,7 @@ function Home() {
       // If empty search, show all content
       setShowMovies(movies);
       setShowArticles(articles);
-       setShowDirectors(directors);
+      setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
       return;
@@ -60,14 +55,14 @@ function Home() {
 
     setIsSearching(true);
     setSearchQuery(text);
-    
+
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
       const data = await response.json();
-      
+
       // Convert snake_case to camelCase for frontend compatibility
       const camelData = snakeToCamel(data);
-      
+
       setShowMovies(camelData.movies || []);
       setShowArticles(camelData.articles || []);
       setShowDirectors(camelData.directors || []);
@@ -80,7 +75,6 @@ function Home() {
       setIsSearching(false);
     }
   };
-
 
   const structuredData = generateWebsiteStructuredData();
 
@@ -112,9 +106,7 @@ function Home() {
                 articleCount={showArticles.length}
                 isLoading={isSearching}
                 showNoResults={
-                  !isSearching &&
-                  showMovies.length === 0 &&
-                  showArticles.length === 0
+                  !isSearching && showMovies.length === 0 && showArticles.length === 0
                 }
               />
             )}
@@ -136,27 +128,21 @@ function Home() {
             >
               <Directors directors={showDirectors} />
             </Section>
-            
+
             <Section
               title={searchQuery ? 'Movies' : 'Movie Reviews'}
               subtitle={searchQuery ? '' : 'Click movie to view review'}
               showSearch={false}
             >
-              <Movies
-                showMovies={showMovies}
-                enterSearch={unifiedSearch}
-              />
+              <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
             </Section>
-            
+
             <Section
               title={searchQuery ? 'Articles' : 'Articles'}
               subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
               showSearch={false}
             >
-              <Articles
-                showArticles={showArticles}
-                enterSearch={unifiedSearch}
-              />
+              <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
             </Section>
           </>
         </SearchPageFrame>

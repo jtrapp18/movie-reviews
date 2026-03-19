@@ -1,14 +1,14 @@
-import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { snakeToCamel, postJSONToDb } from '../helper';
-import styled from "styled-components";
+import styled from 'styled-components';
 import { UserContext } from '../context/userProvider';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import Error from "../styles/Error";
-import { StyledForm, Button } from "../styles";
-import { useTheme } from "../context/themeProvider";
-import { useToast } from "../context/toastContext";
+import Error from '../styles/Error';
+import { StyledForm, Button } from '../styles';
+import { useTheme } from '../context/themeProvider';
+import { useToast } from '../context/toastContext';
 
 const validationSchema = yup.object({
   firstName: yup.string(),
@@ -17,10 +17,7 @@ const validationSchema = yup.object({
     .string()
     .required('Username is required')
     .min(3, 'Username must be at least 3 characters'),
-  email: yup
-    .string()
-    .required('Email is required')
-    .email('Email address is invalid'),
+  email: yup.string().required('Email is required').email('Email address is invalid'),
   password: yup
     .string()
     .required('Password is required')
@@ -28,7 +25,10 @@ const validationSchema = yup.object({
     .matches(/[A-Z]/, 'Password must include at least one uppercase letter')
     .matches(/[a-z]/, 'Password must include at least one lowercase letter')
     .matches(/\d/, 'Password must include at least one number')
-    .matches(/[!@#$%^&*(),.?":{}|<>+]/, 'Password must include at least one special character'),
+    .matches(
+      /[!@#$%^&*(),.?":{}|<>+]/,
+      'Password must include at least one special character'
+    ),
   password_confirmation: yup
     .string()
     .required('Password confirmation is required')
@@ -69,14 +69,30 @@ const ToggleVisibility = styled.button`
 `;
 
 const EyeOpen = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
     <circle cx="12" cy="12" r="3" />
   </svg>
 );
 
 const EyeClosed = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden
+  >
     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
     <line x1="1" y1="1" x2="23" y2="23" />
   </svg>
@@ -93,17 +109,20 @@ function SignUpForm({ setShowConfirm }) {
 
   const formik = useFormik({
     initialValues: {
-      firstName: "",
-      lastName: "",
-      username: "",
-      email: "",
-      password: "",
-      password_confirmation: "",
+      firstName: '',
+      lastName: '',
+      username: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
     },
-    validationSchema,  // Use the validation schema here
+    validationSchema, // Use the validation schema here
     onSubmit: async (values, { setErrors }) => {
       // DEBUG: If you never see this log, Formik validation is failing (onSubmit not called) or the form did a full-page submit.
-      console.log('[Sign up] onSubmit called', { username: values.username, email: values.email });
+      console.log('[Sign up] onSubmit called', {
+        username: values.username,
+        email: values.email,
+      });
       setSubmitError(null);
       const body = {
         firstName: values.firstName,
@@ -116,7 +135,7 @@ function SignUpForm({ setShowConfirm }) {
 
       try {
         console.log('[Sign up] Sending request to /api/account_signup');
-        const newUser = await postJSONToDb("account_signup", body);
+        const newUser = await postJSONToDb('account_signup', body);
         console.log('[Sign up] Response received', newUser ? 'success' : 'empty');
         if (newUser) {
           const userTransformed = snakeToCamel(newUser);
@@ -130,19 +149,19 @@ function SignUpForm({ setShowConfirm }) {
           navigate('/');
         }
       } catch (error) {
-          console.error('[Sign up] Failure:', error.message, error.serverErrors ?? '');
-          const errors = {};
-          if (error.serverErrors && typeof error.serverErrors === 'object') {
-            Object.assign(errors, error.serverErrors);
-          }
-          if (Object.keys(errors).length === 0) {
-            setSubmitError(error.message || 'Something went wrong. Please try again.');
-          } else {
-            setSubmitError(null);
-          }
-          setErrors(errors);
+        console.error('[Sign up] Failure:', error.message, error.serverErrors ?? '');
+        const errors = {};
+        if (error.serverErrors && typeof error.serverErrors === 'object') {
+          Object.assign(errors, error.serverErrors);
+        }
+        if (Object.keys(errors).length === 0) {
+          setSubmitError(error.message || 'Something went wrong. Please try again.');
+        } else {
+          setSubmitError(null);
+        }
+        setErrors(errors);
       }
-    }
+    },
   });
 
   const handleFormSubmit = async (e) => {
@@ -200,7 +219,7 @@ function SignUpForm({ setShowConfirm }) {
         <label htmlFor="password">Password</label>
         <PasswordWrapper>
           <input
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             id="password"
             name="password"
             value={formik.values.password}
@@ -210,7 +229,7 @@ function SignUpForm({ setShowConfirm }) {
           <ToggleVisibility
             type="button"
             onClick={() => setShowPassword((s) => !s)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeClosed /> : <EyeOpen />}
           </ToggleVisibility>
@@ -223,7 +242,7 @@ function SignUpForm({ setShowConfirm }) {
         <label htmlFor="password_confirmation">Password Confirmation</label>
         <PasswordWrapper>
           <input
-            type={showPasswordConfirm ? "text" : "password"}
+            type={showPasswordConfirm ? 'text' : 'password'}
             id="password_confirmation"
             name="password_confirmation"
             value={formik.values.password_confirmation}
@@ -233,7 +252,7 @@ function SignUpForm({ setShowConfirm }) {
           <ToggleVisibility
             type="button"
             onClick={() => setShowPasswordConfirm((s) => !s)}
-            aria-label={showPasswordConfirm ? "Hide password" : "Show password"}
+            aria-label={showPasswordConfirm ? 'Hide password' : 'Show password'}
           >
             {showPasswordConfirm ? <EyeClosed /> : <EyeOpen />}
           </ToggleVisibility>

@@ -5,13 +5,14 @@ Revises: 0af7e5f06a95, add_document_fields_001
 Create Date: 2025-09-06 14:01:42.483332
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'bd039fcadac7'
-down_revision = ('0af7e5f06a95', 'add_document_fields_001')
+revision = "bd039fcadac7"
+down_revision = ("0af7e5f06a95", "add_document_fields_001")
 branch_labels = None
 depends_on = None
 

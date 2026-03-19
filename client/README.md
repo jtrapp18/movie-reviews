@@ -6,10 +6,10 @@ The **Cookie Store** is an online cookie store that allows users to view the coo
 
 ## Contributors
 
-**Jacqueline Trapp**  
+**Jacqueline Trapp**
 GitHub: [JTrapp18](https://github.com/jtrapp18)
 
-**Nem Stankovic**  
+**Nem Stankovic**
 GitHub: [Nemswirls](https://github.com/nemswirls)
 
 ## Features
