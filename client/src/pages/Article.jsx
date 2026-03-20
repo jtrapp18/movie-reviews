@@ -1,7 +1,8 @@
 import { useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { useArticle } from '@features/articles/useArticle';
+import { Articles as ArticlesCarousel } from '@features/articles';
 import ArticleForm from '@forms/ArticleForm';
 import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
@@ -44,9 +45,19 @@ const ArticleContainer = styled.div`
   overflow: hidden;
 `;
 
+const MoreArticlesSection = styled.section`
+  margin-top: 1.25rem;
+  width: 100%;
+`;
+
+const MoreArticlesHeading = styled.h2`
+  margin-bottom: 0.75rem;
+`;
+
 function Article() {
   const { id } = useParams();
   const { user } = useContext(UserContext);
+  const { articles = [] } = useOutletContext();
   const reviewId = id ? parseInt(id, 10) : null;
   const { article, loading, error, setArticle } = useArticle(reviewId);
 
@@ -89,6 +100,9 @@ function Article() {
         article.backdrop
       )}`
     : DEFAULT_ARTICLE_BACKDROP;
+  const relatedArticles = Array.isArray(articles)
+    ? articles.filter((candidate) => candidate?.id !== article.id).slice(0, 12)
+    : [];
 
   return (
     <>
@@ -127,6 +141,12 @@ function Article() {
           <ArticleForm initObj={article} />
         </ArticleContainer>
         <CommentList reviewId={article.id} />
+        {relatedArticles.length > 0 && (
+          <MoreArticlesSection>
+            <MoreArticlesHeading>More Articles</MoreArticlesHeading>
+            <ArticlesCarousel showArticles={relatedArticles} />
+          </MoreArticlesSection>
+        )}
       </StyledContainer>
     </>
   );
