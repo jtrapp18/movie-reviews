@@ -493,6 +493,47 @@ class ArticleBackdropUpload(Resource):
             return {"error": f"Backdrop upload failed: {str(e)}"}, 500
 
 
+class ReviewBackdropUpload(Resource):
+    """Upload an image to use as a movie review backdrop."""
+
+    def post(self, review_id):
+        try:
+            if "image" not in request.files:
+                return {"error": "No image file provided"}, 400
+
+            file = request.files["image"]
+            if not file or file.filename == "":
+                return {"error": "No file selected"}, 400
+
+            # Ensure this is a movie review (has movie_id)
+            review = Review.query.filter(
+                Review.id == review_id, Review.movie_id.isnot(None)
+            ).first()
+            if not review:
+                return {"error": "Review not found"}, 404
+
+            s3_client = get_s3_client()
+            object_key = s3_client.generate_object_key(file.filename, int(review_id))
+            upload_result = s3_client.upload_file(
+                file, object_key, file.mimetype or "image/jpeg"
+            )
+
+            if not upload_result["success"]:
+                return {"error": upload_result["error"]}, 400
+
+            review.backdrop = upload_result["object_key"]
+            db.session.commit()
+
+            return {
+                "backdrop": review.backdrop,
+                "review": review.to_dict(),
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Backdrop upload failed: {str(e)}"}, 500
+
+
 class DirectorBackdropUpload(Resource):
     """Upload an image to use as a director backdrop."""
 
@@ -557,6 +598,33 @@ class ArticleBackdropView(Resource):
             return {"error": f"Backdrop fetch failed: {str(e)}"}, 500
 
 
+class ReviewBackdropView(Resource):
+    """Serve movie review backdrop image from S3."""
+
+    def get(self, review_id):
+        try:
+            review = Review.query.filter(
+                Review.id == review_id, Review.movie_id.isnot(None)
+            ).first()
+            if not review or not review.backdrop:
+                return {"error": "Backdrop not found"}, 404
+
+            s3_client = get_s3_client()
+            key = review.backdrop
+            download = s3_client.download_file(key)
+            if not download["success"]:
+                return {"error": download["error"]}, 404
+
+            from flask import Response
+
+            return Response(
+                download["file_data"],
+                mimetype=download.get("content_type", "image/jpeg"),
+            )
+        except Exception as e:
+            return {"error": f"Backdrop fetch failed: {str(e)}"}, 500
+
+
 class DirectorBackdropView(Resource):
     """Serve director backdrop image from S3."""
 
@@ -591,10 +659,12 @@ def register_routes(api):
     api.add_resource(DocumentDownload, "/api/download_document/<int:review_id>")
     api.add_resource(DocumentView, "/api/view_document/<int:review_id>")
     api.add_resource(DocumentPreview, "/api/document_preview/<int:review_id>")
+    api.add_resource(ReviewBackdropUpload, "/api/reviews/<int:review_id>/backdrop")
     api.add_resource(ArticleBackdropUpload, "/api/articles/<int:article_id>/backdrop")
     api.add_resource(
         DirectorBackdropUpload, "/api/directors/<int:director_id>/backdrop"
     )
+    api.add_resource(ReviewBackdropView, "/api/reviews/<int:review_id>/backdrop/view")
     api.add_resource(
         ArticleBackdropView, "/api/articles/<int:article_id>/backdrop/view"
     )

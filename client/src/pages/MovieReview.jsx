@@ -62,6 +62,11 @@ function MovieReview() {
   }
 
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
+  const reviewBackdropUrl =
+    review?.backdrop && review?.id
+      ? `/api/reviews/${review.id}/backdrop/view?v=${encodeURIComponent(review.backdrop)}`
+      : null;
+  const coverImageUrl = reviewBackdropUrl || movie.backdrop || null;
 
   // Generate SEO data
   const ratingLabel = review?.rating ? getGradingLabel(review.rating) : null;
@@ -85,7 +90,7 @@ function MovieReview() {
         title={seoTitle}
         description={seoDescription}
         keywords={`${movie.title}, movie review, ${movie.originalLanguage}, ${movie.releaseDate}, film analysis`}
-        image={movie.backdrop ?? undefined}
+        image={coverImageUrl ?? undefined}
         url={`/#/movies/${movie.id}`}
         type="article"
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
@@ -93,7 +98,7 @@ function MovieReview() {
       <StyledContainer>
         <MovieContainer>
           <CoverHeader
-            imageUrl={movie.backdrop ?? null}
+            imageUrl={coverImageUrl}
             title={movie.title}
             subtitle={review?.title}
             rating={review?.rating}

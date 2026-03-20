@@ -16,12 +16,12 @@ DEFAULT_CONFIG_CANDIDATES = (
 )
 
 VERDICT_TO_RATING = {
-    "magnum opus": 10,
-    "masterpiece": 9,
-    "must see": 8,
-    "highly recommended": 7,
-    "recommended": 6,
-    "passable": 4,
+    "magnum opus": 7,
+    "masterpiece": 6,
+    "must see": 5,
+    "highly recommended": 4,
+    "recommended": 3,
+    "passable": 2,
     "unredeemable": 1,
 }
 

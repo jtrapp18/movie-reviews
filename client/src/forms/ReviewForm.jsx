@@ -18,6 +18,7 @@ import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
 import { useAdmin } from '@hooks/useAdmin';
+import BackdropUpload from '@components/forms/BackdropUpload';
 
 const RatingOverlayWrapper = styled.div`
   display: flex;
@@ -40,7 +41,8 @@ const ReviewForm = ({ initObj }) => {
   const [updatedReview, setUpdatedReview] = useState(null); // Track updated review data
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setMovies } = useOutletContext();
+  const [backdropKey, setBackdropKey] = useState(initObj?.backdrop || null);
+  const { setMovies, setPosts } = useOutletContext();
   const { addToKey, updateKey, deleteItem } = useCrudStateDB(setMovies, 'movies');
   const { isAdmin } = useAdmin();
   const movieId = parseInt(id);
@@ -50,11 +52,13 @@ const ReviewForm = ({ initObj }) => {
         rating: initObj.rating || '',
         reviewText: initObj.reviewText || '',
         title: initObj.title || '',
+        description: initObj.description || '',
       }
     : {
         rating: '',
         reviewText: '',
         title: '',
+        description: '',
       };
 
   const _submitToDB = initObj
@@ -105,6 +109,7 @@ const ReviewForm = ({ initObj }) => {
       .required('Review title is required')
       .min(3, 'Title must be at least 3 characters')
       .max(100, 'Title must be less than 100 characters'),
+    description: Yup.string().max(500, 'Description must be less than 500 characters'),
     rating: Yup.number()
       .required('Rating is required.')
       .min(1, 'Rating must be at least 1.')
@@ -140,6 +145,7 @@ const ReviewForm = ({ initObj }) => {
           title: values.title,
           rating: values.rating,
           reviewText: values.reviewText,
+          description: values.description,
           movieId: movieId,
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
@@ -174,9 +180,23 @@ const ReviewForm = ({ initObj }) => {
             setUpdatedReview(camelCaseResult);
             // Update initObj for immediate display
             Object.assign(initObj, camelCaseResult);
+            // Keep Home "Recent Posts" in sync with latest review fields (e.g., description/backdrop)
+            setPosts((prev) =>
+              Array.isArray(prev)
+                ? prev.map((post) =>
+                    post.id === camelCaseResult.id
+                      ? { ...post, ...camelCaseResult }
+                      : post
+                  )
+                : prev
+            );
           } else {
             // For new reviews, just store the result - no need to call addToKey since we already submitted
             setUpdatedReview(camelCaseResult);
+            // Prepend new review to posts list so it appears immediately on Home
+            setPosts((prev) =>
+              Array.isArray(prev) ? [camelCaseResult, ...prev] : [camelCaseResult]
+            );
           }
 
           // Invalidate ratings cache since ratings may have changed
@@ -247,6 +267,32 @@ const ReviewForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
+          {/* Backdrop Image Upload (for existing reviews) */}
+          {initObj?.id && (
+            <div>
+              <label>Backdrop Image (optional):</label>
+              <BackdropUpload
+                uploadUrl={`/api/reviews/${initObj.id}/backdrop`}
+                currentUrl={
+                  backdropKey
+                    ? `/api/reviews/${initObj.id}/backdrop/view?v=${encodeURIComponent(
+                        backdropKey
+                      )}`
+                    : null
+                }
+                onUploaded={(url) => {
+                  setBackdropKey(url);
+                  if (initObj) {
+                    initObj.backdrop = url;
+                  }
+                  setUpdatedReview((prev) =>
+                    prev ? { ...prev, backdrop: url } : prev
+                  );
+                }}
+              />
+            </div>
+          )}
+
           {/* Rating Stars */}
           <RatingOverlayWrapper>
             <Rating rating={formik.values.rating} handleStarClick={updateRating} />
@@ -269,6 +315,22 @@ const ReviewForm = ({ initObj }) => {
             />
             {formik.touched.title && formik.errors.title && (
               <Error>{formik.errors.title}</Error>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="description">Review Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Short summary shown in list/card hover..."
+              rows="3"
+            />
+            {formik.touched.description && formik.errors.description && (
+              <Error>{formik.errors.description}</Error>
             )}
           </div>
 
@@ -402,6 +464,7 @@ const ReviewForm = ({ initObj }) => {
                 reviewData?.review_text ||
                 formik.values.reviewText ||
                 '',
+              description: reviewData?.description || '',
               hasDocument: reviewData?.hasDocument || false,
               documentFilename: reviewData?.documentFilename || null,
               documentType: reviewData?.documentType || null,
