@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import Rating from './Rating';
 
 const Wrapper = styled.div`
@@ -45,6 +46,13 @@ const OverlayContent = styled.div`
   text-align: center;
 `;
 
+const Pretitle = styled.p`
+  margin: 0 0 0.35rem 0;
+  color: var(--soft-white);
+  font-style: italic;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+`;
+
 const Title = styled.h1`
   margin: 0 0 0.25rem 0;
   color: var(--soft-white);
@@ -58,6 +66,48 @@ const Subtitle = styled.h2`
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 `;
 
+const LinkedSubtitleHeading = styled.h4`
+  margin: 0 0 0.5rem 0;
+  color: var(--soft-white);
+  font-weight: 600;
+  line-height: 1.25;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+`;
+
+const LinkedSubtitle = styled.button`
+  display: inline;
+  color: inherit;
+  font: inherit;
+  text-shadow: inherit;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease;
+
+  &:hover {
+    text-decoration-color: var(--soft-white);
+  }
+`;
+
+const HoverHint = styled.span`
+  margin-left: 0.4rem;
+  color: inherit;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+`;
+
+const LinkedSubtitleText = styled.span`
+  color: inherit;
+  font-size: inherit;
+  &:hover ${HoverHint} {
+    opacity: 0.9;
+  }
+`;
+
 const RatingOverlayWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -67,8 +117,19 @@ const PublishDate = styled.span`
   color: var(--soft-white);
 `;
 
-function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
-  if (!imageUrl && !title && !subtitle) return null;
+function CoverHeader({
+  imageUrl,
+  title,
+  subtitle,
+  pretitle,
+  subtitleAsTitle = false,
+  subtitleLink,
+  rating,
+  publishDate,
+}) {
+  const navigate = useNavigate();
+
+  if (!imageUrl && !title && !subtitle && !pretitle) return null;
 
   const hasRating = typeof rating === 'number' && rating > 0;
   const formattedDate = publishDate
@@ -79,6 +140,26 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
       })
     : null;
 
+  const renderSubtitle = () => {
+    if (!subtitle) return null;
+    if (subtitleLink) {
+      return (
+        <LinkedSubtitleHeading>
+          <LinkedSubtitle
+            type="button"
+            title="Go to director page"
+            onClick={() => navigate(subtitleLink)}
+          >
+            <LinkedSubtitleText>
+              {subtitle}
+            </LinkedSubtitleText>
+          </LinkedSubtitle>
+        </LinkedSubtitleHeading>
+      );
+    }
+    return subtitleAsTitle ? <Title>{subtitle}</Title> : <Subtitle>{subtitle}</Subtitle>;
+  };
+
   // If we have an image, render the full hero with overlayed text
   if (imageUrl) {
     return (
@@ -87,8 +168,9 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
           <CoverImage src={imageUrl} alt={title || subtitle || 'cover image'} />
           <Overlay>
             <OverlayContent>
+              {pretitle && <Pretitle>{pretitle}</Pretitle>}
               {title && <Title>{title}</Title>}
-              {subtitle && <Subtitle>{subtitle}</Subtitle>}
+              {renderSubtitle()}
               {hasRating && (
                 <RatingOverlayWrapper>
                   <Rating rating={rating} />
@@ -108,8 +190,9 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
       <ImageWrapper style={{ minHeight: '200px' }}>
         <Overlay>
           <OverlayContent>
+            {pretitle && <Pretitle>{pretitle}</Pretitle>}
             {title && <Title>{title}</Title>}
-            {subtitle && <Subtitle>{subtitle}</Subtitle>}
+            {renderSubtitle()}
             {hasRating && (
               <RatingOverlayWrapper>
                 <Rating rating={rating} />

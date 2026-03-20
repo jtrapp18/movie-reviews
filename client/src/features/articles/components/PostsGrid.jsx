@@ -66,17 +66,12 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
           const stripHtml = (str) =>
             typeof str === 'string' ? str.replace(/<[^>]+>/g, '') : str;
 
-          const rawDescription =
-            post.description ||
-            post.shortText ||
-            (post.reviewText ? `${post.reviewText.slice(0, 140)}...` : '');
-
-          const description = stripHtml(rawDescription);
+          const description = stripHtml(post.description || '');
 
           const photo = post.backdrop
-            ? `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(
-                post.backdrop
-              )}`
+            ? post.movieId
+              ? `/api/reviews/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
+              : `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
             : (post.movie?.backdrop ?? null);
 
           return (
