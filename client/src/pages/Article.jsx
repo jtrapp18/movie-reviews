@@ -104,6 +104,7 @@ function Article() {
         <ArticleContainer>
           <CoverHeader
             imageUrl={coverImageUrl}
+            pretitle="A James Trapp Article"
             title={article.movie?.title || article.title}
             subtitle={article.movie?.title ? article.title : undefined}
             rating={article.rating}

@@ -67,6 +67,14 @@ function MovieReview() {
       ? `/api/reviews/${review.id}/backdrop/view?v=${encodeURIComponent(review.backdrop)}`
       : null;
   const coverImageUrl = reviewBackdropUrl || movie.backdrop || null;
+  const releaseYear = (movie.releaseDate || '').slice(0, 4);
+  const movieTitleLine = releaseYear ? `${movie.title} (${releaseYear})` : movie.title;
+  const directorName =
+    (typeof movie.director === 'object' ? movie.director?.name : movie.director) ||
+    null;
+  const directorId =
+    typeof movie.director === 'object' && movie.director?.id ? movie.director.id : null;
+  const directorLine = directorName ? `Directed by ${directorName}` : null;
 
   // Generate SEO data
   const ratingLabel = review?.rating ? getGradingLabel(review.rating) : null;
@@ -99,8 +107,11 @@ function MovieReview() {
         <MovieContainer>
           <CoverHeader
             imageUrl={coverImageUrl}
-            title={movie.title}
-            subtitle={review?.title}
+            pretitle="A James Trapp Movie Review"
+            title={movieTitleLine}
+            subtitle={directorLine}
+            subtitleAsTitle
+            subtitleLink={directorId ? `/directors/${directorId}` : null}
             rating={review?.rating}
             publishDate={review?.dateAdded || review?.date_added}
           />
