@@ -71,3 +71,5 @@ instance
 client/dist/
 
 *.ipynb
+
+*tmp/

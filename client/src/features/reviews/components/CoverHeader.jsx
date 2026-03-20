@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import Stars from './Stars';
+import Rating from './Rating';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -58,7 +58,7 @@ const Subtitle = styled.h2`
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 `;
 
-const StarsWrapper = styled.div`
+const RatingOverlayWrapper = styled.div`
   display: flex;
   justify-content: center;
 `;
@@ -90,9 +90,9 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
               {title && <Title>{title}</Title>}
               {subtitle && <Subtitle>{subtitle}</Subtitle>}
               {hasRating && (
-                <StarsWrapper>
-                  <Stars rating={rating} />
-                </StarsWrapper>
+                <RatingOverlayWrapper>
+                  <Rating rating={rating} />
+                </RatingOverlayWrapper>
               )}
               {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
             </OverlayContent>
@@ -111,9 +111,9 @@ function CoverHeader({ imageUrl, title, subtitle, rating, publishDate }) {
             {title && <Title>{title}</Title>}
             {subtitle && <Subtitle>{subtitle}</Subtitle>}
             {hasRating && (
-              <StarsWrapper>
-                <Stars rating={rating} />
-              </StarsWrapper>
+              <RatingOverlayWrapper>
+                <Rating rating={rating} />
+              </RatingOverlayWrapper>
             )}
             {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
           </OverlayContent>

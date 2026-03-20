@@ -25,7 +25,12 @@ class Director(db.Model, SerializerMixin):
         "Review", back_populates="director", cascade="all", lazy="select"
     )
 
-    serialize_rules = ("-movies.director", "-reviews.director")
+    serialize_rules = (
+        "-movies.director",
+        "-movies.reviews",
+        "-reviews.director",
+        "-reviews.movie",
+    )
 
     def __repr__(self):
         return f"<Director {self.id}: {self.name}>"

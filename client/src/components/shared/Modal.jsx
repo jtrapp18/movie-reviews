@@ -49,6 +49,11 @@ const ModalHeader = styled.div`
 const ModalBody = styled.div`
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   overflow-y: auto;
+  text-align: left;
+
+  p {
+    text-align: left;
+  }
 `;
 
 const CloseButtonRow = styled.div`

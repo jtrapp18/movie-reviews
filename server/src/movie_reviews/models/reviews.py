@@ -61,6 +61,7 @@ class Review(db.Model, SerializerMixin):
         "-movie.reviews",
         "-tags.reviews",
         "-director.reviews",
+        "-director.movies",
         "-likes.review",
     )
 
@@ -69,7 +70,7 @@ class Review(db.Model, SerializerMixin):
 
     @validates("rating")
     def validate_rating(self, key, value):
-        return validate_optional_int_in_range(value, 1, 10, "Rating")
+        return validate_optional_int_in_range(value, 1, 7, "Rating")
 
     @validates("review_text")
     def validate_review_text(self, key, value):

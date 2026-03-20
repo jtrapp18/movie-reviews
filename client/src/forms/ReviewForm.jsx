@@ -7,7 +7,7 @@ import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
 import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
 import Error from '@styles/Error';
-import { Stars } from '@features/reviews';
+import { Rating } from '@features/reviews';
 import ContentDisplay from '@components/forms/FormSubmit';
 import DocumentUpload from '@components/forms/DocumentUpload';
 import TagInput from '@components/forms/TagInput';
@@ -19,7 +19,7 @@ import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
 import { useAdmin } from '@hooks/useAdmin';
 
-const StarsContainer = styled.div`
+const RatingOverlayWrapper = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
@@ -52,7 +52,7 @@ const ReviewForm = ({ initObj }) => {
         title: initObj.title || '',
       }
     : {
-        rating: 0,
+        rating: '',
         reviewText: '',
         title: '',
       };
@@ -108,7 +108,7 @@ const ReviewForm = ({ initObj }) => {
     rating: Yup.number()
       .required('Rating is required.')
       .min(1, 'Rating must be at least 1.')
-      .max(10, 'Rating must be at most 10.'),
+      .max(7, 'Rating must be at most 7.'),
     reviewText: Yup.string()
       .test(
         'review-or-document',
@@ -248,12 +248,12 @@ const ReviewForm = ({ initObj }) => {
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
           {/* Rating Stars */}
-          <StarsContainer>
-            <Stars rating={formik.values.rating} handleStarClick={updateRating} />
+          <RatingOverlayWrapper>
+            <Rating rating={formik.values.rating} handleStarClick={updateRating} />
             {formik.touched.rating && formik.errors.rating && (
               <Error>{formik.errors.rating}</Error>
             )}
-          </StarsContainer>
+          </RatingOverlayWrapper>
 
           {/* Title Input */}
           <div>
