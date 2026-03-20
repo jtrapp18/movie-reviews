@@ -28,7 +28,12 @@ class Movie(db.Model, SerializerMixin):
     reviews = db.relationship("Review", back_populates="movie", cascade="all")
     director = db.relationship("Director", back_populates="movies")
 
-    serialize_rules = ("-reviews.movie", "-director.movies")
+    serialize_rules = (
+        "-reviews.movie",
+        "-reviews.director",
+        "-director.movies",
+        "-director.reviews",
+    )
 
     def __repr__(self):
         return f"<Movie {self.id}, Title: {self.title}>"

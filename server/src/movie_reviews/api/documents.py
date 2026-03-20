@@ -83,12 +83,13 @@ class ReviewWithDocument(Resource):
 
             # Handle document upload if file is provided
             if file and file.filename:
-                result = DocumentProcessor.process_uploaded_document_temporary(file)
+                result = DocumentProcessor.process_uploaded_document_s3(file, review.id)
 
                 if result["success"]:
                     # Update review with document information
                     review.has_document = True
                     review.document_filename = result["filename"]
+                    review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
 
                     # Replace review text with extracted text if replace_text is true
@@ -161,12 +162,13 @@ class ReviewWithDocumentById(Resource):
 
             # Handle document upload if file is provided
             if file and file.filename:
-                result = DocumentProcessor.process_uploaded_document_temporary(file)
+                result = DocumentProcessor.process_uploaded_document_s3(file, review.id)
 
                 if result["success"]:
                     # Update review with document information
                     review.has_document = True
                     review.document_filename = result["filename"]
+                    review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
 
                     # Replace review text with extracted text if replace_text is true
