@@ -61,6 +61,7 @@ class Review(db.Model, SerializerMixin):
         "-movie.reviews",
         "-tags.reviews",
         "-director.reviews",
+        "-director.movies",
         "-likes.review",
     )
 
