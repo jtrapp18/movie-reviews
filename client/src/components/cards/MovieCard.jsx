@@ -8,7 +8,7 @@ import {
 } from '@styles/cards';
 import { useAdmin } from '@hooks/useAdmin';
 import useCrudStateDB from '@hooks/useCrudStateDB';
-import { StarRatingOverlay } from '@features/reviews';
+import { RatingOverlay } from '@features/reviews';
 import { prefetchEntity } from '@features/cache/prefetchEntity';
 import styled from 'styled-components';
 
@@ -64,7 +64,7 @@ function MovieCard({ movie, rating = null, clickable = true, size = 'default' })
       <CardContent>
         <CardTitle>
           {title}
-          {rating && <StarRatingOverlay rating={rating} />}
+          {rating && <RatingOverlay rating={rating} />}
         </CardTitle>
       </CardContent>
 

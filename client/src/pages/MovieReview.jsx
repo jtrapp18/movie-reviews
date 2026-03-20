@@ -9,6 +9,7 @@ import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
 import Loading from '@components/ui/Loading';
 import { UserContext } from '@context/userProvider';
+import { getGradingLabel } from '@utils/gradingTiers';
 import {
   generateMovieReviewStructuredData,
   generateBreadcrumbStructuredData,
@@ -63,8 +64,9 @@ function MovieReview() {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
 
   // Generate SEO data
+  const ratingLabel = review?.rating ? getGradingLabel(review.rating) : null;
   const seoTitle = review
-    ? `${movie.title} Review - ${review.rating}/10`
+    ? `${movie.title} Review${ratingLabel ? ` - ${ratingLabel}` : ''}`
     : `${movie.title} - Movie Review`;
   const seoDescription = review
     ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...`
