@@ -126,13 +126,16 @@ const RichTextContainer = styled.div`
     color: inherit;
   }
 
-  /* Enhanced image styling - center images only */
+  /* Full-bleed images: extend into ContentBody horizontal padding; text stays padded */
   img {
     display: block;
-    max-width: 100%;
     height: auto;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: calc(100% + 2 * var(--content-inline-padding, 1rem));
+    width: calc(100% + 2 * var(--content-inline-padding, 1rem));
+    margin-left: calc(-1 * var(--content-inline-padding, 1rem));
+    margin-right: calc(-1 * var(--content-inline-padding, 1rem));
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
   }
 
   /* Enhanced link styling */

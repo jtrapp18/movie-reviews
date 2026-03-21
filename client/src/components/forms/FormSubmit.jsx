@@ -28,8 +28,9 @@ const Tag = styled.span`
 `;
 
 const ContentBody = styled.div`
+  --content-inline-padding: 1rem;
   width: 100%;
-  padding: 2rem 1rem;
+  padding: 2rem var(--content-inline-padding);
   margin-bottom: 2rem;
 `;
 
