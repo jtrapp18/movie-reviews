@@ -1,47 +1,30 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { getJSON, snakeToCamel } from '@helper';
-import { getEntity, setEntity } from '@features/cache/entityStore';
+import { useCachedEntityDetail } from '@features/cache/useCachedEntityDetail';
 
 const ENTITY_KEY = 'article';
 
 export function useArticle(reviewId) {
-  const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchArticle = useCallback(async () => {
-    if (!reviewId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getJSON(`reviews/${reviewId}`);
-      if (!data || data.error) {
-        setArticle(null);
-        setError(data?.error || 'Article not found');
-        return;
-      }
-      const transformed = snakeToCamel(data);
-      setArticle(transformed);
-      setEntity(ENTITY_KEY, reviewId, transformed);
-    } catch (err) {
-      console.error('Error fetching article:', err);
-      setError('Failed to load article');
-    } finally {
-      setLoading(false);
+  const load = useCallback(async (id) => {
+    const data = await getJSON(`reviews/${id}`);
+    if (!data || data.error) {
+      return { entity: null, error: data?.error || 'Article not found' };
     }
-  }, [reviewId]);
+    return { entity: snakeToCamel(data), error: null };
+  }, []);
 
-  useEffect(() => {
-    if (!reviewId) return;
-    const cached = getEntity(ENTITY_KEY, reviewId);
-    if (cached) {
-      setArticle(cached);
-      setLoading(false);
-      fetchArticle();
-    } else {
-      fetchArticle();
-    }
-  }, [reviewId, fetchArticle]);
+  const {
+    entity: article,
+    loading,
+    error,
+    setEntity: setArticle,
+    refetch,
+  } = useCachedEntityDetail({
+    cacheKey: ENTITY_KEY,
+    id: reviewId,
+    load,
+    fetchErrorMessage: 'Failed to load article',
+  });
 
-  return { article, loading, error, setArticle, refetch: fetchArticle };
+  return { article, loading, error, setArticle, refetch };
 }

@@ -31,10 +31,6 @@ const ContentBody = styled.div`
   width: 100%;
   padding: 2rem 1rem;
   margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem 0rem;
-  }
 `;
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {

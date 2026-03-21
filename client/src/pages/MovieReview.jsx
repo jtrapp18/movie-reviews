@@ -9,38 +9,19 @@ import ReviewForm from '@forms/ReviewForm';
 import CommentList from '@components/comments/CommentList';
 import DirectorCard from '@components/cards/DirectorCard';
 import SEOHead from '@components/shared-sections/SEOHead';
-import Loading from '@components/ui/Loading';
 import { UserContext } from '@context/userProvider';
 import { getGradingLabel } from '@utils/gradingTiers';
 import {
   generateMovieReviewStructuredData,
   generateBreadcrumbStructuredData,
 } from '@utils/seoUtils';
-
-const MovieContainer = styled.div`
-  margin: 1rem 0 2rem 0;
-  width: 100%;
-  background: var(--background-secondary);
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const LikeBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-`;
-
-const SuggestionsSection = styled.section`
-  margin-top: 1.25rem;
-  width: 100%;
-`;
-
-const SuggestionsHeading = styled.h2`
-  margin-bottom: 0.75rem;
-`;
+import EntityDetailState from '@components/layout/EntityDetailState';
+import {
+  DetailContentCard,
+  LikeBar,
+  RelatedSection,
+  RelatedHeading,
+} from '@components/layout/detailPageStyles';
 
 const SuggestionsLayout = styled.div`
   display: flex;
@@ -102,30 +83,28 @@ function MovieReview() {
   const movieId = parseInt(id);
   const { movie, loading, error } = useMovieReview(movieId);
 
-  if (loading) {
-    return (
-      <StyledContainer>
-        <Loading text="Loading movie details" size="large" />
-      </StyledContainer>
-    );
-  }
+  return (
+    <EntityDetailState
+      loading={loading}
+      loadingText="Loading movie details"
+      error={error}
+      missing={!movie}
+      missingMessage="Movie not found"
+    >
+      {movie && (
+        <MovieReviewBody
+          movie={movie}
+          movies={movies}
+          directors={directors}
+          user={user}
+          navigate={navigate}
+        />
+      )}
+    </EntityDetailState>
+  );
+}
 
-  if (error) {
-    return (
-      <StyledContainer>
-        <h1>Error: {error}</h1>
-      </StyledContainer>
-    );
-  }
-
-  if (!movie) {
-    return (
-      <StyledContainer>
-        <h1>Movie not found</h1>
-      </StyledContainer>
-    );
-  }
-
+function MovieReviewBody({ movie, movies, directors, user, navigate }) {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
   const reviewBackdropUrl =
     review?.backdrop && review?.id
@@ -154,13 +133,13 @@ function MovieReview() {
     if (!directorId || !Array.isArray(movies)) return [];
     return movies.filter((m) => {
       if (!m || m.id === movie.id) return false;
-      const matchesDirector = m.directorId === directorId || m.director?.id === directorId;
+      const matchesDirector =
+        m.directorId === directorId || m.director?.id === directorId;
       const hasReview = Array.isArray(m.reviews) && m.reviews.length > 0;
       return matchesDirector && hasReview;
     });
   })();
 
-  // Generate SEO data
   const ratingLabel = review?.rating ? getGradingLabel(review.rating) : null;
   const seoTitle = review
     ? `${movie.title} Review${ratingLabel ? ` - ${ratingLabel}` : ''}`
@@ -188,7 +167,7 @@ function MovieReview() {
         structuredData={[structuredData, breadcrumbData].filter(Boolean)}
       />
       <StyledContainer>
-        <MovieContainer>
+        <DetailContentCard>
           <CoverHeader
             imageUrl={coverImageUrl}
             pretitle="A James Trapp Movie Review"
@@ -208,7 +187,6 @@ function MovieReview() {
                 likedByMe={review.likedByMe ?? false}
                 disabled={!user}
                 onUpdate={(liked, likeCount) => {
-                  // Optimistically update the local movie state returned by the hook
                   if (!movie?.reviews?.length) return;
                   movie.reviews[0] = {
                     ...movie.reviews[0],
@@ -220,13 +198,13 @@ function MovieReview() {
             </LikeBar>
           )}
           <ReviewForm initObj={review} />
-        </MovieContainer>
+        </DetailContentCard>
         {review && <CommentList reviewId={review.id} />}
         {(resolvedDirector || relatedMoviesByDirector.length > 0) && (
-          <SuggestionsSection>
-            <SuggestionsHeading>
+          <RelatedSection>
+            <RelatedHeading>
               {directorName ? `More from ${directorName}` : 'Suggested Next'}
-            </SuggestionsHeading>
+            </RelatedHeading>
             <SuggestionsLayout>
               {resolvedDirector && resolvedDirector.id && (
                 <DirectorTeaserColumn>
@@ -237,9 +215,9 @@ function MovieReview() {
                 </DirectorTeaserColumn>
               )}
 
-              {resolvedDirector && resolvedDirector.id && relatedMoviesByDirector.length > 0 && (
-                <SuggestionsDivider />
-              )}
+              {resolvedDirector &&
+                resolvedDirector.id &&
+                relatedMoviesByDirector.length > 0 && <SuggestionsDivider />}
 
               {relatedMoviesByDirector.length > 0 && (
                 <DirectorMoviesColumn>
@@ -250,7 +228,7 @@ function MovieReview() {
                 </DirectorMoviesColumn>
               )}
             </SuggestionsLayout>
-          </SuggestionsSection>
+          </RelatedSection>
         )}
       </StyledContainer>
     </>

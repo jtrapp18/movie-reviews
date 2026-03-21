@@ -1,46 +1,30 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { getJSON } from '@helper';
-import { getEntity, setEntity } from '@features/cache/entityStore';
+import { useCachedEntityDetail } from '@features/cache/useCachedEntityDetail';
 
 const ENTITY_KEY = 'movieReview';
 
 export function useMovieReview(movieId) {
-  const [movie, setMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchMovie = useCallback(async () => {
-    if (!movieId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getJSON('movies', movieId);
-      if (!data) {
-        setMovie(null);
-        return;
-      }
-      setMovie(data);
-      setEntity(ENTITY_KEY, movieId, data);
-    } catch (err) {
-      console.error('Error fetching movie:', err);
-      setError('Failed to load movie details');
-    } finally {
-      setLoading(false);
+  const load = useCallback(async (id) => {
+    const data = await getJSON('movies', id);
+    if (!data) {
+      return { entity: null, error: null };
     }
-  }, [movieId]);
+    return { entity: data, error: null };
+  }, []);
 
-  useEffect(() => {
-    if (!movieId) return;
-    const cached = getEntity(ENTITY_KEY, movieId);
-    if (cached) {
-      setMovie(cached);
-      setLoading(false);
-      // Always revalidate in the background
-      fetchMovie();
-    } else {
-      fetchMovie();
-    }
-  }, [movieId, fetchMovie]);
+  const {
+    entity: movie,
+    loading,
+    error,
+    setEntity: setMovie,
+    refetch,
+  } = useCachedEntityDetail({
+    cacheKey: ENTITY_KEY,
+    id: movieId,
+    load,
+    fetchErrorMessage: 'Failed to load movie details',
+  });
 
-  return { movie, loading, error, refetch: fetchMovie };
+  return { movie, loading, error, setMovie, refetch };
 }
