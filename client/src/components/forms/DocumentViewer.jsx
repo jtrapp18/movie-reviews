@@ -7,10 +7,10 @@ import {
   sha256Hex,
   getCachedEnrichedHtml,
   setCachedEnrichedHtml,
-  fetchEnrichedHtml,
   logWordPipeline,
   getEnrichHtmlMarkers,
 } from '@utils/enrichedDocCache';
+import { stripMammothDuplicateSections } from '@utils/mammothWordBodyHtml';
 
 const ErrorMessage = styled.div`
   display: flex;
@@ -43,8 +43,9 @@ const WordDocumentContainer = styled.div`
 `;
 
 /**
- * Word: Mammoth → enrich API → RichTextDisplay. Images preserved; semantic classes applied.
- * Cached by SHA-256 of file bytes so repeat views skip Mammoth + enrich.
+ * Word: Mammoth → strip duplicate Main Cast / Line Notes (h1 sections) → RichTextDisplay.
+ * Cast/line notes from DB are prepended; we do not run the review enricher on the body.
+ * Cached by SHA-256 of file bytes so repeat views skip Mammoth + strip.
  */
 const DocumentViewer = ({
   documentUrl,
@@ -107,13 +108,11 @@ const DocumentViewer = ({
       }
     }
 
-    logWordPipeline('cache miss — running mammoth, then enrich API');
+    logWordPipeline('cache miss — running mammoth, then h1 dedup');
 
     const result = await mammoth.convertToHtml({ arrayBuffer });
-    let html = result.value;
-    logWordPipeline('after mammoth', getEnrichHtmlMarkers(html));
-    html = await fetchEnrichedHtml(html);
-    logWordPipeline('final HTML going to RichTextDisplay', getEnrichHtmlMarkers(html));
+    let html = stripMammothDuplicateSections(result.value);
+    logWordPipeline('after mammoth + dedup', getEnrichHtmlMarkers(html));
 
     if (docHash) {
       setCachedEnrichedHtml(docHash, html);
