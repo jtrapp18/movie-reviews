@@ -33,6 +33,8 @@ export function buildReviewFormContentDisplayValues({
     documentFilename: reviewData?.documentFilename || null,
     documentType: reviewData?.documentType || null,
     dateAdded: reviewData?.dateAdded || null,
+    mainCast: reviewData?.mainCast ?? reviewData?.main_cast ?? null,
+    lineNotes: reviewData?.lineNotes ?? reviewData?.line_notes ?? null,
     tags,
   };
 }
@@ -56,12 +58,8 @@ export function buildArticleFormContentDisplayValues({
     ...formikValues,
     ...initObj,
     reviewText:
-      formikValues.reviewText ||
-      initObj?.reviewText ||
-      initObj?.review_text ||
-      '',
-    hasDocument:
-      hasDocument || initObj?.hasDocument || initObj?.has_document || false,
+      formikValues.reviewText || initObj?.reviewText || initObj?.review_text || '',
+    hasDocument: hasDocument || initObj?.hasDocument || initObj?.has_document || false,
     documentFilename:
       selectedFile?.name ||
       initObj?.documentFilename ||
@@ -70,5 +68,7 @@ export function buildArticleFormContentDisplayValues({
     documentType: selectedFile
       ? selectedFile.name.split('.').pop().toLowerCase()
       : initObj?.documentType || initObj?.document_type || null,
+    mainCast: initObj?.mainCast ?? initObj?.main_cast ?? null,
+    lineNotes: initObj?.lineNotes ?? initObj?.line_notes ?? null,
   };
 }

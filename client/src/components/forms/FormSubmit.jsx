@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { Button } from '@styles';
 import DocumentViewer from './DocumentViewer';
 import { useAdmin } from '@hooks/useAdmin';
 import RichTextDisplay from './RichTextDisplay';
 import ZoomableContent from '@components/ui/ZoomableContent';
+import { buildStructuredReviewHtml } from '@utils/structuredReviewHtml';
 import styled from 'styled-components';
 
 const ContentDisplayContainer = styled.div`
@@ -30,6 +32,7 @@ const Tag = styled.span`
 const ContentBody = styled.div`
   --content-inline-padding: 1rem;
   width: 100%;
+  min-width: 0;
   padding: 2rem var(--content-inline-padding);
   margin-bottom: 2rem;
 `;
@@ -45,6 +48,11 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
     formValues.documentType &&
     (formValues.documentType.toLowerCase() === 'docx' ||
       formValues.documentType.toLowerCase() === 'doc');
+
+  const structuredBeforeWordHtml = useMemo(
+    () => buildStructuredReviewHtml(formValues.mainCast, formValues.lineNotes),
+    [formValues.mainCast, formValues.lineNotes]
+  );
 
   // Determine if there's any content to display
   const hasAnyContent = hasContent || hasDocument;
@@ -63,18 +71,19 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
       {hasAnyContent ? (
         <ZoomableContent>
           <ContentBody className="content-body">
-            {/* Prefer saved HTML (e.g. server-enriched Word extract); else Word -> mammoth */}
-            {hasContent ? (
-              <RichTextDisplay content={formValues.reviewText} />
-            ) : isWordDocument ? (
+            {/* Word: mammoth in DocumentViewer keeps inline images; enrich runs client-side. */}
+            {isWordDocument ? (
               <DocumentViewer
                 className="word-document-viewer"
                 documentUrl={`/api/view_document/${reviewId}`}
                 documentType={formValues.documentType}
                 filename={formValues.documentFilename}
                 hasDocument={formValues.hasDocument}
+                prependHtml={structuredBeforeWordHtml}
               />
-            ) : null}
+            ) : (
+              hasContent && <RichTextDisplay content={formValues.reviewText} />
+            )}
 
             {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
             {hasDocument &&
