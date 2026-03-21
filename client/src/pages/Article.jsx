@@ -1,109 +1,79 @@
 import { useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { useArticle } from '@features/articles/useArticle';
+import { Articles as ArticlesCarousel } from '@features/articles';
 import ArticleForm from '@forms/ArticleForm';
 import CommentList from '@components/comments/CommentList';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
 import {
-  generateArticleStructuredData,
-  generateBreadcrumbStructuredData,
+  buildArticleDetailPageStructuredData,
+  buildArticleDetailSeoCopy,
 } from '@utils/seoUtils';
-import Loading from '@components/ui/Loading';
 import { StyledContainer } from '@styles';
+import EntityDetailState from '@components/layout/EntityDetailState';
+import {
+  DetailContentCard,
+  LikeBar,
+  RelatedSection,
+  RelatedHeading,
+} from '@components/layout/detailPageStyles';
 
 const DEFAULT_ARTICLE_BACKDROP = '/images/default-article.jpeg';
-
-const ErrorMessage = styled.div`
-  text-align: center;
-  padding: 50px;
-  font-size: 1.2rem;
-  color: #dc3545;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 20px auto;
-`;
-
-const LikeBar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-`;
-
-const ArticleContainer = styled.div`
-  margin: 1rem 0 2rem 0;
-  width: 100%;
-  background: var(--background-secondary);
-  border-radius: 8px;
-  overflow: hidden;
-`;
 
 function Article() {
   const { id } = useParams();
   const { user } = useContext(UserContext);
+  const { articles = [] } = useOutletContext();
   const reviewId = id ? parseInt(id, 10) : null;
   const { article, loading, error, setArticle } = useArticle(reviewId);
 
-  if (loading) {
-    return (
-      <StyledContainer>
-        <Loading text="Loading article" size="large" />
-      </StyledContainer>
-    );
-  }
+  return (
+    <EntityDetailState
+      loading={loading}
+      loadingText="Loading article"
+      error={error}
+      missing={!article}
+      missingMessage="Article not found"
+    >
+      {article && (
+        <ArticleBody
+          article={article}
+          articles={articles}
+          user={user}
+          setArticle={setArticle}
+        />
+      )}
+    </EntityDetailState>
+  );
+}
 
-  if (error) {
-    return (
-      <StyledContainer>
-        <ErrorMessage>{error}</ErrorMessage>
-      </StyledContainer>
-    );
-  }
-
-  if (!article) {
-    return (
-      <StyledContainer>
-        <ErrorMessage>Article not found</ErrorMessage>
-      </StyledContainer>
-    );
-  }
-
-  // Generate SEO data
-  const seoTitle = article.title;
-  const seoDescription = article.description || article.title;
-  const structuredData = generateArticleStructuredData(article);
-  const breadcrumbData = generateBreadcrumbStructuredData([
-    { name: 'Home', url: window.location.origin + '/#/' },
-    { name: 'Articles', url: window.location.origin + '/#/articles' },
-    { name: article.title, url: window.location.href },
-  ]);
-
+function ArticleBody({ article, articles, user, setArticle }) {
+  const seo = buildArticleDetailSeoCopy(article);
+  const structuredData = buildArticleDetailPageStructuredData(article);
   const coverImageUrl = article.backdrop
-    ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(
-        article.backdrop
-      )}`
+    ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(article.backdrop)}`
     : DEFAULT_ARTICLE_BACKDROP;
+  const relatedArticles = Array.isArray(articles)
+    ? articles.filter((candidate) => candidate?.id !== article.id).slice(0, 12)
+    : [];
 
   return (
     <>
       <SEOHead
-        title={seoTitle}
-        description={seoDescription}
-        keywords={`${article.title}, movie article, film analysis, cinema`}
-        url={`/#/articles/${article.id}`}
+        title={seo.title}
+        description={seo.description}
+        keywords={seo.keywords}
+        url={seo.canonicalPath}
         type="article"
-        structuredData={[structuredData, breadcrumbData].filter(Boolean)}
+        structuredData={structuredData}
       />
       <StyledContainer>
-        <ArticleContainer>
+        <DetailContentCard>
           <CoverHeader
             imageUrl={coverImageUrl}
+            pretitle="A James Trapp Article"
             title={article.movie?.title || article.title}
             subtitle={article.movie?.title ? article.title : undefined}
             rating={article.rating}
@@ -124,8 +94,14 @@ function Article() {
             />
           </LikeBar>
           <ArticleForm initObj={article} />
-        </ArticleContainer>
+        </DetailContentCard>
         <CommentList reviewId={article.id} />
+        {relatedArticles.length > 0 && (
+          <RelatedSection>
+            <RelatedHeading>More Articles</RelatedHeading>
+            <ArticlesCarousel showArticles={relatedArticles} />
+          </RelatedSection>
+        )}
       </StyledContainer>
     </>
   );

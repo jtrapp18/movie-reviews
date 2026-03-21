@@ -9,7 +9,15 @@ from flask_restful import Resource
 from movie_reviews.config import app, db
 from movie_reviews.models import Director, Review, Tag
 from movie_reviews.utils.document_processor import DocumentProcessor
+from movie_reviews.utils.review_html_enricher import enrich_review_html
 from movie_reviews.utils.s3_client import get_s3_client
+
+
+def _set_backdrop_from_doc_upload_if_empty(review: Review, result: dict) -> None:
+    """Use first image extracted from a .docx as backdrop when the review has none yet."""
+    key = result.get("backdrop_object_key")
+    if key and not (review.backdrop or "").strip():
+        review.backdrop = key
 
 
 @app.route("/uploads/<filename>")
@@ -92,6 +100,12 @@ class ReviewWithDocument(Resource):
                     review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
 
+                    if result.get("file_type") in ("docx", "doc"):
+                        review.main_cast = result.get("main_cast")
+                        review.line_notes = result.get("line_notes")
+
+                    _set_backdrop_from_doc_upload_if_empty(review, result)
+
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
                     if replace_text and result["extracted_text"]:
@@ -170,6 +184,12 @@ class ReviewWithDocumentById(Resource):
                     review.document_filename = result["filename"]
                     review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
+
+                    if result.get("file_type") in ("docx", "doc"):
+                        review.main_cast = result.get("main_cast")
+                        review.line_notes = result.get("line_notes")
+
+                    _set_backdrop_from_doc_upload_if_empty(review, result)
 
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
@@ -253,6 +273,12 @@ class DocumentUpload(Resource):
             if replace_text and result["extracted_text"]:
                 review.review_text = result["extracted_text"]
 
+            if result.get("file_type") in ("docx", "doc"):
+                review.main_cast = result.get("main_cast")
+                review.line_notes = result.get("line_notes")
+
+            _set_backdrop_from_doc_upload_if_empty(review, result)
+
             print("DEBUG DocumentUpload - About to commit changes")
             db.session.commit()
             print("DEBUG DocumentUpload - Commit successful")
@@ -299,26 +325,44 @@ class ExtractText(Resource):
                     "error": f'Text extraction failed: {result.get("error", "Unknown error")}'
                 }, 400
 
-            # Extract HTML with full formatting preservation
-            file_type = result["file_type"]
-            temp_path = result["file_path"]
+            # process_uploaded_document_temporary already ran extract_html_from_document
+            html_text = result["extracted_text"]
             raw_text = result["extracted_text"]
+            file_type = result["file_type"]
 
-            # Use the new HTML extraction method
-            html_text = DocumentProcessor.extract_html_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
-            )
-
-            return {
-                "text": html_text,  # Return HTML formatted text
-                "raw_text": raw_text,  # Also include raw text for reference
+            payload = {
+                "text": html_text,
+                "raw_text": raw_text,
                 "filename": result["filename"],
-                "file_type": result["file_type"],
+                "file_type": file_type,
                 "text_length": len(html_text),
-            }, 200
+            }
+            if file_type in ("docx", "doc"):
+                payload["main_cast"] = result.get("main_cast")
+                payload["line_notes"] = result.get("line_notes")
+
+            return payload, 200
 
         except Exception as e:
             return {"error": f"Text extraction failed: {str(e)}"}, 500
+
+
+class EnrichReviewHtml(Resource):
+    """Apply semantic HTML enrichment (cast grid, line notes, verdict) to a fragment."""
+
+    MAX_HTML_LENGTH = 2_000_000
+
+    def post(self):
+        try:
+            data = request.get_json(silent=True) or {}
+            html = data.get("html")
+            if not isinstance(html, str):
+                return {"error": "Field 'html' (string) is required"}, 400
+            if len(html) > self.MAX_HTML_LENGTH:
+                return {"error": "HTML too large"}, 400
+            return {"html": enrich_review_html(html)}, 200
+        except Exception as e:
+            return {"error": str(e)}, 500
 
 
 class DocumentDownload(Resource):
@@ -493,6 +537,47 @@ class ArticleBackdropUpload(Resource):
             return {"error": f"Backdrop upload failed: {str(e)}"}, 500
 
 
+class ReviewBackdropUpload(Resource):
+    """Upload an image to use as a movie review backdrop."""
+
+    def post(self, review_id):
+        try:
+            if "image" not in request.files:
+                return {"error": "No image file provided"}, 400
+
+            file = request.files["image"]
+            if not file or file.filename == "":
+                return {"error": "No file selected"}, 400
+
+            # Ensure this is a movie review (has movie_id)
+            review = Review.query.filter(
+                Review.id == review_id, Review.movie_id.isnot(None)
+            ).first()
+            if not review:
+                return {"error": "Review not found"}, 404
+
+            s3_client = get_s3_client()
+            object_key = s3_client.generate_object_key(file.filename, int(review_id))
+            upload_result = s3_client.upload_file(
+                file, object_key, file.mimetype or "image/jpeg"
+            )
+
+            if not upload_result["success"]:
+                return {"error": upload_result["error"]}, 400
+
+            review.backdrop = upload_result["object_key"]
+            db.session.commit()
+
+            return {
+                "backdrop": review.backdrop,
+                "review": review.to_dict(),
+            }, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Backdrop upload failed: {str(e)}"}, 500
+
+
 class DirectorBackdropUpload(Resource):
     """Upload an image to use as a director backdrop."""
 
@@ -557,6 +642,33 @@ class ArticleBackdropView(Resource):
             return {"error": f"Backdrop fetch failed: {str(e)}"}, 500
 
 
+class ReviewBackdropView(Resource):
+    """Serve movie review backdrop image from S3."""
+
+    def get(self, review_id):
+        try:
+            review = Review.query.filter(
+                Review.id == review_id, Review.movie_id.isnot(None)
+            ).first()
+            if not review or not review.backdrop:
+                return {"error": "Backdrop not found"}, 404
+
+            s3_client = get_s3_client()
+            key = review.backdrop
+            download = s3_client.download_file(key)
+            if not download["success"]:
+                return {"error": download["error"]}, 404
+
+            from flask import Response
+
+            return Response(
+                download["file_data"],
+                mimetype=download.get("content_type", "image/jpeg"),
+            )
+        except Exception as e:
+            return {"error": f"Backdrop fetch failed: {str(e)}"}, 500
+
+
 class DirectorBackdropView(Resource):
     """Serve director backdrop image from S3."""
 
@@ -583,6 +695,7 @@ class DirectorBackdropView(Resource):
 
 
 def register_routes(api):
+    api.add_resource(EnrichReviewHtml, "/api/enrich_review_html")
     api.add_resource(ExtractText, "/api/extract_text")
     api.add_resource(ReviewWithDocument, "/api/reviews_with_document")
     api.add_resource(
@@ -591,10 +704,12 @@ def register_routes(api):
     api.add_resource(DocumentDownload, "/api/download_document/<int:review_id>")
     api.add_resource(DocumentView, "/api/view_document/<int:review_id>")
     api.add_resource(DocumentPreview, "/api/document_preview/<int:review_id>")
+    api.add_resource(ReviewBackdropUpload, "/api/reviews/<int:review_id>/backdrop")
     api.add_resource(ArticleBackdropUpload, "/api/articles/<int:article_id>/backdrop")
     api.add_resource(
         DirectorBackdropUpload, "/api/directors/<int:director_id>/backdrop"
     )
+    api.add_resource(ReviewBackdropView, "/api/reviews/<int:review_id>/backdrop/view")
     api.add_resource(
         ArticleBackdropView, "/api/articles/<int:article_id>/backdrop/view"
     )

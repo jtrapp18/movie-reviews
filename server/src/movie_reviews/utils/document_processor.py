@@ -3,20 +3,34 @@ Document processing utilities for extracting text and images from PDF and Word d
 Uses temporary processing for better deployment compatibility.
 """
 
+from __future__ import annotations
+
 import base64
 import io
+import mimetypes
 import os
 import re
 import tempfile
 import uuid
-from typing import Dict, List
+import zipfile
+from typing import Any
+from xml.etree import ElementTree as ET
 
 import pdfplumber
 import PyPDF2
 from docx import Document
 from werkzeug.utils import secure_filename
 
+from .review_html_enricher import (
+    enrich_review_html,
+    extract_main_cast_line_notes_from_review_html,
+)
 from .s3_client import get_s3_client
+
+# OOXML relationship type for embedded images (document body order via word/document.xml)
+_OOXML_IMAGE_REL = (
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+)
 
 
 class DocumentProcessor:
@@ -264,8 +278,13 @@ class DocumentProcessor:
             return ""
 
     @staticmethod
-    def extract_html_from_docx(file_path: str) -> str:
-        """Extract HTML from Word document with full formatting preservation."""
+    def extract_html_from_docx(
+        file_path: str,
+    ) -> tuple[str, str | None, str | None]:
+        """Extract HTML from Word document with full formatting preservation.
+
+        Also returns JSON strings for ``main_cast`` and ``line_notes`` (or None) when sections match.
+        """
         try:
             doc = Document(file_path)
             html_parts = []
@@ -297,12 +316,18 @@ class DocumentProcessor:
                     para_text = DocumentProcessor._process_paragraph_runs(paragraph)
                     html_parts.append(f"<p>{para_text}</p>")
 
-            return "\n".join(html_parts)
+            raw_html = "\n".join(html_parts)
+            main_cast, line_notes = extract_main_cast_line_notes_from_review_html(
+                raw_html
+            )
+            enriched = enrich_review_html(raw_html)
+            return enriched, main_cast, line_notes
 
         except Exception as e:
             print(f"Error extracting HTML from DOCX: {e}")
             # Fallback to plain text
-            return DocumentProcessor.extract_text_from_docx(file_path)
+            plain = DocumentProcessor.extract_text_from_docx(file_path)
+            return plain, None, None
 
     @staticmethod
     def _process_paragraph_runs(paragraph) -> str:
@@ -352,7 +377,9 @@ class DocumentProcessor:
 
         # Convert to HTML if requested
         if convert_to_html and cleaned_text:
-            return DocumentProcessor.convert_text_to_html(cleaned_text)
+            return enrich_review_html(
+                DocumentProcessor.convert_text_to_html(cleaned_text)
+            )
 
         return cleaned_text
 
@@ -362,8 +389,12 @@ class DocumentProcessor:
         file_type: str,
         clean_text: bool = True,
         remove_title: bool = True,
-    ) -> str:
-        """Extract HTML from document with full formatting preservation."""
+    ) -> tuple[str, str | None, str | None]:
+        """Extract HTML from document with full formatting preservation.
+
+        For Word only, the second and third values are JSON strings for main cast and line notes
+        (or None). For PDF they are always None.
+        """
         if file_type == "pdf":
             # For PDFs, extract text and convert to HTML
             raw_text = DocumentProcessor.extract_text_from_pdf(file_path)
@@ -373,7 +404,10 @@ class DocumentProcessor:
                 )
             else:
                 cleaned_text = raw_text
-            return DocumentProcessor.convert_text_to_html(cleaned_text)
+            html = enrich_review_html(
+                DocumentProcessor.convert_text_to_html(cleaned_text)
+            )
+            return html, None, None
 
         elif file_type in ["docx", "doc"]:
             # For Word docs, extract directly as HTML
@@ -382,7 +416,7 @@ class DocumentProcessor:
             raise ValueError(f"Unsupported file type: {file_type}")
 
     @staticmethod
-    def process_uploaded_document(file, upload_folder: str) -> Dict[str, str]:
+    def process_uploaded_document(file, upload_folder: str) -> dict[str, Any]:
         """
         Process uploaded document and return metadata.
 
@@ -406,10 +440,12 @@ class DocumentProcessor:
         file_path = os.path.join(upload_folder, unique_filename)
         file.save(file_path)
 
-        # Extract text with improved formatting and optional title removal
+        # Extract HTML when possible so semantic classes can be applied
         try:
-            extracted_text = DocumentProcessor.extract_text_from_document(
-                file_path, file_type, clean_text=True, remove_title=True
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    file_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -420,13 +456,17 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": unique_filename,
                 "file_path": file_path,
                 "file_type": file_type,
                 "extracted_text": extracted_text,
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+            return out
 
         except Exception as e:
             # Clean up file if text extraction failed
@@ -435,7 +475,7 @@ class DocumentProcessor:
             return {"success": False, "error": f"Error processing document: {str(e)}"}
 
     @staticmethod
-    def extract_images_from_pdf(file_path: str) -> List[Dict[str, str]]:
+    def extract_images_from_pdf(file_path: str) -> list[dict[str, Any]]:
         """Extract images from PDF and return as base64 encoded strings."""
         images = []
         try:
@@ -478,7 +518,7 @@ class DocumentProcessor:
         return images
 
     @staticmethod
-    def extract_images_from_docx(file_path: str) -> List[Dict[str, str]]:
+    def extract_images_from_docx(file_path: str) -> list[dict[str, Any]]:
         """Extract images from Word document and return as base64 encoded strings."""
         images = []
         try:
@@ -514,9 +554,115 @@ class DocumentProcessor:
         return images
 
     @staticmethod
+    def _extract_first_image_docx_zip(file_path: str) -> dict[str, Any] | None:
+        """
+        First embedded image in word/document.xml order (body). Catches inline and
+        floating/anchor images; ignores headers/footers (other XML parts).
+        """
+        try:
+            with zipfile.ZipFile(file_path, "r") as z:
+                try:
+                    rels_data = z.read("word/_rels/document.xml.rels")
+                    doc_xml = z.read("word/document.xml")
+                except KeyError:
+                    return None
+
+                root = ET.fromstring(rels_data)
+                rid_to_part: dict[str, str] = {}
+                for rel in root:
+                    if rel.tag.split("}")[-1] != "Relationship":
+                        continue
+                    rid = rel.get("Id")
+                    typ = rel.get("Type", "")
+                    tgt = (rel.get("Target") or "").replace("\\", "/").strip()
+                    while tgt.startswith("../"):
+                        tgt = tgt[3:]
+                    tgt = tgt.lstrip("/")
+                    if not rid or not tgt or tgt.startswith("http"):
+                        continue
+                    if typ != _OOXML_IMAGE_REL and "relationships/image" not in typ:
+                        continue
+                    part_path = f"word/{tgt}" if not tgt.startswith("word/") else tgt
+                    rid_to_part[rid] = part_path
+
+                if not rid_to_part:
+                    return None
+
+                for m in re.finditer(rb'r:embed="(rId\d+)"', doc_xml):
+                    rid = m.group(1).decode("ascii")
+                    part_path = rid_to_part.get(rid)
+                    if not part_path:
+                        continue
+                    try:
+                        blob = z.read(part_path)
+                    except KeyError:
+                        continue
+                    if not blob:
+                        continue
+                    suffix = os.path.splitext(part_path)[1].lower() or ".jpeg"
+                    if not suffix.startswith("."):
+                        suffix = f".{suffix}"
+                    ctype, _ = mimetypes.guess_type(f"x{suffix}")
+                    if not ctype:
+                        ctype = "image/jpeg"
+                    return {
+                        "blob": blob,
+                        "content_type": ctype,
+                        "filename_suffix": suffix,
+                    }
+        except Exception as e:
+            print(f"_extract_first_image_docx_zip: {e}")
+        return None
+
+    @staticmethod
+    def _extract_first_inline_shape_image_docx(file_path: str) -> dict[str, Any] | None:
+        """Fallback: first python-docx inline picture (embedded blob only)."""
+        try:
+            from docx.enum.shape import WD_INLINE_SHAPE
+
+            doc = Document(file_path)
+            for shape in doc.inline_shapes:
+                if shape.type != WD_INLINE_SHAPE.PICTURE:
+                    continue
+                image = shape.image
+                blob = image.blob
+                if not blob:
+                    continue
+                content_type = getattr(image, "content_type", None) or "image/jpeg"
+                ext = getattr(image, "ext", None) or ""
+                if not ext.startswith("."):
+                    ext = (
+                        ".jpeg"
+                        if "jpeg" in (content_type or "")
+                        else ".png" if "png" in (content_type or "") else ".jpeg"
+                    )
+                return {
+                    "blob": blob,
+                    "content_type": content_type,
+                    "filename_suffix": ext,
+                }
+        except Exception as e:
+            print(f"_extract_first_inline_shape_image_docx: {e}")
+        return None
+
+    @staticmethod
+    def extract_first_body_image_for_backdrop_docx(
+        file_path: str,
+    ) -> dict[str, Any] | None:
+        """
+        First image in the main document body, suitable for backdrop.
+
+        Prefer OOXML zip scan (matches floating + inline); fall back to inline_shapes.
+        """
+        z = DocumentProcessor._extract_first_image_docx_zip(file_path)
+        if z:
+            return z
+        return DocumentProcessor._extract_first_inline_shape_image_docx(file_path)
+
+    @staticmethod
     def extract_images_from_document(
         file_path: str, file_type: str
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, Any]]:
         """Extract images from document based on file type."""
         if file_type == "pdf":
             return DocumentProcessor.extract_images_from_pdf(file_path)
@@ -526,7 +672,7 @@ class DocumentProcessor:
             return []
 
     @staticmethod
-    def process_uploaded_document_temporary(file) -> Dict[str, any]:
+    def process_uploaded_document_temporary(file) -> dict[str, Any]:
         """
         Process uploaded document using temporary files for better deployment compatibility.
         Extracts text and keeps file for serving - deployment-friendly approach.
@@ -555,9 +701,11 @@ class DocumentProcessor:
             temp_file.write(file.read())
             temp_file.close()
 
-            # Extract text with improved formatting and optional title removal
-            extracted_text = DocumentProcessor.extract_text_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
+            # Extract HTML when possible so review_text matches rich-text display
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    temp_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -567,13 +715,17 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": original_filename,
                 "file_path": temp_path,  # Return the temp file path for serving
                 "file_type": file_type,
                 "extracted_text": extracted_text,
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+            return out
 
         except Exception as e:
             return {"success": False, "error": f"Error processing document: {str(e)}"}
@@ -583,7 +735,7 @@ class DocumentProcessor:
                 temp_file.close()
 
     @staticmethod
-    def process_uploaded_document_s3(file, review_id: int) -> Dict[str, any]:
+    def process_uploaded_document_s3(file, review_id: int) -> dict[str, Any]:
         """
         Process uploaded document using S3 storage for deployment compatibility.
         Extracts text and uploads file to S3 - production-ready approach.
@@ -621,9 +773,11 @@ class DocumentProcessor:
             temp_file.write(file.read())
             temp_file.close()
 
-            # Extract text with improved formatting and optional title removal
-            extracted_text = DocumentProcessor.extract_text_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
+            # Extract HTML when possible so semantic classes can be applied
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    temp_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -649,7 +803,7 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": original_filename,
                 "file_path": s3_object_key,  # Store S3 object key in file_path field
@@ -657,6 +811,36 @@ class DocumentProcessor:
                 "extracted_text": extracted_text,
                 "s3_url": upload_result.get("url"),
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+
+            # First embedded image as review backdrop (same S3 pattern as manual backdrop upload)
+            if file_type == "docx" and temp_path:
+                first_img = (
+                    DocumentProcessor.extract_first_body_image_for_backdrop_docx(
+                        temp_path
+                    )
+                )
+                if first_img:
+                    backdrop_name = f"backdrop{first_img['filename_suffix']}"
+                    backdrop_key = s3_client.generate_object_key(
+                        backdrop_name, review_id
+                    )
+                    bd_upload = s3_client.upload_file(
+                        io.BytesIO(first_img["blob"]),
+                        backdrop_key,
+                        first_img["content_type"],
+                    )
+                    if bd_upload.get("success"):
+                        out["backdrop_object_key"] = backdrop_key
+                    else:
+                        print(
+                            "Backdrop image upload failed (document still saved): "
+                            f"{bd_upload.get('error')}"
+                        )
+
+            return out
 
         except Exception as e:
             return {"success": False, "error": f"Error processing document: {str(e)}"}

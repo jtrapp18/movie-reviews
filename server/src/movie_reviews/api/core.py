@@ -231,6 +231,7 @@ class Reviews(Resource):
             title=data.get("title"),
             rating=data.get("rating"),
             review_text=data.get("review_text"),
+            description=data.get("description"),
             movie_id=data.get("movie_id"),
         )
         db.session.add(new_review)
@@ -399,6 +400,7 @@ class Articles(Resource):
         article = Review(
             title=data.get("title"),
             review_text=data.get("review_text"),
+            description=data.get("description"),
             movie_id=None,  # Articles don't have movie_id
             rating=None,  # Articles don't have ratings
             date_added=date.today(),

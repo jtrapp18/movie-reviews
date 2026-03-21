@@ -21,6 +21,8 @@ class Review(db.Model, SerializerMixin):
     movie_id = db.Column(db.Integer, db.ForeignKey("movies.id"), nullable=True)
     director_id = db.Column(db.Integer, db.ForeignKey("directors.id"), nullable=True)
     rating = Column(Integer, nullable=True)  # Optional for theme-based articles
+    main_cast = Column(Text, nullable=True)
+    line_notes = Column(Text, nullable=True)
     review_text = Column(Text, nullable=False)
     date_added = Column(Date, default=date.today, nullable=False)
     content_type = Column(

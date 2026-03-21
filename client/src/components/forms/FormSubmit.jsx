@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
 import { Button } from '@styles';
 import DocumentViewer from './DocumentViewer';
 import { useAdmin } from '@hooks/useAdmin';
 import RichTextDisplay from './RichTextDisplay';
 import ZoomableContent from '@components/ui/ZoomableContent';
+import { buildStructuredReviewHtml } from '@utils/structuredReviewHtml';
 import styled from 'styled-components';
 
 const ContentDisplayContainer = styled.div`
@@ -28,13 +30,11 @@ const Tag = styled.span`
 `;
 
 const ContentBody = styled.div`
+  --content-inline-padding: 1rem;
   width: 100%;
-  padding: 2rem 1rem;
+  min-width: 0;
+  padding: 2rem var(--content-inline-padding);
   margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem 0rem;
-  }
 `;
 
 const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
@@ -48,6 +48,11 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
     formValues.documentType &&
     (formValues.documentType.toLowerCase() === 'docx' ||
       formValues.documentType.toLowerCase() === 'doc');
+
+  const structuredBeforeWordHtml = useMemo(
+    () => buildStructuredReviewHtml(formValues.mainCast, formValues.lineNotes),
+    [formValues.mainCast, formValues.lineNotes]
+  );
 
   // Determine if there's any content to display
   const hasAnyContent = hasContent || hasDocument;
@@ -66,7 +71,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
       {hasAnyContent ? (
         <ZoomableContent>
           <ContentBody className="content-body">
-            {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
+            {/* Word: mammoth in DocumentViewer keeps inline images; enrich runs client-side. */}
             {isWordDocument ? (
               <DocumentViewer
                 className="word-document-viewer"
@@ -74,6 +79,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
                 documentType={formValues.documentType}
                 filename={formValues.documentFilename}
                 hasDocument={formValues.hasDocument}
+                prependHtml={structuredBeforeWordHtml}
               />
             ) : (
               hasContent && <RichTextDisplay content={formValues.reviewText} />

@@ -3,6 +3,14 @@ import styled from 'styled-components';
 import mammoth from 'mammoth';
 import RichTextDisplay from './RichTextDisplay';
 import Loading from '@components/ui/Loading';
+import {
+  sha256Hex,
+  getCachedEnrichedHtml,
+  setCachedEnrichedHtml,
+  logWordPipeline,
+  getEnrichHtmlMarkers,
+} from '@utils/enrichedDocCache';
+import { stripMammothDuplicateSections } from '@utils/mammothWordBodyHtml';
 
 const ErrorMessage = styled.div`
   display: flex;
@@ -26,54 +34,93 @@ const PDFIframe = styled.iframe`
 `;
 
 const WordDocumentContainer = styled.div`
-  // border-radius: 8px;
-  overflow: auto;
+  /* overflow must stay visible: full-bleed images use negative margins + wider width; overflow:auto caused horizontal scroll */
+  overflow-x: visible;
+  overflow-y: visible;
+  min-width: 0;
+  width: 100%;
   margin-bottom: 10px;
 `;
 
-const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) => {
+/**
+ * Word: Mammoth → strip duplicate Main Cast / Line Notes (h1 sections) → RichTextDisplay.
+ * Cast/line notes from DB are prepended; we do not run the review enricher on the body.
+ * Cached by SHA-256 of file bytes so repeat views skip Mammoth + strip.
+ */
+const DocumentViewer = ({
+  documentUrl,
+  documentType,
+  filename,
+  hasDocument,
+  /** HTML from DB (main cast + line notes) — prepended before Mammoth body in one RichTextDisplay */
+  prependHtml = '',
+}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [wordContent, setWordContent] = useState('');
 
   const loadDocument = async () => {
-    console.log('DocumentViewer - loadDocument called');
     setLoading(true);
     setError(null);
 
     try {
       if (documentType === 'pdf') {
-        console.log('DocumentViewer - PDF will be loaded via iframe');
         setLoading(false);
       } else if (documentType === 'docx' || documentType === 'doc') {
-        console.log('DocumentViewer - loading Word document');
         await loadWordDocument();
       } else {
-        console.log('DocumentViewer - unsupported document type:', documentType);
         setError('Unsupported document type');
       }
     } catch (err) {
-      console.log('DocumentViewer - error loading document:', err);
       setError(`Failed to load document: ${err.message}`);
     } finally {
-      console.log('DocumentViewer - loadDocument finished, setting loading to false');
       setLoading(false);
     }
   };
 
   const loadWordDocument = async () => {
+    const response = await fetch(documentUrl);
+    if (!response.ok) {
+      throw new Error(`Document fetch failed (${response.status})`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+
+    let docHash = null;
     try {
-      const response = await fetch(documentUrl);
-      const arrayBuffer = await response.arrayBuffer();
-
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      setWordContent(result.value);
-
-      if (result.messages.length > 0) {
-        console.log('Document conversion messages:', result.messages);
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        docHash = await sha256Hex(arrayBuffer);
       }
-    } catch (err) {
-      throw new Error(`Word document loading failed: ${err.message}`);
+    } catch {
+      docHash = null;
+    }
+
+    logWordPipeline('document fetched', {
+      documentUrl,
+      bytes: arrayBuffer.byteLength,
+      hashPrefix: docHash ? `${docHash.slice(0, 12)}…` : '(no hash — cache disabled)',
+    });
+
+    if (docHash) {
+      const cached = getCachedEnrichedHtml(docHash);
+      if (cached) {
+        setWordContent(cached);
+        return;
+      }
+    }
+
+    logWordPipeline('cache miss — running mammoth, then h1 dedup');
+
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    let html = stripMammothDuplicateSections(result.value);
+    logWordPipeline('after mammoth + dedup', getEnrichHtmlMarkers(html));
+
+    if (docHash) {
+      setCachedEnrichedHtml(docHash, html);
+    }
+    setWordContent(html);
+
+    if (result.messages.length > 0) {
+      logWordPipeline('Document conversion messages:', result.messages);
     }
   };
 
@@ -88,7 +135,12 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     return null;
   }
 
-  if (loading) return <Loading text="Loading document, please wait" size="small" />;
+  const structuredPrefix = prependHtml || '';
+  const showFullPageLoading = loading && !structuredPrefix.trim();
+
+  if (showFullPageLoading) {
+    return <Loading text="Loading document, please wait" size="small" />;
+  }
 
   if (error) {
     return <ErrorMessage>{error}</ErrorMessage>;
@@ -101,7 +153,7 @@ const DocumentViewer = ({ documentUrl, documentType, filename, hasDocument }) =>
     />
   ) : (
     <WordDocumentContainer>
-      <RichTextDisplay content={wordContent} />
+      <RichTextDisplay content={`${structuredPrefix}${wordContent || ''}`} />
     </WordDocumentContainer>
   );
 };
