@@ -1,8 +1,10 @@
 import json
 import mimetypes
+import os
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
+from urllib.parse import quote_plus
 
 import PyPDF2
 import requests
@@ -14,6 +16,8 @@ DEFAULT_CONFIG_CANDIDATES = (
     Path("server/tmp/batch_import.json"),
     Path("./tmp/batch_import.json"),
 )
+"""Default folder for `{movie_title}.docx` when using `to_upload_dir` batch mode."""
+DEFAULT_TO_UPLOAD_DIR = Path("tmp/to_upload")
 
 VERDICT_TO_RATING = {
     "magnum opus": 7,
@@ -192,7 +196,7 @@ class BatchImportClient:
 
     def _search_tmdb_movie_by_title(self, movie_title: str) -> Optional[Dict[str, Any]]:
         status, payload = self._request_json(
-            "GET", f"/api/pull_movie_info?search={movie_title}"
+            "GET", f"/api/pull_movie_info?search={quote_plus(movie_title)}"
         )
         if status != 200:
             return None
@@ -211,6 +215,110 @@ class BatchImportClient:
                 return candidate
 
         return candidates[0]
+
+    def _fetch_tmdb_director_name(self, external_movie_id: int) -> Optional[str]:
+        """Primary Director credit from TMDb (same source of truth as the API server)."""
+        api_key = os.getenv("MOVIE_API_KEY")
+        if not api_key:
+            print("   -> WARNING: MOVIE_API_KEY unset; cannot resolve director name")
+            return None
+        url = (
+            f"https://api.themoviedb.org/3/movie/{external_movie_id}/credits"
+            f"?api_key={api_key}"
+        )
+        try:
+            resp = requests.get(url, timeout=self.timeout)
+            if resp.status_code != 200:
+                return None
+            data = resp.json()
+            crew = data.get("crew") or []
+            director = next((c for c in crew if c.get("job") == "Director"), None)
+            if not director:
+                return None
+            name = (director.get("name") or "").strip()
+            return name or None
+        except Exception as exc:
+            print(f"   -> WARNING: TMDb credits fetch failed: {exc}")
+            return None
+
+    @staticmethod
+    def _format_review_title_from_metadata(
+        director_name: Optional[str],
+        movie_title_display: str,
+        release_date: Optional[str],
+    ) -> str:
+        """``{director}'s {title} ({year})`` or empty string if anything is missing."""
+        if not director_name or not movie_title_display:
+            return ""
+        year = ""
+        if release_date and len(release_date) >= 4 and release_date[:4].isdigit():
+            year = release_date[:4]
+        if not year:
+            return ""
+        return f"{director_name}'s {movie_title_display} ({year})"
+
+    def entries_from_to_upload_dir(self, dir_path: Path) -> List[Dict[str, Any]]:
+        """
+        Build review import entries from ``{movie_title}.docx`` files (no tags).
+
+        * ``movie_title`` is the filename stem (used for TMDb search).
+        * ``title`` is ``{director}'s {movie_title} ({year})`` when director + year + display
+          title are available; otherwise ``""``.
+        * Each entry includes ``movie_external_id`` so movie resolution is stable.
+        """
+        base = dir_path.expanduser().resolve()
+        if not base.is_dir():
+            raise FileNotFoundError(f"Not a directory: {base}")
+
+        entries: List[Dict[str, Any]] = []
+        for path in sorted(base.glob("*.docx")):
+            stem = path.stem.strip()
+            if not stem:
+                continue
+
+            print(f"   -> to_upload: {path.name}")
+            tmdb = self._search_tmdb_movie_by_title(stem)
+            if not tmdb:
+                print(
+                    f"   -> WARNING: No TMDb match for filename stem {stem!r}; skipping"
+                )
+                continue
+
+            eid = tmdb.get("id")
+            if not eid:
+                print(f"   -> WARNING: TMDb result has no id for {stem!r}; skipping")
+                continue
+            eid = int(eid)
+
+            director_name = self._fetch_tmdb_director_name(eid)
+            movie_display = (
+                (tmdb.get("title") or tmdb.get("original_title") or stem) or ""
+            ).strip()
+            rd = tmdb.get("release_date")
+            rd_str = str(rd).strip() if rd is not None else ""
+
+            title = self._format_review_title_from_metadata(
+                director_name, movie_display, rd_str or None
+            )
+            if not title:
+                print(
+                    f"   -> No formatted title (director/year/title incomplete); "
+                    f"review title left blank for {path.name}"
+                )
+
+            entries.append(
+                {
+                    "kind": "review",
+                    "title": title,
+                    "movie_title": stem,
+                    "movie_external_id": eid,
+                    "review_text": "",
+                    "document_path": str(path),
+                    "replace_text": True,
+                }
+            )
+
+        return entries
 
     def _build_movie_payload(
         self,
@@ -544,16 +652,28 @@ class BatchImportClient:
         return {"ok": True, "kind": "article", "id": article_id, "body": body}
 
     def import_batch(self, config: Dict[str, Any]) -> List[Dict[str, Any]]:
-        entries = config.get("entries", [])
-        if not entries:
-            raise ValueError("Config must include a non-empty 'entries' array")
+        to_upload = config.get("to_upload_dir")
+        if to_upload:
+            entries = self.entries_from_to_upload_dir(Path(to_upload))
+            if not entries:
+                raise ValueError(
+                    f"No importable .docx entries under to_upload_dir={to_upload!r}"
+                )
+        else:
+            entries = config.get("entries", [])
+            if not entries:
+                raise ValueError(
+                    "Config must include a non-empty 'entries' array, or set "
+                    "'to_upload_dir' to a folder of {movie_title}.docx files"
+                )
         default_upsert = bool(config.get("upsert", True))
 
         results = []
         for i, entry in enumerate(entries, start=1):
             kind = (entry.get("kind") or "").strip().lower()
             print(
-                f"[{i}/{len(entries)}] Importing {kind!r}: {entry.get('title', '<untitled>')}"
+                f"[{i}/{len(entries)}] Importing {kind!r}: "
+                f"{entry.get('title') or entry.get('movie_title') or '<untitled>'}"
             )
 
             try:
