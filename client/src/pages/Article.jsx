@@ -8,8 +8,8 @@ import SEOHead from '@components/shared-sections/SEOHead';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
 import {
-  generateArticleStructuredData,
-  generateBreadcrumbStructuredData,
+  buildArticleDetailPageStructuredData,
+  buildArticleDetailSeoCopy,
 } from '@utils/seoUtils';
 import { StyledContainer } from '@styles';
 import EntityDetailState from '@components/layout/EntityDetailState';
@@ -50,14 +50,8 @@ function Article() {
 }
 
 function ArticleBody({ article, articles, user, setArticle }) {
-  const seoTitle = article.title;
-  const seoDescription = article.description || article.title;
-  const structuredData = generateArticleStructuredData(article);
-  const breadcrumbData = generateBreadcrumbStructuredData([
-    { name: 'Home', url: window.location.origin + '/#/' },
-    { name: 'Articles', url: window.location.origin + '/#/articles' },
-    { name: article.title, url: window.location.href },
-  ]);
+  const seo = buildArticleDetailSeoCopy(article);
+  const structuredData = buildArticleDetailPageStructuredData(article);
   const coverImageUrl = article.backdrop
     ? `/api/articles/${article.id}/backdrop/view?v=${encodeURIComponent(article.backdrop)}`
     : DEFAULT_ARTICLE_BACKDROP;
@@ -68,12 +62,12 @@ function ArticleBody({ article, articles, user, setArticle }) {
   return (
     <>
       <SEOHead
-        title={seoTitle}
-        description={seoDescription}
-        keywords={`${article.title}, movie article, film analysis, cinema`}
-        url={`/#/articles/${article.id}`}
+        title={seo.title}
+        description={seo.description}
+        keywords={seo.keywords}
+        url={seo.canonicalPath}
         type="article"
-        structuredData={[structuredData, breadcrumbData].filter(Boolean)}
+        structuredData={structuredData}
       />
       <StyledContainer>
         <DetailContentCard>

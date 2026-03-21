@@ -10,10 +10,9 @@ import CommentList from '@components/comments/CommentList';
 import DirectorCard from '@components/cards/DirectorCard';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { UserContext } from '@context/userProvider';
-import { getGradingLabel } from '@utils/gradingTiers';
 import {
-  generateMovieReviewStructuredData,
-  generateBreadcrumbStructuredData,
+  buildMovieReviewDetailPageStructuredData,
+  buildMovieReviewDetailSeoCopy,
 } from '@utils/seoUtils';
 import EntityDetailState from '@components/layout/EntityDetailState';
 import {
@@ -140,31 +139,19 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
     });
   })();
 
-  const ratingLabel = review?.rating ? getGradingLabel(review.rating) : null;
-  const seoTitle = review
-    ? `${movie.title} Review${ratingLabel ? ` - ${ratingLabel}` : ''}`
-    : `${movie.title} - Movie Review`;
-  const seoDescription = review
-    ? `${movie.title} movie review: ${review.reviewText.substring(0, 150)}...`
-    : `Read our detailed review of ${movie.title} (${movie.releaseDate}). ${movie.overview.substring(0, 100)}...`;
-
-  const structuredData = generateMovieReviewStructuredData(movie, review);
-  const breadcrumbData = generateBreadcrumbStructuredData([
-    { name: 'Home', url: window.location.origin + '/#/' },
-    { name: 'Movies', url: window.location.origin + '/#/search_movies' },
-    { name: movie.title, url: window.location.href },
-  ]);
+  const seo = buildMovieReviewDetailSeoCopy(movie, review);
+  const structuredData = buildMovieReviewDetailPageStructuredData(movie, review);
 
   return (
     <>
       <SEOHead
-        title={seoTitle}
-        description={seoDescription}
-        keywords={`${movie.title}, movie review, ${movie.originalLanguage}, ${movie.releaseDate}, film analysis`}
+        title={seo.title}
+        description={seo.description}
+        keywords={seo.keywords}
         image={coverImageUrl ?? undefined}
-        url={`/#/movies/${movie.id}`}
+        url={seo.canonicalPath}
         type="article"
-        structuredData={[structuredData, breadcrumbData].filter(Boolean)}
+        structuredData={structuredData}
       />
       <StyledContainer>
         <DetailContentCard>
