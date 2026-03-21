@@ -4,12 +4,15 @@ import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
-import { StyledForm, DeleteButton, CancelButton } from '@styles';
+import { StyledForm } from '@styles';
 import Error from '@styles/Error';
 import ContentDisplay from '@components/forms/FormSubmit';
 import TagInput from '@components/forms/TagInput';
-import { FormBackdropField, FormDocumentUploadSection } from '@components/forms/shared';
-import SubmitButton from '@components/forms/SubmitButton';
+import {
+  FormBackdropField,
+  FormDocumentUploadSection,
+  FormActionRow,
+} from '@components/forms/shared';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { snakeToCamel } from '@helper';
 import { submitFormWithDocument } from '@utils/formSubmit';
@@ -310,47 +313,31 @@ const ArticleForm = ({ initObj }) => {
             />
           </div>
 
-          <div
-            style={{
-              marginTop: '30px',
-              marginBottom: '20px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              justifyContent: 'center',
-              alignItems: 'center',
+          <FormActionRow
+            marginTop="30px"
+            marginBottom="20px"
+            onCancel={() => {
+              if (initObj) {
+                setIsEditing(false);
+              } else {
+                navigate(-1);
+              }
             }}
-          >
-            <CancelButton
-              type="button"
-              onClick={() => {
-                if (initObj) {
-                  // If editing existing article, just exit edit mode
-                  setIsEditing(false);
-                } else {
-                  // If creating new article, navigate back
-                  navigate(-1);
-                }
-              }}
-            >
-              Cancel
-            </CancelButton>
-            <SubmitButton
-              isSubmitting={isSubmitting}
-              isEdit={isEdit}
-              editText="Save Changes"
-              createText="Create Article"
-            />
-            {isAdmin && initObj && (
-              <DeleteButton
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Article'}
-              </DeleteButton>
-            )}
-          </div>
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+            editText="Save Changes"
+            createText="Create Article"
+            deleteConfig={
+              isAdmin && initObj
+                ? {
+                    onClick: () => setShowDeleteModal(true),
+                    isDeleting,
+                    label: 'Delete Article',
+                    pendingLabel: 'Deleting...',
+                  }
+                : null
+            }
+          />
         </StyledForm>
       ) : (
         <ContentDisplay

@@ -5,12 +5,11 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm, DeleteButton, CancelButton } from '@styles';
+import { StyledForm } from '@styles';
 import Error from '@styles/Error';
 import { Rating } from '@features/reviews';
 import ContentDisplay from '@components/forms/FormSubmit';
 import TagInput from '@components/forms/TagInput';
-import SubmitButton from '@components/forms/SubmitButton';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { submitFormWithDocument } from '@utils/formSubmit';
 import { extractTextFromFile } from '@utils/textExtraction';
@@ -20,6 +19,7 @@ import { useAdmin } from '@hooks/useAdmin';
 import {
   FormBackdropField,
   FormDocumentUploadSection,
+  FormActionRow,
 } from '@components/forms/shared';
 
 const RatingOverlayWrapper = styled.div`
@@ -270,18 +270,14 @@ const ReviewForm = ({ initObj }) => {
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
           <FormBackdropField
-            uploadUrl={
-              initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined
-            }
+            uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
             backdropKey={backdropKey}
             onUploaded={(url) => {
               setBackdropKey(url);
               if (initObj) {
                 initObj.backdrop = url;
               }
-              setUpdatedReview((prev) =>
-                prev ? { ...prev, backdrop: url } : prev
-              );
+              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
             }}
           />
 
@@ -381,46 +377,30 @@ const ReviewForm = ({ initObj }) => {
             <Error>Review: {formik.errors.reviewText}</Error>
           )}
 
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: '20px',
+          <FormActionRow
+            marginTop="20px"
+            onCancel={() => {
+              if (initObj) {
+                setIsEditing(false);
+              } else {
+                navigate(-1);
+              }
             }}
-          >
-            <CancelButton
-              type="button"
-              onClick={() => {
-                if (initObj) {
-                  // If editing existing review, just exit edit mode
-                  setIsEditing(false);
-                } else {
-                  // If creating new review, navigate back
-                  navigate(-1);
-                }
-              }}
-            >
-              Cancel
-            </CancelButton>
-            <SubmitButton
-              isSubmitting={isSubmitting}
-              isEdit={isEdit}
-              editText="Save Changes"
-              createText="Submit Review"
-            />
-            {isAdmin && initObj && (
-              <DeleteButton
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Movie'}
-              </DeleteButton>
-            )}
-          </div>
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+            editText="Save Changes"
+            createText="Submit Review"
+            deleteConfig={
+              isAdmin && initObj
+                ? {
+                    onClick: () => setShowDeleteModal(true),
+                    isDeleting,
+                    label: 'Delete Movie',
+                    pendingLabel: 'Deleting...',
+                  }
+                : null
+            }
+          />
         </StyledForm>
       ) : (
         <ContentDisplay
