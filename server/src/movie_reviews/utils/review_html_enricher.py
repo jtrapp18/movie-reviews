@@ -195,6 +195,32 @@ def _enrich_line_notes_section(soup: BeautifulSoup, heading: Tag) -> None:
             _replace_with_line_note(soup, node, escape(label), body_html)
 
 
+def _wrap_line_notes_group(soup: BeautifulSoup, heading: Tag) -> None:
+    """Wrap consecutive div.line-note siblings after heading in div.line-notes-group for column layout."""
+    nodes: list[Tag] = []
+    sib = heading.next_sibling
+    while sib is not None:
+        if isinstance(sib, NavigableString):
+            sib = sib.next_sibling
+            continue
+        if isinstance(sib, Tag) and sib.name in HEADING_TAGS:
+            break
+        if isinstance(sib, Tag) and sib.name == "div" and _has_class(sib, "line-note"):
+            nodes.append(sib)
+        elif isinstance(sib, Tag):
+            break
+        sib = sib.next_sibling
+    if len(nodes) < 1:
+        return
+    parent = nodes[0].parent
+    if parent and isinstance(parent, Tag) and _has_class(parent, "line-notes-group"):
+        return
+    wrapper = soup.new_tag("div", attrs={"class": "line-notes-group"})
+    nodes[0].insert_before(wrapper)
+    for n in nodes:
+        wrapper.append(n.extract())
+
+
 def _enrich_verdicts(soup: BeautifulSoup) -> None:
     for p in soup.find_all("p"):
         if _has_class(p, "verdict"):
@@ -312,6 +338,7 @@ def enrich_review_html(html: str) -> str:
             _enrich_cast_section(soup, heading)
         elif title in ("line notes", "line note"):
             _enrich_line_notes_section(soup, heading)
+            _wrap_line_notes_group(soup, heading)
 
     # Mammoth / Word: "Line Notes" is often a normal paragraph, not a Heading style
     if not had_main_cast_heading:
@@ -328,6 +355,7 @@ def enrich_review_html(html: str) -> str:
                 continue
             if _norm_heading(p.get_text()) in ("line notes", "line note"):
                 _enrich_line_notes_section(soup, p)
+                _wrap_line_notes_group(soup, p)
                 break
 
     _enrich_verdicts(soup)

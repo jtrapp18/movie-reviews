@@ -78,7 +78,9 @@ export function buildStructuredReviewHtml(mainCastRaw, lineNotesRaw) {
       .filter(Boolean);
 
     if (blocks.length > 0) {
-      parts.push(`<h1>Line Notes</h1>${blocks.join('')}`);
+      parts.push(
+        `<h1>Line Notes</h1><div class="line-notes-group">${blocks.join('')}</div>`
+      );
     }
   }
 

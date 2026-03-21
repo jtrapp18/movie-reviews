@@ -94,6 +94,14 @@ p {
   --rich-text-table-border: rgba(255, 215, 0, 0.2);
   --rich-text-divider-color: var(--background-tertiary);
   --rich-text-dotted-divider: 1px dotted var(--rich-text-divider-color);
+  --rich-text-dotted-dot-repeat: 10px;
+  --rich-text-dotted-divider-bg: repeating-linear-gradient(
+    to right,
+    var(--rich-text-divider-color) 0,
+    var(--rich-text-divider-color) 2px,
+    transparent 2px,
+    transparent var(--rich-text-dotted-dot-repeat)
+  );
 
   /* --striped: repeating-linear-gradient(-45deg, var(--light-gray),var(--light-gray) 2px, white 2px, white 10px); */
   --striped: repeating-linear-gradient(
@@ -139,6 +147,14 @@ p {
   /* Dividers inside article body (cast, line notes); theme-aware, not fixed gray */
   --rich-text-divider-color: var(--background-tertiary);
   --rich-text-dotted-divider: 1px dotted var(--rich-text-divider-color);
+  --rich-text-dotted-dot-repeat: 10px;
+  --rich-text-dotted-divider-bg: repeating-linear-gradient(
+    to right,
+    var(--rich-text-divider-color) 0,
+    var(--rich-text-divider-color) 2px,
+    transparent 2px,
+    transparent var(--rich-text-dotted-dot-repeat)
+  );
 
   --success-color: var(--cinema-gold-dark);
   --error-color: var(--cinema-red);
@@ -167,6 +183,14 @@ p {
   /* Lighter divider on dark card so dots stay visible */
   --rich-text-divider-color: var(--border);
   --rich-text-dotted-divider: 1px dotted var(--rich-text-divider-color);
+  --rich-text-dotted-dot-repeat: 10px;
+  --rich-text-dotted-divider-bg: repeating-linear-gradient(
+    to right,
+    var(--rich-text-divider-color) 0,
+    var(--rich-text-divider-color) 2px,
+    transparent 2px,
+    transparent var(--rich-text-dotted-dot-repeat)
+  );
 
   --success-color: var(--cinema-gold-dark);
   --error-color: var(--cinema-red);

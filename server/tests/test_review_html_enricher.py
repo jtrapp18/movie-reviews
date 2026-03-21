@@ -27,6 +27,7 @@ def test_cast_line_notes_verdict():
     assert 'class="cast-actor"' in out
     assert 'class="line-note"' in out
     assert 'class="line-note-tag"' in out
+    assert "line-notes-group" in out
     assert 'class="verdict"' in out
 
 
@@ -41,6 +42,7 @@ def test_line_notes_title_as_paragraph_like_mammoth():
     out = enrich_review_html(html)
     assert 'class="cast-grid"' in out
     assert 'class="line-note"' in out
+    assert "line-notes-group" in out
 
 
 def test_line_note_hhmmss_timestamp():
