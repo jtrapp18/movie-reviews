@@ -417,8 +417,12 @@ class BatchImportClient:
 
         patch_payload = {}
         for key in ["description", "date_added", "backdrop"]:
-            if key in entry and entry[key] is not None:
-                patch_payload[key] = entry[key]
+            if key not in entry or entry[key] is None:
+                continue
+            # Do not clear backdrop with "" — document upload may have set it from the .docx
+            if key == "backdrop" and str(entry[key]).strip() == "":
+                continue
+            patch_payload[key] = entry[key]
 
         if patch_payload:
             p_status, p_body = self._request_json(
@@ -517,8 +521,11 @@ class BatchImportClient:
             "title",
             "review_text",
         ]:
-            if key in entry and entry[key] is not None:
-                patch_payload[key] = entry[key]
+            if key not in entry or entry[key] is None:
+                continue
+            if key == "backdrop" and str(entry[key]).strip() == "":
+                continue
+            patch_payload[key] = entry[key]
 
         if patch_payload:
             p_status, p_body = self._request_json(

@@ -7,11 +7,14 @@ from __future__ import annotations
 
 import base64
 import io
+import mimetypes
 import os
 import re
 import tempfile
 import uuid
+import zipfile
 from typing import Any
+from xml.etree import ElementTree as ET
 
 import pdfplumber
 import PyPDF2
@@ -23,6 +26,11 @@ from .review_html_enricher import (
     extract_main_cast_line_notes_from_review_html,
 )
 from .s3_client import get_s3_client
+
+# OOXML relationship type for embedded images (document body order via word/document.xml)
+_OOXML_IMAGE_REL = (
+    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image"
+)
 
 
 class DocumentProcessor:
@@ -546,6 +554,112 @@ class DocumentProcessor:
         return images
 
     @staticmethod
+    def _extract_first_image_docx_zip(file_path: str) -> dict[str, Any] | None:
+        """
+        First embedded image in word/document.xml order (body). Catches inline and
+        floating/anchor images; ignores headers/footers (other XML parts).
+        """
+        try:
+            with zipfile.ZipFile(file_path, "r") as z:
+                try:
+                    rels_data = z.read("word/_rels/document.xml.rels")
+                    doc_xml = z.read("word/document.xml")
+                except KeyError:
+                    return None
+
+                root = ET.fromstring(rels_data)
+                rid_to_part: dict[str, str] = {}
+                for rel in root:
+                    if rel.tag.split("}")[-1] != "Relationship":
+                        continue
+                    rid = rel.get("Id")
+                    typ = rel.get("Type", "")
+                    tgt = (rel.get("Target") or "").replace("\\", "/").strip()
+                    while tgt.startswith("../"):
+                        tgt = tgt[3:]
+                    tgt = tgt.lstrip("/")
+                    if not rid or not tgt or tgt.startswith("http"):
+                        continue
+                    if typ != _OOXML_IMAGE_REL and "relationships/image" not in typ:
+                        continue
+                    part_path = f"word/{tgt}" if not tgt.startswith("word/") else tgt
+                    rid_to_part[rid] = part_path
+
+                if not rid_to_part:
+                    return None
+
+                for m in re.finditer(rb'r:embed="(rId\d+)"', doc_xml):
+                    rid = m.group(1).decode("ascii")
+                    part_path = rid_to_part.get(rid)
+                    if not part_path:
+                        continue
+                    try:
+                        blob = z.read(part_path)
+                    except KeyError:
+                        continue
+                    if not blob:
+                        continue
+                    suffix = os.path.splitext(part_path)[1].lower() or ".jpeg"
+                    if not suffix.startswith("."):
+                        suffix = f".{suffix}"
+                    ctype, _ = mimetypes.guess_type(f"x{suffix}")
+                    if not ctype:
+                        ctype = "image/jpeg"
+                    return {
+                        "blob": blob,
+                        "content_type": ctype,
+                        "filename_suffix": suffix,
+                    }
+        except Exception as e:
+            print(f"_extract_first_image_docx_zip: {e}")
+        return None
+
+    @staticmethod
+    def _extract_first_inline_shape_image_docx(file_path: str) -> dict[str, Any] | None:
+        """Fallback: first python-docx inline picture (embedded blob only)."""
+        try:
+            from docx.enum.shape import WD_INLINE_SHAPE
+
+            doc = Document(file_path)
+            for shape in doc.inline_shapes:
+                if shape.type != WD_INLINE_SHAPE.PICTURE:
+                    continue
+                image = shape.image
+                blob = image.blob
+                if not blob:
+                    continue
+                content_type = getattr(image, "content_type", None) or "image/jpeg"
+                ext = getattr(image, "ext", None) or ""
+                if not ext.startswith("."):
+                    ext = (
+                        ".jpeg"
+                        if "jpeg" in (content_type or "")
+                        else ".png" if "png" in (content_type or "") else ".jpeg"
+                    )
+                return {
+                    "blob": blob,
+                    "content_type": content_type,
+                    "filename_suffix": ext,
+                }
+        except Exception as e:
+            print(f"_extract_first_inline_shape_image_docx: {e}")
+        return None
+
+    @staticmethod
+    def extract_first_body_image_for_backdrop_docx(
+        file_path: str,
+    ) -> dict[str, Any] | None:
+        """
+        First image in the main document body, suitable for backdrop.
+
+        Prefer OOXML zip scan (matches floating + inline); fall back to inline_shapes.
+        """
+        z = DocumentProcessor._extract_first_image_docx_zip(file_path)
+        if z:
+            return z
+        return DocumentProcessor._extract_first_inline_shape_image_docx(file_path)
+
+    @staticmethod
     def extract_images_from_document(
         file_path: str, file_type: str
     ) -> list[dict[str, Any]]:
@@ -700,6 +814,32 @@ class DocumentProcessor:
             if file_type in ("docx", "doc"):
                 out["main_cast"] = main_cast
                 out["line_notes"] = line_notes
+
+            # First embedded image as review backdrop (same S3 pattern as manual backdrop upload)
+            if file_type == "docx" and temp_path:
+                first_img = (
+                    DocumentProcessor.extract_first_body_image_for_backdrop_docx(
+                        temp_path
+                    )
+                )
+                if first_img:
+                    backdrop_name = f"backdrop{first_img['filename_suffix']}"
+                    backdrop_key = s3_client.generate_object_key(
+                        backdrop_name, review_id
+                    )
+                    bd_upload = s3_client.upload_file(
+                        io.BytesIO(first_img["blob"]),
+                        backdrop_key,
+                        first_img["content_type"],
+                    )
+                    if bd_upload.get("success"):
+                        out["backdrop_object_key"] = backdrop_key
+                    else:
+                        print(
+                            "Backdrop image upload failed (document still saved): "
+                            f"{bd_upload.get('error')}"
+                        )
+
             return out
 
         except Exception as e:

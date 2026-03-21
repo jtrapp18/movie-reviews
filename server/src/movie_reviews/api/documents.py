@@ -13,6 +13,13 @@ from movie_reviews.utils.review_html_enricher import enrich_review_html
 from movie_reviews.utils.s3_client import get_s3_client
 
 
+def _set_backdrop_from_doc_upload_if_empty(review: Review, result: dict) -> None:
+    """Use first image extracted from a .docx as backdrop when the review has none yet."""
+    key = result.get("backdrop_object_key")
+    if key and not (review.backdrop or "").strip():
+        review.backdrop = key
+
+
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
     """Serve uploaded files."""
@@ -97,6 +104,8 @@ class ReviewWithDocument(Resource):
                         review.main_cast = result.get("main_cast")
                         review.line_notes = result.get("line_notes")
 
+                    _set_backdrop_from_doc_upload_if_empty(review, result)
+
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
                     if replace_text and result["extracted_text"]:
@@ -179,6 +188,8 @@ class ReviewWithDocumentById(Resource):
                     if result.get("file_type") in ("docx", "doc"):
                         review.main_cast = result.get("main_cast")
                         review.line_notes = result.get("line_notes")
+
+                    _set_backdrop_from_doc_upload_if_empty(review, result)
 
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
@@ -265,6 +276,8 @@ class DocumentUpload(Resource):
             if result.get("file_type") in ("docx", "doc"):
                 review.main_cast = result.get("main_cast")
                 review.line_notes = result.get("line_notes")
+
+            _set_backdrop_from_doc_upload_if_empty(review, result)
 
             print("DEBUG DocumentUpload - About to commit changes")
             db.session.commit()
