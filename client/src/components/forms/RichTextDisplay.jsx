@@ -138,6 +138,68 @@ const RichTextContainer = styled.div`
     margin-bottom: 1.2em;
   }
 
+  /* Server-enriched Word sections (review_html_enricher.py) */
+  p.cast-line {
+    margin: 0.5em 0;
+    padding: 0.45em 0;
+    border-bottom: 1px solid var(--cinema-gray);
+    text-align: left;
+    hyphens: none;
+  }
+
+  .cast-as {
+    font-size: 0.82em;
+    font-style: italic;
+    font-weight: 400;
+    text-transform: lowercase;
+    opacity: 0.88;
+    margin: 0 0.2em;
+  }
+
+  .cast-role {
+    font-style: italic;
+  }
+
+  .line-note {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin: 0.65em 0;
+    padding: 0.4em 0;
+    border-bottom: 1px solid var(--cinema-gray);
+    text-align: left;
+  }
+
+  .line-note-tag {
+    flex: 0 0 auto;
+    font-size: calc(0.8rem * var(--zoom-multiplier, 1));
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding: 0.2em 0.55em;
+    border-radius: 6px;
+    background: var(--rich-text-blockquote-bg);
+    color: var(--rich-text-header);
+    line-height: 1.35;
+  }
+
+  .line-note-body {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+    hyphens: none;
+    line-height: 1.6;
+  }
+
+  p.verdict {
+    margin-top: 1.75em;
+    padding: 0.75em 0;
+    border-top: 1px solid var(--cinema-gray);
+    font-weight: 600;
+    text-align: left;
+    hyphens: none;
+    color: var(--rich-text-header);
+  }
+
   /* Enhanced link styling */
   a {
     text-decoration: none;

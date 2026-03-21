@@ -16,6 +16,7 @@ import PyPDF2
 from docx import Document
 from werkzeug.utils import secure_filename
 
+from .review_html_enricher import enrich_review_html
 from .s3_client import get_s3_client
 
 
@@ -297,7 +298,7 @@ class DocumentProcessor:
                     para_text = DocumentProcessor._process_paragraph_runs(paragraph)
                     html_parts.append(f"<p>{para_text}</p>")
 
-            return "\n".join(html_parts)
+            return enrich_review_html("\n".join(html_parts))
 
         except Exception as e:
             print(f"Error extracting HTML from DOCX: {e}")
@@ -352,7 +353,9 @@ class DocumentProcessor:
 
         # Convert to HTML if requested
         if convert_to_html and cleaned_text:
-            return DocumentProcessor.convert_text_to_html(cleaned_text)
+            return enrich_review_html(
+                DocumentProcessor.convert_text_to_html(cleaned_text)
+            )
 
         return cleaned_text
 
@@ -373,7 +376,9 @@ class DocumentProcessor:
                 )
             else:
                 cleaned_text = raw_text
-            return DocumentProcessor.convert_text_to_html(cleaned_text)
+            return enrich_review_html(
+                DocumentProcessor.convert_text_to_html(cleaned_text)
+            )
 
         elif file_type in ["docx", "doc"]:
             # For Word docs, extract directly as HTML
@@ -406,9 +411,9 @@ class DocumentProcessor:
         file_path = os.path.join(upload_folder, unique_filename)
         file.save(file_path)
 
-        # Extract text with improved formatting and optional title removal
+        # Extract HTML when possible so semantic classes can be applied
         try:
-            extracted_text = DocumentProcessor.extract_text_from_document(
+            extracted_text = DocumentProcessor.extract_html_from_document(
                 file_path, file_type, clean_text=True, remove_title=True
             )
             if not extracted_text.strip():
@@ -555,8 +560,8 @@ class DocumentProcessor:
             temp_file.write(file.read())
             temp_file.close()
 
-            # Extract text with improved formatting and optional title removal
-            extracted_text = DocumentProcessor.extract_text_from_document(
+            # Extract HTML when possible so review_text matches rich-text display
+            extracted_text = DocumentProcessor.extract_html_from_document(
                 temp_path, file_type, clean_text=True, remove_title=True
             )
             if not extracted_text.strip():
@@ -621,8 +626,8 @@ class DocumentProcessor:
             temp_file.write(file.read())
             temp_file.close()
 
-            # Extract text with improved formatting and optional title removal
-            extracted_text = DocumentProcessor.extract_text_from_document(
+            # Extract HTML when possible so semantic classes can be applied
+            extracted_text = DocumentProcessor.extract_html_from_document(
                 temp_path, file_type, clean_text=True, remove_title=True
             )
             if not extracted_text.strip():

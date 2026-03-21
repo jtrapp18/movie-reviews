@@ -63,8 +63,10 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
       {hasAnyContent ? (
         <ZoomableContent>
           <ContentBody className="content-body">
-            {/* Display logic: Word doc -> DocumentViewer, else -> RichTextDisplay */}
-            {isWordDocument ? (
+            {/* Prefer saved HTML (e.g. server-enriched Word extract); else Word -> mammoth */}
+            {hasContent ? (
+              <RichTextDisplay content={formValues.reviewText} />
+            ) : isWordDocument ? (
               <DocumentViewer
                 className="word-document-viewer"
                 documentUrl={`/api/view_document/${reviewId}`}
@@ -72,9 +74,7 @@ const ContentDisplay = ({ formValues, setIsEditing, reviewId }) => {
                 filename={formValues.documentFilename}
                 hasDocument={formValues.hasDocument}
               />
-            ) : (
-              hasContent && <RichTextDisplay content={formValues.reviewText} />
-            )}
+            ) : null}
 
             {/* Show PDF documents using DocumentViewer ONLY if no text content is available */}
             {hasDocument &&
