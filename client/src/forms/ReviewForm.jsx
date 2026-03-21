@@ -5,11 +5,10 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import { StyledForm, DeleteButton, CancelButton } from '@styles';
 import Error from '@styles/Error';
 import { Rating } from '@features/reviews';
 import ContentDisplay from '@components/forms/FormSubmit';
-import DocumentUpload from '@components/forms/DocumentUpload';
 import TagInput from '@components/forms/TagInput';
 import SubmitButton from '@components/forms/SubmitButton';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
@@ -18,7 +17,10 @@ import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
 import { useAdmin } from '@hooks/useAdmin';
-import BackdropUpload from '@components/forms/BackdropUpload';
+import {
+  FormBackdropField,
+  FormDocumentUploadSection,
+} from '@components/forms/shared';
 
 const RatingOverlayWrapper = styled.div`
   display: flex;
@@ -267,31 +269,21 @@ const ReviewForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
-          {/* Backdrop Image Upload (for existing reviews) */}
-          {initObj?.id && (
-            <div>
-              <label>Backdrop Image (optional):</label>
-              <BackdropUpload
-                uploadUrl={`/api/reviews/${initObj.id}/backdrop`}
-                currentUrl={
-                  backdropKey
-                    ? `/api/reviews/${initObj.id}/backdrop/view?v=${encodeURIComponent(
-                        backdropKey
-                      )}`
-                    : null
-                }
-                onUploaded={(url) => {
-                  setBackdropKey(url);
-                  if (initObj) {
-                    initObj.backdrop = url;
-                  }
-                  setUpdatedReview((prev) =>
-                    prev ? { ...prev, backdrop: url } : prev
-                  );
-                }}
-              />
-            </div>
-          )}
+          <FormBackdropField
+            uploadUrl={
+              initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined
+            }
+            backdropKey={backdropKey}
+            onUploaded={(url) => {
+              setBackdropKey(url);
+              if (initObj) {
+                initObj.backdrop = url;
+              }
+              setUpdatedReview((prev) =>
+                prev ? { ...prev, backdrop: url } : prev
+              );
+            }}
+          />
 
           {/* Rating Stars */}
           <RatingOverlayWrapper>
@@ -334,44 +326,26 @@ const ReviewForm = ({ initObj }) => {
             )}
           </div>
 
-          {/* Document Upload Section */}
-          <div>
-            <label>Document Upload (optional):</label>
-            <DocumentUpload
-              reviewId={initObj?.id || (initObj === null ? 'new' : null)}
-              onUploadSuccess={handleDocumentUploadSuccess}
-              onUploadError={handleDocumentUploadError}
-              onFileSelect={handleFileSelect}
-              existingDocument={hasDocument ? initObj : null}
-              onRemoveDocument={() => {
-                // Just update local state - persistence will happen on form submit
-                setHasDocument(false);
-                if (initObj) {
-                  initObj.hasDocument = false;
-                  initObj.documentFilename = null;
-                  initObj.documentType = null;
-                }
-              }}
-            />
-
-            {/* Extract Text Button - show if document is uploaded */}
-            {hasDocument && selectedFile && (
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <ExtractButton
-                  type="button"
-                  onClick={handleExtractText}
-                  disabled={isExtracting}
-                  isExtracting={isExtracting}
-                >
-                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </ExtractButton>
-                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the uploaded document into the review field
-                  below
-                </p>
-              </div>
-            )}
-          </div>
+          <FormDocumentUploadSection
+            reviewId={initObj?.id || (initObj === null ? 'new' : null)}
+            hasDocument={hasDocument}
+            selectedFile={selectedFile}
+            existingDocumentSource={initObj}
+            onUploadSuccess={handleDocumentUploadSuccess}
+            onUploadError={handleDocumentUploadError}
+            onFileSelect={handleFileSelect}
+            onRemoveDocument={() => {
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
+            onExtractText={handleExtractText}
+            isExtracting={isExtracting}
+            extractHint="Click to extract text from the uploaded document into the review field below"
+          />
 
           <RichTextEditor
             value={formik.values.reviewText}

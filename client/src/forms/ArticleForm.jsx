@@ -4,12 +4,11 @@ import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
-import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import { StyledForm, DeleteButton, CancelButton } from '@styles';
 import Error from '@styles/Error';
 import ContentDisplay from '@components/forms/FormSubmit';
-import DocumentUpload from '@components/forms/DocumentUpload';
-import BackdropUpload from '@components/forms/BackdropUpload';
 import TagInput from '@components/forms/TagInput';
+import { FormBackdropField, FormDocumentUploadSection } from '@components/forms/shared';
 import SubmitButton from '@components/forms/SubmitButton';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { snakeToCamel } from '@helper';
@@ -223,28 +222,16 @@ const ArticleForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
           {submitError && <Error>{submitError}</Error>}
-          {/* Backdrop Image Upload (for existing articles) */}
-          {initObj?.id && (
-            <div>
-              <label>Backdrop Image (optional):</label>
-              <BackdropUpload
-                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
-                currentUrl={
-                  backdropKey
-                    ? `/api/articles/${initObj.id}/backdrop/view?v=${encodeURIComponent(
-                        backdropKey
-                      )}`
-                    : null
-                }
-                onUploaded={(url) => {
-                  setBackdropKey(url);
-                  if (initObj) {
-                    initObj.backdrop = url;
-                  }
-                }}
-              />
-            </div>
-          )}
+          <FormBackdropField
+            uploadUrl={initObj?.id ? `/api/articles/${initObj.id}/backdrop` : undefined}
+            backdropKey={backdropKey}
+            onUploaded={(url) => {
+              setBackdropKey(url);
+              if (initObj) {
+                initObj.backdrop = url;
+              }
+            }}
+          />
           <div>
             <label htmlFor="title">Article Title *</label>
             <input
@@ -277,44 +264,26 @@ const ArticleForm = ({ initObj }) => {
             )}
           </div>
 
-          {/* Document Upload Section */}
-          <div>
-            <label>Document Upload (optional):</label>
-            <DocumentUpload
-              reviewId={initObj?.id}
-              onUploadSuccess={handleDocumentUploadSuccess}
-              onUploadError={handleDocumentUploadError}
-              existingDocument={hasDocument ? initObj : null}
-              onFileSelect={handleFileSelect}
-              onRemoveDocument={() => {
-                // Just update local state - persistence will happen on form submit
-                setHasDocument(false);
-                if (initObj) {
-                  initObj.hasDocument = false;
-                  initObj.documentFilename = null;
-                  initObj.documentType = null;
-                }
-              }}
-            />
-
-            {/* Extract Text Button - show if document is uploaded */}
-            {hasDocument && selectedFile && (
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <ExtractButton
-                  type="button"
-                  onClick={handleExtractText}
-                  disabled={isExtracting}
-                  isExtracting={isExtracting}
-                >
-                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </ExtractButton>
-                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the selected document into the article
-                  content field below
-                </p>
-              </div>
-            )}
-          </div>
+          <FormDocumentUploadSection
+            reviewId={initObj?.id}
+            hasDocument={hasDocument}
+            selectedFile={selectedFile}
+            existingDocumentSource={initObj}
+            onUploadSuccess={handleDocumentUploadSuccess}
+            onUploadError={handleDocumentUploadError}
+            onFileSelect={handleFileSelect}
+            onRemoveDocument={() => {
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
+            onExtractText={handleExtractText}
+            isExtracting={isExtracting}
+            extractHint="Click to extract text from the selected document into the article content field below"
+          />
 
           <RichTextEditor
             value={formik.values.reviewText}
