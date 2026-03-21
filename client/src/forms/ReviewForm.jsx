@@ -5,20 +5,23 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import { StyledForm } from '@styles';
 import Error from '@styles/Error';
 import { Rating } from '@features/reviews';
 import ContentDisplay from '@components/forms/FormSubmit';
-import DocumentUpload from '@components/forms/DocumentUpload';
 import TagInput from '@components/forms/TagInput';
-import SubmitButton from '@components/forms/SubmitButton';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { submitFormWithDocument } from '@utils/formSubmit';
 import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
 import { useAdmin } from '@hooks/useAdmin';
-import BackdropUpload from '@components/forms/BackdropUpload';
+import {
+  FormBackdropField,
+  FormDocumentUploadSection,
+  FormActionRow,
+  buildReviewFormContentDisplayValues,
+} from '@components/forms/shared';
 
 const RatingOverlayWrapper = styled.div`
   display: flex;
@@ -267,31 +270,17 @@ const ReviewForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
-          {/* Backdrop Image Upload (for existing reviews) */}
-          {initObj?.id && (
-            <div>
-              <label>Backdrop Image (optional):</label>
-              <BackdropUpload
-                uploadUrl={`/api/reviews/${initObj.id}/backdrop`}
-                currentUrl={
-                  backdropKey
-                    ? `/api/reviews/${initObj.id}/backdrop/view?v=${encodeURIComponent(
-                        backdropKey
-                      )}`
-                    : null
-                }
-                onUploaded={(url) => {
-                  setBackdropKey(url);
-                  if (initObj) {
-                    initObj.backdrop = url;
-                  }
-                  setUpdatedReview((prev) =>
-                    prev ? { ...prev, backdrop: url } : prev
-                  );
-                }}
-              />
-            </div>
-          )}
+          <FormBackdropField
+            uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
+            backdropKey={backdropKey}
+            onUploaded={(url) => {
+              setBackdropKey(url);
+              if (initObj) {
+                initObj.backdrop = url;
+              }
+              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
+            }}
+          />
 
           {/* Rating Stars */}
           <RatingOverlayWrapper>
@@ -334,44 +323,26 @@ const ReviewForm = ({ initObj }) => {
             )}
           </div>
 
-          {/* Document Upload Section */}
-          <div>
-            <label>Document Upload (optional):</label>
-            <DocumentUpload
-              reviewId={initObj?.id || (initObj === null ? 'new' : null)}
-              onUploadSuccess={handleDocumentUploadSuccess}
-              onUploadError={handleDocumentUploadError}
-              onFileSelect={handleFileSelect}
-              existingDocument={hasDocument ? initObj : null}
-              onRemoveDocument={() => {
-                // Just update local state - persistence will happen on form submit
-                setHasDocument(false);
-                if (initObj) {
-                  initObj.hasDocument = false;
-                  initObj.documentFilename = null;
-                  initObj.documentType = null;
-                }
-              }}
-            />
-
-            {/* Extract Text Button - show if document is uploaded */}
-            {hasDocument && selectedFile && (
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <ExtractButton
-                  type="button"
-                  onClick={handleExtractText}
-                  disabled={isExtracting}
-                  isExtracting={isExtracting}
-                >
-                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </ExtractButton>
-                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the uploaded document into the review field
-                  below
-                </p>
-              </div>
-            )}
-          </div>
+          <FormDocumentUploadSection
+            reviewId={initObj?.id || (initObj === null ? 'new' : null)}
+            hasDocument={hasDocument}
+            selectedFile={selectedFile}
+            existingDocumentSource={initObj}
+            onUploadSuccess={handleDocumentUploadSuccess}
+            onUploadError={handleDocumentUploadError}
+            onFileSelect={handleFileSelect}
+            onRemoveDocument={() => {
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
+            onExtractText={handleExtractText}
+            isExtracting={isExtracting}
+            extractHint="Click to extract text from the uploaded document into the review field below"
+          />
 
           <RichTextEditor
             value={formik.values.reviewText}
@@ -407,72 +378,39 @@ const ReviewForm = ({ initObj }) => {
             <Error>Review: {formik.errors.reviewText}</Error>
           )}
 
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: '20px',
+          <FormActionRow
+            marginTop="20px"
+            onCancel={() => {
+              if (initObj) {
+                setIsEditing(false);
+              } else {
+                navigate(-1);
+              }
             }}
-          >
-            <CancelButton
-              type="button"
-              onClick={() => {
-                if (initObj) {
-                  // If editing existing review, just exit edit mode
-                  setIsEditing(false);
-                } else {
-                  // If creating new review, navigate back
-                  navigate(-1);
-                }
-              }}
-            >
-              Cancel
-            </CancelButton>
-            <SubmitButton
-              isSubmitting={isSubmitting}
-              isEdit={isEdit}
-              editText="Save Changes"
-              createText="Submit Review"
-            />
-            {isAdmin && initObj && (
-              <DeleteButton
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Movie'}
-              </DeleteButton>
-            )}
-          </div>
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+            editText="Save Changes"
+            createText="Submit Review"
+            deleteConfig={
+              isAdmin && initObj
+                ? {
+                    onClick: () => setShowDeleteModal(true),
+                    isDeleting,
+                    label: 'Delete Movie',
+                    pendingLabel: 'Deleting...',
+                  }
+                : null
+            }
+          />
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={(() => {
-            // Use updatedReview if available, otherwise fall back to initObj
-            const reviewData = updatedReview || initObj;
-
-            const values = {
-              ...formik.values,
-              ...initObj, // Include all review data
-              // Ensure we only use reviewText (camelCase) for consistency
-              // Always prioritize the database value (which contains the HTML)
-              reviewText:
-                reviewData?.reviewText ||
-                reviewData?.review_text ||
-                formik.values.reviewText ||
-                '',
-              description: reviewData?.description || '',
-              hasDocument: reviewData?.hasDocument || false,
-              documentFilename: reviewData?.documentFilename || null,
-              documentType: reviewData?.documentType || null,
-              dateAdded: reviewData?.dateAdded || null,
-              tags: tags,
-            };
-            return values;
-          })()}
+          formValues={buildReviewFormContentDisplayValues({
+            formikValues: formik.values,
+            initObj,
+            updatedReview,
+            tags,
+          })}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}
         />

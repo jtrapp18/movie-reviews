@@ -1,5 +1,10 @@
 import styled from 'styled-components';
 import DOMPurify from 'dompurify';
+import {
+  isWordPipelineDebugEnabled,
+  getEnrichHtmlMarkers,
+  logWordPipeline,
+} from '@utils/enrichedDocCache';
 
 const RichTextContainer = styled.div`
   /* Enhanced typography for better readability */
@@ -9,6 +14,7 @@ const RichTextContainer = styled.div`
   line-height: 1.7;
   color: var(--rich-text-primary);
   max-width: 100%;
+  min-width: 0;
 
   /* Enhanced spacing and typography for headers */
   h1,
@@ -126,13 +132,170 @@ const RichTextContainer = styled.div`
     color: inherit;
   }
 
-  /* Enhanced image styling - center images only */
+  /* Full-bleed into ContentBody padding only (same --content-inline-padding as .content-body). */
   img {
     display: block;
-    max-width: 100%;
     height: auto;
-    margin-left: auto;
-    margin-right: auto;
+    box-sizing: border-box;
+    /* Percent width is the column width; grow by horizontal padding and pull back with negative margin */
+    width: calc(100% + 2 * var(--content-inline-padding, 1rem));
+    max-width: calc(100% + 2 * var(--content-inline-padding, 1rem));
+    margin-left: calc(-1 * var(--content-inline-padding, 1rem));
+    margin-right: calc(-1 * var(--content-inline-padding, 1rem));
+    margin-top: 1.2em;
+    margin-bottom: 1.2em;
+  }
+
+  /* Server-enriched Word sections (review_html_enricher.py) */
+  .cast-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 1.5rem;
+    row-gap: 0;
+    margin: 0.5em 0 1em 0;
+    width: 100%;
+  }
+
+  /* Viewport-based: reliable vs container queries + overflow:hidden ancestors */
+  @media (min-width: 36rem) {
+    .cast-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  p.cast-line {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.35em 0.45em;
+    margin: 0;
+    padding: 0.45em 0;
+    min-width: 0;
+    border-bottom: none;
+    background-image: var(--rich-text-dotted-divider-bg);
+    background-repeat: repeat-x;
+    background-position: bottom left;
+    background-size: var(--rich-text-dotted-dot-repeat) 1px;
+    text-align: left;
+    hyphens: none;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .cast-actor {
+    font-weight: 600;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .cast-as {
+    flex-shrink: 0;
+    font-size: 0.82em;
+    font-style: italic;
+    font-weight: 400;
+    text-transform: lowercase;
+    color: var(--rich-text-primary);
+    opacity: 0.7;
+  }
+
+  .cast-role {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-style: italic;
+  }
+
+  /*
+   * Line notes: parent grid aligns chip column to widest chip (subgrid).
+   * Each .line-note spans full width; dotted rule is on the row (full bleed under chip + text).
+   */
+  .line-notes-group {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    /* Space between chip column and vertical rule + body (subgrid inherits this gap) */
+    column-gap: 0.75rem;
+    row-gap: 0;
+    align-items: start;
+    margin: 0.65em 0;
+    text-align: left;
+  }
+
+  .line-notes-group .line-note {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: center;
+    margin: 0;
+    padding: 0.4em 0;
+    border-bottom: none;
+    background-image: var(--rich-text-dotted-divider-bg);
+    background-repeat: repeat-x;
+    background-position: bottom left;
+    background-size: var(--rich-text-dotted-dot-repeat) 1px;
+  }
+
+  @supports (grid-template-columns: subgrid) {
+    .line-notes-group .line-note {
+      grid-template-columns: subgrid;
+    }
+  }
+
+  .line-note {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: center;
+    margin: 0.65em 0;
+    padding: 0.4em 0;
+    border-bottom: none;
+    background-image: var(--rich-text-dotted-divider-bg);
+    background-repeat: repeat-x;
+    background-position: bottom left;
+    background-size: var(--rich-text-dotted-dot-repeat) 1px;
+    text-align: left;
+  }
+
+  /* Timestamp / Opens chips: CHIP_VARIANT_ZOOM (see styles/chipVariants.js) — tertiary bg, no white */
+  .line-note-tag {
+    grid-column: 1;
+    justify-self: start;
+    display: inline-block;
+    max-width: 100%;
+    background-color: var(--background-tertiary);
+    color: var(--font-color-1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: calc(0.9rem * var(--zoom-multiplier, 1));
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+  }
+
+  .line-note-body {
+    grid-column: 2;
+    min-width: 0;
+    padding-left: 1rem;
+    border-left: 1px solid var(--rich-text-divider-color);
+    text-align: left;
+    hyphens: none;
+    line-height: 1.6;
+  }
+
+  p.verdict {
+    margin-top: 1.75em;
+    padding: 0.75em 0;
+    border-top: none;
+    background-image: var(--rich-text-dotted-divider-bg);
+    background-repeat: repeat-x;
+    background-position: top left;
+    background-size: var(--rich-text-dotted-dot-repeat) 1px;
+    font-weight: 600;
+    text-align: left;
+    hyphens: none;
+    color: var(--rich-text-header);
   }
 
   /* Enhanced link styling */
@@ -211,7 +374,9 @@ const RichTextDisplay = ({ content }) => {
       'p',
       'br',
       'strong',
+      'b',
       'em',
+      'i',
       'u',
       's',
       'h1',
@@ -234,6 +399,19 @@ const RichTextDisplay = ({ content }) => {
     ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'style'],
     ALLOW_DATA_ATTR: false,
   });
+
+  if (isWordPipelineDebugEnabled()) {
+    const before = getEnrichHtmlMarkers(content);
+    const after = getEnrichHtmlMarkers(sanitizedContent);
+    if (
+      before.castLine !== after.castLine ||
+      before.lineNote !== after.lineNote ||
+      before.castGrid !== after.castGrid ||
+      before.verdict !== after.verdict
+    ) {
+      logWordPipeline('RichTextDisplay DOMPurify changed markers', { before, after });
+    }
+  }
 
   return <RichTextContainer dangerouslySetInnerHTML={{ __html: sanitizedContent }} />;
 };

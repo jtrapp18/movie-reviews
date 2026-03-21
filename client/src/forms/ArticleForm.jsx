@@ -4,13 +4,16 @@ import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
-import { StyledForm, DeleteButton, CancelButton, ExtractButton } from '@styles';
+import { StyledForm } from '@styles';
 import Error from '@styles/Error';
 import ContentDisplay from '@components/forms/FormSubmit';
-import DocumentUpload from '@components/forms/DocumentUpload';
-import BackdropUpload from '@components/forms/BackdropUpload';
 import TagInput from '@components/forms/TagInput';
-import SubmitButton from '@components/forms/SubmitButton';
+import {
+  FormBackdropField,
+  FormDocumentUploadSection,
+  FormActionRow,
+  buildArticleFormContentDisplayValues,
+} from '@components/forms/shared';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { snakeToCamel } from '@helper';
 import { submitFormWithDocument } from '@utils/formSubmit';
@@ -223,28 +226,16 @@ const ArticleForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
           {submitError && <Error>{submitError}</Error>}
-          {/* Backdrop Image Upload (for existing articles) */}
-          {initObj?.id && (
-            <div>
-              <label>Backdrop Image (optional):</label>
-              <BackdropUpload
-                uploadUrl={`/api/articles/${initObj.id}/backdrop`}
-                currentUrl={
-                  backdropKey
-                    ? `/api/articles/${initObj.id}/backdrop/view?v=${encodeURIComponent(
-                        backdropKey
-                      )}`
-                    : null
-                }
-                onUploaded={(url) => {
-                  setBackdropKey(url);
-                  if (initObj) {
-                    initObj.backdrop = url;
-                  }
-                }}
-              />
-            </div>
-          )}
+          <FormBackdropField
+            uploadUrl={initObj?.id ? `/api/articles/${initObj.id}/backdrop` : undefined}
+            backdropKey={backdropKey}
+            onUploaded={(url) => {
+              setBackdropKey(url);
+              if (initObj) {
+                initObj.backdrop = url;
+              }
+            }}
+          />
           <div>
             <label htmlFor="title">Article Title *</label>
             <input
@@ -277,44 +268,26 @@ const ArticleForm = ({ initObj }) => {
             )}
           </div>
 
-          {/* Document Upload Section */}
-          <div>
-            <label>Document Upload (optional):</label>
-            <DocumentUpload
-              reviewId={initObj?.id}
-              onUploadSuccess={handleDocumentUploadSuccess}
-              onUploadError={handleDocumentUploadError}
-              existingDocument={hasDocument ? initObj : null}
-              onFileSelect={handleFileSelect}
-              onRemoveDocument={() => {
-                // Just update local state - persistence will happen on form submit
-                setHasDocument(false);
-                if (initObj) {
-                  initObj.hasDocument = false;
-                  initObj.documentFilename = null;
-                  initObj.documentType = null;
-                }
-              }}
-            />
-
-            {/* Extract Text Button - show if document is uploaded */}
-            {hasDocument && selectedFile && (
-              <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                <ExtractButton
-                  type="button"
-                  onClick={handleExtractText}
-                  disabled={isExtracting}
-                  isExtracting={isExtracting}
-                >
-                  {isExtracting ? 'Extracting...' : 'Extract Text from Document'}
-                </ExtractButton>
-                <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>
-                  Click to extract text from the selected document into the article
-                  content field below
-                </p>
-              </div>
-            )}
-          </div>
+          <FormDocumentUploadSection
+            reviewId={initObj?.id}
+            hasDocument={hasDocument}
+            selectedFile={selectedFile}
+            existingDocumentSource={initObj}
+            onUploadSuccess={handleDocumentUploadSuccess}
+            onUploadError={handleDocumentUploadError}
+            onFileSelect={handleFileSelect}
+            onRemoveDocument={() => {
+              setHasDocument(false);
+              if (initObj) {
+                initObj.hasDocument = false;
+                initObj.documentFilename = null;
+                initObj.documentType = null;
+              }
+            }}
+            onExtractText={handleExtractText}
+            isExtracting={isExtracting}
+            extractHint="Click to extract text from the selected document into the article content field below"
+          />
 
           <RichTextEditor
             value={formik.values.reviewText}
@@ -341,73 +314,40 @@ const ArticleForm = ({ initObj }) => {
             />
           </div>
 
-          <div
-            style={{
-              marginTop: '30px',
-              marginBottom: '20px',
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              justifyContent: 'center',
-              alignItems: 'center',
+          <FormActionRow
+            marginTop="30px"
+            marginBottom="20px"
+            onCancel={() => {
+              if (initObj) {
+                setIsEditing(false);
+              } else {
+                navigate(-1);
+              }
             }}
-          >
-            <CancelButton
-              type="button"
-              onClick={() => {
-                if (initObj) {
-                  // If editing existing article, just exit edit mode
-                  setIsEditing(false);
-                } else {
-                  // If creating new article, navigate back
-                  navigate(-1);
-                }
-              }}
-            >
-              Cancel
-            </CancelButton>
-            <SubmitButton
-              isSubmitting={isSubmitting}
-              isEdit={isEdit}
-              editText="Save Changes"
-              createText="Create Article"
-            />
-            {isAdmin && initObj && (
-              <DeleteButton
-                type="button"
-                onClick={() => setShowDeleteModal(true)}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Article'}
-              </DeleteButton>
-            )}
-          </div>
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+            editText="Save Changes"
+            createText="Create Article"
+            deleteConfig={
+              isAdmin && initObj
+                ? {
+                    onClick: () => setShowDeleteModal(true),
+                    isDeleting,
+                    label: 'Delete Article',
+                    pendingLabel: 'Deleting...',
+                  }
+                : null
+            }
+          />
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={(() => {
-            const values = {
-              ...formik.values,
-              ...initObj, // Include all the original article data
-              // Ensure we only use reviewText (camelCase) for consistency
-              reviewText:
-                formik.values.reviewText ||
-                initObj?.reviewText ||
-                initObj?.review_text ||
-                '',
-              hasDocument:
-                hasDocument || initObj?.hasDocument || initObj?.has_document || false,
-              documentFilename:
-                selectedFile?.name ||
-                initObj?.documentFilename ||
-                initObj?.document_filename ||
-                null,
-              documentType: selectedFile
-                ? selectedFile.name.split('.').pop().toLowerCase()
-                : initObj?.documentType || initObj?.document_type || null,
-            };
-            return values;
-          })()}
+          formValues={buildArticleFormContentDisplayValues({
+            formikValues: formik.values,
+            initObj,
+            hasDocument,
+            selectedFile,
+          })}
           setIsEditing={setIsEditing}
           reviewId={createdArticle?.id || initObj?.id}
         />

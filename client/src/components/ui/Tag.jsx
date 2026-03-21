@@ -1,14 +1,15 @@
 import styled from 'styled-components';
+import { CHIP_VARIANT_ZOOM } from '@styles/chipVariants';
 
 const TagContainer = styled.div`
   display: inline-flex;
   align-items: center;
-  background-color: ${(props) => props.backgroundColor || '#007bff'};
-  color: ${(props) => props.textColor || '#ffffff'};
+  background-color: ${(props) => props.backgroundColor};
+  color: ${(props) => props.textColor};
   padding: ${(props) => (props.size === 'small' ? '2px 6px' : '4px 12px')};
   border-radius: ${(props) => (props.size === 'small' ? '12px' : '20px')};
   font-size: ${(props) => (props.size === 'small' ? '0.7rem' : '0.85rem')};
-  font-weight: 500;
+  font-weight: ${(props) => (props.$variant === 'zoom' ? 600 : 500)};
   margin: 2px;
   cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
   transition: all 0.2s ease;
@@ -22,13 +23,13 @@ const TagContainer = styled.div`
       props.clickable &&
       `
       transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      ${props.$variant === 'zoom' ? '' : 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);'}
     `}
   }
 
   .tag-remove {
     margin-left: 6px;
-    color: ${(props) => props.textColor || 'white'};
+    color: ${(props) => props.textColor};
     cursor: pointer;
 
     &:hover {
@@ -39,6 +40,8 @@ const TagContainer = styled.div`
 
 const Tag = ({
   children,
+  /** 'default' (blue pill) | 'zoom' — same palette as ZoomControls */
+  variant = 'default',
   backgroundColor,
   textColor,
   borderColor,
@@ -48,6 +51,18 @@ const Tag = ({
   size = 'normal',
   ...props
 }) => {
+  const resolved =
+    variant === 'zoom'
+      ? {
+          backgroundColor: backgroundColor ?? CHIP_VARIANT_ZOOM.backgroundColor,
+          textColor: textColor ?? CHIP_VARIANT_ZOOM.textColor,
+          borderColor: borderColor ?? CHIP_VARIANT_ZOOM.borderColor,
+        }
+      : {
+          backgroundColor: backgroundColor ?? '#007bff',
+          textColor: textColor ?? '#ffffff',
+          borderColor: borderColor ?? 'transparent',
+        };
   const handleClick = (e) => {
     if (clickable && onClick) {
       onClick(e);
@@ -63,9 +78,10 @@ const Tag = ({
 
   return (
     <TagContainer
-      backgroundColor={backgroundColor}
-      textColor={textColor}
-      borderColor={borderColor}
+      $variant={variant}
+      backgroundColor={resolved.backgroundColor}
+      textColor={resolved.textColor}
+      borderColor={resolved.borderColor}
       clickable={clickable}
       onClick={handleClick}
       size={size}

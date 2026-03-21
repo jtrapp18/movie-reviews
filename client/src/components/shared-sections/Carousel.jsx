@@ -18,11 +18,62 @@ const CarouselStyles = styled.div`
     margin: 0 6px;
   }
 
-  /* Hide arrows */
+  /* Hide arrows unless $showArrows */
+  ${(p) =>
+    !p.$showArrows &&
+    `
   .slick-prev,
   .slick-next {
     display: none;
   }
+  `}
+
+  ${(p) =>
+    p.$showArrows &&
+    `
+  .slick-prev,
+  .slick-next {
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 2px solid #333;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .slick-prev {
+    left: 10px;
+  }
+
+  .slick-next {
+    right: 10px;
+  }
+
+  .slick-prev:hover,
+  .slick-next:hover {
+    background-color: #007bff !important;
+    border-color: #007bff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+  }
+
+  .slick-prev:hover:before,
+  .slick-next:hover:before {
+    color: white;
+  }
+
+  .slick-disabled {
+    opacity: 0.3;
+  }
+  `}
 
   /* Dots styling */
   .slick-dots {
@@ -50,6 +101,14 @@ const CarouselStyles = styled.div`
     opacity: 1;
     color: var(--primary);
   }
+`;
+
+/** Fixed-width slide shell for article cards in carousels (list + detail “more” rows). */
+export const ArticleCarouselSlide = styled.div`
+  margin: 0;
+  width: 200px;
+  height: 100%;
+  flex-shrink: 0;
 `;
 
 const NoResultsPlaceholder = styled.div`
@@ -91,7 +150,13 @@ const NoResultsPlaceholder = styled.div`
   }
 `;
 
-const Carousel = ({ children, settings = {}, noResultsMessage = "No results found" }) => {
+const Carousel = ({
+  children,
+  settings = {},
+  noResultsMessage = 'No results found',
+  /** When true, slick arrows are shown and styled (articles index page). */
+  showArrows = false,
+}) => {
   const defaultSettings = {
     dots: true,
     infinite: true,
@@ -107,7 +172,11 @@ const Carousel = ({ children, settings = {}, noResultsMessage = "No results foun
     arrows: false,
   };
 
-  const finalSettings = { ...defaultSettings, ...settings };
+  const finalSettings = {
+    ...defaultSettings,
+    ...settings,
+    ...(showArrows ? { arrows: true } : {}),
+  };
 
   // Check if children array is empty
   const hasChildren = React.Children.count(children) > 0;
@@ -128,7 +197,7 @@ const Carousel = ({ children, settings = {}, noResultsMessage = "No results foun
 
   return (
     <CarouselContainer>
-      <CarouselStyles>
+      <CarouselStyles $showArrows={showArrows}>
         <Slider {...finalSettings}>
           {React.Children.map(children, (child, index) => (
             <MotionWrapper key={child.key ?? index} index={index}>

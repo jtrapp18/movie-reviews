@@ -1,8 +1,7 @@
 import { CardContainer, Button } from '@styles';
 import ArticleCard from '@components/cards/ArticleCard';
 import styled from 'styled-components';
-import MotionWrapper from '@styles/MotionWrapper';
-import Carousel from '@components/shared-sections/Carousel';
+import Carousel, { ArticleCarouselSlide } from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@hooks/useAdmin';
@@ -20,7 +19,6 @@ function Articles({ showArticles }) {
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
 
-  // Handle null or undefined showArticles
   if (!showArticles || !Array.isArray(showArticles)) {
     return (
       <CardContainer>
@@ -36,22 +34,11 @@ function Articles({ showArticles }) {
   return (
     <CardContainer>
       <Carousel>
-        {showArticles.map((article, index) => {
-          return (
-            <MotionWrapper key={article.id} index={index}>
-              <div
-                style={{
-                  margin: '0',
-                  width: '200px',
-                  height: '100%',
-                  flexShrink: 0,
-                }}
-              >
-                <ArticleCard article={article} />
-              </div>
-            </MotionWrapper>
-          );
-        })}
+        {showArticles.map((article) => (
+          <ArticleCarouselSlide key={article.id}>
+            <ArticleCard article={article} />
+          </ArticleCarouselSlide>
+        ))}
       </Carousel>
 
       {isAdmin && (
