@@ -3,20 +3,25 @@ Document processing utilities for extracting text and images from PDF and Word d
 Uses temporary processing for better deployment compatibility.
 """
 
+from __future__ import annotations
+
 import base64
 import io
 import os
 import re
 import tempfile
 import uuid
-from typing import Dict, List
+from typing import Any
 
 import pdfplumber
 import PyPDF2
 from docx import Document
 from werkzeug.utils import secure_filename
 
-from .review_html_enricher import enrich_review_html
+from .review_html_enricher import (
+    enrich_review_html,
+    extract_main_cast_line_notes_from_review_html,
+)
 from .s3_client import get_s3_client
 
 
@@ -265,8 +270,13 @@ class DocumentProcessor:
             return ""
 
     @staticmethod
-    def extract_html_from_docx(file_path: str) -> str:
-        """Extract HTML from Word document with full formatting preservation."""
+    def extract_html_from_docx(
+        file_path: str,
+    ) -> tuple[str, str | None, str | None]:
+        """Extract HTML from Word document with full formatting preservation.
+
+        Also returns JSON strings for ``main_cast`` and ``line_notes`` (or None) when sections match.
+        """
         try:
             doc = Document(file_path)
             html_parts = []
@@ -298,12 +308,18 @@ class DocumentProcessor:
                     para_text = DocumentProcessor._process_paragraph_runs(paragraph)
                     html_parts.append(f"<p>{para_text}</p>")
 
-            return enrich_review_html("\n".join(html_parts))
+            raw_html = "\n".join(html_parts)
+            main_cast, line_notes = extract_main_cast_line_notes_from_review_html(
+                raw_html
+            )
+            enriched = enrich_review_html(raw_html)
+            return enriched, main_cast, line_notes
 
         except Exception as e:
             print(f"Error extracting HTML from DOCX: {e}")
             # Fallback to plain text
-            return DocumentProcessor.extract_text_from_docx(file_path)
+            plain = DocumentProcessor.extract_text_from_docx(file_path)
+            return plain, None, None
 
     @staticmethod
     def _process_paragraph_runs(paragraph) -> str:
@@ -365,8 +381,12 @@ class DocumentProcessor:
         file_type: str,
         clean_text: bool = True,
         remove_title: bool = True,
-    ) -> str:
-        """Extract HTML from document with full formatting preservation."""
+    ) -> tuple[str, str | None, str | None]:
+        """Extract HTML from document with full formatting preservation.
+
+        For Word only, the second and third values are JSON strings for main cast and line notes
+        (or None). For PDF they are always None.
+        """
         if file_type == "pdf":
             # For PDFs, extract text and convert to HTML
             raw_text = DocumentProcessor.extract_text_from_pdf(file_path)
@@ -376,9 +396,10 @@ class DocumentProcessor:
                 )
             else:
                 cleaned_text = raw_text
-            return enrich_review_html(
+            html = enrich_review_html(
                 DocumentProcessor.convert_text_to_html(cleaned_text)
             )
+            return html, None, None
 
         elif file_type in ["docx", "doc"]:
             # For Word docs, extract directly as HTML
@@ -387,7 +408,7 @@ class DocumentProcessor:
             raise ValueError(f"Unsupported file type: {file_type}")
 
     @staticmethod
-    def process_uploaded_document(file, upload_folder: str) -> Dict[str, str]:
+    def process_uploaded_document(file, upload_folder: str) -> dict[str, Any]:
         """
         Process uploaded document and return metadata.
 
@@ -413,8 +434,10 @@ class DocumentProcessor:
 
         # Extract HTML when possible so semantic classes can be applied
         try:
-            extracted_text = DocumentProcessor.extract_html_from_document(
-                file_path, file_type, clean_text=True, remove_title=True
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    file_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -425,13 +448,17 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": unique_filename,
                 "file_path": file_path,
                 "file_type": file_type,
                 "extracted_text": extracted_text,
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+            return out
 
         except Exception as e:
             # Clean up file if text extraction failed
@@ -440,7 +467,7 @@ class DocumentProcessor:
             return {"success": False, "error": f"Error processing document: {str(e)}"}
 
     @staticmethod
-    def extract_images_from_pdf(file_path: str) -> List[Dict[str, str]]:
+    def extract_images_from_pdf(file_path: str) -> list[dict[str, Any]]:
         """Extract images from PDF and return as base64 encoded strings."""
         images = []
         try:
@@ -483,7 +510,7 @@ class DocumentProcessor:
         return images
 
     @staticmethod
-    def extract_images_from_docx(file_path: str) -> List[Dict[str, str]]:
+    def extract_images_from_docx(file_path: str) -> list[dict[str, Any]]:
         """Extract images from Word document and return as base64 encoded strings."""
         images = []
         try:
@@ -521,7 +548,7 @@ class DocumentProcessor:
     @staticmethod
     def extract_images_from_document(
         file_path: str, file_type: str
-    ) -> List[Dict[str, str]]:
+    ) -> list[dict[str, Any]]:
         """Extract images from document based on file type."""
         if file_type == "pdf":
             return DocumentProcessor.extract_images_from_pdf(file_path)
@@ -531,7 +558,7 @@ class DocumentProcessor:
             return []
 
     @staticmethod
-    def process_uploaded_document_temporary(file) -> Dict[str, any]:
+    def process_uploaded_document_temporary(file) -> dict[str, Any]:
         """
         Process uploaded document using temporary files for better deployment compatibility.
         Extracts text and keeps file for serving - deployment-friendly approach.
@@ -561,8 +588,10 @@ class DocumentProcessor:
             temp_file.close()
 
             # Extract HTML when possible so review_text matches rich-text display
-            extracted_text = DocumentProcessor.extract_html_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    temp_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -572,13 +601,17 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": original_filename,
                 "file_path": temp_path,  # Return the temp file path for serving
                 "file_type": file_type,
                 "extracted_text": extracted_text,
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+            return out
 
         except Exception as e:
             return {"success": False, "error": f"Error processing document: {str(e)}"}
@@ -588,7 +621,7 @@ class DocumentProcessor:
                 temp_file.close()
 
     @staticmethod
-    def process_uploaded_document_s3(file, review_id: int) -> Dict[str, any]:
+    def process_uploaded_document_s3(file, review_id: int) -> dict[str, Any]:
         """
         Process uploaded document using S3 storage for deployment compatibility.
         Extracts text and uploads file to S3 - production-ready approach.
@@ -627,8 +660,10 @@ class DocumentProcessor:
             temp_file.close()
 
             # Extract HTML when possible so semantic classes can be applied
-            extracted_text = DocumentProcessor.extract_html_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
+            extracted_text, main_cast, line_notes = (
+                DocumentProcessor.extract_html_from_document(
+                    temp_path, file_type, clean_text=True, remove_title=True
+                )
             )
             if not extracted_text.strip():
                 return {
@@ -654,7 +689,7 @@ class DocumentProcessor:
                     "file_type": file_type,
                 }
 
-            return {
+            out: dict[str, Any] = {
                 "success": True,
                 "filename": original_filename,
                 "file_path": s3_object_key,  # Store S3 object key in file_path field
@@ -662,6 +697,10 @@ class DocumentProcessor:
                 "extracted_text": extracted_text,
                 "s3_url": upload_result.get("url"),
             }
+            if file_type in ("docx", "doc"):
+                out["main_cast"] = main_cast
+                out["line_notes"] = line_notes
+            return out
 
         except Exception as e:
             return {"success": False, "error": f"Error processing document: {str(e)}"}

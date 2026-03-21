@@ -9,6 +9,7 @@ from flask_restful import Resource
 from movie_reviews.config import app, db
 from movie_reviews.models import Director, Review, Tag
 from movie_reviews.utils.document_processor import DocumentProcessor
+from movie_reviews.utils.review_html_enricher import enrich_review_html
 from movie_reviews.utils.s3_client import get_s3_client
 
 
@@ -92,6 +93,10 @@ class ReviewWithDocument(Resource):
                     review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
 
+                    if result.get("file_type") in ("docx", "doc"):
+                        review.main_cast = result.get("main_cast")
+                        review.line_notes = result.get("line_notes")
+
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
                     if replace_text and result["extracted_text"]:
@@ -170,6 +175,10 @@ class ReviewWithDocumentById(Resource):
                     review.document_filename = result["filename"]
                     review.document_path = result["file_path"]
                     review.document_type = result["file_type"]
+
+                    if result.get("file_type") in ("docx", "doc"):
+                        review.main_cast = result.get("main_cast")
+                        review.line_notes = result.get("line_notes")
 
                     # Replace review text with extracted text if replace_text is true
                     replace_text = data.get("replace_text", "true").lower() == "true"
@@ -253,6 +262,10 @@ class DocumentUpload(Resource):
             if replace_text and result["extracted_text"]:
                 review.review_text = result["extracted_text"]
 
+            if result.get("file_type") in ("docx", "doc"):
+                review.main_cast = result.get("main_cast")
+                review.line_notes = result.get("line_notes")
+
             print("DEBUG DocumentUpload - About to commit changes")
             db.session.commit()
             print("DEBUG DocumentUpload - Commit successful")
@@ -299,26 +312,44 @@ class ExtractText(Resource):
                     "error": f'Text extraction failed: {result.get("error", "Unknown error")}'
                 }, 400
 
-            # Extract HTML with full formatting preservation
-            file_type = result["file_type"]
-            temp_path = result["file_path"]
+            # process_uploaded_document_temporary already ran extract_html_from_document
+            html_text = result["extracted_text"]
             raw_text = result["extracted_text"]
+            file_type = result["file_type"]
 
-            # Use the new HTML extraction method
-            html_text = DocumentProcessor.extract_html_from_document(
-                temp_path, file_type, clean_text=True, remove_title=True
-            )
-
-            return {
-                "text": html_text,  # Return HTML formatted text
-                "raw_text": raw_text,  # Also include raw text for reference
+            payload = {
+                "text": html_text,
+                "raw_text": raw_text,
                 "filename": result["filename"],
-                "file_type": result["file_type"],
+                "file_type": file_type,
                 "text_length": len(html_text),
-            }, 200
+            }
+            if file_type in ("docx", "doc"):
+                payload["main_cast"] = result.get("main_cast")
+                payload["line_notes"] = result.get("line_notes")
+
+            return payload, 200
 
         except Exception as e:
             return {"error": f"Text extraction failed: {str(e)}"}, 500
+
+
+class EnrichReviewHtml(Resource):
+    """Apply semantic HTML enrichment (cast grid, line notes, verdict) to a fragment."""
+
+    MAX_HTML_LENGTH = 2_000_000
+
+    def post(self):
+        try:
+            data = request.get_json(silent=True) or {}
+            html = data.get("html")
+            if not isinstance(html, str):
+                return {"error": "Field 'html' (string) is required"}, 400
+            if len(html) > self.MAX_HTML_LENGTH:
+                return {"error": "HTML too large"}, 400
+            return {"html": enrich_review_html(html)}, 200
+        except Exception as e:
+            return {"error": str(e)}, 500
 
 
 class DocumentDownload(Resource):
@@ -651,6 +682,7 @@ class DirectorBackdropView(Resource):
 
 
 def register_routes(api):
+    api.add_resource(EnrichReviewHtml, "/api/enrich_review_html")
     api.add_resource(ExtractText, "/api/extract_text")
     api.add_resource(ReviewWithDocument, "/api/reviews_with_document")
     api.add_resource(
