@@ -20,6 +20,7 @@ import {
   FormBackdropField,
   FormDocumentUploadSection,
   FormActionRow,
+  buildReviewFormContentDisplayValues,
 } from '@components/forms/shared';
 
 const RatingOverlayWrapper = styled.div`
@@ -404,29 +405,12 @@ const ReviewForm = ({ initObj }) => {
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={(() => {
-            // Use updatedReview if available, otherwise fall back to initObj
-            const reviewData = updatedReview || initObj;
-
-            const values = {
-              ...formik.values,
-              ...initObj, // Include all review data
-              // Ensure we only use reviewText (camelCase) for consistency
-              // Always prioritize the database value (which contains the HTML)
-              reviewText:
-                reviewData?.reviewText ||
-                reviewData?.review_text ||
-                formik.values.reviewText ||
-                '',
-              description: reviewData?.description || '',
-              hasDocument: reviewData?.hasDocument || false,
-              documentFilename: reviewData?.documentFilename || null,
-              documentType: reviewData?.documentType || null,
-              dateAdded: reviewData?.dateAdded || null,
-              tags: tags,
-            };
-            return values;
-          })()}
+          formValues={buildReviewFormContentDisplayValues({
+            formikValues: formik.values,
+            initObj,
+            updatedReview,
+            tags,
+          })}
           setIsEditing={setIsEditing}
           reviewId={initObj?.id}
         />

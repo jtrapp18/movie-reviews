@@ -12,6 +12,7 @@ import {
   FormBackdropField,
   FormDocumentUploadSection,
   FormActionRow,
+  buildArticleFormContentDisplayValues,
 } from '@components/forms/shared';
 import DeleteConfirmationModal from '@components/feedback/DeleteConfirmationModal';
 import { snakeToCamel } from '@helper';
@@ -341,29 +342,12 @@ const ArticleForm = ({ initObj }) => {
         </StyledForm>
       ) : (
         <ContentDisplay
-          formValues={(() => {
-            const values = {
-              ...formik.values,
-              ...initObj, // Include all the original article data
-              // Ensure we only use reviewText (camelCase) for consistency
-              reviewText:
-                formik.values.reviewText ||
-                initObj?.reviewText ||
-                initObj?.review_text ||
-                '',
-              hasDocument:
-                hasDocument || initObj?.hasDocument || initObj?.has_document || false,
-              documentFilename:
-                selectedFile?.name ||
-                initObj?.documentFilename ||
-                initObj?.document_filename ||
-                null,
-              documentType: selectedFile
-                ? selectedFile.name.split('.').pop().toLowerCase()
-                : initObj?.documentType || initObj?.document_type || null,
-            };
-            return values;
-          })()}
+          formValues={buildArticleFormContentDisplayValues({
+            formikValues: formik.values,
+            initObj,
+            hasDocument,
+            selectedFile,
+          })}
           setIsEditing={setIsEditing}
           reviewId={createdArticle?.id || initObj?.id}
         />

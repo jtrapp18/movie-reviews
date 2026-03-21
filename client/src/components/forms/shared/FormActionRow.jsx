@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { CancelButton, SubmitButton, DeleteButton } from '@styles';
+import { CancelButton, DeleteButton } from '@styles';
+import SubmitButton from '@components/forms/SubmitButton';
 
 const Row = styled.div`
   display: flex;
