@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const StyledCard = styled.article`
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
   gap: 12px;
   border-radius: 8px 8px 0 0;
   background-color: var(--background-secondary);

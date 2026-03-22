@@ -1,5 +1,9 @@
 export { default as SidePanelBlock } from './SidePanelBlock';
-export { SidePanelStack, SidePanelPlaceholder } from './sidePanelStyles';
+export {
+  SidePanelStack,
+  SidePanelPlaceholder,
+  SidePanelHeadingLabel,
+} from './sidePanelStyles';
 export {
   useContinueReading,
   appendContinueReading,
@@ -8,3 +12,4 @@ export {
 } from './useContinueReading';
 export { default as ContinueReadingList } from './ContinueReadingList';
 export { pathForPost, normalizePath } from './continueReadingPaths';
+export { default as ActivityFeedList } from './ActivityFeedList';

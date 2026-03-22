@@ -31,6 +31,19 @@ export const SidePanelBlockTitle = styled.h3`
   font-weight: 600;
   text-align: left;
   width: 100%;
+  line-height: 1.2;
+  color: var(--font-color-2, #555);
+`;
+
+/**
+ * Uppercase rail section label — use for CONTINUE, ACTIVITY, etc. so headings match.
+ */
+export const SidePanelHeadingLabel = styled.span`
+  display: inline-block;
+  letter-spacing: 0.04em;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: uppercase;
 `;
 
 /** Default body slot while sections are stubbed / empty */

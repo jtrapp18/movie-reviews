@@ -13,9 +13,10 @@ import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
 import HomeHero from './HomeHero';
 import {
+  ActivityFeedList,
   ContinueReadingList,
   SidePanelBlock,
-  SidePanelPlaceholder,
+  SidePanelHeadingLabel,
 } from '@features/sidePanel';
 
 const StyledContainer = styled.div`
@@ -205,20 +206,18 @@ function Home() {
             <HomeSplitShell>
               <HomeSidebar aria-label="Sidebar">
                 <SidePanelBlock
-                  title={
-                    <span style={{ letterSpacing: '0.04em' }}>CONTINUE</span>
-                  }
+                  title={<SidePanelHeadingLabel>CONTINUE</SidePanelHeadingLabel>}
                   titleId="side-panel-continue-heading"
                   motionIndex={1}
                 >
                   <ContinueReadingList posts={posts} limit={5} />
                 </SidePanelBlock>
                 <SidePanelBlock
-                  title="Activity"
+                  title={<SidePanelHeadingLabel>ACTIVITY</SidePanelHeadingLabel>}
                   titleId="side-panel-activity-heading"
                   motionIndex={2}
                 >
-                  <SidePanelPlaceholder />
+                  <ActivityFeedList />
                 </SidePanelBlock>
               </HomeSidebar>
 
