@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import SearchBar from '@components/shared-sections/SearchBar';
 import Loading from '@components/ui/Loading';
-import { StyledContainer } from '@styles';
+import { StyledSizedContainer } from '@styles';
 
 const PageContainer = styled.div`
   min-height: 100%;
@@ -33,12 +33,14 @@ function SearchPageFrame({
   loadingText = 'Loading',
   showHeader = true,
   wide = false,
+  /** narrow | medium | full — only applies when wide is false */
+  containerSize = 'narrow',
   children,
 }) {
-  const Container = wide ? PageContainer : StyledContainer;
+  const Container = wide ? PageContainer : StyledSizedContainer;
 
   return (
-    <Container>
+    <Container {...(!wide ? { $size: containerSize } : {})}>
       {showHeader && (
         <PageHeader>
           {title && <h1>{title}</h1>}

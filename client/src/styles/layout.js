@@ -1,4 +1,37 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+
+/** Max widths for centered page shells (SearchPageFrame, etc.) */
+export const CONTAINER_MAX_WIDTH = {
+  /** Current default: reading column */
+  narrow: 'min(900px, 90vw)',
+  /** Home + side rail: room for feed + panel without going edge-to-edge */
+  medium: 'min(1200px, 94vw)',
+  /** Widest bounded content */
+  full: 'min(1400px, 96vw)',
+};
+
+const containerShell = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  padding: 1rem;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  hr {
+    width: 100%;
+  }
+`;
 
 const StyledMain = styled.main`
   min-height: calc(100vh - var(--height-header) - 4px);
@@ -17,28 +50,15 @@ const StyledMain = styled.main`
 `;
 
 const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  ${containerShell}
+  width: ${CONTAINER_MAX_WIDTH.narrow};
+`;
 
-  width: min(900px, 90vw);
-  margin: 0 auto;
-  padding: 1rem;
-  line-height: 1.6;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
-  }
-
-  h1 {
-    text-align: center;
-  }
-
-  hr {
-    width: 100%;
-  }
+/** Same shell as StyledContainer but with narrow | medium | full max width */
+export const StyledSizedContainer = styled.div`
+  ${containerShell}
+  width: ${({ $size = 'narrow' }) =>
+    CONTAINER_MAX_WIDTH[$size] ?? CONTAINER_MAX_WIDTH.narrow};
 `;
 
 const CardContainer = styled.div`

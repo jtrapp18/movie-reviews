@@ -9,7 +9,7 @@ import { prefetchEntity } from '@features/cache/prefetchEntity';
 
 const GridContainer = styled.div`
   width: 100%;
-  padding: 0 20px;
+  padding: ${({ $fillColumn }) => ($fillColumn ? '0' : '0 20px')};
   box-sizing: border-box;
 `;
 
@@ -17,8 +17,8 @@ const StyledGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  max-width: 700px;
-  margin: 0 auto;
+  max-width: ${({ $fillColumn }) => ($fillColumn ? '100%' : '700px')};
+  margin: ${({ $fillColumn }) => ($fillColumn ? '0' : '0 auto')};
 `;
 
 const LoadMoreContainer = styled.div`
@@ -27,7 +27,7 @@ const LoadMoreContainer = styled.div`
   margin-top: 16px;
 `;
 
-const PostsGrid = ({ posts, initialCount = 5 }) => {
+const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
   const navigate = useNavigate();
   const [visibleCount, setVisibleCount] = useState(initialCount);
 
@@ -57,8 +57,8 @@ const PostsGrid = ({ posts, initialCount = 5 }) => {
   };
 
   return (
-    <GridContainer>
-      <StyledGrid>
+    <GridContainer $fillColumn={fillColumn}>
+      <StyledGrid $fillColumn={fillColumn}>
         {visiblePosts.map((post, index) => {
           const title = post.title || post.movie?.title || 'Untitled';
           const date = formatDate(post.dateAdded);

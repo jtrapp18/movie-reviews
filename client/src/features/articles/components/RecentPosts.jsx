@@ -1,8 +1,22 @@
+import styled from 'styled-components';
 import { CardContainer } from '@styles';
 import Loading from '@components/ui/Loading';
 import PostsGrid from './PostsGrid';
 
-function RecentPosts({ posts }) {
+/** Same as CardContainer but left-aligns grid when beside side panel (Home) */
+const RecentPostsOuter = styled.div`
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  max-width: 100vw;
+  justify-items: ${({ $fillColumn }) => ($fillColumn ? 'stretch' : 'center')};
+
+  hr {
+    width: 100%;
+  }
+`;
+
+function RecentPosts({ posts, fillColumn = false }) {
   if (!posts) {
     return (
       <CardContainer>
@@ -16,6 +30,14 @@ function RecentPosts({ posts }) {
       <CardContainer>
         <p>No posts yet.</p>
       </CardContainer>
+    );
+  }
+
+  if (fillColumn) {
+    return (
+      <RecentPostsOuter $fillColumn>
+        <PostsGrid posts={posts} fillColumn />
+      </RecentPostsOuter>
     );
   }
 
