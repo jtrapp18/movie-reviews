@@ -121,21 +121,15 @@ function DirectorTimeline({ movies }) {
             ? `${movie.overview.slice(0, 180)}…`
             : movie.overview || 'No synopsis available.';
 
-        // Determine rating and correct ID using ratings map
-        let rating = null;
-        let movieWithCorrectId = movie;
-
-        if (movie.externalId) {
-          const movieData = ratingsMap[movie.externalId];
-          rating = movieData?.rating || null;
-          const localId = movieData?.local_id;
-          if (localId) {
-            movieWithCorrectId = { ...movie, id: localId };
-          }
-        } else if (movie.id) {
-          const localData = ratingsMap[movie.id];
-          rating = localData?.rating || null;
-        }
+        const movieData = movie.externalId
+          ? ratingsMap[movie.externalId]
+          : movie.id
+            ? ratingsMap[movie.id]
+            : undefined;
+        const rating = movieData?.rating ?? null;
+        const hasReview = Boolean(movieData);
+        const localId = movieData?.local_id;
+        const movieWithCorrectId = localId ? { ...movie, id: localId } : movie;
 
         return (
           <TimelineItem key={movieWithCorrectId.id || movie.externalId || idx}>
@@ -144,7 +138,11 @@ function DirectorTimeline({ movies }) {
               <span>{year}</span>
             </YearColumn>
             <ContentColumn>
-              <MovieCard movie={movieWithCorrectId} rating={rating} />
+              <MovieCard
+                movie={movieWithCorrectId}
+                rating={rating}
+                hasReview={hasReview}
+              />
               <MovieInfo>
                 <MovieTitle>{movie.title}</MovieTitle>
                 <p style={{ margin: 0 }}>{overview}</p>

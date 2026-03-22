@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getJSON } from '@helper';
 import { formatRelativeTime } from '@utils/formatting';
+import GlowBullet from '@components/ui/GlowBullet';
 
 const List = styled.div`
   display: flex;
@@ -13,47 +14,69 @@ const List = styled.div`
 `;
 
 const Row = styled(Link)`
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
   width: 100%;
   padding: 0.65rem 0.75rem;
   border-radius: 8px;
-  /* Design token “background 2” — same family as PostCard / rail surfaces */
   background: var(--background-secondary);
   text-decoration: none;
   color: inherit;
   font-size: 0.82rem;
-  line-height: 1.4;
+  line-height: 1.45;
   box-sizing: border-box;
   border: none;
-  /* Flat at rest — hover matches PostCard (lift + shadow only) */
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
 
   &:hover {
-    /* Gentler lift than grid PostCards (-2px); same token shadow as PostCard */
     transform: translateY(-1px);
     box-shadow: var(--shadow);
   }
+
+  &:focus-visible {
+    outline: 2px solid var(--cinema-gold-dark, #b8860b);
+    outline-offset: 2px;
+  }
 `;
 
-const Actor = styled.span`
-  font-weight: 600;
+/** Narrow column so the bullet reads as a list marker, not inline punctuation */
+const BulletColumn = styled.div`
+  flex-shrink: 0;
+  width: 1.35em;
+  min-width: 1.35em;
+`;
+
+const TextColumn = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+/**
+ * div not p: avoid invalid nesting if any global style treats strong as block.
+ */
+const PrimaryLine = styled.div`
+  margin: 0;
+  color: var(--font-color-1);
+
+  /* Actor + title: same tag, same metrics (avoids one strong looking “bigger”) */
+  strong {
+    display: inline;
+    font-weight: 600;
+    font-size: inherit;
+    line-height: inherit;
+    font-family: inherit;
+    color: var(--font-color-1);
+  }
 `;
 
 const Meta = styled.span`
+  display: block;
+  margin-top: 0.3rem;
   color: var(--font-color-2);
   font-size: 0.72rem;
-  display: block;
-  margin-top: 0.2rem;
-`;
-
-const Snippet = styled.span`
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--font-color-2);
-  font-size: 0.75rem;
-  font-style: italic;
 `;
 
 function truncate(s, len = 42) {
@@ -121,19 +144,21 @@ function ActivityFeedList() {
       {items.map((item) => {
         const path = item.review?.path || '/';
         const title = truncate(item.review?.title || 'Untitled', 48);
+        const fullTitle = item.review?.title || 'Untitled';
         const name = item.actor?.username || 'Someone';
         const verb = item.type === 'like' ? 'liked' : 'commented on';
 
         return (
-          <Row key={`${item.type}-${item.id}`} to={path}>
-            <span>
-              <Actor>{name}</Actor> {verb}{' '}
-              <strong title={item.review?.title}>{title}</strong>
-            </span>
-            {item.type === 'comment' && item.snippet ? (
-              <Snippet>{truncate(item.snippet, 90)}</Snippet>
-            ) : null}
-            <Meta>{formatRelativeTime(item.occurredAt)}</Meta>
+          <Row key={`${item.type}-${item.id}`} to={path} title={fullTitle}>
+            <BulletColumn>
+              <GlowBullet variant="column" />
+            </BulletColumn>
+            <TextColumn>
+              <PrimaryLine>
+                <strong>{name}</strong> {verb} <strong>{title}</strong>
+              </PrimaryLine>
+              <Meta>{formatRelativeTime(item.occurredAt)}</Meta>
+            </TextColumn>
           </Row>
         );
       })}

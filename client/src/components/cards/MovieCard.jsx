@@ -18,7 +18,13 @@ const MetadataContainer = styled.div`
   gap: 4px;
 `;
 
-function MovieCard({ movie, rating = null, clickable = true, size = 'default' }) {
+function MovieCard({
+  movie,
+  rating = null,
+  hasReview = false,
+  clickable = true,
+  size = 'default',
+}) {
   const { originalLanguage, originalTitle, overview, title, releaseDate, coverPhoto } =
     movie;
 
@@ -28,7 +34,7 @@ function MovieCard({ movie, rating = null, clickable = true, size = 'default' })
   const { addItem } = useCrudStateDB(setMovies, 'movies');
 
   const handleClick = async () => {
-    if (rating) {
+    if (hasReview) {
       navigate(`/movies/${movie.id}`);
       return;
     }
