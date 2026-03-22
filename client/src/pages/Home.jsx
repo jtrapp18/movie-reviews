@@ -31,8 +31,9 @@ const StyledContainer = styled.div`
 `;
 
 /**
- * Full-width split below the hero: flush sidebar (left) + main feed (right).
- * Right column holds the previous single-column home content (posts + carousels).
+ * Split rail + feed only for the “above the fold” home block (recent posts).
+ * Carousels / sections below use HomeBelowFold so we don’t reserve
+ * empty sidebar space next to long scrolling content.
  */
 const HomeSplitShell = styled.div`
   align-self: stretch;
@@ -119,6 +120,16 @@ const RecentPostsBlock = styled.div`
     margin: 0;
     text-align: center;
   }
+`;
+
+/** Full-width band under the split — carousels align to same max-width column */
+const HomeBelowFold = styled.div`
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
 `;
 
 function Home() {
@@ -250,37 +261,39 @@ function Home() {
                     )}
                     <RecentPosts posts={posts} fillColumn />
                   </RecentPostsBlock>
-
-                  <hr />
-
-                  <Section
-                    title="Directors"
-                    subtitle={searchQuery ? '' : 'Explore directors in the collection'}
-                    showSearch={false}
-                  >
-                    <Directors directors={showDirectors} />
-                  </Section>
-
-                  <Section
-                    title={searchQuery ? 'Movies' : 'Movie Reviews'}
-                    subtitle={searchQuery ? '' : 'Click movie to view review'}
-                    showSearch={false}
-                  >
-                    <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
-                  </Section>
-
-                  <Section
-                    title={searchQuery ? 'Articles' : 'Articles'}
-                    subtitle={
-                      searchQuery ? '' : 'Browse theme-based articles and essays'
-                    }
-                    showSearch={false}
-                  >
-                    <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
-                  </Section>
                 </HomeMainColumn>
               </HomeMainArea>
             </HomeSplitShell>
+
+            <HomeBelowFold>
+              <HomeMainColumn>
+                <hr />
+
+                <Section
+                  title="Directors"
+                  subtitle={searchQuery ? '' : 'Explore directors in the collection'}
+                  showSearch={false}
+                >
+                  <Directors directors={showDirectors} />
+                </Section>
+
+                <Section
+                  title={searchQuery ? 'Movies' : 'Movie Reviews'}
+                  subtitle={searchQuery ? '' : 'Click movie to view review'}
+                  showSearch={false}
+                >
+                  <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
+                </Section>
+
+                <Section
+                  title={searchQuery ? 'Articles' : 'Articles'}
+                  subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
+                  showSearch={false}
+                >
+                  <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
+                </Section>
+              </HomeMainColumn>
+            </HomeBelowFold>
           </>
         </SearchPageFrame>
       </StyledContainer>

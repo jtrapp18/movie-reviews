@@ -96,4 +96,15 @@ const StyledDeleted = styled.div`
   }
 `;
 
+/** Horizontal inset on small screens when StyledContainer drops padding (see containerShell). */
+export const MobilePageGutter = styled.div`
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+`;
+
 export { StyledMain, StyledContainer, CardContainer, StyledDeleted };

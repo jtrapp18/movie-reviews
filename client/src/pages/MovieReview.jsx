@@ -17,6 +17,7 @@ import {
 import EntityDetailState from '@components/layout/EntityDetailState';
 import {
   DetailContentCard,
+  DetailBelowFold,
   LikeBar,
   RelatedSection,
   RelatedHeading,
@@ -186,36 +187,42 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
           )}
           <ReviewForm initObj={review} />
         </DetailContentCard>
-        {review && <CommentList reviewId={review.id} />}
-        {(resolvedDirector || relatedMoviesByDirector.length > 0) && (
-          <RelatedSection>
-            <RelatedHeading>
-              {directorName ? `More from ${directorName}` : 'Suggested Next'}
-            </RelatedHeading>
-            <SuggestionsLayout>
-              {resolvedDirector && resolvedDirector.id && (
-                <DirectorTeaserColumn>
-                  <DirectorCard
-                    director={resolvedDirector}
-                    onClick={() => navigate(`/directors/${resolvedDirector.id}`)}
-                  />
-                </DirectorTeaserColumn>
-              )}
+        {(review || resolvedDirector || relatedMoviesByDirector.length > 0) && (
+          <DetailBelowFold>
+            {review && <CommentList reviewId={review.id} />}
+            {(resolvedDirector || relatedMoviesByDirector.length > 0) && (
+              <RelatedSection>
+                <RelatedHeading>
+                  {directorName ? `More from ${directorName}` : 'Suggested Next'}
+                </RelatedHeading>
+                <SuggestionsLayout>
+                  {resolvedDirector && resolvedDirector.id && (
+                    <DirectorTeaserColumn>
+                      <DirectorCard
+                        director={resolvedDirector}
+                        onClick={() => navigate(`/directors/${resolvedDirector.id}`)}
+                      />
+                    </DirectorTeaserColumn>
+                  )}
 
-              {resolvedDirector &&
-                resolvedDirector.id &&
-                relatedMoviesByDirector.length > 0 && <SuggestionsDivider />}
+                  {resolvedDirector &&
+                    resolvedDirector.id &&
+                    relatedMoviesByDirector.length > 0 && <SuggestionsDivider />}
 
-              {relatedMoviesByDirector.length > 0 && (
-                <DirectorMoviesColumn>
-                  <DirectorMoviesTitle>James Trapp Movie Reviews</DirectorMoviesTitle>
-                  <DirectorMoviesCarouselWrap>
-                    <Movies showMovies={relatedMoviesByDirector} cardSize="small" />
-                  </DirectorMoviesCarouselWrap>
-                </DirectorMoviesColumn>
-              )}
-            </SuggestionsLayout>
-          </RelatedSection>
+                  {relatedMoviesByDirector.length > 0 && (
+                    <DirectorMoviesColumn>
+                      <DirectorMoviesTitle>
+                        James Trapp Movie Reviews
+                      </DirectorMoviesTitle>
+                      <DirectorMoviesCarouselWrap>
+                        <Movies showMovies={relatedMoviesByDirector} cardSize="small" />
+                      </DirectorMoviesCarouselWrap>
+                    </DirectorMoviesColumn>
+                  )}
+                </SuggestionsLayout>
+              </RelatedSection>
+            )}
+          </DetailBelowFold>
         )}
       </StyledContainer>
     </>
