@@ -67,29 +67,20 @@ const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
       <SwimlaneHeader>{genre.name}</SwimlaneHeader>
       <MoviesContainer>
         {movies.map((movie) => {
-          // Get rating for this movie
-          let rating = null;
-          let movieWithCorrectId = movie;
-
-          if (movie.externalId) {
-            // External movie - look up by external ID
-            const movieData = ratingsMap[movie.externalId];
-            rating = movieData?.rating || null;
-            const localId = movieData?.local_id;
-            if (localId) {
-              movieWithCorrectId = { ...movie, id: localId };
-            }
-          } else {
-            // Local movie - look up by local ID
-            const localData = ratingsMap[movie.id];
-            rating = localData?.rating || null;
-          }
+          const movieData = movie.externalId
+            ? ratingsMap[movie.externalId]
+            : ratingsMap[movie.id];
+          const rating = movieData?.rating ?? null;
+          const hasReview = Boolean(movieData);
+          const localId = movieData?.local_id;
+          const movieWithCorrectId = localId ? { ...movie, id: localId } : movie;
 
           return (
             <MovieCardWrapper key={movie.externalId || movie.id}>
               <MovieCard
                 movie={movieWithCorrectId}
                 rating={rating}
+                hasReview={hasReview}
                 onClick={() => onMovieClick(movie)}
               />
             </MovieCardWrapper>

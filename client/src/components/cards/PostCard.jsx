@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const StyledCard = styled.article`
   width: 100%;
-  max-width: 1000px;
+  max-width: 800px;
   gap: 12px;
   border-radius: 8px 8px 0 0;
   background-color: var(--background-secondary);
@@ -37,6 +37,7 @@ const StyledCard = styled.article`
     margin: 0;
     font-family: var(--title-font);
     font-weight: bold;
+    text-align: left;
   }
 
   .description {

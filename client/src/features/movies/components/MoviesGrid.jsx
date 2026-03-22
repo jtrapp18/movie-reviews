@@ -39,7 +39,8 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
     <Grid>
       {movies.map((movie) => {
         const movieData = ratingsMap[movie.externalId];
-        const rating = movieData?.rating || null;
+        const rating = movieData?.rating ?? null;
+        const hasReview = Boolean(movieData);
         const localId = movieData?.local_id;
 
         // If we have a local ID, use it for navigation
@@ -51,6 +52,7 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
             <MovieCard
               movie={movieWithCorrectId}
               rating={rating}
+              hasReview={hasReview}
               onClick={() => onMovieClick(movie)}
             />
           </MovieCardWrapper>
