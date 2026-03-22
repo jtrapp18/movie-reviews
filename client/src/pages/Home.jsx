@@ -6,10 +6,17 @@ import { Articles, RecentPosts } from '@features/articles';
 import { Directors } from '@features/directors';
 import Section from '@components/layout/Section';
 import MotionWrapper from '@styles/MotionWrapper';
+import { CONTAINER_MAX_WIDTH } from '@styles';
 import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
+import HomeHero from './HomeHero';
+import {
+  SidePanelBlock,
+  SidePanelPlaceholder,
+  useContinueReading,
+} from '@features/sidePanel';
 
 const StyledContainer = styled.div`
   padding: 0;
@@ -23,76 +30,68 @@ const StyledContainer = styled.div`
 `;
 
 /**
- * Main row: side panel (left on desktop) + Recent Posts (right).
- * Side panel is hidden below 1024px.
+ * Full-width split below the hero: flush sidebar (left) + main feed (right).
+ * Right column holds the previous single-column home content (posts + carousels).
  */
-const ActivityRecentShell = styled.div`
+const HomeSplitShell = styled.div`
   align-self: stretch;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  width: 100%;
+  /* No background — main column uses page bg; sidebar sets its own */
+  box-sizing: border-box;
 
   @media (min-width: 1024px) {
     flex-direction: row;
     align-items: stretch;
-    /* Tight space between side panel and Recent Posts */
-    gap: 0.5rem;
   }
 `;
 
-/**
- * Outer side panel — red background blocks the full column (layout staging).
- * Inner sections (e.g. Activity) sit on top with their own surface.
- */
-const SidePanel = styled.aside`
+const HomeSidebar = styled.aside`
   display: none;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
   gap: 0.75rem;
-  flex: 0 0 280px;
-  width: 280px;
-  min-height: 0;
-  order: 0;
-  align-self: stretch;
   box-sizing: border-box;
-  padding: 0.75rem;
-  border-radius: 8px;
-  background: red;
+  padding: 1rem 0.75rem;
+  background: var(--background-secondary);
+  border-right: 1px solid var(--border);
 
   @media (min-width: 1024px) {
     display: flex;
+    flex: 0 0 280px;
+    width: 280px;
+    min-height: 0;
+    align-self: stretch;
   }
 `;
 
-/** Inner block inside the side panel (Activity, future widgets, …) — not the red shell */
-const SidePanelSection = styled.section`
+/** Fills space to the right of the sidebar; does not set a max-width (flex quirk fix). */
+const HomeMainArea = styled.div`
+  flex: 1 1 0%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  min-height: 0;
-  flex: ${({ $fill }) => ($fill ? '1' : '0 0 auto')};
-  padding: 0.65rem;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--font-color-1, #1a1a1a);
+  align-items: center;
+  box-sizing: border-box;
+  background: transparent;
 `;
 
-const SidePanelSectionTitle = styled.h3`
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: left;
-  width: 100%;
-`;
-
-/** Placeholder body — fixed footprint; Activity section does not stretch with panel */
-const ActivityContentPlaceholder = styled.div`
-  min-height: 120px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.06);
-  width: 100%;
+/**
+ * Capped at medium width — `width: min(100%, …)` so flex row doesn’t stretch past 1200px
+ * (plain max-width on a flex:1 child was not reliably constraining).
+ */
+const HomeMainColumn = styled.div`
+  width: min(100%, ${CONTAINER_MAX_WIDTH.medium});
+  max-width: ${CONTAINER_MAX_WIDTH.medium};
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: clamp(1.25rem, 3vw, 2rem) 1rem 2rem;
+  box-sizing: border-box;
 `;
 
 const RecentPostsBlock = styled.div`
@@ -104,7 +103,8 @@ const RecentPostsBlock = styled.div`
   align-items: stretch;
   gap: 5px;
 
-  h1 {
+  h1,
+  h2 {
     text-align: center;
     margin: 0;
   }
@@ -171,6 +171,7 @@ function Home() {
   };
 
   const structuredData = generateWebsiteStructuredData();
+  const { items: continueReadingItems } = useContinueReading();
 
   return (
     <>
@@ -191,73 +192,96 @@ function Home() {
           loadingText="Searching"
           showHeader={false}
           containerSize="medium"
+          hero={<HomeHero />}
+          heroSearchPrimaryBand
+          contentFlushTop
         >
           <>
             {/* Search results header */}
-            {searchQuery && (
-              <SearchResultsHeader
-                searchQuery={searchQuery}
-                movieCount={showMovies.length}
-                articleCount={showArticles.length}
-                isLoading={isSearching}
-                showNoResults={
-                  !isSearching && showMovies.length === 0 && showArticles.length === 0
-                }
-              />
-            )}
+            <HomeSplitShell>
+              <HomeSidebar aria-label="Sidebar">
+                <SidePanelBlock
+                  title="Continue reading"
+                  titleId="side-panel-continue-heading"
+                  motionIndex={1}
+                >
+                  <SidePanelPlaceholder
+                    aria-label={
+                      continueReadingItems.length > 0
+                        ? `${continueReadingItems.length} saved in Continue reading`
+                        : 'Continue reading (empty)'
+                    }
+                  />
+                </SidePanelBlock>
+                <SidePanelBlock
+                  title="Activity"
+                  titleId="side-panel-activity-heading"
+                  motionIndex={2}
+                >
+                  <SidePanelPlaceholder />
+                </SidePanelBlock>
+              </HomeSidebar>
 
-            <ActivityRecentShell>
-              <SidePanel aria-label="Sidebar">
-                <SidePanelSection aria-labelledby="side-panel-activity-heading">
-                  <MotionWrapper index={1}>
-                    <SidePanelSectionTitle id="side-panel-activity-heading">
-                      Activity
-                    </SidePanelSectionTitle>
-                  </MotionWrapper>
-                  <ActivityContentPlaceholder />
-                </SidePanelSection>
-              </SidePanel>
+              <HomeMainArea>
+                <HomeMainColumn>
+                  {searchQuery && (
+                    <SearchResultsHeader
+                      searchQuery={searchQuery}
+                      movieCount={showMovies.length}
+                      articleCount={showArticles.length}
+                      isLoading={isSearching}
+                      showNoResults={
+                        !isSearching &&
+                        showMovies.length === 0 &&
+                        showArticles.length === 0
+                      }
+                    />
+                  )}
 
-              <RecentPostsBlock>
-                <MotionWrapper index={2}>
-                  <h1>Recent Posts</h1>
-                </MotionWrapper>
-                {searchQuery ? null : (
-                  <MotionWrapper index={3}>
-                    <h3>
-                      <i>Latest movie reviews and articles</i>
-                    </h3>
-                  </MotionWrapper>
-                )}
-                <RecentPosts posts={posts} fillColumn />
-              </RecentPostsBlock>
-            </ActivityRecentShell>
+                  <RecentPostsBlock>
+                    <MotionWrapper index={3}>
+                      <h1>Recent Posts</h1>
+                    </MotionWrapper>
+                    {searchQuery ? null : (
+                      <MotionWrapper index={4}>
+                        <h3>
+                          <i>Latest movie reviews and articles</i>
+                        </h3>
+                      </MotionWrapper>
+                    )}
+                    <RecentPosts posts={posts} fillColumn />
+                  </RecentPostsBlock>
 
-            <hr />
+                  <hr />
 
-            <Section
-              title="Directors"
-              subtitle={searchQuery ? '' : 'Explore directors in the collection'}
-              showSearch={false}
-            >
-              <Directors directors={showDirectors} />
-            </Section>
+                  <Section
+                    title="Directors"
+                    subtitle={searchQuery ? '' : 'Explore directors in the collection'}
+                    showSearch={false}
+                  >
+                    <Directors directors={showDirectors} />
+                  </Section>
 
-            <Section
-              title={searchQuery ? 'Movies' : 'Movie Reviews'}
-              subtitle={searchQuery ? '' : 'Click movie to view review'}
-              showSearch={false}
-            >
-              <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
-            </Section>
+                  <Section
+                    title={searchQuery ? 'Movies' : 'Movie Reviews'}
+                    subtitle={searchQuery ? '' : 'Click movie to view review'}
+                    showSearch={false}
+                  >
+                    <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
+                  </Section>
 
-            <Section
-              title={searchQuery ? 'Articles' : 'Articles'}
-              subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
-              showSearch={false}
-            >
-              <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
-            </Section>
+                  <Section
+                    title={searchQuery ? 'Articles' : 'Articles'}
+                    subtitle={
+                      searchQuery ? '' : 'Browse theme-based articles and essays'
+                    }
+                    showSearch={false}
+                  >
+                    <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
+                  </Section>
+                </HomeMainColumn>
+              </HomeMainArea>
+            </HomeSplitShell>
           </>
         </SearchPageFrame>
       </StyledContainer>

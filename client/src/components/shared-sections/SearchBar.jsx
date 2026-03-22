@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const SearchContainer = styled.div`
   width: 100%;
   max-width: ${(props) => (props.$isExpanded ? '100vw' : '800px')};
-  margin: 1rem 0 2rem 0;
+  margin: 1rem auto 2rem auto;
   padding: ${(props) => (props.$isExpanded ? '0 20px' : '0')};
   display: flex;
   align-items: center;
