@@ -1,17 +1,26 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styled from 'styled-components';
+
+/** Above Headroom (900) and mobile nav overlay (9999); below Toast (99999). */
+const MODAL_Z_INDEX = 10000;
 
 const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${MODAL_Z_INDEX};
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
+    env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+
+  @media (max-width: 768px) {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+  }
 `;
 
 const ModalContent = styled.div`
@@ -25,6 +34,15 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
 `;
 
 const ModalHeader = styled.div`
@@ -49,6 +67,8 @@ const ModalHeader = styled.div`
 const ModalBody = styled.div`
   padding: 1rem 1.5rem 1.5rem 1.5rem;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
   text-align: left;
 
   p {
@@ -94,7 +114,7 @@ const Modal = ({ isOpen, onClose, title, subtitle, children }) => {
     e.stopPropagation();
   };
 
-  return (
+  return createPortal(
     <ModalOverlay onClick={handleOverlayClick}>
       <ModalContent onClick={handleContentClick}>
         <ModalHeader>
@@ -108,7 +128,8 @@ const Modal = ({ isOpen, onClose, title, subtitle, children }) => {
         </ModalHeader>
         <ModalBody>{children}</ModalBody>
       </ModalContent>
-    </ModalOverlay>
+    </ModalOverlay>,
+    document.body
   );
 };
 

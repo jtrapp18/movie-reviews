@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -15,13 +15,14 @@ import { submitFormWithDocument } from '@utils/formSubmit';
 import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
+import { devDebug } from '@utils/logger';
 import { useAdmin } from '@hooks/useAdmin';
 import {
-  FormBackdropField,
   FormDocumentUploadSection,
   FormActionRow,
   buildReviewFormContentDisplayValues,
 } from '@components/forms/shared';
+import ReviewBackdropSection from '@components/forms/ReviewBackdropSection';
 
 const RatingOverlayWrapper = styled.div`
   display: flex;
@@ -29,11 +30,21 @@ const RatingOverlayWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const ReviewForm = ({ initObj }) => {
+const ReviewForm = ({
+  initObj,
+  movie,
+  onEditingChange,
+  backdropPreference,
+  onBackdropPreferenceChange,
+}) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(!initObj);
   const isEdit = !!initObj; // True if we have an existing review to edit
+
+  useEffect(() => {
+    onEditingChange?.(isEditing);
+  }, [isEditing, onEditingChange]);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -150,14 +161,16 @@ const ReviewForm = ({ initObj }) => {
           reviewText: values.reviewText,
           description: values.description,
           movieId: movieId,
+          showReviewBackdrop: backdropPreference,
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
-        console.info('ReviewForm - submitting review', {
+        devDebug('[ReviewForm] submitting review', {
           movieId,
           isEdit,
           hasDocument,
           tagCount: tags.length,
+          showReviewBackdrop: backdropPreference,
         });
 
         // Submit the review
@@ -169,13 +182,17 @@ const ReviewForm = ({ initObj }) => {
         );
 
         if (result.success) {
-          console.info('ReviewForm - review submitted successfully', {
+          devDebug('[ReviewForm] review saved', {
             id: result.result?.id,
             tagCount: result.result?.tags?.length || 0,
           });
 
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
+          devDebug('[ReviewForm] review result (backdrop fields)', {
+            backdrop: result.result?.backdrop,
+            showReviewBackdrop: camelCaseResult.showReviewBackdrop,
+          });
 
           // Update the movies context with the new/updated review
           if (isEdit) {
@@ -270,15 +287,40 @@ const ReviewForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
-          <FormBackdropField
+          <ReviewBackdropSection
+            movieBackdropUrl={movie?.backdrop || null}
             uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
             backdropKey={backdropKey}
+            reviewPersisted={Boolean(initObj?.id)}
+            showReviewBackdrop={backdropPreference}
+            onShowReviewBackdropChange={onBackdropPreferenceChange}
             onUploaded={(url) => {
               setBackdropKey(url);
               if (initObj) {
                 initObj.backdrop = url;
               }
               setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
+              setPosts((prev) =>
+                Array.isArray(prev)
+                  ? prev.map((post) =>
+                      post.id === initObj?.id ? { ...post, backdrop: url } : post
+                    )
+                  : prev
+              );
+            }}
+            onReviewBackdropDeleted={() => {
+              setBackdropKey(null);
+              if (initObj) {
+                initObj.backdrop = null;
+              }
+              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: null } : prev));
+              setPosts((prev) =>
+                Array.isArray(prev)
+                  ? prev.map((post) =>
+                      post.id === initObj?.id ? { ...post, backdrop: null } : post
+                    )
+                  : prev
+              );
             }}
           />
 

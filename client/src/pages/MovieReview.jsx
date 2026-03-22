@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer } from '@styles';
@@ -15,8 +15,10 @@ import {
   buildMovieReviewDetailSeoCopy,
 } from '@utils/seoUtils';
 import EntityDetailState from '@components/layout/EntityDetailState';
+import { resolveMovieReviewCoverUrl } from '@utils/movieReviewBackdrop';
 import {
   DetailContentCard,
+  DetailBelowFold,
   LikeBar,
   RelatedSection,
   RelatedHeading,
@@ -74,6 +76,32 @@ const DirectorMoviesCarouselWrap = styled.div`
   width: 100%;
 `;
 
+/** Live hero preview while editing — hidden in read view; cleared on save/cancel so hero matches saved choice. */
+const CoverPreviewRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: -0.25rem 0 0.75rem;
+  padding: 0 0.25rem;
+`;
+
+const CoverPreviewLabel = styled.span`
+  font-size: 0.85rem;
+  color: var(--font-color-2);
+`;
+
+const CoverPreviewBtn = styled.button`
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: var(--background-secondary);
+  color: var(--font-color);
+  font-weight: ${({ $active }) => ($active ? 700 : 400)};
+`;
+
 function MovieReview() {
   const { user } = useContext(UserContext);
   const { movies = [], directors = [] } = useOutletContext();
@@ -105,11 +133,50 @@ function MovieReview() {
 
 function MovieReviewBody({ movie, movies, directors, user, navigate }) {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
+  const reviewId = review?.id ?? null;
+  const prefersReviewSaved = review?.showReviewBackdrop !== false;
+
+  /** Mirrors ReviewForm isEditing — hero preview only while true. */
+  const [reviewFormEditing, setReviewFormEditing] = useState(() => !review);
+
+  /**
+   * Single source of truth for which backdrop is preferred (review vs movie).
+   * Shared by the hero Cover preview and the form; drives PATCH `show_review_backdrop`.
+   */
+  const [backdropPreference, setBackdropPreference] = useState(
+    () => review?.showReviewBackdrop !== false
+  );
+
+  /** When not editing, always follow the saved review (e.g. after save/cancel or movie change). */
+  useEffect(() => {
+    if (!reviewFormEditing) {
+      setBackdropPreference(prefersReviewSaved);
+    }
+  }, [reviewFormEditing, prefersReviewSaved, reviewId]);
+
+  /** When entering edit mode, reset the working preference from the saved review. */
+  const prevReviewFormEditingRef = useRef(reviewFormEditing);
+  useEffect(() => {
+    const enteredEdit = !prevReviewFormEditingRef.current && reviewFormEditing;
+    prevReviewFormEditingRef.current = reviewFormEditing;
+    if (enteredEdit && reviewId != null) {
+      setBackdropPreference(prefersReviewSaved);
+    }
+  }, [reviewFormEditing, reviewId, prefersReviewSaved]);
+
   const reviewBackdropUrl =
     review?.backdrop && review?.id
       ? `/api/reviews/${review.id}/backdrop/view?v=${encodeURIComponent(review.backdrop)}`
       : null;
-  const coverImageUrl = reviewBackdropUrl || movie.backdrop || null;
+  const hasBothBackdrops = Boolean(reviewBackdropUrl && movie?.backdrop);
+
+  const coverImageUrl = resolveMovieReviewCoverUrl({
+    review,
+    movie,
+    preferReview: reviewFormEditing ? backdropPreference : undefined,
+  });
+
+  const seoCoverImage = resolveMovieReviewCoverUrl({ review, movie });
   const releaseYear = (movie.releaseDate || '').slice(0, 4);
   const movieTitleLine = releaseYear ? `${movie.title} (${releaseYear})` : movie.title;
   const directorName =
@@ -148,7 +215,7 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
         title={seo.title}
         description={seo.description}
         keywords={seo.keywords}
-        image={coverImageUrl ?? undefined}
+        image={seoCoverImage ?? undefined}
         url={seo.canonicalPath}
         type="article"
         structuredData={structuredData}
@@ -165,6 +232,25 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
             rating={review?.rating}
             publishDate={review?.dateAdded || review?.date_added}
           />
+          {review && hasBothBackdrops && reviewFormEditing && (
+            <CoverPreviewRow>
+              <CoverPreviewLabel>Cover preview</CoverPreviewLabel>
+              <CoverPreviewBtn
+                type="button"
+                $active={backdropPreference}
+                onClick={() => setBackdropPreference(true)}
+              >
+                Review
+              </CoverPreviewBtn>
+              <CoverPreviewBtn
+                type="button"
+                $active={!backdropPreference}
+                onClick={() => setBackdropPreference(false)}
+              >
+                Movie
+              </CoverPreviewBtn>
+            </CoverPreviewRow>
+          )}
           {review && (
             <LikeBar>
               <LikeButton
@@ -184,38 +270,50 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
               />
             </LikeBar>
           )}
-          <ReviewForm initObj={review} />
+          <ReviewForm
+            initObj={review}
+            movie={movie}
+            onEditingChange={setReviewFormEditing}
+            backdropPreference={backdropPreference}
+            onBackdropPreferenceChange={setBackdropPreference}
+          />
         </DetailContentCard>
-        {review && <CommentList reviewId={review.id} />}
-        {(resolvedDirector || relatedMoviesByDirector.length > 0) && (
-          <RelatedSection>
-            <RelatedHeading>
-              {directorName ? `More from ${directorName}` : 'Suggested Next'}
-            </RelatedHeading>
-            <SuggestionsLayout>
-              {resolvedDirector && resolvedDirector.id && (
-                <DirectorTeaserColumn>
-                  <DirectorCard
-                    director={resolvedDirector}
-                    onClick={() => navigate(`/directors/${resolvedDirector.id}`)}
-                  />
-                </DirectorTeaserColumn>
-              )}
+        {(review || resolvedDirector || relatedMoviesByDirector.length > 0) && (
+          <DetailBelowFold>
+            {review && <CommentList reviewId={review.id} />}
+            {(resolvedDirector || relatedMoviesByDirector.length > 0) && (
+              <RelatedSection>
+                <RelatedHeading>
+                  {directorName ? `More from ${directorName}` : 'Suggested Next'}
+                </RelatedHeading>
+                <SuggestionsLayout>
+                  {resolvedDirector && resolvedDirector.id && (
+                    <DirectorTeaserColumn>
+                      <DirectorCard
+                        director={resolvedDirector}
+                        onClick={() => navigate(`/directors/${resolvedDirector.id}`)}
+                      />
+                    </DirectorTeaserColumn>
+                  )}
 
-              {resolvedDirector &&
-                resolvedDirector.id &&
-                relatedMoviesByDirector.length > 0 && <SuggestionsDivider />}
+                  {resolvedDirector &&
+                    resolvedDirector.id &&
+                    relatedMoviesByDirector.length > 0 && <SuggestionsDivider />}
 
-              {relatedMoviesByDirector.length > 0 && (
-                <DirectorMoviesColumn>
-                  <DirectorMoviesTitle>James Trapp Movie Reviews</DirectorMoviesTitle>
-                  <DirectorMoviesCarouselWrap>
-                    <Movies showMovies={relatedMoviesByDirector} cardSize="small" />
-                  </DirectorMoviesCarouselWrap>
-                </DirectorMoviesColumn>
-              )}
-            </SuggestionsLayout>
-          </RelatedSection>
+                  {relatedMoviesByDirector.length > 0 && (
+                    <DirectorMoviesColumn>
+                      <DirectorMoviesTitle>
+                        James Trapp Movie Reviews
+                      </DirectorMoviesTitle>
+                      <DirectorMoviesCarouselWrap>
+                        <Movies showMovies={relatedMoviesByDirector} cardSize="small" />
+                      </DirectorMoviesCarouselWrap>
+                    </DirectorMoviesColumn>
+                  )}
+                </SuggestionsLayout>
+              </RelatedSection>
+            )}
+          </DetailBelowFold>
         )}
       </StyledContainer>
     </>

@@ -157,13 +157,16 @@ const Carousel = ({
   /** When true, slick arrows are shown and styled (articles index page). */
   showArrows = false,
 }) => {
+  const childCount = React.Children.count(children);
+
   const defaultSettings = {
-    dots: true,
-    infinite: true,
+    dots: childCount > 1,
+    /* react-slick infinite mode clones slides; with a single slide that shows duplicates */
+    infinite: childCount > 1,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
+    autoplay: childCount > 1,
     autoplaySpeed: 3000,
     pauseOnHover: true,
     centerMode: false,
@@ -178,8 +181,12 @@ const Carousel = ({
     ...(showArrows ? { arrows: true } : {}),
   };
 
-  // Check if children array is empty
-  const hasChildren = React.Children.count(children) > 0;
+  if (childCount <= 1) {
+    finalSettings.infinite = false;
+    finalSettings.autoplay = false;
+  }
+
+  const hasChildren = childCount > 0;
 
   if (!hasChildren) {
     return (

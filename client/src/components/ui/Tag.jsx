@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { CHIP_VARIANT_ZOOM } from '@styles/chipVariants';
+import { CHIP_VARIANT_SECONDARY } from '@styles/chipVariants';
 
 const TagContainer = styled.div`
   display: inline-flex;
@@ -8,14 +8,20 @@ const TagContainer = styled.div`
   color: ${(props) => props.textColor};
   padding: ${(props) => (props.size === 'small' ? '2px 6px' : '4px 12px')};
   border-radius: ${(props) => (props.size === 'small' ? '12px' : '20px')};
-  font-size: ${(props) => (props.size === 'small' ? '0.7rem' : '0.85rem')};
-  font-weight: ${(props) => (props.$variant === 'zoom' ? 600 : 500)};
+  font-size: ${(props) =>
+    props.$variant === 'secondary'
+      ? 'calc(var(--default-font-size) * var(--zoom-multiplier, 1))'
+      : props.size === 'small'
+        ? '0.7rem'
+        : '0.85rem'};
+  font-weight: ${(props) => (props.$variant === 'secondary' ? 600 : 500)};
   margin: 2px;
   cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
   transition: all 0.2s ease;
   border: 1px solid ${(props) => props.borderColor || 'transparent'};
-  height: ${(props) => (props.size === 'small' ? '20px' : '28px')};
-  line-height: 1;
+  height: ${(props) =>
+    props.$variant === 'secondary' ? 'auto' : props.size === 'small' ? '20px' : '28px'};
+  line-height: ${(props) => (props.$variant === 'secondary' ? '1.35' : '1')};
   white-space: nowrap;
 
   &:hover {
@@ -23,7 +29,7 @@ const TagContainer = styled.div`
       props.clickable &&
       `
       transform: translateY(-1px);
-      ${props.$variant === 'zoom' ? '' : 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);'}
+      ${props.$variant === 'secondary' ? '' : 'box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);'}
     `}
   }
 
@@ -40,7 +46,7 @@ const TagContainer = styled.div`
 
 const Tag = ({
   children,
-  /** 'default' (blue pill) | 'zoom' — same palette as ZoomControls */
+  /** 'default' (blue pill) | 'secondary' (tertiary chip — line notes, etc.) */
   variant = 'default',
   backgroundColor,
   textColor,
@@ -52,11 +58,11 @@ const Tag = ({
   ...props
 }) => {
   const resolved =
-    variant === 'zoom'
+    variant === 'secondary'
       ? {
-          backgroundColor: backgroundColor ?? CHIP_VARIANT_ZOOM.backgroundColor,
-          textColor: textColor ?? CHIP_VARIANT_ZOOM.textColor,
-          borderColor: borderColor ?? CHIP_VARIANT_ZOOM.borderColor,
+          backgroundColor: backgroundColor ?? CHIP_VARIANT_SECONDARY.backgroundColor,
+          textColor: textColor ?? CHIP_VARIANT_SECONDARY.textColor,
+          borderColor: borderColor ?? CHIP_VARIANT_SECONDARY.borderColor,
         }
       : {
           backgroundColor: backgroundColor ?? '#007bff',

@@ -66,7 +66,7 @@ const Header = () => {
   useContext(UserContext);
 
   return (
-    <Headroom>
+    <Headroom style={{ zIndex: 900 }}>
       <StyledHeader>
         {/* <VintagePhotoRoll
               src={vintagePhotoRoll}

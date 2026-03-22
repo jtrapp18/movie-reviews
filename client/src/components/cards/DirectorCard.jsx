@@ -168,7 +168,7 @@ function DirectorCard({
               >
                 <Toggle isExpanded={isExpanded}>
                   {isExpanded ? 'Hide movies' : 'Show movies'}
-                  <span>{isExpanded ? '▲' : '▼'}</span>
+                  <span aria-hidden>▼</span>
                 </Toggle>
                 <Button
                   onClick={(e) => {
