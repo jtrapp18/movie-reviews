@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -17,11 +17,11 @@ import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
 import { useAdmin } from '@hooks/useAdmin';
 import {
-  FormBackdropField,
   FormDocumentUploadSection,
   FormActionRow,
   buildReviewFormContentDisplayValues,
 } from '@components/forms/shared';
+import ReviewBackdropSection from '@components/forms/ReviewBackdropSection';
 
 const RatingOverlayWrapper = styled.div`
   display: flex;
@@ -29,11 +29,15 @@ const RatingOverlayWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const ReviewForm = ({ initObj }) => {
+const ReviewForm = ({ initObj, movie, onEditingChange }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(!initObj);
   const isEdit = !!initObj; // True if we have an existing review to edit
+
+  useEffect(() => {
+    onEditingChange?.(isEditing);
+  }, [isEditing, onEditingChange]);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -56,12 +60,14 @@ const ReviewForm = ({ initObj }) => {
         reviewText: initObj.reviewText || '',
         title: initObj.title || '',
         description: initObj.description || '',
+        showReviewBackdrop: initObj.showReviewBackdrop !== false,
       }
     : {
         rating: '',
         reviewText: '',
         title: '',
         description: '',
+        showReviewBackdrop: true,
       };
 
   const _submitToDB = initObj
@@ -150,6 +156,7 @@ const ReviewForm = ({ initObj }) => {
           reviewText: values.reviewText,
           description: values.description,
           movieId: movieId,
+          showReviewBackdrop: values.showReviewBackdrop,
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
@@ -270,15 +277,42 @@ const ReviewForm = ({ initObj }) => {
         <StyledForm onSubmit={formik.handleSubmit}>
           <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
 
-          <FormBackdropField
+          <ReviewBackdropSection
+            movieBackdropUrl={movie?.backdrop || null}
             uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
             backdropKey={backdropKey}
+            reviewPersisted={Boolean(initObj?.id)}
+            showReviewBackdrop={formik.values.showReviewBackdrop}
+            onShowReviewBackdropChange={(v) =>
+              formik.setFieldValue('showReviewBackdrop', v)
+            }
             onUploaded={(url) => {
               setBackdropKey(url);
               if (initObj) {
                 initObj.backdrop = url;
               }
               setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
+              setPosts((prev) =>
+                Array.isArray(prev)
+                  ? prev.map((post) =>
+                      post.id === initObj?.id ? { ...post, backdrop: url } : post
+                    )
+                  : prev
+              );
+            }}
+            onReviewBackdropDeleted={() => {
+              setBackdropKey(null);
+              if (initObj) {
+                initObj.backdrop = null;
+              }
+              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: null } : prev));
+              setPosts((prev) =>
+                Array.isArray(prev)
+                  ? prev.map((post) =>
+                      post.id === initObj?.id ? { ...post, backdrop: null } : post
+                    )
+                  : prev
+              );
             }}
           />
 

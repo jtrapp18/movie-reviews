@@ -31,6 +31,7 @@ class Review(db.Model, SerializerMixin):
     title = Column(String(200), nullable=True)  # Optional title for articles
     description = Column(Text, nullable=True)  # Short description for articles
     backdrop = Column(String(500), nullable=True)  # URL to backdrop photo
+    show_review_backdrop = Column(Boolean, default=True, nullable=False)
     # Document-related fields
     has_document = Column(Boolean, default=False, nullable=True)
     document_filename = Column(String(255), nullable=True)

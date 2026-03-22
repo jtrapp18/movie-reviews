@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@styles';
-import { FaImage, FaEdit } from 'react-icons/fa';
+import { FaImage, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Container = styled.div`
   margin: 16px 0;
@@ -77,10 +77,18 @@ const FileInput = styled.input`
   display: none;
 `;
 
-function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
+function BackdropUpload({
+  uploadUrl,
+  currentUrl,
+  onUploaded,
+  onDeleted,
+  /** When true, show a remove button (requires `uploadUrl` + persisted image). */
+  allowDelete = false,
+}) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
 
   const handleFileChange = (e) => {
@@ -133,6 +141,34 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
     }
   };
 
+  const handleDelete = async () => {
+    if (!uploadUrl || !allowDelete) return;
+    if (!window.confirm('Remove this review backdrop? The movie backdrop will be used if available.')) {
+      return;
+    }
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch(uploadUrl, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || 'Delete failed');
+        return;
+      }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      if (onDeleted) onDeleted();
+    } catch (err) {
+      console.error('Backdrop delete failed:', err);
+      setError('Delete failed');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const displayUrl = previewUrl || currentUrl;
 
   return (
@@ -151,7 +187,7 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
         {displayUrl && (
           <OverlayLabel>
             <FaImage style={{ marginRight: 6 }} />
-            Cover photo
+            Review backdrop
           </OverlayLabel>
         )}
       </Frame>
@@ -177,6 +213,17 @@ function BackdropUpload({ uploadUrl, currentUrl, onUploaded }) {
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </Button>
+        {allowDelete && uploadUrl && currentUrl && !previewUrl && (
+          <Button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting || uploading}
+            style={{ background: 'rgba(180, 60, 60, 0.25)', borderColor: 'rgba(180, 80, 80, 0.5)' }}
+          >
+            <FaTrash style={{ marginRight: 6 }} />
+            {deleting ? 'Removing…' : 'Remove'}
+          </Button>
+        )}
         {selectedFile && (
           <span style={{ fontSize: '0.85rem', color: '#ccc' }}>
             {selectedFile.name}

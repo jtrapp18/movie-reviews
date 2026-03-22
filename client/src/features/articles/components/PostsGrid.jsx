@@ -7,6 +7,7 @@ import { formatDate } from '@utils/formatting';
 import MotionWrapper from '@styles/MotionWrapper';
 import { prefetchEntity } from '@features/cache/prefetchEntity';
 import { appendContinueReading, pathForPost } from '@features/sidePanel';
+import { resolveMovieReviewCoverUrl } from '@utils/movieReviewBackdrop';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -73,11 +74,16 @@ const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
 
           const description = stripHtml(post.description || '');
 
-          const photo = post.backdrop
-            ? post.movieId
-              ? `/api/reviews/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
-              : `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
-            : (post.movie?.backdrop ?? null);
+          const movieId = post.movieId ?? post.movie?.id;
+          const isMovieReview = movieId != null && movieId !== '';
+          let photo;
+          if (isMovieReview) {
+            photo = resolveMovieReviewCoverUrl({ review: post, movie: post.movie });
+          } else if (post.backdrop) {
+            photo = `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`;
+          } else {
+            photo = null;
+          }
 
           const releaseRaw = post.movie?.release_date ?? post.movie?.releaseDate;
           const releaseYear = releaseRaw ? String(releaseRaw).slice(0, 4) : null;

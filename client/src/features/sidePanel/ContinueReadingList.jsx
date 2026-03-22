@@ -6,6 +6,7 @@ import { formatDate } from '@utils/formatting';
 import { prefetchEntity } from '@features/cache/prefetchEntity';
 import { appendContinueReading, useContinueReading } from '@features/sidePanel';
 import { normalizePath, pathForPost } from './continueReadingPaths';
+import { resolveMovieReviewCoverUrl } from '@utils/movieReviewBackdrop';
 
 const List = styled.div`
   display: flex;
@@ -80,11 +81,14 @@ function ContinueReadingList({ posts = [], limit = 5 }) {
         const description = stripHtml(post.description || '');
         const movieId = post.movieId ?? post.movie?.id;
         const isMovieReview = movieId != null && movieId !== '';
-        const photo = post.backdrop
-          ? isMovieReview
-            ? `/api/reviews/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
-            : `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
-          : (post.movie?.backdrop ?? null);
+        let photo;
+        if (isMovieReview) {
+          photo = resolveMovieReviewCoverUrl({ review: post, movie: post.movie });
+        } else if (post.backdrop) {
+          photo = `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`;
+        } else {
+          photo = null;
+        }
         const releaseRaw = post.movie?.release_date ?? post.movie?.releaseDate;
         const releaseYear = releaseRaw ? String(releaseRaw).slice(0, 4) : null;
 
