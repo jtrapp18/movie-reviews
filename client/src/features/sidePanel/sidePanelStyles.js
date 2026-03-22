@@ -12,7 +12,7 @@ export const SidePanelStack = styled.div`
 `;
 
 /**
- * White inner card — use for Continue reading, Activity, etc.
+ * Titled block inside the side panel — no separate surface (inherits sidebar bg).
  */
 export const SidePanelBlockRoot = styled.section`
   display: flex;
@@ -20,9 +20,8 @@ export const SidePanelBlockRoot = styled.section`
   gap: 0.5rem;
   min-height: 0;
   flex: ${({ $fill }) => ($fill ? '1' : '0 0 auto')};
-  padding: 0.65rem;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 0.35rem 0;
+  background: transparent;
   color: var(--font-color-1, #1a1a1a);
 `;
 
@@ -38,6 +37,7 @@ export const SidePanelBlockTitle = styled.h3`
 export const SidePanelPlaceholder = styled.div`
   min-height: 120px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.06);
+  border: 1px dashed var(--font-color-3);
   width: 100%;
+  box-sizing: border-box;
 `;

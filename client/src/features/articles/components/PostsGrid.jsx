@@ -6,6 +6,7 @@ import { Button } from '@styles';
 import { formatDate } from '@utils/formatting';
 import MotionWrapper from '@styles/MotionWrapper';
 import { prefetchEntity } from '@features/cache/prefetchEntity';
+import { appendContinueReading, pathForPost } from '@features/sidePanel';
 
 const GridContainer = styled.div`
   width: 100%;
@@ -45,11 +46,15 @@ const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
   const visiblePosts = sortedPosts.slice(0, visibleCount);
 
   const handleCardClick = (post) => {
-    if (post.movieId) {
-      navigate(`/movies/${post.movieId}`);
-    } else {
-      navigate(`/articles/${post.id}`);
-    }
+    const title = post.title || post.movie?.title || 'Untitled';
+    const path = pathForPost(post);
+    const movieId = post.movieId ?? post.movie?.id;
+    appendContinueReading({
+      path,
+      title,
+      kind: movieId != null && movieId !== '' ? 'movieReview' : 'article',
+    });
+    navigate(path);
   };
 
   const handleLoadMore = () => {
@@ -74,6 +79,9 @@ const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
               : `/api/articles/${post.id}/backdrop/view?v=${encodeURIComponent(post.backdrop)}`
             : (post.movie?.backdrop ?? null);
 
+          const releaseRaw = post.movie?.release_date ?? post.movie?.releaseDate;
+          const releaseYear = releaseRaw ? String(releaseRaw).slice(0, 4) : null;
+
           return (
             <MotionWrapper key={post.id} index={index}>
               <PostCard
@@ -81,6 +89,9 @@ const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
                 title={title}
                 date={date}
                 description={description}
+                isMovieReview={Boolean(post.movieId)}
+                movieTitle={post.movie?.title}
+                releaseYear={releaseYear}
                 onClick={() => handleCardClick(post)}
                 onMouseEnter={() => {
                   if (post.movieId) {

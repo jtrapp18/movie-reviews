@@ -4,6 +4,15 @@ import SearchBar from '@components/shared-sections/SearchBar';
 import Loading from '@components/ui/Loading';
 import { StyledSizedContainer, CONTAINER_MAX_WIDTH } from '@styles';
 
+/** Shell for SearchPageFrame — drop top padding when hero+search sit in a flush primary band */
+const SearchFrameShell = styled(StyledSizedContainer)`
+  ${({ $heroSearchPrimaryBand }) =>
+    $heroSearchPrimaryBand &&
+    `
+    padding-top: 0;
+  `}
+`;
+
 const PageContainer = styled.div`
   min-height: 100%;
   padding: 20px 0 40px 0;
@@ -72,7 +81,7 @@ const HeroSearchBandInner = styled.div`
   }
 `;
 
-function SearchPageFrame({
+export default function SearchPageFrame({
   title,
   subtitle,
   searchPlaceholder,
@@ -91,7 +100,7 @@ function SearchPageFrame({
   contentFlushTop = false,
   children,
 }) {
-  const Container = wide ? PageContainer : StyledSizedContainer;
+  const Container = wide ? PageContainer : SearchFrameShell;
 
   const heroForBand =
     heroSearchPrimaryBand && hero && isValidElement(hero)
@@ -99,7 +108,11 @@ function SearchPageFrame({
       : hero;
 
   return (
-    <Container {...(!wide ? { $size: containerSize } : {})}>
+    <Container
+      {...(!wide
+        ? { $size: containerSize, $heroSearchPrimaryBand: heroSearchPrimaryBand }
+        : {})}
+    >
       {showHeader && (
         <PageHeader>
           {title && <h1>{title}</h1>}
@@ -133,5 +146,3 @@ function SearchPageFrame({
     </Container>
   );
 }
-
-export default SearchPageFrame;

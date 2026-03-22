@@ -13,14 +13,14 @@ import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
 import HomeHero from './HomeHero';
 import {
+  ContinueReadingList,
   SidePanelBlock,
   SidePanelPlaceholder,
-  useContinueReading,
 } from '@features/sidePanel';
 
 const StyledContainer = styled.div`
   padding: 0;
-  margin-top: 20px;
+  margin-top: 0;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -49,19 +49,24 @@ const HomeSplitShell = styled.div`
   }
 `;
 
+/** ~25% wider than original 280px rail for continue-reading cards */
+const HOME_SIDEBAR_WIDTH_PX = 350;
+
 const HomeSidebar = styled.aside`
   display: none;
   flex-direction: column;
   gap: 0.75rem;
   box-sizing: border-box;
-  padding: 1rem 0.75rem;
+  padding: 1rem 0.85rem 1rem 1.35rem;
+  /* “Background 2” in design tokens */
   background: var(--background-secondary);
-  border-right: 1px solid var(--border);
+  /* Same as global h3 / subhead; uses --font-color-3 (see index.css) */
+  border-right: 1px solid var(--font-color-3);
 
   @media (min-width: 1024px) {
     display: flex;
-    flex: 0 0 280px;
-    width: 280px;
+    flex: 0 0 ${HOME_SIDEBAR_WIDTH_PX}px;
+    width: ${HOME_SIDEBAR_WIDTH_PX}px;
     min-height: 0;
     align-self: stretch;
   }
@@ -171,7 +176,6 @@ function Home() {
   };
 
   const structuredData = generateWebsiteStructuredData();
-  const { items: continueReadingItems } = useContinueReading();
 
   return (
     <>
@@ -201,17 +205,13 @@ function Home() {
             <HomeSplitShell>
               <HomeSidebar aria-label="Sidebar">
                 <SidePanelBlock
-                  title="Continue reading"
+                  title={
+                    <span style={{ letterSpacing: '0.04em' }}>CONTINUE</span>
+                  }
                   titleId="side-panel-continue-heading"
                   motionIndex={1}
                 >
-                  <SidePanelPlaceholder
-                    aria-label={
-                      continueReadingItems.length > 0
-                        ? `${continueReadingItems.length} saved in Continue reading`
-                        : 'Continue reading (empty)'
-                    }
-                  />
+                  <ContinueReadingList posts={posts} limit={5} />
                 </SidePanelBlock>
                 <SidePanelBlock
                   title="Activity"
