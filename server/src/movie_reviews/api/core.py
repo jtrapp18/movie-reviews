@@ -317,10 +317,25 @@ class ReviewById(Resource):
             print(f"DEBUG PATCH - Setting {attr} = {data.get(attr)}")
             setattr(review, attr, data.get(attr))
 
+        if "show_review_backdrop" in data:
+            logger.info(
+                "PATCH review %s show_review_backdrop incoming=%s committed_value=%s",
+                review_id,
+                data.get("show_review_backdrop"),
+                getattr(review, "show_review_backdrop", None),
+            )
+
         print(f"DEBUG PATCH - After update, document_path: {review.document_path}")
         db.session.commit()
         print(f"DEBUG PATCH - After commit, document_path: {review.document_path}")
-        return review.to_dict(), 200
+        out = review.to_dict()
+        if "show_review_backdrop" in out or "show_review_backdrop" in data:
+            logger.info(
+                "PATCH review %s to_dict show_review_backdrop=%s",
+                review_id,
+                out.get("show_review_backdrop"),
+            )
+        return out, 200
 
     def delete(self, review_id):
         review = Review.query.get(review_id)

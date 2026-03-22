@@ -29,7 +29,13 @@ const RatingOverlayWrapper = styled.div`
   margin-bottom: 10px;
 `;
 
-const ReviewForm = ({ initObj, movie, onEditingChange }) => {
+const ReviewForm = ({
+  initObj,
+  movie,
+  onEditingChange,
+  backdropPreference,
+  onBackdropPreferenceChange,
+}) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(!initObj);
@@ -60,14 +66,12 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
         reviewText: initObj.reviewText || '',
         title: initObj.title || '',
         description: initObj.description || '',
-        showReviewBackdrop: initObj.showReviewBackdrop !== false,
       }
     : {
         rating: '',
         reviewText: '',
         title: '',
         description: '',
-        showReviewBackdrop: true,
       };
 
   const _submitToDB = initObj
@@ -156,7 +160,7 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
           reviewText: values.reviewText,
           description: values.description,
           movieId: movieId,
-          showReviewBackdrop: values.showReviewBackdrop,
+          showReviewBackdrop: backdropPreference,
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
@@ -165,6 +169,7 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
           isEdit,
           hasDocument,
           tagCount: tags.length,
+          showReviewBackdrop: backdropPreference,
         });
 
         // Submit the review
@@ -183,6 +188,23 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
 
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
+          console.info(
+            '[backdropPreference] raw API result (backdrop fields)',
+            JSON.stringify(
+              result.result && typeof result.result === 'object'
+                ? {
+                    backdrop: result.result.backdrop,
+                    show_review_backdrop: result.result.show_review_backdrop,
+                  }
+                : null
+            )
+          );
+          console.info(
+            '[backdropPreference] after snakeToCamel',
+            JSON.stringify({
+              showReviewBackdrop: camelCaseResult.showReviewBackdrop,
+            })
+          );
 
           // Update the movies context with the new/updated review
           if (isEdit) {
@@ -190,6 +212,10 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
             setUpdatedReview(camelCaseResult);
             // Update initObj for immediate display
             Object.assign(initObj, camelCaseResult);
+            console.info(
+              '[backdropPreference] initObj after assign',
+              JSON.stringify({ showReviewBackdrop: initObj.showReviewBackdrop })
+            );
             // Keep Home "Recent Posts" in sync with latest review fields (e.g., description/backdrop)
             setPosts((prev) =>
               Array.isArray(prev)
@@ -282,10 +308,8 @@ const ReviewForm = ({ initObj, movie, onEditingChange }) => {
             uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
             backdropKey={backdropKey}
             reviewPersisted={Boolean(initObj?.id)}
-            showReviewBackdrop={formik.values.showReviewBackdrop}
-            onShowReviewBackdropChange={(v) =>
-              formik.setFieldValue('showReviewBackdrop', v)
-            }
+            showReviewBackdrop={backdropPreference}
+            onShowReviewBackdropChange={onBackdropPreferenceChange}
             onUploaded={(url) => {
               setBackdropKey(url);
               if (initObj) {

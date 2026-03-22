@@ -133,23 +133,36 @@ function MovieReview() {
 
 function MovieReviewBody({ movie, movies, directors, user, navigate }) {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
+  const reviewId = review?.id ?? null;
+  const prefersReviewSaved = review?.showReviewBackdrop !== false;
+
   /** Mirrors ReviewForm isEditing — hero preview only while true. */
   const [reviewFormEditing, setReviewFormEditing] = useState(() => !review);
-  const prevReviewFormEditingRef = useRef(reviewFormEditing);
 
-  /** `null` = follow saved `showReviewBackdrop`; otherwise force which backdrop the hero shows while editing. */
-  const [coverPreview, setCoverPreview] = useState(null);
+  /**
+   * Single source of truth for which backdrop is preferred (review vs movie).
+   * Shared by the hero Cover preview and the form; drives PATCH `show_review_backdrop`.
+   */
+  const [backdropPreference, setBackdropPreference] = useState(
+    () => review?.showReviewBackdrop !== false
+  );
 
+  /** When not editing, always follow the saved review (e.g. after save/cancel or movie change). */
   useEffect(() => {
-    setCoverPreview(null);
-  }, [movie.id]);
-
-  useEffect(() => {
-    if (prevReviewFormEditingRef.current && !reviewFormEditing) {
-      setCoverPreview(null);
+    if (!reviewFormEditing) {
+      setBackdropPreference(prefersReviewSaved);
     }
+  }, [reviewFormEditing, prefersReviewSaved, reviewId]);
+
+  /** When entering edit mode, reset the working preference from the saved review. */
+  const prevReviewFormEditingRef = useRef(reviewFormEditing);
+  useEffect(() => {
+    const enteredEdit = !prevReviewFormEditingRef.current && reviewFormEditing;
     prevReviewFormEditingRef.current = reviewFormEditing;
-  }, [reviewFormEditing]);
+    if (enteredEdit && reviewId != null) {
+      setBackdropPreference(prefersReviewSaved);
+    }
+  }, [reviewFormEditing, reviewId, prefersReviewSaved]);
 
   const reviewBackdropUrl =
     review?.backdrop && review?.id
@@ -157,21 +170,13 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
       : null;
   const hasBothBackdrops = Boolean(reviewBackdropUrl && movie?.backdrop);
 
-  const savedPrefersReview = review?.showReviewBackdrop !== false;
-  const preferReview = coverPreview === null ? undefined : coverPreview === 'review';
-
   const coverImageUrl = resolveMovieReviewCoverUrl({
     review,
     movie,
-    preferReview,
+    preferReview: reviewFormEditing ? backdropPreference : undefined,
   });
 
   const seoCoverImage = resolveMovieReviewCoverUrl({ review, movie });
-
-  const reviewBtnActive =
-    coverPreview === null ? savedPrefersReview : coverPreview === 'review';
-  const movieBtnActive =
-    coverPreview === null ? !savedPrefersReview : coverPreview === 'movie';
   const releaseYear = (movie.releaseDate || '').slice(0, 4);
   const movieTitleLine = releaseYear ? `${movie.title} (${releaseYear})` : movie.title;
   const directorName =
@@ -232,15 +237,15 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
               <CoverPreviewLabel>Cover preview</CoverPreviewLabel>
               <CoverPreviewBtn
                 type="button"
-                $active={reviewBtnActive}
-                onClick={() => setCoverPreview('review')}
+                $active={backdropPreference}
+                onClick={() => setBackdropPreference(true)}
               >
                 Review
               </CoverPreviewBtn>
               <CoverPreviewBtn
                 type="button"
-                $active={movieBtnActive}
-                onClick={() => setCoverPreview('movie')}
+                $active={!backdropPreference}
+                onClick={() => setBackdropPreference(false)}
               >
                 Movie
               </CoverPreviewBtn>
@@ -269,6 +274,8 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
             initObj={review}
             movie={movie}
             onEditingChange={setReviewFormEditing}
+            backdropPreference={backdropPreference}
+            onBackdropPreferenceChange={setBackdropPreference}
           />
         </DetailContentCard>
         {(review || resolvedDirector || relatedMoviesByDirector.length > 0) && (

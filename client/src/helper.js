@@ -128,8 +128,9 @@ function patchJSONToDb(dbKey, Id, jsonObj) {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(snake_object),
-  }).then((res) => {
+  }).then(async (res) => {
     if (!res.ok) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }

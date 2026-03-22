@@ -28,6 +28,23 @@ export const submitFormWithDocument = async (
       id,
       hasDocument: !!file,
     });
+    console.info(
+      '[backdropPreference] formData before clean',
+      JSON.stringify({
+        showReviewBackdrop: formData.showReviewBackdrop,
+        type: typeof formData.showReviewBackdrop,
+      })
+    );
+    console.info(
+      '[backdropPreference] cleanFormData after strip empty',
+      JSON.stringify({
+        showReviewBackdrop: cleanFormData.showReviewBackdrop,
+        hasShowReviewBackdropKey: Object.prototype.hasOwnProperty.call(
+          cleanFormData,
+          'showReviewBackdrop'
+        ),
+      })
+    );
 
     // All submissions go to reviews table - articles and reviews are the same model
     const result = isEdit
