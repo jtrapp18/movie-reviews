@@ -1,3 +1,5 @@
+import { devDebug } from './utils/logger.js';
+
 //****************************************************************************************************
 // JSON-server CRUD functionality
 
@@ -28,7 +30,7 @@ function userLogout() {
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       } else {
-        console.log('Successfully logged out');
+        devDebug('[helper] logout succeeded');
       }
     })
     .catch((e) => console.error(e));
@@ -78,7 +80,7 @@ async function getJSON(dbKey, Id = null) {
 function postJSONToDb(dbKey, jsonObj) {
   const snake_object = camelToSnake(jsonObj);
   const url = `/api/${dbKey}`;
-  console.log('[postJSONToDb] POST', url);
+  devDebug('[postJSONToDb] POST', url);
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -110,11 +112,11 @@ function postJSONToDb(dbKey, jsonObj) {
       ) {
         err.serverErrors = errPayload;
       }
-      console.log('[postJSONToDb] Error response', res.status, errPayload);
+      devDebug('[postJSONToDb] Error response', res.status, errPayload);
       throw err;
     }
     const data = await res.json();
-    console.log('[postJSONToDb] Success', res.status, url);
+    devDebug('[postJSONToDb] Success', res.status, url);
     invalidateJsonCache(dbKey);
     return data;
   });
@@ -402,7 +404,7 @@ function isCacheValid(timestamp) {
 // Invalidate ratings cache (call when ratings are updated)
 function invalidateRatingsCache() {
   ratingsCache.clear();
-  console.log('Ratings cache invalidated');
+  devDebug('ratings cache invalidated');
 }
 
 // Optimized function to get ratings for a list of movies (handles both local and external)
@@ -413,7 +415,7 @@ async function getMovieRatings(movies) {
   const cacheKey = generateCacheKey(movies);
   const cached = ratingsCache.get(cacheKey);
   if (cached && isCacheValid(cached.timestamp)) {
-    console.log('Using cached ratings for', movies.length, 'movies');
+    devDebug('[helper] ratings cache hit', { movieCount: movies.length });
     return cached.data;
   }
 
@@ -444,7 +446,7 @@ async function getMovieRatings(movies) {
     timestamp: Date.now(),
   });
 
-  console.log('Fetched fresh ratings for', movies.length, 'movies');
+  devDebug('[helper] ratings fetched', { movieCount: movies.length });
   return ratingsMap;
 }
 

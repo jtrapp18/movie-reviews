@@ -256,7 +256,7 @@ const RichTextContainer = styled.div`
     text-align: left;
   }
 
-  /* Timestamp / Opens chips: CHIP_VARIANT_ZOOM (see styles/chipVariants.js) — tertiary bg, no white */
+  /* Timestamp / Opens chips: CHIP_VARIANT_SECONDARY (see styles/chipVariants.js) */
   .line-note-tag {
     grid-column: 1;
     justify-self: start;
@@ -266,7 +266,7 @@ const RichTextContainer = styled.div`
     color: var(--font-color-1);
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: calc(0.9rem * var(--zoom-multiplier, 1));
+    font-size: calc(var(--default-font-size) * var(--zoom-multiplier, 1));
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     line-height: 1.35;

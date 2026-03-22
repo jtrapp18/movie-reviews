@@ -3,6 +3,7 @@
  */
 
 import { postJSONToDb, patchJSONToDb } from '../helper';
+import { devDebug } from './logger.js';
 
 /**
  * Submit form with optional document upload
@@ -23,46 +24,30 @@ export const submitFormWithDocument = async (
       }
     });
 
-    console.info('submitFormWithDocument - submitting review', {
+    devDebug('[formSubmit] submitting review', {
       isEdit,
       id,
       hasDocument: !!file,
+      showReviewBackdrop: formData.showReviewBackdrop,
+      hasShowReviewBackdropKey: Object.prototype.hasOwnProperty.call(
+        cleanFormData,
+        'showReviewBackdrop'
+      ),
     });
-    console.info(
-      '[backdropPreference] formData before clean',
-      JSON.stringify({
-        showReviewBackdrop: formData.showReviewBackdrop,
-        type: typeof formData.showReviewBackdrop,
-      })
-    );
-    console.info(
-      '[backdropPreference] cleanFormData after strip empty',
-      JSON.stringify({
-        showReviewBackdrop: cleanFormData.showReviewBackdrop,
-        hasShowReviewBackdropKey: Object.prototype.hasOwnProperty.call(
-          cleanFormData,
-          'showReviewBackdrop'
-        ),
-      })
-    );
 
     // All submissions go to reviews table - articles and reviews are the same model
     const result = isEdit
       ? await patchJSONToDb('reviews', id, cleanFormData)
       : await postJSONToDb('reviews', cleanFormData);
 
-    console.info('submitFormWithDocument - review saved', {
-      id: result?.id,
-    });
+    devDebug('[formSubmit] review saved', { id: result?.id });
 
     // Handle document upload if file is provided
     if (file && result?.id) {
       try {
-        console.info('submitFormWithDocument - uploading document', {
-          id: result.id,
-        });
+        devDebug('[formSubmit] uploading document', { id: result.id });
         await uploadDocument(file, result.id, false);
-        console.info('submitFormWithDocument - document uploaded');
+        devDebug('[formSubmit] document uploaded');
       } catch (uploadError) {
         console.error('Document upload failed:', uploadError);
         // Don't fail the whole submission if document upload fails

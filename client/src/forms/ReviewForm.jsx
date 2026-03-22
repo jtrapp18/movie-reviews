@@ -15,6 +15,7 @@ import { submitFormWithDocument } from '@utils/formSubmit';
 import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { snakeToCamel, invalidateRatingsCache, getJSON } from '@helper';
+import { devDebug } from '@utils/logger';
 import { useAdmin } from '@hooks/useAdmin';
 import {
   FormDocumentUploadSection,
@@ -164,7 +165,7 @@ const ReviewForm = ({
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
-        console.info('ReviewForm - submitting review', {
+        devDebug('[ReviewForm] submitting review', {
           movieId,
           isEdit,
           hasDocument,
@@ -181,30 +182,17 @@ const ReviewForm = ({
         );
 
         if (result.success) {
-          console.info('ReviewForm - review submitted successfully', {
+          devDebug('[ReviewForm] review saved', {
             id: result.result?.id,
             tagCount: result.result?.tags?.length || 0,
           });
 
           // Convert snake_case to camelCase
           const camelCaseResult = snakeToCamel(result.result);
-          console.info(
-            '[backdropPreference] raw API result (backdrop fields)',
-            JSON.stringify(
-              result.result && typeof result.result === 'object'
-                ? {
-                    backdrop: result.result.backdrop,
-                    show_review_backdrop: result.result.show_review_backdrop,
-                  }
-                : null
-            )
-          );
-          console.info(
-            '[backdropPreference] after snakeToCamel',
-            JSON.stringify({
-              showReviewBackdrop: camelCaseResult.showReviewBackdrop,
-            })
-          );
+          devDebug('[ReviewForm] review result (backdrop fields)', {
+            backdrop: result.result?.backdrop,
+            showReviewBackdrop: camelCaseResult.showReviewBackdrop,
+          });
 
           // Update the movies context with the new/updated review
           if (isEdit) {
@@ -212,10 +200,6 @@ const ReviewForm = ({
             setUpdatedReview(camelCaseResult);
             // Update initObj for immediate display
             Object.assign(initObj, camelCaseResult);
-            console.info(
-              '[backdropPreference] initObj after assign',
-              JSON.stringify({ showReviewBackdrop: initObj.showReviewBackdrop })
-            );
             // Keep Home "Recent Posts" in sync with latest review fields (e.g., description/backdrop)
             setPosts((prev) =>
               Array.isArray(prev)

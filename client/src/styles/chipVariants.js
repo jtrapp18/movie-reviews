@@ -1,11 +1,8 @@
 /**
- * Shared chip / pill tokens aligned with ZoomControlsContainer (the gray bar),
- * not ZoomButton circles — uses --background-tertiary so the fill is theme-aware
- * and never soft-white (light: gray; dark: cinema-gray).
- *
- * Use for: line-note timestamp chips in rich HTML, <Tag variant="zoom" />.
+ * Secondary chip tokens — tertiary background, theme-aware (see Tag variant="secondary").
+ * Originally matched ZoomControls bar styling; name refers to role, not zoom UI.
  */
-export const CHIP_VARIANT_ZOOM = {
+export const CHIP_VARIANT_SECONDARY = {
   backgroundColor: 'var(--background-tertiary)',
   textColor: 'var(--font-color-1)',
   borderColor: 'transparent',
