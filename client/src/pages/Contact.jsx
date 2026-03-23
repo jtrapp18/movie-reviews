@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { Button, StyledContainer, StyledForm } from '../styles';
+import { Button, StaticPageShell, StyledForm } from '@styles';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 
@@ -77,7 +77,7 @@ function Contact() {
   };
 
   return (
-    <StyledContainer>
+    <StaticPageShell>
       <Header>
         <h1>Contact James</h1>
         <div className="subtitle">
@@ -177,7 +177,7 @@ function Contact() {
           )}
         </div>
       </StyledForm>
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

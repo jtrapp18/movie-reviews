@@ -27,8 +27,9 @@ export const SidePanelBlockRoot = styled.section`
 
 export const SidePanelBlockTitle = styled.h3`
   margin: 0;
+  padding-top: 0.55rem;
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 400;
   text-align: left;
   width: 100%;
   line-height: 1.2;
@@ -36,7 +37,7 @@ export const SidePanelBlockTitle = styled.h3`
 `;
 
 /**
- * Uppercase rail section label — use for CONTINUE, ACTIVITY, etc. so headings match.
+ * Uppercase rail section label — use for CONTINUE READING, RECENT ACTIVITY, etc.
  */
 export const SidePanelHeadingLabel = styled.span`
   display: inline-block;

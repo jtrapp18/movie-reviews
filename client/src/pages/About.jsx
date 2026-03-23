@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
-import { StyledContainer, Button, MobilePageGutter } from '@styles';
+import { StaticPageShell, Button } from '@styles';
 import GradingModal from '@components/about/GradingModal';
 
 const aboutContent = yaml.load(aboutContentYaml);
@@ -72,56 +72,54 @@ function About() {
 
   return (
     <>
-      <StyledContainer>
-        <MobilePageGutter>
-          <Header>
-            <h1>{aboutContent.header.title}</h1>
-            <h3>
-              <i>{aboutContent.header.subtitle}</i>
-            </h3>
-          </Header>
+      <StaticPageShell>
+        <Header>
+          <h1>{aboutContent.header.title}</h1>
+          <h3>
+            <i>{aboutContent.header.subtitle}</i>
+          </h3>
+        </Header>
 
-          <AboutSection>
-            <Paragraphs text={aboutContent.aboutJames.personalStory} />
+        <AboutSection>
+          <Paragraphs text={aboutContent.aboutJames.personalStory} />
 
-            <Paragraphs text={aboutContent.aboutJames.intro} />
+          <Paragraphs text={aboutContent.aboutJames.intro} />
 
-            <Paragraphs text={aboutContent.aboutJames.closing} />
+          <Paragraphs text={aboutContent.aboutJames.closing} />
 
-            <Button onClick={() => setIsGradingOpen(true)}>
-              View James&apos; Film Grading System
-            </Button>
-          </AboutSection>
+          <Button onClick={() => setIsGradingOpen(true)}>
+            View James&apos; Film Grading System
+          </Button>
+        </AboutSection>
 
-          <AboutSection title="About This Website">
-            <Paragraphs text={aboutContent.aboutWebsite.intro} />
+        <AboutSection title="About This Website">
+          <Paragraphs text={aboutContent.aboutWebsite.intro} />
 
-            {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
-              <ContentType key={index}>
-                <h4>{type.title}</h4>
-                <p>{type.description}</p>
-              </ContentType>
-            ))}
-          </AboutSection>
+          {aboutContent.aboutWebsite.contentTypes.map((type, index) => (
+            <ContentType key={index}>
+              <h4>{type.title}</h4>
+              <p>{type.description}</p>
+            </ContentType>
+          ))}
+        </AboutSection>
 
-          <AboutSection title="Get in Touch">
-            <Paragraphs text={aboutContent.contact.intro} />
+        <AboutSection title="Get in Touch">
+          <Paragraphs text={aboutContent.contact.intro} />
 
-            {aboutContent.contact.methods.map((method, index) => (
-              <ContactMethod key={index}>
-                <span className="type">{method.type}:</span>
-                <span className="value">
-                  {method.type === 'Contact' ? (
-                    <ContactPageLink to="/contact">Contact page</ContactPageLink>
-                  ) : (
-                    method.value
-                  )}
-                </span>
-              </ContactMethod>
-            ))}
-          </AboutSection>
-        </MobilePageGutter>
-      </StyledContainer>
+          {aboutContent.contact.methods.map((method, index) => (
+            <ContactMethod key={index}>
+              <span className="type">{method.type}:</span>
+              <span className="value">
+                {method.type === 'Contact' ? (
+                  <ContactPageLink to="/contact">Contact page</ContactPageLink>
+                ) : (
+                  method.value
+                )}
+              </span>
+            </ContactMethod>
+          ))}
+        </AboutSection>
+      </StaticPageShell>
 
       <GradingModal isOpen={isGradingOpen} onClose={() => setIsGradingOpen(false)} />
     </>

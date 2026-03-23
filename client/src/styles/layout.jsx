@@ -1,14 +1,5 @@
 import styled, { css } from 'styled-components';
-
-/** Max widths for centered page shells (SearchPageFrame, etc.) */
-export const CONTAINER_MAX_WIDTH = {
-  /** Current default: reading column */
-  narrow: 'min(900px, 90vw)',
-  /** Home + side rail: room for feed + panel without going edge-to-edge */
-  medium: 'min(1200px, 94vw)',
-  /** Widest bounded content */
-  full: 'min(1400px, 96vw)',
-};
+import { CONTAINER_MAX_WIDTH } from './containerMaxWidth';
 
 const containerShell = css`
   display: flex;
@@ -41,9 +32,6 @@ const StyledMain = styled.main`
   position: relative;
   flex: 1;
 
-  /* Background image */
-  // background-image: ${(props) =>
-    props.isMobile ? 'none' : `url('/images/grid_left.png')`};
   background-size: auto 40vh;
   background-position: top left;
   background-repeat: no-repeat;
@@ -106,5 +94,18 @@ export const MobilePageGutter = styled.div`
     padding-right: 1rem;
   }
 `;
+
+/**
+ * Bounded reading column + mobile horizontal inset. Use for static/marketing pages
+ * (About, Contact, etc.). Search-driven pages use SearchPageFrame and wrap their
+ * body in MobilePageGutter where needed.
+ */
+export function StaticPageShell({ children, ...rest }) {
+  return (
+    <StyledContainer {...rest}>
+      <MobilePageGutter>{children}</MobilePageGutter>
+    </StyledContainer>
+  );
+}
 
 export { StyledMain, StyledContainer, CardContainer, StyledDeleted };
