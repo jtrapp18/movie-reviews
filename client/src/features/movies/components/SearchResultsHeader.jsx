@@ -25,6 +25,33 @@ const SearchQuery = styled.span`
   font-weight: 600;
 `;
 
+const AnimatedEllipsis = styled.span`
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  vertical-align: baseline;
+`;
+
+const Dot = styled.span`
+  opacity: 0;
+  animation: fadeDot 1.2s infinite;
+  animation-delay: ${({ $delay = 0 }) => `${$delay}s`};
+
+  @keyframes fadeDot {
+    0%,
+    20% {
+      opacity: 0;
+    }
+    45%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+`;
+
 const SearchResultsHeader = ({
   searchQuery,
   movieCount = 0,
@@ -36,7 +63,14 @@ const SearchResultsHeader = ({
   if (isLoading) {
     return (
       <HeaderContainer>
-        <Title>Searching...</Title>
+        <Title>
+          Searching
+          <AnimatedEllipsis aria-hidden="true">
+            <Dot $delay={0.05}>.</Dot>
+            <Dot $delay={0.25}>.</Dot>
+            <Dot $delay={0.45}>.</Dot>
+          </AnimatedEllipsis>
+        </Title>
       </HeaderContainer>
     );
   }
