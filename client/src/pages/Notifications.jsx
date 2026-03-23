@@ -1,24 +1,14 @@
 import { useEffect, useContext, useRef } from 'react';
 import styled from 'styled-components';
-import { StyledContainer } from '@styles';
+import { StaticPageShell } from '@styles';
 import { UserContext } from '@context/userProvider';
 import LoginMessage from '@components/feedback/LoginMessage';
 import { NotificationList, useNotifications } from '@features/notifications';
 import Loading from '@components/ui/Loading';
-
-const Header = styled.header`
-  margin-bottom: 1.5rem;
-
-  h1 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1.75rem;
-  }
-
-  .sub {
-    font-size: 0.95rem;
-    color: var(--font-color-2);
-  }
-`;
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const ErrorBanner = styled.div`
   padding: 0.75rem 1rem;
@@ -54,20 +44,22 @@ function Notifications() {
 
   if (!user) {
     return (
-      <StyledContainer>
+      <StaticPageShell>
         <LoginMessage message="Log in to view your notifications." />
-      </StyledContainer>
+      </StaticPageShell>
     );
   }
 
   return (
-    <StyledContainer>
-      <Header>
+    <StaticPageShell>
+      <StaticPageHeader>
         <h1>Notifications</h1>
-        <p className="sub">
-          {total > 0 ? `${total} notification${total !== 1 ? 's' : ''}` : ''}
-        </p>
-      </Header>
+        {total > 0 ? (
+          <StaticPageSubtitle>
+            {`${total} notification${total !== 1 ? 's' : ''}`}
+          </StaticPageSubtitle>
+        ) : null}
+      </StaticPageHeader>
 
       {error && <ErrorBanner>{error}</ErrorBanner>}
 
@@ -81,7 +73,7 @@ function Notifications() {
           isLoading={isLoading}
         />
       )}
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

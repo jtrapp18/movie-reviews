@@ -4,7 +4,6 @@ const StyledCard = styled.article`
   width: 100%;
   max-width: 800px;
   gap: 12px;
-  border-radius: 8px 8px 0 0;
   background-color: var(--background-secondary);
   cursor: pointer;
   transition:
@@ -21,7 +20,7 @@ const StyledCard = styled.article`
     height: 300px;
     max-height: 80vh;
     object-fit: cover;
-    border-radius: 4px 4px 0 0;
+    border-radius: 10px 10px 0 0;
     flex-shrink: 0;
     filter: grayscale(90%);
   }

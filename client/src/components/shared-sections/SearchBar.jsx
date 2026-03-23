@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 const SearchContainer = styled.div`
@@ -15,7 +15,7 @@ const SearchContainer = styled.div`
     $variant === 'hero' &&
     css`
       margin: 0 auto 0.5rem;
-      max-width: 100%;
+      max-width: min(100%, 800px);
     `}
 
   div {
@@ -233,16 +233,32 @@ const SearchBar = ({
   enterSearch,
   placeholder = 'Search movies...',
   variant = 'default',
+  value,
+  onValueChange,
 }) => {
   const [searchInput, setSearchInput] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const isControlled = typeof value === 'string';
+
+  useEffect(() => {
+    if (isControlled) {
+      setSearchInput(value);
+    }
+  }, [isControlled, value]);
 
   const handleChangeSearch = (event) => {
-    setSearchInput(event.target.value);
+    const nextValue = event.target.value;
+    if (!isControlled) {
+      setSearchInput(nextValue);
+    }
+    onValueChange?.(nextValue);
   };
 
   const handleClearSearch = () => {
-    setSearchInput('');
+    if (!isControlled) {
+      setSearchInput('');
+    }
+    onValueChange?.('');
     enterSearch('');
     setIsExpanded(false);
   };
@@ -250,7 +266,8 @@ const SearchBar = ({
   const handleKeyDown = (event) => {
     // Check if "Enter" key is pressed
     if (event.key === 'Enter') {
-      enterSearch(searchInput);
+      const submittedValue = isControlled ? value : searchInput;
+      enterSearch(submittedValue ?? '');
     }
   };
 
@@ -266,14 +283,10 @@ const SearchBar = ({
   };
 
   return (
-    <SearchContainer
-      $isExpanded={isExpanded}
-      $variant={variant}
-      className="search-bar"
-    >
+    <SearchContainer $isExpanded={isExpanded} $variant={variant} className="search-bar">
       <div>
         <input
-          value={searchInput}
+          value={isControlled ? value : searchInput}
           type="text"
           id="search"
           placeholder={placeholder}

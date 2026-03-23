@@ -14,6 +14,8 @@ const StyledHeader = styled.div`
   display: flex;
   justify-content: space-between;
   background: var(--background-secondary);
+  border-bottom: 1px solid rgba(0, 17, 61, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.02);
   padding: 1.5% 5% 0.5%;
   align-items: end;
   position: relative;
@@ -43,7 +45,7 @@ const HeaderTitle = styled.div`
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
     font-size: 1.4rem;
-    font-weight: 600;
+    font-weight: 500;
     // color: var(--font-color-1);
     margin: 0;
     line-height: 1.1;

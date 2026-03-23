@@ -125,7 +125,10 @@ const ReviewForm = ({
       .max(100, 'Title must be less than 100 characters'),
     description: Yup.string().max(500, 'Description must be less than 500 characters'),
     rating: Yup.number()
-      .required('Rating is required.')
+      .nullable()
+      .transform((value, originalValue) =>
+        originalValue === '' || originalValue === null ? null : value
+      )
       .min(1, 'Rating must be at least 1.')
       .max(7, 'Rating must be at most 7.'),
     reviewText: Yup.string()
@@ -157,7 +160,10 @@ const ReviewForm = ({
         // Prepare the form data for submission
         const formData = {
           title: values.title,
-          rating: values.rating,
+          rating:
+            values.rating === '' || values.rating == null
+              ? null
+              : Number(values.rating),
           reviewText: values.reviewText,
           description: values.description,
           movieId: movieId,

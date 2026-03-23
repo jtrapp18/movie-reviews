@@ -17,6 +17,9 @@ from movie_reviews.config import db
 from movie_reviews.logging import logger
 from movie_reviews.models import Director, Movie, Review, ReviewLike, Tag
 
+FALLBACK_POSTER_URL = "https://placehold.co/500x750?text=No+Poster"
+FALLBACK_DIRECTOR_PHOTO_URL = "https://placehold.co/500x750?text=No+Photo"
+
 
 def _fetch_tmdb_director_for_movie(external_movie_id):
     """Fetch director details from TMDb for a given movie external_id."""
@@ -90,7 +93,7 @@ def _get_or_create_director_for_movie(external_movie_id):
     if not external_id:
         return None
 
-    # Look up existing director by external_id
+    # Look up existing director by external_id first.
     director = Director.query.filter_by(external_id=external_id).first()
     if director:
         # Optionally refresh basic fields from TMDb (non-destructive)
@@ -101,8 +104,26 @@ def _get_or_create_director_for_movie(external_movie_id):
             director.biography = director_data["biography"]
         return director
 
+    # Backward-compatibility path:
+    # Older records may exist without external_id, so try matching by name.
+    director_name = (director_data.get("name") or "").strip()
+    if director_name:
+        director = Director.query.filter(
+            func.lower(Director.name) == director_name.lower()
+        ).first()
+        if director:
+            # Link legacy record to TMDb identity for future exact matches.
+            director.external_id = external_id
+            if director_data["cover_photo"]:
+                director.cover_photo = director_data["cover_photo"]
+            elif not director.cover_photo:
+                director.cover_photo = FALLBACK_DIRECTOR_PHOTO_URL
+            if director_data["biography"]:
+                director.biography = director_data["biography"]
+            return director
+
     # Create new director
-    cover_photo = director_data["cover_photo"] or ""
+    cover_photo = director_data["cover_photo"] or FALLBACK_DIRECTOR_PHOTO_URL
     director = Director(
         external_id=external_id,
         name=director_data["name"],
@@ -114,13 +135,123 @@ def _get_or_create_director_for_movie(external_movie_id):
     return director
 
 
+def _fetch_tmdb_movie_bundle(external_movie_id):
+    """Fetch TMDb movie details + director details for investigation/debug."""
+    api_key = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+    image_base_url = "https://image.tmdb.org/t/p/w1280"
+
+    if not api_key:
+        return {"error": "MOVIE_API_KEY is not configured"}, 500
+
+    if not external_movie_id:
+        return {"error": "Movie has no external_id to query TMDb"}, 400
+
+    movie_url = f"{base_url}/movie/{external_movie_id}?api_key={api_key}&language=en-US"
+    credits_url = (
+        f"{base_url}/movie/{external_movie_id}/credits?api_key={api_key}&language=en-US"
+    )
+
+    try:
+        movie_response = requests.get(movie_url, timeout=12)
+        credits_response = requests.get(credits_url, timeout=12)
+    except Exception as exc:
+        return {"error": f"Failed to reach TMDb: {str(exc)}"}, 502
+
+    if movie_response.status_code != 200:
+        return {
+            "error": (
+                f"TMDb movie request failed. Status {movie_response.status_code}: "
+                f"{movie_response.text}"
+            )
+        }, movie_response.status_code
+
+    if credits_response.status_code != 200:
+        return {
+            "error": (
+                f"TMDb credits request failed. Status {credits_response.status_code}: "
+                f"{credits_response.text}"
+            )
+        }, credits_response.status_code
+
+    movie_data = movie_response.json() or {}
+    credits_data = credits_response.json() or {}
+    crew = credits_data.get("crew", []) or []
+    director_entry = next((c for c in crew if c.get("job") == "Director"), None)
+
+    director_data = None
+    if director_entry and director_entry.get("id"):
+        person_url = (
+            f"{base_url}/person/{director_entry['id']}?api_key={api_key}&language=en-US"
+        )
+        try:
+            person_response = requests.get(person_url, timeout=12)
+            if person_response.status_code == 200:
+                director_data = person_response.json() or {}
+        except Exception:
+            director_data = None
+
+    normalized_movie = {
+        "external_id": movie_data.get("id"),
+        "title": movie_data.get("title"),
+        "original_title": movie_data.get("original_title"),
+        "overview": movie_data.get("overview"),
+        "original_language": movie_data.get("original_language"),
+        "release_date": movie_data.get("release_date"),
+        "cover_photo": (
+            f"{image_base_url}{movie_data.get('poster_path')}"
+            if movie_data.get("poster_path")
+            else None
+        ),
+        "backdrop": (
+            f"{image_base_url}{movie_data.get('backdrop_path')}"
+            if movie_data.get("backdrop_path")
+            else None
+        ),
+    }
+
+    normalized_director = None
+    if director_entry:
+        normalized_director = {
+            "external_id": director_entry.get("id"),
+            "name": (director_data or {}).get("name") or director_entry.get("name"),
+            "biography": (director_data or {}).get("biography"),
+            "cover_photo": (
+                f"https://image.tmdb.org/t/p/w500"
+                f"{(director_data or {}).get('profile_path') or director_entry.get('profile_path')}"
+                if (
+                    (director_data or {}).get("profile_path")
+                    or director_entry.get("profile_path")
+                )
+                else None
+            ),
+        }
+
+    return {
+        "tmdb_movie": movie_data,
+        "tmdb_credits": credits_data,
+        "tmdb_director": director_data,
+        "normalized_movie": normalized_movie,
+        "normalized_director": normalized_director,
+    }, 200
+
+
 class Movies(Resource):
     def get(self):
         movies = [movie.to_dict() for movie in Movie.query.all()]
         return movies, 200
 
     def post(self):
-        data = request.get_json()
+        data = request.get_json() or {}
+        raw_cover_photo = data.get("cover_photo")
+        cover_photo = (
+            raw_cover_photo.strip()
+            if isinstance(raw_cover_photo, str)
+            else raw_cover_photo
+        )
+        if not cover_photo:
+            # Some TMDb results do not have poster_path; keep create flow resilient.
+            cover_photo = FALLBACK_POSTER_URL
 
         try:
             new_movie = Movie(
@@ -130,7 +261,7 @@ class Movies(Resource):
                 overview=data.get("overview"),
                 title=data.get("title"),
                 release_date=data.get("release_date"),
-                cover_photo=data.get("cover_photo"),
+                cover_photo=cover_photo,
                 backdrop=data.get("backdrop"),
             )
 
@@ -149,6 +280,15 @@ class Movies(Resource):
 
         except Exception as e:
             db.session.rollback()
+            logger.error(
+                (
+                    "Failed to create movie via /api/movies: %s | payload_keys=%s "
+                    "| raw_cover_photo=%r | hint=Likely validation failure in movie/director creation"
+                ),
+                str(e),
+                sorted((data or {}).keys()),
+                raw_cover_photo,
+            )
             return {"error": str(e)}, 400
 
 
@@ -220,6 +360,60 @@ class MovieById(Resource):
         return {}, 204
 
 
+class MovieTmdbInvestigation(Resource):
+    def get(self, movie_id):
+        movie = Movie.query.get(movie_id)
+        if not movie:
+            return {"error": "Movie not found"}, 404
+
+        tmdb_payload, status = _fetch_tmdb_movie_bundle(movie.external_id)
+        if status != 200:
+            return tmdb_payload, status
+
+        local_snapshot = {
+            "id": movie.id,
+            "external_id": movie.external_id,
+            "title": movie.title,
+            "original_title": movie.original_title,
+            "overview": movie.overview,
+            "original_language": movie.original_language,
+            "release_date": (
+                movie.release_date.isoformat() if movie.release_date else None
+            ),
+            "cover_photo": movie.cover_photo,
+            "backdrop": movie.backdrop,
+        }
+
+        normalized_movie = tmdb_payload.get("normalized_movie") or {}
+        changed_fields = []
+        for field in [
+            "title",
+            "original_title",
+            "overview",
+            "original_language",
+            "release_date",
+            "cover_photo",
+            "backdrop",
+        ]:
+            if (local_snapshot.get(field) or None) != (
+                normalized_movie.get(field) or None
+            ):
+                changed_fields.append(
+                    {
+                        "field": field,
+                        "local": local_snapshot.get(field),
+                        "tmdb": normalized_movie.get(field),
+                    }
+                )
+
+        return {
+            "movie_id": movie_id,
+            "local_movie": local_snapshot,
+            "changed_fields": changed_fields,
+            **tmdb_payload,
+        }, 200
+
+
 class Reviews(Resource):
     def get(self):
         reviews = [review.to_dict() for review in Review.query.all()]
@@ -227,9 +421,11 @@ class Reviews(Resource):
 
     def post(self):
         data = request.get_json()
+        raw_rating = (data or {}).get("rating")
+        rating = raw_rating if isinstance(raw_rating, int) else None
         new_review = Review(
             title=data.get("title"),
-            rating=data.get("rating"),
+            rating=rating,
             review_text=data.get("review_text"),
             description=data.get("description"),
             movie_id=data.get("movie_id"),
@@ -314,8 +510,11 @@ class ReviewById(Resource):
 
         # Handle other attributes normally
         for attr in data:
-            print(f"DEBUG PATCH - Setting {attr} = {data.get(attr)}")
-            setattr(review, attr, data.get(attr))
+            incoming_value = data.get(attr)
+            if attr == "rating" and not isinstance(incoming_value, int):
+                incoming_value = None
+            print(f"DEBUG PATCH - Setting {attr} = {incoming_value}")
+            setattr(review, attr, incoming_value)
 
         if "show_review_backdrop" in data:
             logger.info(
@@ -858,4 +1057,5 @@ def register_routes(api):
     api.add_resource(MovieRatings, "/api/movie-ratings")
     api.add_resource(MovieRatingsBulk, "/api/movie-ratings-bulk")
     api.add_resource(DeleteMovie, "/api/movies/<int:movie_id>/delete")
+    api.add_resource(MovieTmdbInvestigation, "/api/movies/<int:movie_id>/tmdb")
     api.add_resource(DeleteArticle, "/api/articles/<int:article_id>/delete")

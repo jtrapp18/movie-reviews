@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { getJSON } from '@helper';
 import { formatRelativeTime } from '@utils/formatting';
 import GlowBullet from '@components/ui/GlowBullet';
+import Loading from '@components/ui/Loading';
 
 const List = styled.div`
   display: flex;
@@ -112,17 +113,7 @@ function ActivityFeedList() {
   }, []);
 
   if (loading) {
-    return (
-      <p
-        style={{
-          margin: 0,
-          fontSize: '0.85rem',
-          color: 'var(--font-color-2)',
-        }}
-      >
-        Loading…
-      </p>
-    );
+    return <Loading text="Loading" size="small" />;
   }
 
   if (items.length === 0) {

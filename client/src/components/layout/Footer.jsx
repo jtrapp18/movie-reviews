@@ -40,7 +40,6 @@ const StyledFooter = styled.footer`
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             margin: 5px 0;
             padding: 0;
-            font-weight: 500;
         }
 
         p:first-of-type {
@@ -57,13 +56,12 @@ const StyledFooter = styled.footer`
         }
 
         a {
-            color: var(--light-gray);
+            color: var(--soft-white);
             text-decoration: none;
             transition: all 0.3s ease;
-            font-weight: 600;
 
             &:hover {
-                color: var(--soft-white);
+                font-weight: 300;
             }
         }
     }

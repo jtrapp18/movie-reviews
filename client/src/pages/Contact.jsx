@@ -1,27 +1,13 @@
 import { useState } from 'react';
-import styled from 'styled-components';
 import { Button, StaticPageShell, StyledForm } from '@styles';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const aboutContent = yaml.load(aboutContentYaml);
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    // color: var(--cinema-gold-dark);
-    // font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    // color: var(--cinema-silver);
-    // font-size: clamp(1.1rem, 3vw, 1.3rem);
-    font-style: italic;
-  }
-`;
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -78,12 +64,12 @@ function Contact() {
 
   return (
     <StaticPageShell>
-      <Header>
+      <StaticPageHeader>
         <h1>Contact James</h1>
-        <div className="subtitle">
+        <StaticPageSubtitle>
           Get in touch about film reviews, suggestions, or feedback
-        </div>
-      </Header>
+        </StaticPageSubtitle>
+      </StaticPageHeader>
 
       <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
