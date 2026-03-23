@@ -11,7 +11,7 @@ import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
-import HomeHero from './HomeHero';
+import HomeHero, { HomeHeroFilterPills } from './HomeHero';
 import {
   ActivityFeedList,
   ContinueReadingList,
@@ -132,7 +132,7 @@ const HomeBelowFold = styled.div`
   box-sizing: border-box;
 `;
 
-function Home() {
+export default function Home() {
   const { movies, articles, posts, directors } = useOutletContext();
 
   const [showMovies, setShowMovies] = useState([]);
@@ -210,6 +210,9 @@ function Home() {
           containerSize="medium"
           hero={<HomeHero />}
           heroSearchPrimaryBand
+          heroBandBackgroundImage="/images/spotlight.jpeg"
+          heroBandFooter={<HomeHeroFilterPills />}
+          searchBarVariant="hero"
           contentFlushTop
         >
           <>
@@ -300,5 +303,3 @@ function Home() {
     </>
   );
 }
-
-export default Home;

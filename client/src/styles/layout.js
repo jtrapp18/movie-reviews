@@ -107,4 +107,17 @@ export const MobilePageGutter = styled.div`
   }
 `;
 
+/**
+ * Bounded reading column + mobile horizontal inset. Use for static/marketing pages
+ * (About, Contact, etc.). Search-driven pages use SearchPageFrame and wrap their
+ * body in MobilePageGutter where needed.
+ */
+export function StaticPageShell({ children, ...rest }) {
+  return (
+    <StyledContainer {...rest}>
+      <MobilePageGutter>{children}</MobilePageGutter>
+    </StyledContainer>
+  );
+}
+
 export { StyledMain, StyledContainer, CardContainer, StyledDeleted };

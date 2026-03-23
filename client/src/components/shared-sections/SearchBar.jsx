@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const SearchContainer = styled.div`
   width: 100%;
@@ -10,6 +10,13 @@ const SearchContainer = styled.div`
   align-items: center;
   position: relative;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  ${({ $variant }) =>
+    $variant === 'hero' &&
+    css`
+      margin: 0 auto 0.5rem;
+      max-width: 100%;
+    `}
 
   div {
     width: 100%;
@@ -98,8 +105,60 @@ const SearchContainer = styled.div`
     right: 20px;
   }
 
+  ${({ $variant }) =>
+    $variant === 'hero' &&
+    css`
+      input {
+        border-radius: 9999px;
+        padding: 14px 22px;
+        padding-right: 48px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(20, 22, 28, 0.55);
+        backdrop-filter: blur(10px);
+        color: var(--soft-white);
+        font-size: 0.95rem;
+        box-shadow: none;
+
+        &::placeholder {
+          color: rgba(248, 249, 250, 0.55);
+          font-size: 0.95rem;
+        }
+
+        &:not(:placeholder-shown) {
+          font-size: 1rem;
+          font-weight: 500;
+          padding: 14px 22px;
+          padding-right: 48px;
+        }
+
+        &:hover {
+          color: var(--soft-white);
+          background: rgba(28, 30, 38, 0.65);
+        }
+
+        &:focus {
+          border-color: rgba(255, 255, 255, 0.35);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+        }
+      }
+
+      span {
+        color: rgba(248, 249, 250, 0.65);
+      }
+
+      input:not(:placeholder-shown) + span {
+        font-size: 1rem;
+        padding: 0;
+        width: 28px;
+        height: 28px;
+        right: 16px;
+      }
+    `}
+
   @media (max-width: 768px) {
-    margin: 1.5rem auto;
+    /* Tighter stack under title/subtitle; PageHeader also trims margin on small screens */
+    margin: 0.5rem auto 1.5rem;
     padding: 0 1rem;
 
     input {
@@ -135,10 +194,46 @@ const SearchContainer = styled.div`
       padding: 8px;
       right: 16px;
     }
+
+    ${({ $variant }) =>
+      $variant === 'hero' &&
+      css`
+        margin: 0 auto 0.5rem;
+
+        input {
+          font-size: 0.9rem;
+          padding: 0.85rem 1.1rem;
+          padding-right: 2.75rem;
+
+          &::placeholder {
+            font-size: 0.9rem;
+          }
+
+          &:not(:placeholder-shown) {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.35;
+            padding: 0.85rem 1.1rem;
+            padding-right: 2.75rem;
+          }
+        }
+
+        input:not(:placeholder-shown) + span {
+          font-size: 0.95rem;
+          width: 26px;
+          height: 26px;
+          padding: 0;
+          right: 14px;
+        }
+      `}
   }
 `;
 
-const SearchBar = ({ enterSearch, placeholder = 'Search movies...' }) => {
+const SearchBar = ({
+  enterSearch,
+  placeholder = 'Search movies...',
+  variant = 'default',
+}) => {
   const [searchInput, setSearchInput] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -171,7 +266,11 @@ const SearchBar = ({ enterSearch, placeholder = 'Search movies...' }) => {
   };
 
   return (
-    <SearchContainer $isExpanded={isExpanded} className="search-bar">
+    <SearchContainer
+      $isExpanded={isExpanded}
+      $variant={variant}
+      className="search-bar"
+    >
       <div>
         <input
           value={searchInput}

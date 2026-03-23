@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 const Root = styled.section`
   width: 100%;
   text-align: center;
-  padding: 0.25rem 0 0;
+  padding: 0.5rem 0 0;
 
   ${({ $onPrimary }) =>
     $onPrimary &&
@@ -12,34 +12,164 @@ const Root = styled.section`
     `}
 `;
 
+const Eyebrow = styled.p`
+  margin: 0 0 0.65rem;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1.4;
+  color: rgba(248, 249, 250, 0.72);
+
+  ${({ $onPrimary }) =>
+    !$onPrimary &&
+    css`
+      color: var(--font-color-2);
+    `}
+`;
+
 /** Not an h1 — page title stays “Recent Posts” on Home */
-const Title = styled.p`
-  margin: 0 0 0.35rem;
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  line-height: 1.2;
-  font-weight: 600;
+const Name = styled.p`
+  margin: 0 0 0.85rem;
+  font-family: var(--title-font), 'Georgia', serif;
+  font-size: clamp(2.25rem, 7vw, 3.75rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: 0.02em;
   color: var(--font-color-1);
 
   ${({ $onPrimary }) =>
     $onPrimary &&
     css`
       color: var(--soft-white);
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      text-shadow:
+        0 2px 24px rgba(0, 0, 0, 0.45),
+        0 1px 2px rgba(0, 0, 0, 0.35);
     `}
 `;
 
-const Tagline = styled.p`
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.45;
-  color: var(--font-color-2);
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: min(100%, 22rem);
+  margin: 0 auto 1rem;
+`;
+
+const DividerLine = styled.span`
+  flex: 1;
+  height: 1px;
+  max-width: 8rem;
+  background: rgba(255, 255, 255, 0.38);
 
   ${({ $onPrimary }) =>
-    $onPrimary &&
+    !$onPrimary &&
     css`
-      color: rgba(248, 249, 250, 0.9);
+      background: var(--font-color-3);
     `}
 `;
+
+const Diamond = styled.span`
+  flex-shrink: 0;
+  width: 0.35rem;
+  height: 0.35rem;
+  background: rgba(255, 255, 255, 0.55);
+  transform: rotate(45deg);
+
+  ${({ $onPrimary }) =>
+    !$onPrimary &&
+    css`
+      background: var(--font-color-3);
+    `}
+`;
+
+const Categories = styled.p`
+  margin: 0;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: clamp(0.7rem, 1.65vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  color: rgba(248, 249, 250, 0.78);
+
+  ${({ $onPrimary }) =>
+    !$onPrimary &&
+    css`
+      color: var(--font-color-2);
+    `}
+`;
+
+const PillsRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 0.15rem;
+`;
+
+const Pill = styled.button`
+  margin: 0;
+  padding: 0.4rem 0.85rem;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  cursor: default;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  ${({ $active }) =>
+    $active
+      ? css`
+          background: rgba(248, 249, 250, 0.22);
+          color: var(--soft-white);
+          border-color: rgba(255, 255, 255, 0.35);
+        `
+      : css`
+          background: rgba(12, 14, 18, 0.35);
+          color: rgba(248, 249, 250, 0.92);
+          border-color: rgba(255, 255, 255, 0.18);
+
+          &:hover {
+            background: rgba(248, 249, 250, 0.1);
+            border-color: rgba(255, 255, 255, 0.28);
+          }
+        `}
+`;
+
+const HERO_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'reviews', label: 'Reviews' },
+  { id: 'essays', label: 'Essays' },
+  { id: 'directors', label: 'Directors' },
+  { id: '1970s', label: '1970s' },
+  { id: 'cinematography', label: 'Cinematography' },
+];
+
+/**
+ * Decorative filter chips under the home hero search bar (visual only).
+ */
+export function HomeHeroFilterPills() {
+  return (
+    <PillsRow role="presentation" aria-hidden="true">
+      {HERO_FILTERS.map((f) => (
+        <Pill key={f.id} type="button" tabIndex={-1} $active={f.id === 'all'}>
+          {f.label}
+        </Pill>
+      ))}
+    </PillsRow>
+  );
+}
 
 /**
  * Hero strip for the home page — sits above the unified search bar via SearchPageFrame `hero`.
@@ -48,12 +178,16 @@ const Tagline = styled.p`
 function HomeHero({ onPrimary = false }) {
   return (
     <Root $onPrimary={onPrimary} aria-labelledby="home-hero-title">
-      <Title id="home-hero-title" $onPrimary={onPrimary}>
-        Movie Reviews Hub
-      </Title>
-      <Tagline $onPrimary={onPrimary}>
-        Discover reviews, articles, and directors in one place.
-      </Tagline>
+      <Eyebrow $onPrimary={onPrimary}>Film criticism & analysis</Eyebrow>
+      <Name id="home-hero-title" $onPrimary={onPrimary}>
+        James Trapp
+      </Name>
+      <Divider aria-hidden="true">
+        <DividerLine $onPrimary={onPrimary} />
+        <Diamond $onPrimary={onPrimary} />
+        <DividerLine $onPrimary={onPrimary} />
+      </Divider>
+      <Categories $onPrimary={onPrimary}>Reviews · Essays · Directors</Categories>
     </Root>
   );
 }

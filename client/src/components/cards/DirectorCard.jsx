@@ -142,6 +142,7 @@ function DirectorCard({
             <div
               style={{
                 flex: 1,
+                minWidth: 0,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
