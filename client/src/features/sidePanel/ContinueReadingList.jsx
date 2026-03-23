@@ -78,9 +78,11 @@ function ContinueReadingList({ posts = [], limit = 5 }) {
       {items.map((post) => {
         const title = post.title || post.movie?.title || 'Untitled';
         const date = formatDate(post.dateAdded);
-        const description = stripHtml(post.description || '');
         const movieId = post.movieId ?? post.movie?.id;
         const isMovieReview = movieId != null && movieId !== '';
+        const description = isMovieReview
+          ? post.movie?.overview?.trim() || 'No overview available'
+          : stripHtml(post.description || '');
         let photo;
         if (isMovieReview) {
           photo = resolveMovieReviewCoverUrl({ review: post, movie: post.movie });

@@ -220,14 +220,16 @@ export default function Home() {
             <HomeSplitShell>
               <HomeSidebar aria-label="Sidebar">
                 <SidePanelBlock
-                  title={<SidePanelHeadingLabel>CONTINUE</SidePanelHeadingLabel>}
+                  title={
+                    <SidePanelHeadingLabel>CONTINUE READING</SidePanelHeadingLabel>
+                  }
                   titleId="side-panel-continue-heading"
                   motionIndex={1}
                 >
                   <ContinueReadingList posts={posts} limit={5} />
                 </SidePanelBlock>
                 <SidePanelBlock
-                  title={<SidePanelHeadingLabel>ACTIVITY</SidePanelHeadingLabel>}
+                  title={<SidePanelHeadingLabel>RECENT ACTIVITY</SidePanelHeadingLabel>}
                   titleId="side-panel-activity-heading"
                   motionIndex={2}
                 >

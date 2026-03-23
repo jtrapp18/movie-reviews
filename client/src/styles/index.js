@@ -1,4 +1,5 @@
 // Export all styled components from organized theme files
+export * from './containerMaxWidth';
 export * from './theme';
 export * from './buttons';
 export * from './forms';

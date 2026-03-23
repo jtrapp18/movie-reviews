@@ -31,18 +31,20 @@ const StyledCard = styled.article`
     flex-direction: column;
     padding: 0.5rem;
     gap: 4px;
+    text-align: left;
   }
 
-  h2 {
+  .content h2 {
     margin: 0;
     font-family: var(--title-font);
     font-weight: bold;
     text-align: left;
   }
 
-  .description {
+  .content .description {
     margin: 0;
     line-height: 1.45;
+    text-align: left;
   }
 
   /* --- compact (side rail): wide image on top, text below (backdrop-friendly) --- */
@@ -79,7 +81,7 @@ const StyledCard = styled.article`
       gap: 4px;
     }
 
-    h2 {
+    .content h2 {
       font-size: 0.9rem;
       line-height: 1.3;
       font-weight: 600;
@@ -89,7 +91,7 @@ const StyledCard = styled.article`
       overflow: hidden;
     }
 
-    .description {
+    .content .description {
       font-size: 0.78rem;
       line-height: 1.4;
       color: var(--font-color-2);

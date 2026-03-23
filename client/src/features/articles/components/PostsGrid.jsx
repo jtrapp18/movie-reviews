@@ -72,10 +72,11 @@ const PostsGrid = ({ posts, initialCount = 5, fillColumn = false }) => {
           const stripHtml = (str) =>
             typeof str === 'string' ? str.replace(/<[^>]+>/g, '') : str;
 
-          const description = stripHtml(post.description || '');
-
           const movieId = post.movieId ?? post.movie?.id;
           const isMovieReview = movieId != null && movieId !== '';
+          const description = isMovieReview
+            ? post.movie?.overview?.trim() || 'No overview available'
+            : stripHtml(post.description || '');
           let photo;
           if (isMovieReview) {
             photo = resolveMovieReviewCoverUrl({ review: post, movie: post.movie });
