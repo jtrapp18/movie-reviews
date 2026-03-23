@@ -14,6 +14,7 @@ const SummaryRow = styled.summary`
   display: flex;
   align-items: stretch;
   gap: 16px;
+  width: 100%;
   cursor: pointer;
   user-select: none;
 
@@ -51,6 +52,8 @@ const AccordionBody = styled.div`
 `;
 
 const AccordionDetails = styled.details`
+  width: 100%;
+  box-sizing: border-box;
   border-radius: 8px;
   padding: 8px 12px;
   background: var(--background-secondary);
@@ -75,6 +78,24 @@ const Toggle = styled.span`
   &:hover {
     font-weight: bold;
   }
+`;
+
+const SummaryContent = styled.div`
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const SummaryActions = styled.div`
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 `;
 
 function SmallDirectorCard({ director, index = 0, onClick = () => {} }) {
@@ -139,15 +160,7 @@ function DirectorCard({
             >
               <SmallDirectorCard director={director} index={0} onClick={onViewPage} />
             </div>
-            <div
-              style={{
-                flex: 1,
-                minWidth: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}
-            >
+            <SummaryContent>
               <p
                 style={{
                   margin: 0,
@@ -157,16 +170,7 @@ function DirectorCard({
               >
                 {shortBio}
               </p>
-              <div
-                style={{
-                  marginTop: '0.5rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  flexWrap: 'wrap',
-                }}
-              >
+              <SummaryActions>
                 <Toggle isExpanded={isExpanded}>
                   {isExpanded ? 'Hide movies' : 'Show movies'}
                   <span aria-hidden>▼</span>
@@ -180,8 +184,8 @@ function DirectorCard({
                 >
                   View page
                 </Button>
-              </div>
-            </div>
+              </SummaryActions>
+            </SummaryContent>
           </SummaryRow>
 
           <AccordionBody className={isExpanded ? 'is-open' : ''}>
