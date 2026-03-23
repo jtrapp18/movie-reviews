@@ -46,7 +46,7 @@ const HomeSplitShell = styled.div`
   box-sizing: border-box;
 
   @media (min-width: 1024px) {
-    flex-direction: row;
+    flex-direction: ${({ $searchActive }) => ($searchActive ? 'column' : 'row')};
     align-items: stretch;
   }
 `;
@@ -66,7 +66,7 @@ const HomeSidebar = styled.aside`
   border-right: 1px solid var(--font-color-3);
 
   @media (min-width: 1024px) {
-    display: flex;
+    display: ${({ $searchActive }) => ($searchActive ? 'none' : 'flex')};
     flex: 0 0 ${HOME_SIDEBAR_WIDTH_PX}px;
     width: ${HOME_SIDEBAR_WIDTH_PX}px;
     min-height: 0;
@@ -139,6 +139,8 @@ export default function Home() {
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [activeHeroFilter, setActiveHeroFilter] = useState('all');
   const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
@@ -161,11 +163,14 @@ export default function Home() {
       setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
+      setSearchInputValue('');
+      setActiveHeroFilter('all');
       return;
     }
 
     setIsSearching(true);
     setSearchQuery(text);
+    setSearchInputValue(text);
 
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
@@ -187,6 +192,22 @@ export default function Home() {
     }
   };
 
+  const HERO_FILTER_TO_QUERY = {
+    all: '',
+    reviews: 'reviews',
+    essays: 'essays',
+    directors: 'directors',
+    '1970s': '1970s',
+    cinematography: 'cinematography',
+  };
+
+  const handleHeroFilterSelect = (filterId) => {
+    const query = HERO_FILTER_TO_QUERY[filterId] ?? '';
+    setActiveHeroFilter(filterId);
+    setSearchInputValue(query);
+    unifiedSearch(query);
+  };
+
   const structuredData = generateWebsiteStructuredData();
 
   return (
@@ -204,6 +225,15 @@ export default function Home() {
           subtitle={null}
           searchPlaceholder="Search movies, reviews, articles, and tags..."
           onSearch={unifiedSearch}
+          searchValue={searchInputValue}
+          onSearchValueChange={(value) => {
+            setSearchInputValue(value);
+            if (!value.trim()) {
+              setActiveHeroFilter('all');
+            } else {
+              setActiveHeroFilter('');
+            }
+          }}
           isLoading={isSearching}
           loadingText="Searching"
           showHeader={false}
@@ -211,14 +241,19 @@ export default function Home() {
           hero={<HomeHero />}
           heroSearchPrimaryBand
           heroBandBackgroundImage="/images/spotlight.jpeg"
-          heroBandFooter={<HomeHeroFilterPills />}
+          heroBandFooter={
+            <HomeHeroFilterPills
+              activeFilter={activeHeroFilter}
+              onSelectFilter={handleHeroFilterSelect}
+            />
+          }
           searchBarVariant="hero"
           contentFlushTop
         >
           <>
             {/* Search results header */}
-            <HomeSplitShell>
-              <HomeSidebar aria-label="Sidebar">
+            <HomeSplitShell $searchActive={Boolean(searchQuery)}>
+              <HomeSidebar $searchActive={Boolean(searchQuery)} aria-label="Sidebar">
                 <SidePanelBlock
                   title={
                     <SidePanelHeadingLabel>CONTINUE READING</SidePanelHeadingLabel>
@@ -244,28 +279,30 @@ export default function Home() {
                       searchQuery={searchQuery}
                       movieCount={showMovies.length}
                       articleCount={showArticles.length}
+                      directorCount={showDirectors.length}
                       isLoading={isSearching}
                       showNoResults={
                         !isSearching &&
                         showMovies.length === 0 &&
-                        showArticles.length === 0
+                        showArticles.length === 0 &&
+                        showDirectors.length === 0
                       }
                     />
                   )}
 
-                  <RecentPostsBlock>
-                    <MotionWrapper index={3}>
-                      <h1>Recent Posts</h1>
-                    </MotionWrapper>
-                    {searchQuery ? null : (
+                  {!searchQuery && (
+                    <RecentPostsBlock>
+                      <MotionWrapper index={3}>
+                        <h1>Recent Posts</h1>
+                      </MotionWrapper>
                       <MotionWrapper index={4}>
                         <h3>
                           <i>Latest movie reviews and articles</i>
                         </h3>
                       </MotionWrapper>
-                    )}
-                    <RecentPosts posts={posts} fillColumn />
-                  </RecentPostsBlock>
+                      <RecentPosts posts={posts} fillColumn />
+                    </RecentPostsBlock>
+                  )}
                 </HomeMainColumn>
               </HomeMainArea>
             </HomeSplitShell>

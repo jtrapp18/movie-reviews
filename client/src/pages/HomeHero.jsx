@@ -33,8 +33,8 @@ const Eyebrow = styled.p`
 const Name = styled.p`
   margin: 0 0 0.85rem;
   font-family: var(--signature-font), 'Georgia', serif;
-  font-size: clamp(3rem, 8vw, 5rem);
-  font-weight: 400;
+  font-size: clamp(3rem, 7vw, 4.5rem);
+  // font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0.02em;
   color: var(--font-color-1);
@@ -122,7 +122,7 @@ const Pill = styled.button`
   letter-spacing: 0.04em;
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  cursor: default;
+  cursor: pointer;
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -157,13 +157,18 @@ const HERO_FILTERS = [
 ];
 
 /**
- * Decorative filter chips under the home hero search bar (visual only).
+ * Filter chips under the home hero search bar.
  */
-export function HomeHeroFilterPills() {
+export function HomeHeroFilterPills({ activeFilter = 'all', onSelectFilter }) {
   return (
-    <PillsRow role="presentation" aria-hidden="true">
+    <PillsRow>
       {HERO_FILTERS.map((f) => (
-        <Pill key={f.id} type="button" tabIndex={-1} $active={f.id === 'all'}>
+        <Pill
+          key={f.id}
+          type="button"
+          onClick={() => onSelectFilter?.(f.id)}
+          $active={f.id === activeFilter}
+        >
           {f.label}
         </Pill>
       ))}

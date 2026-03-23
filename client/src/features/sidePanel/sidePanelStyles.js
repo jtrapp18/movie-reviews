@@ -28,8 +28,8 @@ export const SidePanelBlockRoot = styled.section`
 export const SidePanelBlockTitle = styled.h3`
   margin: 0;
   padding-top: 0.55rem;
-  font-size: 1.1rem;
-  font-weight: 400;
+  font-size: 0.95rem;
+  font-weight: 300;
   text-align: left;
   width: 100%;
   line-height: 1.2;

@@ -19,6 +19,9 @@ const ResultsCount = styled.p`
 
 const SearchQuery = styled.span`
   // color: var(--cinema-gold-dark);
+  display: inline;
+  font-size: inherit;
+  color: inherit;
   font-weight: 600;
 `;
 
@@ -26,6 +29,7 @@ const SearchResultsHeader = ({
   searchQuery,
   movieCount = 0,
   articleCount = 0,
+  directorCount = 0,
   isLoading = false,
   showNoResults = false,
 }) => {
@@ -37,7 +41,9 @@ const SearchResultsHeader = ({
     );
   }
 
-  if (showNoResults || (movieCount === 0 && articleCount === 0)) {
+  const totalCount = movieCount + articleCount + directorCount;
+
+  if (showNoResults || totalCount === 0) {
     return (
       <HeaderContainer>
         <Title>No Results Found</Title>
@@ -48,14 +54,20 @@ const SearchResultsHeader = ({
 
   const movieText = movieCount === 1 ? 'movie' : 'movies';
   const articleText = articleCount === 1 ? 'article' : 'articles';
+  const directorText = directorCount === 1 ? 'director' : 'directors';
+
+  const resultParts = [];
+  if (directorCount > 0) resultParts.push(`${directorCount} ${directorText}`);
+  if (movieCount > 0) resultParts.push(`${movieCount} ${movieText}`);
+  if (articleCount > 0) resultParts.push(`${articleCount} ${articleText}`);
 
   let resultsText = '';
-  if (movieCount > 0 && articleCount > 0) {
-    resultsText = `${movieCount} ${movieText} and ${articleCount} ${articleText} found`;
-  } else if (movieCount > 0) {
-    resultsText = `${movieCount} ${movieText} found`;
-  } else if (articleCount > 0) {
-    resultsText = `${articleCount} ${articleText} found`;
+  if (resultParts.length === 1) {
+    resultsText = `${resultParts[0]} found`;
+  } else if (resultParts.length === 2) {
+    resultsText = `${resultParts[0]} and ${resultParts[1]} found`;
+  } else if (resultParts.length === 3) {
+    resultsText = `${resultParts[0]}, ${resultParts[1]}, and ${resultParts[2]} found`;
   }
 
   return (

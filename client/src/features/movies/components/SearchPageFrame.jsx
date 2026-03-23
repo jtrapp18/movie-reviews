@@ -79,6 +79,8 @@ const HeroSearchPrimaryBand = styled.div`
   justify-content: flex-start;
   padding: clamp(1.25rem, 4vh, 2.5rem) 0;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
 
   ${({ $heroImageUrl }) =>
     !$heroImageUrl &&
@@ -123,6 +125,21 @@ const HeroSearchPrimaryBand = styled.div`
       `
     );
   }}
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: clamp(18px, 3vw, 30px);
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(240, 240, 240, 0.28) 100%
+    );
+  }
 `;
 
 const HeroSearchBandInner = styled.div`
@@ -164,6 +181,10 @@ export default function SearchPageFrame({
   heroBandFooter = null,
   /** `hero` styles the search input for the dark hero band */
   searchBarVariant = 'default',
+  /** Optional controlled search text passed to SearchBar */
+  searchValue,
+  /** Optional callback for controlled SearchBar updates */
+  onSearchValueChange,
   children,
 }) {
   const Container = wide ? PageContainer : SearchFrameShell;
@@ -198,6 +219,8 @@ export default function SearchPageFrame({
               enterSearch={onSearch}
               placeholder={searchPlaceholder}
               variant={searchBarVariant}
+              value={searchValue}
+              onValueChange={onSearchValueChange}
             />
             {heroBandFooter}
           </HeroSearchBandInner>
@@ -209,6 +232,8 @@ export default function SearchPageFrame({
             enterSearch={onSearch}
             placeholder={searchPlaceholder}
             variant={searchBarVariant}
+            value={searchValue}
+            onValueChange={onSearchValueChange}
           />
         </>
       )}
