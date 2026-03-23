@@ -117,7 +117,7 @@ const RecentPostsBlock = styled.div`
   }
 
   h3 {
-    margin: 0;
+    margin: 0 0 0.5rem;
     text-align: center;
   }
 `;

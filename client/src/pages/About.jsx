@@ -6,12 +6,12 @@ import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
 import { StaticPageShell, Button } from '@styles';
 import GradingModal from '@components/about/GradingModal';
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const aboutContent = yaml.load(aboutContentYaml);
-
-const Header = styled.div`
-  text-align: center;
-`;
 
 function Paragraphs({ text }) {
   const paragraphs = text
@@ -73,12 +73,10 @@ function About() {
   return (
     <>
       <StaticPageShell>
-        <Header>
+        <StaticPageHeader>
           <h1>{aboutContent.header.title}</h1>
-          <h3>
-            <i>{aboutContent.header.subtitle}</i>
-          </h3>
-        </Header>
+          <StaticPageSubtitle>{aboutContent.header.subtitle}</StaticPageSubtitle>
+        </StaticPageHeader>
 
         <AboutSection>
           <Paragraphs text={aboutContent.aboutJames.personalStory} />

@@ -32,9 +32,9 @@ const Eyebrow = styled.p`
 /** Not an h1 — page title stays “Recent Posts” on Home */
 const Name = styled.p`
   margin: 0 0 0.85rem;
-  font-family: var(--title-font), 'Georgia', serif;
-  font-size: clamp(2.25rem, 7vw, 3.75rem);
-  font-weight: 500;
+  font-family: var(--signature-font), 'Georgia', serif;
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 400;
   line-height: 1.08;
   letter-spacing: 0.02em;
   color: var(--font-color-1);
@@ -86,7 +86,7 @@ const Diamond = styled.span`
 `;
 
 const Categories = styled.p`
-  margin: 0;
+  margin: 0 0 2rem;
   font-family: var(--default-font), system-ui, sans-serif;
   font-size: clamp(0.7rem, 1.65vw, 0.82rem);
   font-weight: 500;

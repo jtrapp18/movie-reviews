@@ -43,7 +43,7 @@ const HeaderTitle = styled.div`
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
     font-size: 1.4rem;
-    font-weight: 600;
+    font-weight: 500;
     // color: var(--font-color-1);
     margin: 0;
     line-height: 1.1;

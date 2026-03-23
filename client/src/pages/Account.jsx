@@ -1,24 +1,15 @@
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { StyledContainer, StyledForm, Button } from '../styles';
+import { StaticPageShell, StyledForm, Button } from '../styles';
 import { UserContext } from '../context/userProvider';
 import { patchJSONToDb, snakeToCamel } from '../helper';
 import Error from '../styles/Error';
 import LoginMessage from '@components/feedback/LoginMessage';
 import { useTheme } from '../context/themeProvider';
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 2rem;
-
-  h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    font-style: italic;
-  }
-`;
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const Row = styled.div`
   display: inline-flex;
@@ -101,12 +92,12 @@ function Account() {
 
   if (!user) {
     return (
-      <StyledContainer>
-        <Header>
+      <StaticPageShell>
+        <StaticPageHeader>
           <h1>Account</h1>
           <LoginMessage message="manage your account" />
-        </Header>
-      </StyledContainer>
+        </StaticPageHeader>
+      </StaticPageShell>
     );
   }
 
@@ -139,13 +130,11 @@ function Account() {
   };
 
   return (
-    <StyledContainer>
-      <Header>
+    <StaticPageShell>
+      <StaticPageHeader>
         <h1>Account Settings</h1>
-        <div className="subtitle">
-          <h3>View and update your profile details.</h3>
-        </div>
-      </Header>
+        <StaticPageSubtitle>View and update your profile details.</StaticPageSubtitle>
+      </StaticPageHeader>
 
       {!editing && (
         <>
@@ -258,7 +247,7 @@ function Account() {
           </div>
         </StyledForm>
       )}
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

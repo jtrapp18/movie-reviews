@@ -15,7 +15,7 @@ const SearchContainer = styled.div`
     $variant === 'hero' &&
     css`
       margin: 0 auto 0.5rem;
-      max-width: 100%;
+      max-width: min(100%, 800px);
     `}
 
   div {
@@ -266,11 +266,7 @@ const SearchBar = ({
   };
 
   return (
-    <SearchContainer
-      $isExpanded={isExpanded}
-      $variant={variant}
-      className="search-bar"
-    >
+    <SearchContainer $isExpanded={isExpanded} $variant={variant} className="search-bar">
       <div>
         <input
           value={searchInput}
