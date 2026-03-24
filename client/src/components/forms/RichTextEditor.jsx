@@ -3,7 +3,7 @@ import 'react-quill/dist/quill.snow.css';
 import styled from 'styled-components';
 
 const OptionalText = styled.p`
-  color: var(--cinema-gold);
+  color: inherit;
   font-size: 0.9em;
   font-family: var(--default-font);
 `;
