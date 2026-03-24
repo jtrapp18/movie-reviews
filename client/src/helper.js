@@ -230,6 +230,46 @@ async function getMoviesByGenre(genreId, searchQuery = null) {
   }
 }
 
+async function getMoviesByFilters({
+  genreId = null,
+  decade = null,
+  searchQuery = null,
+} = {}) {
+  const params = new URLSearchParams();
+  if (genreId) params.append('genre_id', genreId);
+  if (decade) params.append('decade', decade);
+  if (searchQuery) params.append('search', searchQuery);
+
+  const imgUrl = 'https://image.tmdb.org/t/p/w1280';
+  const url = `/api/discover_movies?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.error(`Error fetching filtered movies! Status: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    const camelData = snakeToCamel(data.results || []);
+    return camelData.map((m) => ({
+      externalId: m.id,
+      originalLanguage: m.originalLanguage,
+      originalTitle: m.originalTitle,
+      overview: m.overview,
+      title: m.title,
+      releaseDate: m.releaseDate,
+      coverPhoto: `${imgUrl}${m.posterPath}`,
+      backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
+      voteAverage: m.voteAverage,
+      genreIds: m.genreIds,
+    }));
+  } catch (err) {
+    console.error('Request failed for filters', { genreId, decade, searchQuery, err });
+    return [];
+  }
+}
+
 //****************************************************************************************************
 // Conversion between cases
 
@@ -485,6 +525,7 @@ export {
   deleteJSONFromDb,
   getMovieInfo,
   getMoviesByGenre,
+  getMoviesByFilters,
   getLocalMovieRatings,
   getMovieRatingsByExternalIds,
   getMovieRatings,

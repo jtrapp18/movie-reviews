@@ -1,12 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import MotionWrapper from '@styles/MotionWrapper';
 import ArticleCard from '@components/cards/ArticleCard';
-import SearchBar from '@components/shared-sections/SearchBar';
-import PageContainer from '@components/layout/PageContainer';
+import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import { SearchPageFrame } from '@features/movies';
 import { CardContainer } from '@styles';
-import Carousel, { ArticleCarouselSlide } from '@components/shared-sections/Carousel';
 import { useArticlesList } from '@features/articles/useArticlesList';
+import styled from 'styled-components';
+
+const ArticlesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+`;
+
+const ArticleCardWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 function Articles() {
   const {
@@ -17,6 +28,7 @@ function Articles() {
   const { articles, loading, fetchArticles } = useArticlesList(contextArticles);
   const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
   const [isSearching, setIsSearching] = useState(false);
+  const [activeQuickSearch, setActiveQuickSearch] = useState(null);
 
   useEffect(() => {
     setFilteredArticles(articles ?? []);
@@ -25,6 +37,7 @@ function Articles() {
   const handleSearch = async (searchText) => {
     if (!searchText.trim()) {
       setFilteredArticles(articles);
+      setActiveQuickSearch(null);
     } else {
       setIsSearching(true);
       const data = await fetchArticles(searchText);
@@ -41,50 +54,51 @@ function Articles() {
 
   const isLoading =
     (!coreDataLoaded && (!articles || articles.length === 0)) || loading;
-  if (!filteredArticles || !Array.isArray(filteredArticles) || isLoading) {
-    return (
-      <PageContainer fullHeight>
-        <MotionWrapper index={1}>
-          <h1>Articles</h1>
-        </MotionWrapper>
-        <MotionWrapper index={2}>
-          <h3>{isLoading ? 'Loading articles...' : 'No articles yet.'}</h3>
-        </MotionWrapper>
-      </PageContainer>
-    );
-  }
+  const quickButtons = ['analysis', 'horror', 'hitchcock', 'cinematography'];
 
   return (
-    <PageContainer fullHeight>
-      <MotionWrapper index={1}>
-        <h1>Articles</h1>
-      </MotionWrapper>
-      <MotionWrapper index={2}>
-        <h3>Browse theme-based articles and essays</h3>
-      </MotionWrapper>
-
+    <SearchPageFrame
+      title={null}
+      subtitle={null}
+      searchPlaceholder={
+        isSearching
+          ? 'Searching...'
+          : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
+      }
+      onSearch={handleSearch}
+      isLoading={isLoading}
+      loadingText="Loading articles..."
+      showHeader={false}
+      heroSearchPrimaryBand
+      heroBandBackgroundImage="/images/spotlight.jpeg"
+      searchBarVariant="hero"
+      hero={
+        <SearchHeroBanner
+          title="Articles"
+          subtitle="Browse theme-based articles and essays"
+          buttonLabels={quickButtons}
+          activeButton={activeQuickSearch}
+          onButtonClick={(label) => {
+            setActiveQuickSearch(label);
+            handleSearch(label);
+          }}
+        />
+      }
+    >
       <CardContainer>
-        <MotionWrapper index={0}>
-          <SearchBar
-            key="articles-search"
-            enterSearch={handleSearch}
-            placeholder={
-              isSearching
-                ? 'Searching...'
-                : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
-            }
-          />
-        </MotionWrapper>
-
-        <Carousel showArrows>
-          {filteredArticles.map((article) => (
-            <ArticleCarouselSlide key={article.id}>
-              <ArticleCard article={article} />
-            </ArticleCarouselSlide>
-          ))}
-        </Carousel>
+        {Array.isArray(filteredArticles) && filteredArticles.length > 0 ? (
+          <ArticlesGrid>
+            {filteredArticles.map((article) => (
+              <ArticleCardWrapper key={article.id}>
+                <ArticleCard article={article} />
+              </ArticleCardWrapper>
+            ))}
+          </ArticlesGrid>
+        ) : (
+          <p>No articles match your search.</p>
+        )}
       </CardContainer>
-    </PageContainer>
+    </SearchPageFrame>
   );
 }
 

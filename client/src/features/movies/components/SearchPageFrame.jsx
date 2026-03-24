@@ -36,7 +36,8 @@ const SearchFrameShell = styled(StyledSizedContainer)`
 
 const PageContainer = styled.div`
   min-height: 100%;
-  padding: 20px 0 40px 0;
+  padding: ${({ $heroSearchPrimaryBand }) =>
+    $heroSearchPrimaryBand ? '0 0 40px 0' : '20px 0 40px 0'};
   margin: 0;
   width: 100vw;
   display: flex;
@@ -196,9 +197,8 @@ export default function SearchPageFrame({
 
   return (
     <Container
-      {...(!wide
-        ? { $size: containerSize, $heroSearchPrimaryBand: heroSearchPrimaryBand }
-        : {})}
+      $heroSearchPrimaryBand={heroSearchPrimaryBand}
+      {...(!wide ? { $size: containerSize } : {})}
     >
       {showHeader && (
         <PageHeader>

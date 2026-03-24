@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer } from '@styles';
+import { StyledContainer, StyledForm } from '@styles';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { useMovieReview } from '@features/reviews/useMovieReview';
 import { Movies } from '@features/movies';
@@ -24,6 +24,7 @@ import {
   RelatedSection,
   RelatedHeading,
 } from '@components/layout/detailPageStyles';
+import { useAdmin } from '@hooks/useAdmin';
 
 const SuggestionsLayout = styled.div`
   display: flex;
@@ -103,13 +104,62 @@ const CoverPreviewBtn = styled.button`
   font-weight: ${({ $active }) => ($active ? 700 : 400)};
 `;
 
+const MovieMetaEditor = styled.section`
+  margin: 0.5rem 0 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+`;
+
+const MovieMetaEditorFields = styled(StyledForm).attrs({ as: 'div' })`
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+`;
+
+const MetaEditorRow = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+`;
+
+const MetaEditorField = styled.div`
+  min-width: 200px;
+`;
+
+const MetaEditorActions = styled.div`
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+`;
+
+const MetaEditorBtn = styled.button`
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--font-color);
+  cursor: pointer;
+`;
+
+const MetaEditorStatus = styled.p`
+  margin: 0.5rem 0 0;
+  font-size: 0.86rem;
+  color: ${({ $error }) => ($error ? '#ff8a8a' : 'var(--font-color-2)')};
+`;
+
 function MovieReview() {
   const { user } = useContext(UserContext);
+  const { isAdmin } = useAdmin();
   const { movies = [], directors = [] } = useOutletContext();
   const navigate = useNavigate();
   const { id } = useParams();
   const movieId = parseInt(id);
-  const { movie, loading, error } = useMovieReview(movieId);
+  const { movie, loading, error, setMovie } = useMovieReview(movieId);
 
   return (
     <EntityDetailState
@@ -125,6 +175,8 @@ function MovieReview() {
           movies={movies}
           directors={directors}
           user={user}
+          isAdmin={isAdmin}
+          setMovie={setMovie}
           navigate={navigate}
         />
       )}
@@ -132,10 +184,24 @@ function MovieReview() {
   );
 }
 
-function MovieReviewBody({ movie, movies, directors, user, navigate }) {
+function MovieReviewBody({
+  movie,
+  movies,
+  directors,
+  user,
+  isAdmin,
+  setMovie,
+  navigate,
+}) {
   const review = movie.reviews.length === 0 ? null : movie.reviews[0];
   const reviewId = review?.id ?? null;
   const prefersReviewSaved = review?.showReviewBackdrop !== false;
+  const [isEditingMovieMeta, setIsEditingMovieMeta] = useState(false);
+  const [metaReleaseDate, setMetaReleaseDate] = useState(movie.releaseDate || '');
+  const [metaOverview, setMetaOverview] = useState(movie.overview || '');
+  const [metaSaving, setMetaSaving] = useState(false);
+  const [metaError, setMetaError] = useState('');
+  const [metaMessage, setMetaMessage] = useState('');
 
   /** Mirrors ReviewForm isEditing — hero preview only while true. */
   const [reviewFormEditing, setReviewFormEditing] = useState(() => !review);
@@ -154,6 +220,11 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
       setBackdropPreference(prefersReviewSaved);
     }
   }, [reviewFormEditing, prefersReviewSaved, reviewId]);
+
+  useEffect(() => {
+    setMetaReleaseDate(movie.releaseDate || '');
+    setMetaOverview(movie.overview || '');
+  }, [movie.releaseDate, movie.overview]);
 
   /** When entering edit mode, reset the working preference from the saved review. */
   const prevReviewFormEditingRef = useRef(reviewFormEditing);
@@ -209,6 +280,49 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
 
   const seo = buildMovieReviewDetailSeoCopy(movie, review);
   const structuredData = buildMovieReviewDetailPageStructuredData(movie, review);
+
+  const saveMovieMeta = async () => {
+    const trimmedOverview = (metaOverview || '').trim();
+    if (!metaReleaseDate) {
+      setMetaError('Release date is required.');
+      return;
+    }
+    if (!trimmedOverview) {
+      setMetaError('Overview is required.');
+      return;
+    }
+
+    setMetaSaving(true);
+    setMetaError('');
+    setMetaMessage('');
+    try {
+      const res = await fetch(`/api/movies/${movie.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          release_date: metaReleaseDate,
+          overview: trimmedOverview,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to update movie details (status ${res.status}).`);
+      }
+      const updated = await res.json();
+      const updatedMovie = {
+        ...movie,
+        releaseDate: updated.release_date ?? metaReleaseDate,
+        overview: updated.overview ?? trimmedOverview,
+      };
+      setMovie(updatedMovie);
+      setMetaMessage('Movie details updated.');
+      setIsEditingMovieMeta(false);
+    } catch (e) {
+      setMetaError(e.message || 'Failed to update movie details.');
+    } finally {
+      setMetaSaving(false);
+    }
+  };
 
   return (
     <>
@@ -271,7 +385,74 @@ function MovieReviewBody({ movie, movies, directors, user, navigate }) {
               />
             </LikeBar>
           )}
-          <MovieTmdbInspector movieId={movie?.id} />
+          {isAdmin && reviewFormEditing && <MovieTmdbInspector movieId={movie?.id} />}
+          {isAdmin && reviewFormEditing && (
+            <MovieMetaEditor>
+              <MetaEditorRow>
+                <MetaEditorBtn
+                  type="button"
+                  onClick={() => {
+                    setMetaError('');
+                    setMetaMessage('');
+                    setIsEditingMovieMeta((prev) => !prev);
+                  }}
+                >
+                  {isEditingMovieMeta
+                    ? 'Close Movie Details Editor'
+                    : 'Edit Movie Details'}
+                </MetaEditorBtn>
+              </MetaEditorRow>
+
+              {isEditingMovieMeta && (
+                <MovieMetaEditorFields>
+                  <MetaEditorField>
+                    <label htmlFor="movie-meta-release-date">Release Date</label>
+                    <input
+                      id="movie-meta-release-date"
+                      type="date"
+                      value={metaReleaseDate}
+                      onChange={(e) => setMetaReleaseDate(e.target.value)}
+                    />
+                  </MetaEditorField>
+                  <MetaEditorField style={{ marginTop: '0.7rem' }}>
+                    <label htmlFor="movie-meta-overview">Overview</label>
+                    <textarea
+                      id="movie-meta-overview"
+                      value={metaOverview}
+                      onChange={(e) => setMetaOverview(e.target.value)}
+                    />
+                  </MetaEditorField>
+                  <MetaEditorActions>
+                    <MetaEditorBtn
+                      type="button"
+                      onClick={saveMovieMeta}
+                      disabled={metaSaving}
+                    >
+                      {metaSaving ? 'Saving...' : 'Save'}
+                    </MetaEditorBtn>
+                    <MetaEditorBtn
+                      type="button"
+                      onClick={() => {
+                        setMetaReleaseDate(movie.releaseDate || '');
+                        setMetaOverview(movie.overview || '');
+                        setMetaError('');
+                        setMetaMessage('');
+                        setIsEditingMovieMeta(false);
+                      }}
+                      disabled={metaSaving}
+                    >
+                      Cancel
+                    </MetaEditorBtn>
+                  </MetaEditorActions>
+                </MovieMetaEditorFields>
+              )}
+
+              {metaError && <MetaEditorStatus $error>{metaError}</MetaEditorStatus>}
+              {!metaError && metaMessage && (
+                <MetaEditorStatus>{metaMessage}</MetaEditorStatus>
+              )}
+            </MovieMetaEditor>
+          )}
           <ReviewForm
             initObj={review}
             movie={movie}

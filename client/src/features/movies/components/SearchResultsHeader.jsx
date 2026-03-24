@@ -54,6 +54,7 @@ const Dot = styled.span`
 
 const SearchResultsHeader = ({
   searchQuery,
+  searchContextText = null,
   movieCount = 0,
   articleCount = 0,
   directorCount = 0,
@@ -107,7 +108,8 @@ const SearchResultsHeader = ({
   return (
     <HeaderContainer>
       <Title>
-        Results for <SearchQuery>&quot;{searchQuery}&quot;</SearchQuery>
+        Results for{' '}
+        <SearchQuery>&quot;{searchContextText ?? searchQuery}&quot;</SearchQuery>
       </Title>
       <ResultsCount>{resultsText}</ResultsCount>
     </HeaderContainer>

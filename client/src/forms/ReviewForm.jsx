@@ -291,7 +291,8 @@ const ReviewForm = ({
     <>
       {isEditing ? (
         <StyledForm onSubmit={formik.handleSubmit}>
-          <h2>{initObj ? 'Update Review' : 'Leave a Review'}</h2>
+          <h1>{initObj ? 'Edit Review' : 'Create New Review'}</h1>
+          {submitError && <Error>{submitError}</Error>}
 
           <ReviewBackdropSection
             movieBackdropUrl={movie?.backdrop || null}
@@ -417,17 +418,9 @@ const ReviewForm = ({
             />
           </div>
 
-          {submitError && <Error>{submitError}</Error>}
-
-          {/* Display validation errors */}
-          {formik.errors.title && <Error>Title: {formik.errors.title}</Error>}
-          {formik.errors.rating && <Error>Rating: {formik.errors.rating}</Error>}
-          {formik.errors.reviewText && (
-            <Error>Review: {formik.errors.reviewText}</Error>
-          )}
-
           <FormActionRow
-            marginTop="20px"
+            marginTop="30px"
+            marginBottom="20px"
             onCancel={() => {
               if (initObj) {
                 setIsEditing(false);

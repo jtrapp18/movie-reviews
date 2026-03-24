@@ -9,7 +9,7 @@ const GridContainer = styled.div`
   padding: 0 20px;
 `;
 
-const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
+const SearchResultsGrid = ({ searchQuery, searchContextText = null, movies, onMovieClick }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,6 +30,7 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
       <GridContainer>
         <SearchResultsHeader
           searchQuery={searchQuery}
+          searchContextText={searchContextText}
           movieCount={0}
           showNoResults={true}
         />
@@ -40,14 +41,22 @@ const SearchResultsGrid = ({ searchQuery, movies, onMovieClick }) => {
   if (loading) {
     return (
       <GridContainer>
-        <SearchResultsHeader searchQuery={searchQuery} isLoading={true} />
+        <SearchResultsHeader
+          searchQuery={searchQuery}
+          searchContextText={searchContextText}
+          isLoading={true}
+        />
       </GridContainer>
     );
   }
 
   return (
     <GridContainer>
-      <SearchResultsHeader searchQuery={searchQuery} movieCount={movies.length} />
+      <SearchResultsHeader
+        searchQuery={searchQuery}
+        searchContextText={searchContextText}
+        movieCount={movies.length}
+      />
       <MoviesGrid movies={movies} onMovieClick={onMovieClick} />
     </GridContainer>
   );
