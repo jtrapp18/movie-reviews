@@ -71,14 +71,6 @@ const RichTextContainer = styled.div`
     hyphens: auto;
   }
 
-  p:first-child {
-    margin-top: 0;
-  }
-
-  p:last-child {
-    margin-bottom: 0;
-  }
-
   /* Enhanced list styling */
   ul,
   ol {
@@ -142,8 +134,8 @@ const RichTextContainer = styled.div`
     max-width: calc(100% + 2 * var(--content-inline-padding, 1rem));
     margin-left: calc(-1 * var(--content-inline-padding, 1rem));
     margin-right: calc(-1 * var(--content-inline-padding, 1rem));
-    margin-top: 1.2em;
-    margin-bottom: 1.2em;
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   /* Server-enriched Word sections (review_html_enricher.py) */
@@ -165,7 +157,7 @@ const RichTextContainer = styled.div`
 
   p.cast-line {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: baseline;
     gap: 0.35em 0.45em;
     margin: 0;
@@ -178,15 +170,15 @@ const RichTextContainer = styled.div`
     background-size: var(--rich-text-dotted-dot-repeat) 1px;
     text-align: left;
     hyphens: none;
-    white-space: nowrap;
-    overflow-x: auto;
-    scrollbar-width: thin;
+    white-space: normal;
+    overflow-x: visible;
   }
 
   .cast-actor {
     font-weight: 600;
     flex: 0 1 auto;
     min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .cast-as {
@@ -203,6 +195,7 @@ const RichTextContainer = styled.div`
     flex: 1 1 auto;
     min-width: 0;
     font-style: italic;
+    overflow-wrap: anywhere;
   }
 
   /*

@@ -7,8 +7,9 @@ const InlineRatingContainer = styled.button`
   width: 100%;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 3px;
-  white-space: nowrap;
+  white-space: normal;
   flex-shrink: 0;
   margin-top: 2px;
   background: transparent;
@@ -21,6 +22,10 @@ const RatingLabel = styled.i`
   color: var(--cinema-gold);
   width: 100%;
   text-align: center;
+  font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+  line-height: 1.1;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 `;
 
 const RatingOverlay = ({ rating }) => {

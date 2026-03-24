@@ -9,7 +9,7 @@ const Button = styled.button`
   border: none;
   cursor: ${(p) => (p.$disabled ? 'default' : 'pointer')};
   padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
   color: var(--font-color-2);
   opacity: ${(p) => (p.$disabled ? 0.7 : 1)};
 
@@ -22,8 +22,14 @@ const Button = styled.button`
   }
 `;
 
+const Heart = styled.span`
+  font-size: inherit;
+  line-height: 1;
+`;
+
 const Count = styled.span`
   font-variant-numeric: tabular-nums;
+  font-size: inherit;
 `;
 
 /**
@@ -95,7 +101,7 @@ function LikeButton({
       aria-pressed={isLiked}
       aria-label={isLiked ? 'Unlike' : 'Like'}
     >
-      <span aria-hidden>{isLiked ? '♥' : '♡'}</span>
+      <Heart aria-hidden>{isLiked ? '♥' : '♡'}</Heart>
       <Count>{count}</Count>
     </Button>
   );
