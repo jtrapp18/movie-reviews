@@ -4,6 +4,7 @@ import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
+import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
 
 // Define genres we want to show
 const GENRES = [
@@ -23,6 +24,7 @@ function SearchMovies() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchMode, setIsSearchMode] = useState(false);
+  const [activeQuickSearch, setActiveQuickSearch] = useState(null);
 
   const fetchAllGenres = async () => {
     setLoading(true);
@@ -66,6 +68,7 @@ function SearchMovies() {
 
   const enterSearch = (text) => {
     setSearchQuery(text);
+    setActiveQuickSearch(null);
     if (text && text.trim()) {
       setIsSearchMode(true);
       fetchSearchResults(text);
@@ -83,16 +86,40 @@ function SearchMovies() {
   const introText = isAdmin
     ? 'Click any movie card to add a new review'
     : 'Click any movie card to view review';
+  const quickGroups = [
+    { title: 'Genre', labels: ['All', ...GENRES.map((g) => g.name), 'Thriller', 'Documentary'] },
+    { title: 'Decade', labels: ['All', 'Pre-1960s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'] },
+  ];
 
   return (
     <SearchPageFrame
-      title="Search Movies"
-      subtitle={<i>{introText}</i>}
-      searchPlaceholder={loading ? 'Searching...' : 'Search movies by title...'}
+      title={null}
+      subtitle={null}
+      searchPlaceholder={loading ? 'Searching...' : 'Search movies by title, director, year...'}
       onSearch={enterSearch}
       isLoading={loading}
       loadingText="Loading movies"
       wide
+      showHeader={false}
+      heroSearchPrimaryBand
+      heroBandBackgroundImage="/images/spotlight.jpeg"
+      searchBarVariant="hero"
+      hero={
+        <SearchHeroBanner
+          title="Search Movies"
+          subtitle={introText}
+        />
+      }
+      heroBandFooter={
+        <SearchHeroBanner
+          buttonGroups={quickGroups}
+          activeButton={activeQuickSearch}
+          onButtonClick={(label) => {
+            setActiveQuickSearch(label);
+            enterSearch(label === 'All' ? '' : label);
+          }}
+        />
+      }
     >
       {isSearchMode ? (
         <MotionWrapper index={1}>

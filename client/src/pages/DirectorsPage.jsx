@@ -5,6 +5,7 @@ import { MobilePageGutter } from '@styles';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDirectorsList } from '@features/directors/useDirectorsList';
+import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
 
 const Layout = styled.div`
   width: 100%;
@@ -104,12 +105,22 @@ function DirectorsPage() {
 
   return (
     <SearchPageFrame
-      title="Director Highlights"
-      subtitle="A movie is only as good as its director."
+      title={null}
+      subtitle={null}
       searchPlaceholder="Search directors by name or bio..."
       onSearch={(value) => setSearchQuery(value)}
       isLoading={loading}
       loadingText="Loading directors"
+      showHeader={false}
+      heroSearchPrimaryBand
+      heroBandBackgroundImage="/images/spotlight.jpeg"
+      searchBarVariant="hero"
+      hero={
+        <SearchHeroBanner
+          title="Director Highlights"
+          subtitle="A movie is only as good as its director."
+        />
+      }
     >
       <MobilePageGutter>
         <Layout>
