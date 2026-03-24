@@ -2,7 +2,7 @@
 
 import os
 import time
-from datetime import date
+from datetime import date, datetime
 from urllib.parse import quote_plus
 
 import requests
@@ -81,6 +81,49 @@ def _fetch_tmdb_director_for_movie(external_movie_id):
         "cover_photo": cover_photo,
         "biography": biography,
     }
+
+
+def _extract_earliest_tmdb_release_date(release_dates_payload):
+    """Return earliest YYYY-MM-DD from TMDb /release_dates payload."""
+    results = (release_dates_payload or {}).get("results", []) or []
+    earliest = None
+
+    for country_group in results:
+        for release_info in country_group.get("release_dates") or []:
+            release_dt = release_info.get("release_date")
+            if not release_dt or not isinstance(release_dt, str):
+                continue
+            # TMDb uses ISO timestamps like 2009-04-30T00:00:00.000Z
+            normalized = release_dt.replace("Z", "+00:00")
+            try:
+                parsed = datetime.fromisoformat(normalized)
+            except ValueError:
+                continue
+            release_day = parsed.date().isoformat()
+            if earliest is None or release_day < earliest:
+                earliest = release_day
+
+    return earliest
+
+
+def _fetch_tmdb_earliest_release_date(external_movie_id):
+    """Fetch earliest release date across countries for a TMDb movie."""
+    api_key = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+
+    if not api_key or not external_movie_id:
+        return None
+
+    url = f"{base_url}/movie/{external_movie_id}/release_dates?api_key={api_key}"
+    try:
+        response = requests.get(url, timeout=12)
+    except Exception:
+        return None
+
+    if response.status_code != 200:
+        return None
+
+    return _extract_earliest_tmdb_release_date(response.json() or {})
 
 
 def _get_or_create_director_for_movie(external_movie_id):
@@ -191,13 +234,15 @@ def _fetch_tmdb_movie_bundle(external_movie_id):
         except Exception:
             director_data = None
 
+    earliest_release_date = _fetch_tmdb_earliest_release_date(external_movie_id)
+
     normalized_movie = {
         "external_id": movie_data.get("id"),
         "title": movie_data.get("title"),
         "original_title": movie_data.get("original_title"),
         "overview": movie_data.get("overview"),
         "original_language": movie_data.get("original_language"),
-        "release_date": movie_data.get("release_date"),
+        "release_date": earliest_release_date or movie_data.get("release_date"),
         "cover_photo": (
             f"{image_base_url}{movie_data.get('poster_path')}"
             if movie_data.get("poster_path")
@@ -270,15 +315,21 @@ class Movies(Resource):
         if not cover_photo:
             # Some TMDb results do not have poster_path; keep create flow resilient.
             cover_photo = FALLBACK_POSTER_URL
+        release_date = data.get("release_date")
+        external_id = data.get("external_id")
+        if external_id:
+            earliest_release_date = _fetch_tmdb_earliest_release_date(external_id)
+            if earliest_release_date:
+                release_date = earliest_release_date
 
         try:
             new_movie = Movie(
-                external_id=data.get("external_id"),
+                external_id=external_id,
                 original_language=data.get("original_language"),
                 original_title=data.get("original_title"),
                 overview=data.get("overview"),
                 title=data.get("title"),
-                release_date=data.get("release_date"),
+                release_date=release_date,
                 cover_photo=cover_photo,
                 backdrop=data.get("backdrop"),
             )
