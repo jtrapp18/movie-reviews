@@ -577,6 +577,31 @@ class ReviewBackdropUpload(Resource):
             db.session.rollback()
             return {"error": f"Backdrop upload failed: {str(e)}"}, 500
 
+    def delete(self, review_id):
+        """Remove a review's custom backdrop (S3 object + DB) so the movie backdrop can show alone."""
+        try:
+            review = Review.query.filter(
+                Review.id == review_id, Review.movie_id.isnot(None)
+            ).first()
+            if not review:
+                return {"error": "Review not found"}, 404
+
+            key = (review.backdrop or "").strip()
+            if key:
+                s3_client = get_s3_client()
+                del_result = s3_client.delete_file(key)
+                if not del_result.get("success"):
+                    return {"error": del_result.get("error", "Delete failed")}, 400
+
+            review.backdrop = None
+            db.session.commit()
+
+            return {"review": review.to_dict()}, 200
+
+        except Exception as e:
+            db.session.rollback()
+            return {"error": f"Backdrop delete failed: {str(e)}"}, 500
+
 
 class DirectorBackdropUpload(Resource):
     """Upload an image to use as a director backdrop."""

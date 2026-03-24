@@ -2,7 +2,7 @@
 
 import os
 import time
-from datetime import date
+from datetime import date, datetime
 from urllib.parse import quote_plus
 
 import requests
@@ -16,6 +16,9 @@ from sqlalchemy.orm import joinedload
 from movie_reviews.config import db
 from movie_reviews.logging import logger
 from movie_reviews.models import Director, Movie, Review, ReviewLike, Tag
+
+FALLBACK_POSTER_URL = "https://placehold.co/500x750?text=No+Poster"
+FALLBACK_DIRECTOR_PHOTO_URL = "https://placehold.co/500x750?text=No+Photo"
 
 
 def _fetch_tmdb_director_for_movie(external_movie_id):
@@ -80,6 +83,49 @@ def _fetch_tmdb_director_for_movie(external_movie_id):
     }
 
 
+def _extract_earliest_tmdb_release_date(release_dates_payload):
+    """Return earliest YYYY-MM-DD from TMDb /release_dates payload."""
+    results = (release_dates_payload or {}).get("results", []) or []
+    earliest = None
+
+    for country_group in results:
+        for release_info in country_group.get("release_dates") or []:
+            release_dt = release_info.get("release_date")
+            if not release_dt or not isinstance(release_dt, str):
+                continue
+            # TMDb uses ISO timestamps like 2009-04-30T00:00:00.000Z
+            normalized = release_dt.replace("Z", "+00:00")
+            try:
+                parsed = datetime.fromisoformat(normalized)
+            except ValueError:
+                continue
+            release_day = parsed.date().isoformat()
+            if earliest is None or release_day < earliest:
+                earliest = release_day
+
+    return earliest
+
+
+def _fetch_tmdb_earliest_release_date(external_movie_id):
+    """Fetch earliest release date across countries for a TMDb movie."""
+    api_key = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+
+    if not api_key or not external_movie_id:
+        return None
+
+    url = f"{base_url}/movie/{external_movie_id}/release_dates?api_key={api_key}"
+    try:
+        response = requests.get(url, timeout=12)
+    except Exception:
+        return None
+
+    if response.status_code != 200:
+        return None
+
+    return _extract_earliest_tmdb_release_date(response.json() or {})
+
+
 def _get_or_create_director_for_movie(external_movie_id):
     """Ensure there is a Director row for the given TMDb movie external_id."""
     director_data = _fetch_tmdb_director_for_movie(external_movie_id)
@@ -90,7 +136,7 @@ def _get_or_create_director_for_movie(external_movie_id):
     if not external_id:
         return None
 
-    # Look up existing director by external_id
+    # Look up existing director by external_id first.
     director = Director.query.filter_by(external_id=external_id).first()
     if director:
         # Optionally refresh basic fields from TMDb (non-destructive)
@@ -101,8 +147,26 @@ def _get_or_create_director_for_movie(external_movie_id):
             director.biography = director_data["biography"]
         return director
 
+    # Backward-compatibility path:
+    # Older records may exist without external_id, so try matching by name.
+    director_name = (director_data.get("name") or "").strip()
+    if director_name:
+        director = Director.query.filter(
+            func.lower(Director.name) == director_name.lower()
+        ).first()
+        if director:
+            # Link legacy record to TMDb identity for future exact matches.
+            director.external_id = external_id
+            if director_data["cover_photo"]:
+                director.cover_photo = director_data["cover_photo"]
+            elif not director.cover_photo:
+                director.cover_photo = FALLBACK_DIRECTOR_PHOTO_URL
+            if director_data["biography"]:
+                director.biography = director_data["biography"]
+            return director
+
     # Create new director
-    cover_photo = director_data["cover_photo"] or ""
+    cover_photo = director_data["cover_photo"] or FALLBACK_DIRECTOR_PHOTO_URL
     director = Director(
         external_id=external_id,
         name=director_data["name"],
@@ -114,23 +178,159 @@ def _get_or_create_director_for_movie(external_movie_id):
     return director
 
 
+def _fetch_tmdb_movie_bundle(external_movie_id):
+    """Fetch TMDb movie details + director details for investigation/debug."""
+    api_key = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+    image_base_url = "https://image.tmdb.org/t/p/w1280"
+
+    if not api_key:
+        return {"error": "MOVIE_API_KEY is not configured"}, 500
+
+    if not external_movie_id:
+        return {"error": "Movie has no external_id to query TMDb"}, 400
+
+    movie_url = f"{base_url}/movie/{external_movie_id}?api_key={api_key}&language=en-US"
+    credits_url = (
+        f"{base_url}/movie/{external_movie_id}/credits?api_key={api_key}&language=en-US"
+    )
+
+    try:
+        movie_response = requests.get(movie_url, timeout=12)
+        credits_response = requests.get(credits_url, timeout=12)
+    except Exception as exc:
+        return {"error": f"Failed to reach TMDb: {str(exc)}"}, 502
+
+    if movie_response.status_code != 200:
+        return {
+            "error": (
+                f"TMDb movie request failed. Status {movie_response.status_code}: "
+                f"{movie_response.text}"
+            )
+        }, movie_response.status_code
+
+    if credits_response.status_code != 200:
+        return {
+            "error": (
+                f"TMDb credits request failed. Status {credits_response.status_code}: "
+                f"{credits_response.text}"
+            )
+        }, credits_response.status_code
+
+    movie_data = movie_response.json() or {}
+    credits_data = credits_response.json() or {}
+    crew = credits_data.get("crew", []) or []
+    director_entry = next((c for c in crew if c.get("job") == "Director"), None)
+
+    director_data = None
+    if director_entry and director_entry.get("id"):
+        person_url = (
+            f"{base_url}/person/{director_entry['id']}?api_key={api_key}&language=en-US"
+        )
+        try:
+            person_response = requests.get(person_url, timeout=12)
+            if person_response.status_code == 200:
+                director_data = person_response.json() or {}
+        except Exception:
+            director_data = None
+
+    earliest_release_date = _fetch_tmdb_earliest_release_date(external_movie_id)
+
+    normalized_movie = {
+        "external_id": movie_data.get("id"),
+        "title": movie_data.get("title"),
+        "original_title": movie_data.get("original_title"),
+        "overview": movie_data.get("overview"),
+        "original_language": movie_data.get("original_language"),
+        "release_date": earliest_release_date or movie_data.get("release_date"),
+        "cover_photo": (
+            f"{image_base_url}{movie_data.get('poster_path')}"
+            if movie_data.get("poster_path")
+            else None
+        ),
+        "backdrop": (
+            f"{image_base_url}{movie_data.get('backdrop_path')}"
+            if movie_data.get("backdrop_path")
+            else None
+        ),
+    }
+
+    normalized_director = None
+    if director_entry:
+        normalized_director = {
+            "external_id": director_entry.get("id"),
+            "name": (director_data or {}).get("name") or director_entry.get("name"),
+            "biography": (director_data or {}).get("biography"),
+            "cover_photo": (
+                f"https://image.tmdb.org/t/p/w500"
+                f"{(director_data or {}).get('profile_path') or director_entry.get('profile_path')}"
+                if (
+                    (director_data or {}).get("profile_path")
+                    or director_entry.get("profile_path")
+                )
+                else None
+            ),
+        }
+
+    return {
+        "tmdb_movie": movie_data,
+        "tmdb_credits": credits_data,
+        "tmdb_director": director_data,
+        "normalized_movie": normalized_movie,
+        "normalized_director": normalized_director,
+    }, 200
+
+
+def _merge_tmdb_movie_results(*result_lists):
+    """Merge TMDb movie result lists by movie id (deduplicated, popularity-sorted)."""
+    dedup = {}
+    for results in result_lists:
+        for movie in results or []:
+            movie_id = movie.get("id")
+            if not movie_id:
+                continue
+            existing = dedup.get(movie_id)
+            if not existing or (movie.get("popularity") or 0) > (
+                existing.get("popularity") or 0
+            ):
+                dedup[movie_id] = movie
+    merged = list(dedup.values())
+    merged.sort(key=lambda m: (m.get("popularity") or 0), reverse=True)
+    return merged
+
+
 class Movies(Resource):
     def get(self):
         movies = [movie.to_dict() for movie in Movie.query.all()]
         return movies, 200
 
     def post(self):
-        data = request.get_json()
+        data = request.get_json() or {}
+        raw_cover_photo = data.get("cover_photo")
+        cover_photo = (
+            raw_cover_photo.strip()
+            if isinstance(raw_cover_photo, str)
+            else raw_cover_photo
+        )
+        if not cover_photo:
+            # Some TMDb results do not have poster_path; keep create flow resilient.
+            cover_photo = FALLBACK_POSTER_URL
+        release_date = data.get("release_date")
+        external_id = data.get("external_id")
+        if external_id:
+            earliest_release_date = _fetch_tmdb_earliest_release_date(external_id)
+            if earliest_release_date:
+                release_date = earliest_release_date
 
         try:
             new_movie = Movie(
-                external_id=data.get("external_id"),
+                external_id=external_id,
                 original_language=data.get("original_language"),
                 original_title=data.get("original_title"),
                 overview=data.get("overview"),
                 title=data.get("title"),
-                release_date=data.get("release_date"),
-                cover_photo=data.get("cover_photo"),
+                release_date=release_date,
+                cover_photo=cover_photo,
                 backdrop=data.get("backdrop"),
             )
 
@@ -149,6 +349,15 @@ class Movies(Resource):
 
         except Exception as e:
             db.session.rollback()
+            logger.error(
+                (
+                    "Failed to create movie via /api/movies: %s | payload_keys=%s "
+                    "| raw_cover_photo=%r | hint=Likely validation failure in movie/director creation"
+                ),
+                str(e),
+                sorted((data or {}).keys()),
+                raw_cover_photo,
+            )
             return {"error": str(e)}, 400
 
 
@@ -220,6 +429,60 @@ class MovieById(Resource):
         return {}, 204
 
 
+class MovieTmdbInvestigation(Resource):
+    def get(self, movie_id):
+        movie = Movie.query.get(movie_id)
+        if not movie:
+            return {"error": "Movie not found"}, 404
+
+        tmdb_payload, status = _fetch_tmdb_movie_bundle(movie.external_id)
+        if status != 200:
+            return tmdb_payload, status
+
+        local_snapshot = {
+            "id": movie.id,
+            "external_id": movie.external_id,
+            "title": movie.title,
+            "original_title": movie.original_title,
+            "overview": movie.overview,
+            "original_language": movie.original_language,
+            "release_date": (
+                movie.release_date.isoformat() if movie.release_date else None
+            ),
+            "cover_photo": movie.cover_photo,
+            "backdrop": movie.backdrop,
+        }
+
+        normalized_movie = tmdb_payload.get("normalized_movie") or {}
+        changed_fields = []
+        for field in [
+            "title",
+            "original_title",
+            "overview",
+            "original_language",
+            "release_date",
+            "cover_photo",
+            "backdrop",
+        ]:
+            if (local_snapshot.get(field) or None) != (
+                normalized_movie.get(field) or None
+            ):
+                changed_fields.append(
+                    {
+                        "field": field,
+                        "local": local_snapshot.get(field),
+                        "tmdb": normalized_movie.get(field),
+                    }
+                )
+
+        return {
+            "movie_id": movie_id,
+            "local_movie": local_snapshot,
+            "changed_fields": changed_fields,
+            **tmdb_payload,
+        }, 200
+
+
 class Reviews(Resource):
     def get(self):
         reviews = [review.to_dict() for review in Review.query.all()]
@@ -227,9 +490,11 @@ class Reviews(Resource):
 
     def post(self):
         data = request.get_json()
+        raw_rating = (data or {}).get("rating")
+        rating = raw_rating if isinstance(raw_rating, int) else None
         new_review = Review(
             title=data.get("title"),
-            rating=data.get("rating"),
+            rating=rating,
             review_text=data.get("review_text"),
             description=data.get("description"),
             movie_id=data.get("movie_id"),
@@ -314,13 +579,31 @@ class ReviewById(Resource):
 
         # Handle other attributes normally
         for attr in data:
-            print(f"DEBUG PATCH - Setting {attr} = {data.get(attr)}")
-            setattr(review, attr, data.get(attr))
+            incoming_value = data.get(attr)
+            if attr == "rating" and not isinstance(incoming_value, int):
+                incoming_value = None
+            print(f"DEBUG PATCH - Setting {attr} = {incoming_value}")
+            setattr(review, attr, incoming_value)
+
+        if "show_review_backdrop" in data:
+            logger.info(
+                "PATCH review %s show_review_backdrop incoming=%s committed_value=%s",
+                review_id,
+                data.get("show_review_backdrop"),
+                getattr(review, "show_review_backdrop", None),
+            )
 
         print(f"DEBUG PATCH - After update, document_path: {review.document_path}")
         db.session.commit()
         print(f"DEBUG PATCH - After commit, document_path: {review.document_path}")
-        return review.to_dict(), 200
+        out = review.to_dict()
+        if "show_review_backdrop" in out or "show_review_backdrop" in data:
+            logger.info(
+                "PATCH review %s to_dict show_review_backdrop=%s",
+                review_id,
+                out.get("show_review_backdrop"),
+            )
+        return out, 200
 
     def delete(self, review_id):
         review = Review.query.get(review_id)
@@ -552,10 +835,60 @@ class PullMovieInfo(Resource):
         API_KEY = os.getenv("MOVIE_API_KEY")
         base_url = "https://api.themoviedb.org/3"
 
-        # If there's a search query, use the search endpoint
+        # If there's a search query, search by movie title and director name.
         if searchText:
             encoded_query = quote_plus(searchText)
-            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+            movie_search_url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+            person_search_url = f"{base_url}/search/person?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+
+            print(movie_search_url)
+            movie_response = requests.get(movie_search_url)
+            if movie_response.status_code != 200:
+                return {
+                    "error": (
+                        f"Failed to fetch movie search. Status {movie_response.status_code}: "
+                        f"{movie_response.text}"
+                    )
+                }, movie_response.status_code
+
+            movie_results = (movie_response.json() or {}).get("results", []) or []
+
+            # If the query looks like a director name, include movies tied to matching directors.
+            director_movie_results = []
+            person_response = requests.get(person_search_url)
+            if person_response.status_code == 200:
+                person_results = (person_response.json() or {}).get("results", []) or []
+                director_people = [
+                    p
+                    for p in person_results
+                    if (p.get("known_for_department") == "Directing")
+                    or any(
+                        k.get("media_type") == "movie" and k.get("title")
+                        for k in (p.get("known_for") or [])
+                    )
+                ][:3]
+
+                for person in director_people:
+                    person_id = person.get("id")
+                    if not person_id:
+                        continue
+                    credits_url = (
+                        f"{base_url}/person/{person_id}/movie_credits"
+                        f"?api_key={API_KEY}&language=en-US"
+                    )
+                    credits_response = requests.get(credits_url)
+                    if credits_response.status_code != 200:
+                        continue
+                    crew = (credits_response.json() or {}).get("crew", []) or []
+                    directed_movies = [
+                        m for m in crew if m.get("job") == "Director" and m.get("id")
+                    ]
+                    director_movie_results.extend(directed_movies)
+
+            merged_results = _merge_tmdb_movie_results(
+                movie_results, director_movie_results
+            )
+            return {"results": merged_results}, 200
         else:
             # No search term provided, fetch popular movies
             url = f"{base_url}/movie/popular?api_key={API_KEY}"
@@ -576,18 +909,76 @@ class DiscoverMovies(Resource):
     def get(self):
         genre_id = request.args.get("genre_id")
         search_query = request.args.get("search", "").strip()
+        decade = request.args.get("decade", "").strip()
         page = request.args.get("page", 1)
 
         API_KEY = os.getenv("MOVIE_API_KEY")
         base_url = "https://api.themoviedb.org/3"
 
+        # Decade mapping:
+        # - pre-1960s => <= 1959-12-31
+        # - 1960s => 1960-01-01..1969-12-31, etc.
+        date_gte = None
+        date_lte = None
+        if decade:
+            if decade == "pre-1960s":
+                date_lte = "1959-12-31"
+            elif decade.endswith("s") and decade[:4].isdigit():
+                start_year = int(decade[:4])
+                end_year = start_year + 9
+                date_gte = f"{start_year}-01-01"
+                date_lte = f"{end_year}-12-31"
+
+        def _matches_filters(movie):
+            if genre_id:
+                genre_ids = movie.get("genre_ids") or []
+                try:
+                    gid = int(genre_id)
+                except (TypeError, ValueError):
+                    gid = None
+                if gid and gid not in genre_ids:
+                    return False
+
+            if date_gte or date_lte:
+                release_date = movie.get("release_date") or ""
+                if not release_date:
+                    return False
+                if date_gte and release_date < date_gte:
+                    return False
+                if date_lte and release_date > date_lte:
+                    return False
+
+            return True
+
         if search_query:
-            # Use search endpoint with genre filter
+            # Use search endpoint for text query, then apply genre/decade filters locally.
             encoded_query = quote_plus(search_query)
-            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&with_genres={genre_id}&language=en-US&page={page}"
-        else:
-            # Use discover endpoint for popular movies in this genre
-            url = f"{base_url}/discover/movie?api_key={API_KEY}&with_genres={genre_id}&language=en-US&page={page}&sort_by=popularity.desc"
+            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page={page}"
+            print(f"DiscoverMovies(search) - {url}")
+            response = requests.get(url)
+            if response.status_code == 200:
+                payload = response.json() or {}
+                payload["results"] = [
+                    movie
+                    for movie in (payload.get("results") or [])
+                    if _matches_filters(movie)
+                ]
+                return payload
+            return {
+                "error": f"Failed to fetch movies. Status {response.status_code}: {response.text}"
+            }, response.status_code
+
+        # No search query: use discover endpoint with server-side filters.
+        url = (
+            f"{base_url}/discover/movie?api_key={API_KEY}&language=en-US&page={page}"
+            "&sort_by=popularity.desc"
+        )
+        if genre_id:
+            url += f"&with_genres={quote_plus(str(genre_id))}"
+        if date_gte:
+            url += f"&primary_release_date.gte={date_gte}"
+        if date_lte:
+            url += f"&primary_release_date.lte={date_lte}"
 
         print(f"DiscoverMovies - {url}")
 
@@ -843,4 +1234,5 @@ def register_routes(api):
     api.add_resource(MovieRatings, "/api/movie-ratings")
     api.add_resource(MovieRatingsBulk, "/api/movie-ratings-bulk")
     api.add_resource(DeleteMovie, "/api/movies/<int:movie_id>/delete")
+    api.add_resource(MovieTmdbInvestigation, "/api/movies/<int:movie_id>/tmdb")
     api.add_resource(DeleteArticle, "/api/articles/<int:article_id>/delete")

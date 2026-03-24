@@ -30,23 +30,13 @@ function Movies({ showMovies, cardSize = 'default' }) {
     <CardContainer>
       <Carousel noResultsMessage="No movies found">
         {showMovies.map((movie, index) => {
-          // Get rating for this movie
-          let rating = null;
-          let movieWithCorrectId = movie;
-
-          if (movie.externalId) {
-            // External movie - look up by external ID
-            const movieData = ratingsMap[movie.externalId];
-            rating = movieData?.rating || null;
-            const localId = movieData?.local_id;
-            if (localId) {
-              movieWithCorrectId = { ...movie, id: localId };
-            }
-          } else {
-            // Local movie - look up by local ID
-            const localData = ratingsMap[movie.id];
-            rating = localData?.rating || null;
-          }
+          const movieData = movie.externalId
+            ? ratingsMap[movie.externalId]
+            : ratingsMap[movie.id];
+          const rating = movieData?.rating ?? null;
+          const hasReview = Boolean(movieData);
+          const localId = movieData?.local_id;
+          const movieWithCorrectId = localId ? { ...movie, id: localId } : movie;
 
           return (
             <MotionWrapper key={movie.title} index={index}>
@@ -58,7 +48,12 @@ function Movies({ showMovies, cardSize = 'default' }) {
                   flexShrink: 0,
                 }}
               >
-                <MovieCard movie={movieWithCorrectId} rating={rating} size={cardSize} />
+                <MovieCard
+                  movie={movieWithCorrectId}
+                  rating={rating}
+                  hasReview={hasReview}
+                  size={cardSize}
+                />
               </div>
             </MotionWrapper>
           );

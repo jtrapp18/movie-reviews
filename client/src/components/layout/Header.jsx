@@ -14,6 +14,8 @@ const StyledHeader = styled.div`
   display: flex;
   justify-content: space-between;
   background: var(--background-secondary);
+  border-bottom: 1px solid rgba(0, 17, 61, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.02);
   padding: 1.5% 5% 0.5%;
   align-items: end;
   position: relative;
@@ -21,8 +23,8 @@ const StyledHeader = styled.div`
 
 const LeftSection = styled.div`
   display: flex;
-  align-items: end;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.7rem;
   z-index: 1;
 `;
 
@@ -37,16 +39,17 @@ const HeaderTitle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: center;
+  transform: translateY(2px);
   z-index: 1;
 
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 500;
     // color: var(--font-color-1);
     margin: 0;
-    line-height: 1.1;
+    line-height: 1;
     transform: rotate(-1deg);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   }
@@ -55,7 +58,8 @@ const HeaderTitle = styled.div`
     font-family: inherit;
     font-size: 0.75rem;
     color: var(--cinema-maroon);
-    margin-top: 1px;
+    margin-top: 0;
+    line-height: 1.1;
     font-weight: 400;
     font-style: italic;
   }
@@ -66,7 +70,7 @@ const Header = () => {
   useContext(UserContext);
 
   return (
-    <Headroom>
+    <Headroom style={{ zIndex: 900 }}>
       <StyledHeader>
         {/* <VintagePhotoRoll
               src={vintagePhotoRoll}

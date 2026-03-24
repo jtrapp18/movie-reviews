@@ -15,6 +15,7 @@ import { StyledContainer } from '@styles';
 import EntityDetailState from '@components/layout/EntityDetailState';
 import {
   DetailContentCard,
+  DetailBelowFold,
   LikeBar,
   RelatedSection,
   RelatedHeading,
@@ -95,13 +96,15 @@ function ArticleBody({ article, articles, user, setArticle }) {
           </LikeBar>
           <ArticleForm initObj={article} />
         </DetailContentCard>
-        <CommentList reviewId={article.id} />
-        {relatedArticles.length > 0 && (
-          <RelatedSection>
-            <RelatedHeading>More Articles</RelatedHeading>
-            <ArticlesCarousel showArticles={relatedArticles} />
-          </RelatedSection>
-        )}
+        <DetailBelowFold>
+          <CommentList reviewId={article.id} />
+          {relatedArticles.length > 0 && (
+            <RelatedSection>
+              <RelatedHeading>More Articles</RelatedHeading>
+              <ArticlesCarousel showArticles={relatedArticles} />
+            </RelatedSection>
+          )}
+        </DetailBelowFold>
       </StyledContainer>
     </>
   );

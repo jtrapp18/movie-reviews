@@ -5,14 +5,23 @@ import { Movies } from '@features/movies';
 import { Articles, RecentPosts } from '@features/articles';
 import { Directors } from '@features/directors';
 import Section from '@components/layout/Section';
+import MotionWrapper from '@styles/MotionWrapper';
+import { CONTAINER_MAX_WIDTH } from '@styles';
 import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
+import HomeHero, { HomeHeroFilterPills } from './HomeHero';
+import {
+  ActivityFeedList,
+  ContinueReadingList,
+  SidePanelBlock,
+  SidePanelHeadingLabel,
+} from '@features/sidePanel';
 
 const StyledContainer = styled.div`
   padding: 0;
-  margin-top: 20px;
+  margin-top: 0;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -21,13 +30,117 @@ const StyledContainer = styled.div`
   min-height: 100vh;
 `;
 
-function Home() {
+/**
+ * Split rail + feed only for the “above the fold” home block (recent posts).
+ * Carousels / sections below use HomeBelowFold so we don’t reserve
+ * empty sidebar space next to long scrolling content.
+ */
+const HomeSplitShell = styled.div`
+  align-self: stretch;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  display: flex;
+  flex-direction: column;
+  /* No background — main column uses page bg; sidebar sets its own */
+  box-sizing: border-box;
+
+  @media (min-width: 1024px) {
+    flex-direction: ${({ $searchActive }) => ($searchActive ? 'column' : 'row')};
+    align-items: stretch;
+  }
+`;
+
+/** ~25% wider than original 280px rail for continue-reading cards */
+const HOME_SIDEBAR_WIDTH_PX = 350;
+
+const HomeSidebar = styled.aside`
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-sizing: border-box;
+  padding: 1rem 0.85rem 1rem 1.35rem;
+  /* “Background 2” in design tokens */
+  background: var(--background-secondary);
+  /* Same as global h3 / subhead; uses --font-color-3 (see index.css) */
+  border-right: 1px solid var(--font-color-3);
+
+  @media (min-width: 1024px) {
+    display: ${({ $searchActive }) => ($searchActive ? 'none' : 'flex')};
+    flex: 0 0 ${HOME_SIDEBAR_WIDTH_PX}px;
+    width: ${HOME_SIDEBAR_WIDTH_PX}px;
+    min-height: 0;
+    align-self: stretch;
+  }
+`;
+
+/** Fills space to the right of the sidebar; does not set a max-width (flex quirk fix). */
+const HomeMainArea = styled.div`
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  background: transparent;
+`;
+
+/**
+ * Capped at medium width — `width: min(100%, …)` so flex row doesn’t stretch past 1200px
+ * (plain max-width on a flex:1 child was not reliably constraining).
+ */
+const HomeMainColumn = styled.div`
+  width: min(100%, ${CONTAINER_MAX_WIDTH.medium});
+  max-width: ${CONTAINER_MAX_WIDTH.medium};
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: clamp(1.25rem, 3vw, 2rem) 1rem 2rem;
+  box-sizing: border-box;
+`;
+
+const RecentPostsBlock = styled.div`
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+
+  h1,
+  h2 {
+    text-align: center;
+    margin: 0;
+  }
+
+  h3 {
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+`;
+
+/** Full-width band under the split — carousels align to same max-width column */
+const HomeBelowFold = styled.div`
+  align-self: stretch;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+`;
+
+export default function Home() {
   const { movies, articles, posts, directors } = useOutletContext();
 
   const [showMovies, setShowMovies] = useState([]);
   const [showArticles, setShowArticles] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchInputValue, setSearchInputValue] = useState('');
+  const [activeHeroFilter, setActiveHeroFilter] = useState('all');
   const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
@@ -50,11 +163,14 @@ function Home() {
       setShowDirectors(directors);
       setIsSearching(false);
       setSearchQuery('');
+      setSearchInputValue('');
+      setActiveHeroFilter('all');
       return;
     }
 
     setIsSearching(true);
     setSearchQuery(text);
+    setSearchInputValue(text);
 
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(text)}`);
@@ -76,6 +192,22 @@ function Home() {
     }
   };
 
+  const HERO_FILTER_TO_QUERY = {
+    all: '',
+    reviews: 'reviews',
+    essays: 'essays',
+    directors: 'directors',
+    '1970s': '1970s',
+    cinematography: 'cinematography',
+  };
+
+  const handleHeroFilterSelect = (filterId) => {
+    const query = HERO_FILTER_TO_QUERY[filterId] ?? '';
+    setActiveHeroFilter(filterId);
+    setSearchInputValue(query);
+    unifiedSearch(query);
+  };
+
   const structuredData = generateWebsiteStructuredData();
 
   return (
@@ -93,62 +225,120 @@ function Home() {
           subtitle={null}
           searchPlaceholder="Search movies, reviews, articles, and tags..."
           onSearch={unifiedSearch}
+          searchValue={searchInputValue}
+          onSearchValueChange={(value) => {
+            setSearchInputValue(value);
+            if (!value.trim()) {
+              setActiveHeroFilter('all');
+            } else {
+              setActiveHeroFilter('');
+            }
+          }}
           isLoading={isSearching}
           loadingText="Searching"
           showHeader={false}
+          containerSize="medium"
+          hero={<HomeHero />}
+          heroSearchPrimaryBand
+          heroBandBackgroundImage="/images/spotlight.jpeg"
+          heroBandFooter={
+            <HomeHeroFilterPills
+              activeFilter={activeHeroFilter}
+              onSelectFilter={handleHeroFilterSelect}
+            />
+          }
+          searchBarVariant="hero"
+          contentFlushTop
         >
           <>
             {/* Search results header */}
-            {searchQuery && (
-              <SearchResultsHeader
-                searchQuery={searchQuery}
-                movieCount={showMovies.length}
-                articleCount={showArticles.length}
-                isLoading={isSearching}
-                showNoResults={
-                  !isSearching && showMovies.length === 0 && showArticles.length === 0
-                }
-              />
-            )}
+            <HomeSplitShell $searchActive={Boolean(searchQuery)}>
+              <HomeSidebar $searchActive={Boolean(searchQuery)} aria-label="Sidebar">
+                <SidePanelBlock
+                  title={
+                    <SidePanelHeadingLabel>CONTINUE READING</SidePanelHeadingLabel>
+                  }
+                  titleId="side-panel-continue-heading"
+                  motionIndex={1}
+                >
+                  <ContinueReadingList posts={posts} limit={5} />
+                </SidePanelBlock>
+                <SidePanelBlock
+                  title={<SidePanelHeadingLabel>RECENT ACTIVITY</SidePanelHeadingLabel>}
+                  titleId="side-panel-activity-heading"
+                  motionIndex={2}
+                >
+                  <ActivityFeedList />
+                </SidePanelBlock>
+              </HomeSidebar>
 
-            <Section
-              title="Recent Posts"
-              subtitle={searchQuery ? '' : 'Latest movie reviews and articles'}
-              showSearch={false}
-            >
-              <RecentPosts posts={posts} />
-            </Section>
+              <HomeMainArea>
+                <HomeMainColumn>
+                  {searchQuery && (
+                    <SearchResultsHeader
+                      searchQuery={searchQuery}
+                      movieCount={showMovies.length}
+                      articleCount={showArticles.length}
+                      directorCount={showDirectors.length}
+                      isLoading={isSearching}
+                      showNoResults={
+                        !isSearching &&
+                        showMovies.length === 0 &&
+                        showArticles.length === 0 &&
+                        showDirectors.length === 0
+                      }
+                    />
+                  )}
 
-            <hr />
+                  {!searchQuery && (
+                    <RecentPostsBlock>
+                      <MotionWrapper index={3}>
+                        <h1>Recent Posts</h1>
+                      </MotionWrapper>
+                      <MotionWrapper index={4}>
+                        <h3>
+                          <i>Latest movie reviews and articles</i>
+                        </h3>
+                      </MotionWrapper>
+                      <RecentPosts posts={posts} fillColumn />
+                    </RecentPostsBlock>
+                  )}
+                </HomeMainColumn>
+              </HomeMainArea>
+            </HomeSplitShell>
 
-            <Section
-              title="Directors"
-              subtitle={searchQuery ? '' : 'Explore directors in the collection'}
-              showSearch={false}
-            >
-              <Directors directors={showDirectors} />
-            </Section>
+            <HomeBelowFold>
+              <HomeMainColumn>
+                <hr />
 
-            <Section
-              title={searchQuery ? 'Movies' : 'Movie Reviews'}
-              subtitle={searchQuery ? '' : 'Click movie to view review'}
-              showSearch={false}
-            >
-              <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
-            </Section>
+                <Section
+                  title="Directors"
+                  subtitle={searchQuery ? '' : 'Explore directors in the collection'}
+                  showSearch={false}
+                >
+                  <Directors directors={showDirectors} />
+                </Section>
 
-            <Section
-              title={searchQuery ? 'Articles' : 'Articles'}
-              subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
-              showSearch={false}
-            >
-              <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
-            </Section>
+                <Section
+                  title={searchQuery ? 'Movies' : 'Movie Reviews'}
+                  subtitle={searchQuery ? '' : 'Click movie to view review'}
+                  showSearch={false}
+                >
+                  <Movies showMovies={showMovies} enterSearch={unifiedSearch} />
+                </Section>
+
+                <Section
+                  title={searchQuery ? 'Articles' : 'Articles'}
+                  subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
+                  showSearch={false}
+                >
+                  <Articles showArticles={showArticles} enterSearch={unifiedSearch} />
+                </Section>
+              </HomeMainColumn>
+            </HomeBelowFold>
           </>
         </SearchPageFrame>
       </StyledContainer>
     </>
   );
 }
-
-export default Home;

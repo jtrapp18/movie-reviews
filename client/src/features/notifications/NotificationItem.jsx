@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { formatRelativeTime } from '@utils/formatting';
 
 const Row = styled(Link)`
   display: block;
@@ -48,18 +49,6 @@ const Time = styled.span`
   margin-top: 0.2rem;
 `;
 
-function formatRelative(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  const now = new Date();
-  const sec = Math.floor((now - d) / 1000);
-  if (sec < 60) return 'Just now';
-  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
-  if (sec < 604800) return `${Math.floor(sec / 86400)}d ago`;
-  return d.toLocaleDateString();
-}
-
 export default function NotificationItem({ item }) {
   const { eventType, actorUsername, reviewId, reviewTitle, eventAt, read } = item;
   const label =
@@ -80,7 +69,7 @@ export default function NotificationItem({ item }) {
           {reviewTitle.length > 50 ? reviewTitle.slice(0, 50) + '…' : reviewTitle}
         </ReviewRef>
       )}
-      <Time>{formatRelative(eventAt)}</Time>
+      <Time>{formatRelativeTime(eventAt)}</Time>
     </Row>
   );
 }

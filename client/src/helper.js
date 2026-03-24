@@ -1,3 +1,5 @@
+import { devDebug } from './utils/logger.js';
+
 //****************************************************************************************************
 // JSON-server CRUD functionality
 
@@ -28,7 +30,7 @@ function userLogout() {
       if (!res.ok) {
         throw new Error(`HTTP error! Status: ${res.status}`);
       } else {
-        console.log('Successfully logged out');
+        devDebug('[helper] logout succeeded');
       }
     })
     .catch((e) => console.error(e));
@@ -78,7 +80,7 @@ async function getJSON(dbKey, Id = null) {
 function postJSONToDb(dbKey, jsonObj) {
   const snake_object = camelToSnake(jsonObj);
   const url = `/api/${dbKey}`;
-  console.log('[postJSONToDb] POST', url);
+  devDebug('[postJSONToDb] POST', url);
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -110,11 +112,11 @@ function postJSONToDb(dbKey, jsonObj) {
       ) {
         err.serverErrors = errPayload;
       }
-      console.log('[postJSONToDb] Error response', res.status, errPayload);
+      devDebug('[postJSONToDb] Error response', res.status, errPayload);
       throw err;
     }
     const data = await res.json();
-    console.log('[postJSONToDb] Success', res.status, url);
+    devDebug('[postJSONToDb] Success', res.status, url);
     invalidateJsonCache(dbKey);
     return data;
   });
@@ -128,8 +130,9 @@ function patchJSONToDb(dbKey, Id, jsonObj) {
     headers: {
       'Content-Type': 'application/json',
     },
+    credentials: 'include',
     body: JSON.stringify(snake_object),
-  }).then((res) => {
+  }).then(async (res) => {
     if (!res.ok) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
@@ -223,6 +226,46 @@ async function getMoviesByGenre(genreId, searchQuery = null) {
     return movieInfo;
   } catch (err) {
     console.error('Request failed for genre', genreId, err);
+    return [];
+  }
+}
+
+async function getMoviesByFilters({
+  genreId = null,
+  decade = null,
+  searchQuery = null,
+} = {}) {
+  const params = new URLSearchParams();
+  if (genreId) params.append('genre_id', genreId);
+  if (decade) params.append('decade', decade);
+  if (searchQuery) params.append('search', searchQuery);
+
+  const imgUrl = 'https://image.tmdb.org/t/p/w1280';
+  const url = `/api/discover_movies?${params.toString()}`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      console.error(`Error fetching filtered movies! Status: ${res.status}`);
+      return [];
+    }
+
+    const data = await res.json();
+    const camelData = snakeToCamel(data.results || []);
+    return camelData.map((m) => ({
+      externalId: m.id,
+      originalLanguage: m.originalLanguage,
+      originalTitle: m.originalTitle,
+      overview: m.overview,
+      title: m.title,
+      releaseDate: m.releaseDate,
+      coverPhoto: `${imgUrl}${m.posterPath}`,
+      backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
+      voteAverage: m.voteAverage,
+      genreIds: m.genreIds,
+    }));
+  } catch (err) {
+    console.error('Request failed for filters', { genreId, decade, searchQuery, err });
     return [];
   }
 }
@@ -401,7 +444,7 @@ function isCacheValid(timestamp) {
 // Invalidate ratings cache (call when ratings are updated)
 function invalidateRatingsCache() {
   ratingsCache.clear();
-  console.log('Ratings cache invalidated');
+  devDebug('ratings cache invalidated');
 }
 
 // Optimized function to get ratings for a list of movies (handles both local and external)
@@ -412,7 +455,7 @@ async function getMovieRatings(movies) {
   const cacheKey = generateCacheKey(movies);
   const cached = ratingsCache.get(cacheKey);
   if (cached && isCacheValid(cached.timestamp)) {
-    console.log('Using cached ratings for', movies.length, 'movies');
+    devDebug('[helper] ratings cache hit', { movieCount: movies.length });
     return cached.data;
   }
 
@@ -443,7 +486,7 @@ async function getMovieRatings(movies) {
     timestamp: Date.now(),
   });
 
-  console.log('Fetched fresh ratings for', movies.length, 'movies');
+  devDebug('[helper] ratings fetched', { movieCount: movies.length });
   return ratingsMap;
 }
 
@@ -482,6 +525,7 @@ export {
   deleteJSONFromDb,
   getMovieInfo,
   getMoviesByGenre,
+  getMoviesByFilters,
   getLocalMovieRatings,
   getMovieRatingsByExternalIds,
   getMovieRatings,

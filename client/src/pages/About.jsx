@@ -1,16 +1,17 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
-import { StyledContainer, Button } from '@styles';
+import { StaticPageShell, Button } from '@styles';
 import GradingModal from '@components/about/GradingModal';
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const aboutContent = yaml.load(aboutContentYaml);
-
-const Header = styled.div`
-  text-align: center;
-`;
 
 function Paragraphs({ text }) {
   const paragraphs = text
@@ -57,18 +58,25 @@ const ContactMethod = styled.div`
   }
 `;
 
+const ContactPageLink = styled(Link)`
+  color: var(--font-color-1);
+  text-decoration: underline;
+
+  &:hover {
+    color: var(--cinema-gold-dark);
+  }
+`;
+
 function About() {
   const [isGradingOpen, setIsGradingOpen] = useState(false);
 
   return (
     <>
-      <StyledContainer>
-        <Header>
+      <StaticPageShell>
+        <StaticPageHeader>
           <h1>{aboutContent.header.title}</h1>
-          <h3>
-            <i>{aboutContent.header.subtitle}</i>
-          </h3>
-        </Header>
+          <StaticPageSubtitle>{aboutContent.header.subtitle}</StaticPageSubtitle>
+        </StaticPageHeader>
 
         <AboutSection>
           <Paragraphs text={aboutContent.aboutJames.personalStory} />
@@ -78,7 +86,7 @@ function About() {
           <Paragraphs text={aboutContent.aboutJames.closing} />
 
           <Button onClick={() => setIsGradingOpen(true)}>
-            View James&apos;s Film Grading System
+            View James&apos; Film Grading System
           </Button>
         </AboutSection>
 
@@ -99,11 +107,17 @@ function About() {
           {aboutContent.contact.methods.map((method, index) => (
             <ContactMethod key={index}>
               <span className="type">{method.type}:</span>
-              <span className="value">{method.value}</span>
+              <span className="value">
+                {method.type === 'Contact' ? (
+                  <ContactPageLink to="/contact">Contact page</ContactPageLink>
+                ) : (
+                  method.value
+                )}
+              </span>
             </ContactMethod>
           ))}
         </AboutSection>
-      </StyledContainer>
+      </StaticPageShell>
 
       <GradingModal isOpen={isGradingOpen} onClose={() => setIsGradingOpen(false)} />
     </>

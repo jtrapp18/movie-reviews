@@ -1,19 +1,21 @@
 import styled from 'styled-components';
 
 const TextContainer = styled.div`
-  display: flex;
+  display: ${(props) => (props.size ? 'flex' : 'inline-flex')};
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: ${(props) => {
+    if (!props.size) return '0';
     if (props.size === 'small') return '10px';
     if (props.size === 'large') return '60px';
     return props.compact ? '20px' : '40px';
   }};
-  text-align: center;
+  text-align: ${(props) => (props.size ? 'center' : 'inherit')};
 
   & p {
     font-size: ${(props) => {
+      if (!props.size) return 'inherit';
       if (props.size === 'small') return 'var(--default-font-size)';
       if (props.size === 'large') return '20px';
       return props.compact ? '16px' : 'clamp(1.7rem, 4vw, 2rem)';
@@ -26,7 +28,10 @@ const TextContainer = styled.div`
     color: inherit;
     font-size: inherit; // Use the same size as the parent p element
     white-space: nowrap;
-    margin-left: ${(props) => (props.size === 'small' ? '4px' : '8px')};
+    margin-left: ${(props) => {
+      if (!props.size) return '0.2em';
+      return props.size === 'small' ? '4px' : '8px';
+    }};
   }
 
   & .dot {
@@ -69,7 +74,7 @@ const TextContainer = styled.div`
 const AnimatedText = ({
   text = 'Loading',
   compact = false,
-  size = 'medium', // 'small', 'medium', 'large'
+  size, // Omit for inherited inline sizing; use small/medium/large for explicit sizing.
   showDots = true, // Always show dots by default
   className = '',
 }) => {

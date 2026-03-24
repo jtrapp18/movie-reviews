@@ -1,9 +1,11 @@
 import { useMemo, useState, useEffect } from 'react';
 import DirectorCard from '@components/cards/DirectorCard';
 import { SearchPageFrame } from '@features/movies';
+import { MobilePageGutter } from '@styles';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDirectorsList } from '@features/directors/useDirectorsList';
+import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
 
 const Layout = styled.div`
   width: 100%;
@@ -103,51 +105,63 @@ function DirectorsPage() {
 
   return (
     <SearchPageFrame
-      title="Director Highlights"
-      subtitle="A movie is only as good as its director."
+      title={null}
+      subtitle={null}
       searchPlaceholder="Search directors by name or bio..."
       onSearch={(value) => setSearchQuery(value)}
       isLoading={loading}
       loadingText="Loading directors"
+      showHeader={false}
+      heroSearchPrimaryBand
+      heroBandBackgroundImage="/images/spotlight.jpeg"
+      searchBarVariant="hero"
+      hero={
+        <SearchHeroBanner
+          title="Director Highlights"
+          subtitle="A movie is only as good as its director."
+        />
+      }
     >
-      <Layout>
-        <AZColumn>
-          <strong>A–Z</strong>
-          <button
-            type="button"
-            className={!letterFilter ? 'active' : ''}
-            onClick={() => setLetterFilter(null)}
-          >
-            All
-          </button>
-          {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
+      <MobilePageGutter>
+        <Layout>
+          <AZColumn>
+            <strong>A–Z</strong>
             <button
-              key={letter}
               type="button"
-              className={letterFilter === letter ? 'active' : ''}
-              onClick={() => setLetterFilter(letter)}
+              className={!letterFilter ? 'active' : ''}
+              onClick={() => setLetterFilter(null)}
             >
-              {letter}
+              All
             </button>
-          ))}
-        </AZColumn>
+            {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
+              <button
+                key={letter}
+                type="button"
+                className={letterFilter === letter ? 'active' : ''}
+                onClick={() => setLetterFilter(letter)}
+              >
+                {letter}
+              </button>
+            ))}
+          </AZColumn>
 
-        <AccordionContainer>
-          {filteredDirectors.map((director, index) => (
-            <DirectorCard
-              key={director.id}
-              director={director}
-              index={index}
-              variant="detail"
-              movies={director.movies || []}
-              isExpanded={expandedId === director.id}
-              onToggle={(open) => setExpandedId(open ? director.id : null)}
-              onViewPage={() => navigate(`/directors/${director.id}`)}
-            />
-          ))}
-          {!filteredDirectors.length && <p>No directors match your search.</p>}
-        </AccordionContainer>
-      </Layout>
+          <AccordionContainer>
+            {filteredDirectors.map((director, index) => (
+              <DirectorCard
+                key={director.id}
+                director={director}
+                index={index}
+                variant="detail"
+                movies={director.movies || []}
+                isExpanded={expandedId === director.id}
+                onToggle={(open) => setExpandedId(open ? director.id : null)}
+                onViewPage={() => navigate(`/directors/${director.id}`)}
+              />
+            ))}
+            {!filteredDirectors.length && <p>No directors match your search.</p>}
+          </AccordionContainer>
+        </Layout>
+      </MobilePageGutter>
     </SearchPageFrame>
   );
 }

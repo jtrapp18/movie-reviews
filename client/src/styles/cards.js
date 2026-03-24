@@ -128,12 +128,19 @@ const CardOverlay = styled.div`
   padding: 5%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Top-anchored: centering caused long text to clip from the top */
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  text-align: left;
   transition: opacity 0.25s ease;
 
   p {
     font-size: var(--card-font-size);
     color: var(--card-font);
+    flex-shrink: 0;
   }
 
   ${MediaCard}:hover & {

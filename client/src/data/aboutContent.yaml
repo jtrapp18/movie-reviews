@@ -37,7 +37,7 @@ aboutJames:
 
 aboutWebsite:
   intro: |
-    This site serves as James's personal collection of film reviews, critical essays, and thematic analysis.
+    This site serves as James' personal collection of film reviews, critical essays, and thematic analysis.
     Here, you'll find:
 
   contentTypes:
@@ -49,5 +49,5 @@ aboutWebsite:
 contact:
   intro: 'James welcomes feedback, discussion, and recommendations from fellow film enthusiasts.'
   methods:
-    - type: 'Email'
+    - type: 'Contact'
       value: 'jamesryantrapp@gmail.com'

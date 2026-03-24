@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { MobilePageGutter } from '@styles';
 
 /** Card wrapper for review/article detail body (hero + engagement + form) */
 export const DetailContentCard = styled.div`
@@ -16,6 +17,12 @@ export const LikeBar = styled.div`
   justify-content: center;
   padding: 0.5rem 0;
   margin-bottom: 0.5rem;
+`;
+
+/** Comments + related under the main card */
+export const DetailBelowFold = styled(MobilePageGutter)`
+  display: flex;
+  flex-direction: column;
 `;
 
 /** Section below main content (more articles, director suggestions, etc.) */
