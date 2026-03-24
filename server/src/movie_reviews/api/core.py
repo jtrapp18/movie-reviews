@@ -909,18 +909,76 @@ class DiscoverMovies(Resource):
     def get(self):
         genre_id = request.args.get("genre_id")
         search_query = request.args.get("search", "").strip()
+        decade = request.args.get("decade", "").strip()
         page = request.args.get("page", 1)
 
         API_KEY = os.getenv("MOVIE_API_KEY")
         base_url = "https://api.themoviedb.org/3"
 
+        # Decade mapping:
+        # - pre-1960s => <= 1959-12-31
+        # - 1960s => 1960-01-01..1969-12-31, etc.
+        date_gte = None
+        date_lte = None
+        if decade:
+            if decade == "pre-1960s":
+                date_lte = "1959-12-31"
+            elif decade.endswith("s") and decade[:4].isdigit():
+                start_year = int(decade[:4])
+                end_year = start_year + 9
+                date_gte = f"{start_year}-01-01"
+                date_lte = f"{end_year}-12-31"
+
+        def _matches_filters(movie):
+            if genre_id:
+                genre_ids = movie.get("genre_ids") or []
+                try:
+                    gid = int(genre_id)
+                except (TypeError, ValueError):
+                    gid = None
+                if gid and gid not in genre_ids:
+                    return False
+
+            if date_gte or date_lte:
+                release_date = movie.get("release_date") or ""
+                if not release_date:
+                    return False
+                if date_gte and release_date < date_gte:
+                    return False
+                if date_lte and release_date > date_lte:
+                    return False
+
+            return True
+
         if search_query:
-            # Use search endpoint with genre filter
+            # Use search endpoint for text query, then apply genre/decade filters locally.
             encoded_query = quote_plus(search_query)
-            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&with_genres={genre_id}&language=en-US&page={page}"
-        else:
-            # Use discover endpoint for popular movies in this genre
-            url = f"{base_url}/discover/movie?api_key={API_KEY}&with_genres={genre_id}&language=en-US&page={page}&sort_by=popularity.desc"
+            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page={page}"
+            print(f"DiscoverMovies(search) - {url}")
+            response = requests.get(url)
+            if response.status_code == 200:
+                payload = response.json() or {}
+                payload["results"] = [
+                    movie
+                    for movie in (payload.get("results") or [])
+                    if _matches_filters(movie)
+                ]
+                return payload
+            return {
+                "error": f"Failed to fetch movies. Status {response.status_code}: {response.text}"
+            }, response.status_code
+
+        # No search query: use discover endpoint with server-side filters.
+        url = (
+            f"{base_url}/discover/movie?api_key={API_KEY}&language=en-US&page={page}"
+            "&sort_by=popularity.desc"
+        )
+        if genre_id:
+            url += f"&with_genres={quote_plus(str(genre_id))}"
+        if date_gte:
+            url += f"&primary_release_date.gte={date_gte}"
+        if date_lte:
+            url += f"&primary_release_date.lte={date_lte}"
 
         print(f"DiscoverMovies - {url}")
 

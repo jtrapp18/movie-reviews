@@ -1,4 +1,4 @@
-import { getMoviesByGenre, getMovieInfo } from '@helper';
+import { getMoviesByGenre, getMoviesByFilters } from '@helper';
 import { useState, useEffect, useContext } from 'react';
 import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
@@ -16,6 +16,17 @@ const GENRES = [
   { id: 16, name: 'Animation', emoji: '🎨' },
 ];
 
+const GENRE_LABEL_TO_ID = {
+  Action: 28,
+  Comedy: 35,
+  Drama: 18,
+  Horror: 27,
+  'Sci-Fi': 878,
+  Animation: 16,
+  Thriller: 53,
+  Documentary: 99,
+};
+
 function SearchMovies() {
   const navigate = useNavigate();
   const { isAdmin } = useContext(AdminContext);
@@ -24,7 +35,12 @@ function SearchMovies() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchMode, setIsSearchMode] = useState(false);
-  const [activeQuickSearch, setActiveQuickSearch] = useState(null);
+  const [activeGenreId, setActiveGenreId] = useState(null);
+  const [activeDecade, setActiveDecade] = useState(null);
+  const [activeFiltersByGroup, setActiveFiltersByGroup] = useState({
+    Genre: 'All',
+    Decade: 'All',
+  });
 
   const fetchAllGenres = async () => {
     setLoading(true);
@@ -49,10 +65,14 @@ function SearchMovies() {
     }
   };
 
-  const fetchSearchResults = async (searchText) => {
+  const fetchSearchResults = async (searchText, genreId = null, decade = null) => {
     setLoading(true);
     try {
-      const movies = await getMovieInfo(searchText);
+      const movies = await getMoviesByFilters({
+        genreId,
+        decade,
+        searchQuery: searchText || null,
+      });
       setSearchResults(movies || []);
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -68,10 +88,10 @@ function SearchMovies() {
 
   const enterSearch = (text) => {
     setSearchQuery(text);
-    setActiveQuickSearch(null);
-    if (text && text.trim()) {
+    const hasFilters = Boolean(activeGenreId || activeDecade);
+    if ((text && text.trim()) || hasFilters) {
       setIsSearchMode(true);
-      fetchSearchResults(text);
+      fetchSearchResults(text, activeGenreId, activeDecade);
     } else {
       setIsSearchMode(false);
       setSearchResults([]);
@@ -90,6 +110,20 @@ function SearchMovies() {
     { title: 'Genre', labels: ['All', ...GENRES.map((g) => g.name), 'Thriller', 'Documentary'] },
     { title: 'Decade', labels: ['All', 'Pre-1960s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'] },
   ];
+
+  const activeSearchContextText = (() => {
+    const parts = [];
+    if (searchQuery && searchQuery.trim()) {
+      parts.push(searchQuery.trim());
+    }
+    if (activeFiltersByGroup.Genre && activeFiltersByGroup.Genre !== 'All') {
+      parts.push(`Genre: ${activeFiltersByGroup.Genre}`);
+    }
+    if (activeFiltersByGroup.Decade && activeFiltersByGroup.Decade !== 'All') {
+      parts.push(`Decade: ${activeFiltersByGroup.Decade}`);
+    }
+    return parts.join(' • ') || 'All Movies';
+  })();
 
   return (
     <SearchPageFrame
@@ -113,10 +147,33 @@ function SearchMovies() {
       heroBandFooter={
         <SearchHeroBanner
           buttonGroups={quickGroups}
-          activeButton={activeQuickSearch}
-          onButtonClick={(label) => {
-            setActiveQuickSearch(label);
-            enterSearch(label === 'All' ? '' : label);
+          activeButtonsByGroup={activeFiltersByGroup}
+          onButtonClick={(label, groupTitle) => {
+            let nextGenreId = activeGenreId;
+            let nextDecade = activeDecade;
+            const nextActiveByGroup = { ...activeFiltersByGroup };
+
+            if (groupTitle === 'Genre') {
+              nextGenreId = label === 'All' ? null : (GENRE_LABEL_TO_ID[label] ?? null);
+              setActiveGenreId(nextGenreId);
+              nextActiveByGroup.Genre = label;
+            } else if (groupTitle === 'Decade') {
+              nextDecade = label === 'All' ? null : label.toLowerCase();
+              setActiveDecade(nextDecade);
+              nextActiveByGroup.Decade = label;
+            }
+            setActiveFiltersByGroup(nextActiveByGroup);
+
+            const hasSearchText = Boolean(searchQuery && searchQuery.trim());
+            const hasFilters = Boolean(nextGenreId || nextDecade);
+
+            if (hasSearchText || hasFilters) {
+              setIsSearchMode(true);
+              fetchSearchResults(searchQuery, nextGenreId, nextDecade);
+            } else {
+              setIsSearchMode(false);
+              setSearchResults([]);
+            }
           }}
         />
       }
@@ -125,6 +182,7 @@ function SearchMovies() {
         <MotionWrapper index={1}>
           <SearchResultsGrid
             searchQuery={searchQuery}
+            searchContextText={activeSearchContextText}
             movies={searchResults}
             onMovieClick={handleMovieClick}
           />

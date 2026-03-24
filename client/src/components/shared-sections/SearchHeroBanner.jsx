@@ -123,6 +123,7 @@ function SearchHeroBanner({
   buttonLabels = [],
   buttonGroups = [],
   activeButton = null,
+  activeButtonsByGroup = {},
   onButtonClick,
 }) {
   const normalizedGroups =
@@ -131,6 +132,20 @@ function SearchHeroBanner({
       : buttonLabels.length > 0
         ? [{ title: null, labels: buttonLabels }]
         : [];
+
+  const isLabelActive = (groupTitle, label) => {
+    if (
+      groupTitle &&
+      activeButtonsByGroup &&
+      typeof activeButtonsByGroup === 'object'
+    ) {
+      const activeForGroup = activeButtonsByGroup[groupTitle];
+      if (typeof activeForGroup === 'string') {
+        return activeForGroup === label;
+      }
+    }
+    return activeButton === label;
+  };
 
   return (
     <Root>
@@ -151,7 +166,7 @@ function SearchHeroBanner({
               <Pill
                 key={`${group.title || 'group'}-${label}`}
                 type="button"
-                $active={activeButton === label}
+                $active={isLabelActive(group.title || null, label)}
                 onClick={() => onButtonClick?.(label, group.title || null)}
               >
                 {label}
