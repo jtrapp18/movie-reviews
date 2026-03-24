@@ -4,11 +4,11 @@ import { NavLink } from 'react-router-dom';
 const LogoContainer = styled.div`
   height: fit-content;
   display: flex;
-  align-items: end;
-  margin-top: 0.3rem;
+  align-items: center;
+  margin-top: 0;
 
   img {
-    height: clamp(1.5rem, 5vw, 3rem);
+    height: clamp(1.5rem, 4.4vw, 2.8rem);
     transition: transform 0.3s ease-in-out;
 
     &:hover {

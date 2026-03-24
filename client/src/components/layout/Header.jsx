@@ -23,8 +23,8 @@ const StyledHeader = styled.div`
 
 const LeftSection = styled.div`
   display: flex;
-  align-items: end;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.7rem;
   z-index: 1;
 `;
 
@@ -39,16 +39,17 @@ const HeaderTitle = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: center;
+  transform: translateY(2px);
   z-index: 1;
 
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 500;
     // color: var(--font-color-1);
     margin: 0;
-    line-height: 1.1;
+    line-height: 1;
     transform: rotate(-1deg);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   }
@@ -57,7 +58,8 @@ const HeaderTitle = styled.div`
     font-family: inherit;
     font-size: 0.75rem;
     color: var(--cinema-maroon);
-    margin-top: 1px;
+    margin-top: 0;
+    line-height: 1.1;
     font-weight: 400;
     font-style: italic;
   }
