@@ -236,6 +236,24 @@ def _fetch_tmdb_movie_bundle(external_movie_id):
     }, 200
 
 
+def _merge_tmdb_movie_results(*result_lists):
+    """Merge TMDb movie result lists by movie id (deduplicated, popularity-sorted)."""
+    dedup = {}
+    for results in result_lists:
+        for movie in results or []:
+            movie_id = movie.get("id")
+            if not movie_id:
+                continue
+            existing = dedup.get(movie_id)
+            if not existing or (movie.get("popularity") or 0) > (
+                existing.get("popularity") or 0
+            ):
+                dedup[movie_id] = movie
+    merged = list(dedup.values())
+    merged.sort(key=lambda m: (m.get("popularity") or 0), reverse=True)
+    return merged
+
+
 class Movies(Resource):
     def get(self):
         movies = [movie.to_dict() for movie in Movie.query.all()]
@@ -766,10 +784,60 @@ class PullMovieInfo(Resource):
         API_KEY = os.getenv("MOVIE_API_KEY")
         base_url = "https://api.themoviedb.org/3"
 
-        # If there's a search query, use the search endpoint
+        # If there's a search query, search by movie title and director name.
         if searchText:
             encoded_query = quote_plus(searchText)
-            url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+            movie_search_url = f"{base_url}/search/movie?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+            person_search_url = f"{base_url}/search/person?api_key={API_KEY}&query={encoded_query}&language=en-US&page=1"
+
+            print(movie_search_url)
+            movie_response = requests.get(movie_search_url)
+            if movie_response.status_code != 200:
+                return {
+                    "error": (
+                        f"Failed to fetch movie search. Status {movie_response.status_code}: "
+                        f"{movie_response.text}"
+                    )
+                }, movie_response.status_code
+
+            movie_results = (movie_response.json() or {}).get("results", []) or []
+
+            # If the query looks like a director name, include movies tied to matching directors.
+            director_movie_results = []
+            person_response = requests.get(person_search_url)
+            if person_response.status_code == 200:
+                person_results = (person_response.json() or {}).get("results", []) or []
+                director_people = [
+                    p
+                    for p in person_results
+                    if (p.get("known_for_department") == "Directing")
+                    or any(
+                        k.get("media_type") == "movie" and k.get("title")
+                        for k in (p.get("known_for") or [])
+                    )
+                ][:3]
+
+                for person in director_people:
+                    person_id = person.get("id")
+                    if not person_id:
+                        continue
+                    credits_url = (
+                        f"{base_url}/person/{person_id}/movie_credits"
+                        f"?api_key={API_KEY}&language=en-US"
+                    )
+                    credits_response = requests.get(credits_url)
+                    if credits_response.status_code != 200:
+                        continue
+                    crew = (credits_response.json() or {}).get("crew", []) or []
+                    directed_movies = [
+                        m for m in crew if m.get("job") == "Director" and m.get("id")
+                    ]
+                    director_movie_results.extend(directed_movies)
+
+            merged_results = _merge_tmdb_movie_results(
+                movie_results, director_movie_results
+            )
+            return {"results": merged_results}, 200
         else:
             # No search term provided, fetch popular movies
             url = f"{base_url}/movie/popular?api_key={API_KEY}"
