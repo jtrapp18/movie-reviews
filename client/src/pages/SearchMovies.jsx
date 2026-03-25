@@ -46,7 +46,7 @@ function SearchMovies() {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [activeGenreId, setActiveGenreId] = useState(null);
   const [activeDecade, setActiveDecade] = useState(null);
-  const [mode, setMode] = useState('discover'); // 'discover' | 'library'
+  const [mode, setMode] = useState('library'); // 'discover' | 'library'
   const [libraryRatingTier, setLibraryRatingTier] = useState(null); // number (1..7) or null
   const [libraryReleaseBucket, setLibraryReleaseBucket] = useState('All'); // All | Pre-1960s | 1960s...
   const [activeFiltersByGroup, setActiveFiltersByGroup] = useState({
@@ -149,7 +149,7 @@ function SearchMovies() {
     },
   ];
 
-  const modeGroup = [{ title: null, labels: ['Discover', 'My Library'] }];
+  const modeGroup = [{ title: 'Mode', labels: ['My Library', 'Discover'] }];
 
   const libraryTierButtons = (() => {
     // already sorted desc in util; we want highest tier first

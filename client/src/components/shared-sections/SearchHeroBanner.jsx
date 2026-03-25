@@ -1,56 +1,10 @@
 import styled, { css } from 'styled-components';
+import HeroTextStack from '@components/shared-sections/HeroTextStack';
 
 const Root = styled.section`
   width: 100%;
   text-align: center;
   padding: 0.25rem 0 0;
-`;
-
-const Title = styled.p`
-  margin: 0 0 0.35rem;
-  font-family: var(--title-font), serif;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  font-weight: 600;
-  line-height: 1.08;
-  color: rgba(248, 249, 250, 0.96);
-  text-shadow:
-    0 2px 16px rgba(0, 0, 0, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.28);
-`;
-
-const Subtitle = styled.p`
-  margin: 0 0 1rem;
-  font-family: var(--default-font), system-ui, sans-serif;
-  font-size: clamp(0.7rem, 1.65vw, 0.82rem);
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  line-height: 1.5;
-  color: rgba(248, 249, 250, 0.78);
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: min(100%, 22rem);
-  margin: 0.7rem auto 0.95rem;
-`;
-
-const DividerLine = styled.span`
-  flex: 1;
-  height: 1px;
-  max-width: 8rem;
-  background: rgba(255, 255, 255, 0.38);
-`;
-
-const Diamond = styled.span`
-  flex-shrink: 0;
-  width: 0.35rem;
-  height: 0.35rem;
-  background: rgba(255, 255, 255, 0.55);
-  transform: rotate(45deg);
 `;
 
 const GroupWrap = styled.div`
@@ -149,15 +103,13 @@ function SearchHeroBanner({
 
   return (
     <Root>
-      {title ? <Title>{title}</Title> : null}
-      {showDivider && (title || subtitle) ? (
-        <Divider aria-hidden="true">
-          <DividerLine />
-          <Diamond />
-          <DividerLine />
-        </Divider>
-      ) : null}
-      {subtitle ? <Subtitle>{subtitle}</Subtitle> : null}
+      <HeroTextStack
+        title={title}
+        subtitle={subtitle}
+        showDivider={showDivider && Boolean(title || subtitle)}
+        size="hero"
+        tone="onPrimary"
+      />
       {normalizedGroups.map((group, groupIdx) => (
         <GroupWrap key={`${group.title || 'group'}-${groupIdx}`}>
           {group.title ? <GroupLabel>{group.title}</GroupLabel> : null}

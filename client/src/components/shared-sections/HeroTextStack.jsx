@@ -91,7 +91,9 @@ const Diamond = styled.span`
  */
 export default function HeroTextStack({
   eyebrow,
+  eyebrowNode,
   title,
+  titleNode,
   subtitle,
   subtitleNode,
   showDivider = true,
@@ -100,12 +102,26 @@ export default function HeroTextStack({
   tone = 'onPrimary', // 'onPrimary' | 'inherit'
   children,
 }) {
-  if (!eyebrow && !title && !subtitle && !subtitleNode && !children) return null;
+  if (
+    !eyebrow &&
+    !eyebrowNode &&
+    !title &&
+    !titleNode &&
+    !subtitle &&
+    !subtitleNode &&
+    !children
+  ) {
+    return null;
+  }
 
   return (
     <Root $tone={tone}>
-      {eyebrow ? <Eyebrow $size={size}>{eyebrow}</Eyebrow> : null}
-      {title ? <Title $size={size}>{title}</Title> : null}
+      {eyebrowNode ? (
+        eyebrowNode
+      ) : eyebrow ? (
+        <Eyebrow $size={size}>{eyebrow}</Eyebrow>
+      ) : null}
+      {titleNode ? titleNode : title ? <Title $size={size}>{title}</Title> : null}
       {showDivider && (title || subtitle || subtitleNode || children) ? (
         <Divider aria-hidden="true">
           <DividerLine />
@@ -113,13 +129,17 @@ export default function HeroTextStack({
           <DividerLine />
         </Divider>
       ) : null}
-      {subtitleNode
-        ? subtitleNode
-        : subtitle
-          ? subtitleAsTitle
-            ? <Title as="h1" $size={size}>{subtitle}</Title>
-            : <Subtitle $size={size}>{subtitle}</Subtitle>
-          : null}
+      {subtitleNode ? (
+        subtitleNode
+      ) : subtitle ? (
+        subtitleAsTitle ? (
+          <Title as="h1" $size={size}>
+            {subtitle}
+          </Title>
+        ) : (
+          <Subtitle $size={size}>{subtitle}</Subtitle>
+        )
+      ) : null}
       {children ? (
         <div
           style={{
