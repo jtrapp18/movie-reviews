@@ -87,6 +87,8 @@ const SearchResultsHeader = ({
     );
   }
 
+  const context = (searchContextText ?? searchQuery ?? '').trim();
+
   const movieText = movieCount === 1 ? 'movie' : 'movies';
   const articleText = articleCount === 1 ? 'article' : 'articles';
   const directorText = directorCount === 1 ? 'director' : 'directors';
@@ -107,10 +109,11 @@ const SearchResultsHeader = ({
 
   return (
     <HeaderContainer>
-      <Title>
-        Results for{' '}
-        <SearchQuery>&quot;{searchContextText ?? searchQuery}&quot;</SearchQuery>
-      </Title>
+      {context ? (
+        <Title>
+          Results for <SearchQuery>&quot;{context}&quot;</SearchQuery>
+        </Title>
+      ) : null}
       <ResultsCount>{resultsText}</ResultsCount>
     </HeaderContainer>
   );

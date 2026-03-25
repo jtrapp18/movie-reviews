@@ -1,10 +1,12 @@
 import { getMoviesByGenre, getMoviesByFilters } from '@helper';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
 import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import styled from 'styled-components';
+import { getAllGradingTiers } from '@utils/gradingTiers';
 
 // Define genres we want to show
 const GENRES = [
@@ -27,8 +29,15 @@ const GENRE_LABEL_TO_ID = {
   Documentary: 99,
 };
 
+const LibraryStack = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
 function SearchMovies() {
   const navigate = useNavigate();
+  const { movies: libraryMovies = [] } = useOutletContext();
   const { isAdmin } = useContext(AdminContext);
   const [genreData, setGenreData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
@@ -37,12 +46,15 @@ function SearchMovies() {
   const [isSearchMode, setIsSearchMode] = useState(false);
   const [activeGenreId, setActiveGenreId] = useState(null);
   const [activeDecade, setActiveDecade] = useState(null);
+  const [mode, setMode] = useState('discover'); // 'discover' | 'library'
+  const [libraryRatingTier, setLibraryRatingTier] = useState(null); // number (1..7) or null
+  const [libraryReleaseBucket, setLibraryReleaseBucket] = useState('All'); // All | Pre-1960s | 1960s...
   const [activeFiltersByGroup, setActiveFiltersByGroup] = useState({
     Genre: 'All',
     Decade: 'All',
   });
 
-  const fetchAllGenres = async () => {
+  const fetchAllGenres = useCallback(async () => {
     setLoading(true);
     try {
       const promises = GENRES.map(async (genre) => {
@@ -63,7 +75,7 @@ function SearchMovies() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const fetchSearchResults = async (searchText, genreId = null, decade = null) => {
     setLoading(true);
@@ -83,19 +95,29 @@ function SearchMovies() {
   };
 
   useEffect(() => {
-    fetchAllGenres();
-  }, []);
+    if (mode === 'discover') {
+      fetchAllGenres();
+      return;
+    }
+    setLoading(false);
+  }, [mode, fetchAllGenres]);
 
   const enterSearch = (text) => {
     setSearchQuery(text);
+    if (mode === 'library') {
+      setIsSearchMode(true);
+      return;
+    }
+
     const hasFilters = Boolean(activeGenreId || activeDecade);
     if ((text && text.trim()) || hasFilters) {
       setIsSearchMode(true);
       fetchSearchResults(text, activeGenreId, activeDecade);
-    } else {
-      setIsSearchMode(false);
-      setSearchResults([]);
+      return;
     }
+
+    setIsSearchMode(false);
+    setSearchResults([]);
   };
 
   const handleMovieClick = (movie) => {
@@ -107,8 +129,43 @@ function SearchMovies() {
     ? 'Click any movie card to add a new review'
     : 'Click any movie card to view review';
   const quickGroups = [
-    { title: 'Genre', labels: ['All', ...GENRES.map((g) => g.name), 'Thriller', 'Documentary'] },
-    { title: 'Decade', labels: ['All', 'Pre-1960s', '1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'] },
+    {
+      title: 'Genre',
+      labels: ['All', ...GENRES.map((g) => g.name), 'Thriller', 'Documentary'],
+    },
+    {
+      title: 'Decade',
+      labels: [
+        'All',
+        'Pre-1960s',
+        '1960s',
+        '1970s',
+        '1980s',
+        '1990s',
+        '2000s',
+        '2010s',
+        '2020s',
+      ],
+    },
+  ];
+
+  const modeGroup = [{ title: null, labels: ['Discover', 'My Library'] }];
+
+  const libraryTierButtons = (() => {
+    // already sorted desc in util; we want highest tier first
+    return getAllGradingTiers().map((t) => ({ label: t.grade, tier: t.tier }));
+  })();
+
+  const libraryReleaseButtons = [
+    'All',
+    'Pre-1960s',
+    '1960s',
+    '1970s',
+    '1980s',
+    '1990s',
+    '2000s',
+    '2010s',
+    '2020s',
   ];
 
   const activeSearchContextText = (() => {
@@ -116,20 +173,109 @@ function SearchMovies() {
     if (searchQuery && searchQuery.trim()) {
       parts.push(searchQuery.trim());
     }
-    if (activeFiltersByGroup.Genre && activeFiltersByGroup.Genre !== 'All') {
+    if (
+      mode === 'discover' &&
+      activeFiltersByGroup.Genre &&
+      activeFiltersByGroup.Genre !== 'All'
+    ) {
       parts.push(`Genre: ${activeFiltersByGroup.Genre}`);
     }
-    if (activeFiltersByGroup.Decade && activeFiltersByGroup.Decade !== 'All') {
+    if (
+      mode === 'discover' &&
+      activeFiltersByGroup.Decade &&
+      activeFiltersByGroup.Decade !== 'All'
+    ) {
       parts.push(`Decade: ${activeFiltersByGroup.Decade}`);
     }
-    return parts.join(' • ') || 'All Movies';
+    if (mode === 'library' && libraryRatingTier != null) {
+      const label = libraryTierButtons.find((t) => t.tier === libraryRatingTier)?.label;
+      if (label) parts.push(`Rating: ${label}`);
+    }
+    if (mode === 'library' && libraryReleaseBucket && libraryReleaseBucket !== 'All') {
+      parts.push(`Release: ${libraryReleaseBucket}`);
+    }
+    return parts.join(' • ') || (mode === 'library' ? 'My Library' : 'All Movies');
+  })();
+
+  const filteredLibraryMovies = (() => {
+    if (!Array.isArray(libraryMovies)) return [];
+    const q = (searchQuery || '').trim().toLowerCase();
+    const out = q
+      ? libraryMovies.filter((m) => {
+          const directorName =
+            typeof m?.director === 'object' ? m.director?.name : m?.director;
+          return (
+            (m?.title || '').toLowerCase().includes(q) ||
+            (m?.originalTitle || '').toLowerCase().includes(q) ||
+            (m?.overview || '').toLowerCase().includes(q) ||
+            (directorName || '').toLowerCase().includes(q)
+          );
+        })
+      : libraryMovies;
+
+    const byRating =
+      libraryRatingTier == null
+        ? out
+        : out.filter((m) => {
+            const r =
+              Array.isArray(m?.reviews) && m.reviews.length ? m.reviews[0] : null;
+            return Number(r?.rating) === Number(libraryRatingTier);
+          });
+
+    const bucket = (libraryReleaseBucket || 'All').toLowerCase();
+    const byRelease =
+      bucket === 'all'
+        ? byRating
+        : byRating.filter((m) => {
+            const rd = String(m?.releaseDate || m?.release_date || '');
+            if (!rd || rd.length < 4) return false;
+            const year = Number(rd.slice(0, 4));
+            if (!Number.isFinite(year)) return false;
+            if (bucket === 'pre-1960s') return year <= 1959;
+            if (bucket.endsWith('s') && /^\d{4}/.test(bucket)) {
+              const start = Number(bucket.slice(0, 4));
+              return year >= start && year <= start + 9;
+            }
+            return false;
+          });
+
+    return [...byRelease].sort((a, b) =>
+      String(a?.title || '').localeCompare(String(b?.title || ''))
+    );
+  })();
+
+  const libraryRecentlyAdded = (() => {
+    const list = Array.isArray(libraryMovies) ? libraryMovies : [];
+    const withReview = list.filter(
+      (m) => Array.isArray(m?.reviews) && m.reviews.length > 0
+    );
+    const sorted = [...withReview].sort((a, b) => {
+      const aDate = a.reviews?.[0]?.dateAdded || a.reviews?.[0]?.date_added || null;
+      const bDate = b.reviews?.[0]?.dateAdded || b.reviews?.[0]?.date_added || null;
+      return new Date(bDate || 0) - new Date(aDate || 0);
+    });
+    return sorted.slice(0, 20);
+  })();
+
+  const isLibrarySearchActive = (() => {
+    if (mode !== 'library') return false;
+    const hasQuery = Boolean(searchQuery && searchQuery.trim());
+    const hasRating = libraryRatingTier != null;
+    const hasRelease = Boolean(libraryReleaseBucket && libraryReleaseBucket !== 'All');
+    return hasQuery || hasRating || hasRelease;
   })();
 
   return (
     <SearchPageFrame
       title={null}
       subtitle={null}
-      searchPlaceholder={loading ? 'Searching...' : 'Search movies by title, director, year...'}
+      searchPlaceholder={
+        loading
+          ? 'Searching...'
+          : mode === 'library'
+            ? 'Search your library by title, director, overview...'
+            : 'Search movies by title, director, year...'
+      }
       onSearch={enterSearch}
       isLoading={loading}
       loadingText="Loading movies"
@@ -138,47 +284,133 @@ function SearchMovies() {
       heroSearchPrimaryBand
       heroBandBackgroundImage="/images/spotlight.jpeg"
       searchBarVariant="hero"
-      hero={
-        <SearchHeroBanner
-          title="Search Movies"
-          subtitle={introText}
-        />
-      }
+      hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
       heroBandFooter={
-        <SearchHeroBanner
-          buttonGroups={quickGroups}
-          activeButtonsByGroup={activeFiltersByGroup}
-          onButtonClick={(label, groupTitle) => {
-            let nextGenreId = activeGenreId;
-            let nextDecade = activeDecade;
-            const nextActiveByGroup = { ...activeFiltersByGroup };
+        <>
+          <SearchHeroBanner
+            buttonGroups={modeGroup}
+            showDivider={false}
+            activeButtonsByGroup={{
+              Mode: mode === 'library' ? 'My Library' : 'Discover',
+            }}
+            onButtonClick={(label) => {
+              const nextMode = label === 'My Library' ? 'library' : 'discover';
+              setMode(nextMode);
+              setSearchQuery('');
 
-            if (groupTitle === 'Genre') {
-              nextGenreId = label === 'All' ? null : (GENRE_LABEL_TO_ID[label] ?? null);
-              setActiveGenreId(nextGenreId);
-              nextActiveByGroup.Genre = label;
-            } else if (groupTitle === 'Decade') {
-              nextDecade = label === 'All' ? null : label.toLowerCase();
-              setActiveDecade(nextDecade);
-              nextActiveByGroup.Decade = label;
-            }
-            setActiveFiltersByGroup(nextActiveByGroup);
-
-            const hasSearchText = Boolean(searchQuery && searchQuery.trim());
-            const hasFilters = Boolean(nextGenreId || nextDecade);
-
-            if (hasSearchText || hasFilters) {
-              setIsSearchMode(true);
-              fetchSearchResults(searchQuery, nextGenreId, nextDecade);
-            } else {
-              setIsSearchMode(false);
+              // Reset discover-only state when switching modes.
+              setActiveGenreId(null);
+              setActiveDecade(null);
+              setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
               setSearchResults([]);
-            }
-          }}
-        />
+              setIsSearchMode(false);
+              setLibraryRatingTier(null);
+              setLibraryReleaseBucket('All');
+
+              if (nextMode === 'discover') {
+                setLoading(true);
+              } else {
+                setLoading(false);
+              }
+            }}
+          />
+          {mode === 'discover' ? (
+            <SearchHeroBanner
+              buttonGroups={quickGroups}
+              showDivider={false}
+              activeButtonsByGroup={activeFiltersByGroup}
+              onButtonClick={(label, groupTitle) => {
+                let nextGenreId = activeGenreId;
+                let nextDecade = activeDecade;
+                const nextActiveByGroup = { ...activeFiltersByGroup };
+
+                if (groupTitle === 'Genre') {
+                  nextGenreId =
+                    label === 'All' ? null : (GENRE_LABEL_TO_ID[label] ?? null);
+                  setActiveGenreId(nextGenreId);
+                  nextActiveByGroup.Genre = label;
+                } else if (groupTitle === 'Decade') {
+                  nextDecade = label === 'All' ? null : label.toLowerCase();
+                  setActiveDecade(nextDecade);
+                  nextActiveByGroup.Decade = label;
+                }
+                setActiveFiltersByGroup(nextActiveByGroup);
+
+                const hasSearchText = Boolean(searchQuery && searchQuery.trim());
+                const hasFilters = Boolean(nextGenreId || nextDecade);
+
+                if (hasSearchText || hasFilters) {
+                  setIsSearchMode(true);
+                  fetchSearchResults(searchQuery, nextGenreId, nextDecade);
+                } else {
+                  setIsSearchMode(false);
+                  setSearchResults([]);
+                }
+              }}
+            />
+          ) : (
+            <>
+              <SearchHeroBanner
+                buttonGroups={[
+                  {
+                    title: 'Rating',
+                    labels: ['All', ...libraryTierButtons.map((t) => t.label)],
+                  },
+                ]}
+                showDivider={false}
+                activeButtonsByGroup={{
+                  Rating:
+                    libraryRatingTier == null
+                      ? 'All'
+                      : (libraryTierButtons.find((t) => t.tier === libraryRatingTier)
+                          ?.label ?? 'All'),
+                }}
+                onButtonClick={(label) => {
+                  if (label === 'All') {
+                    setLibraryRatingTier(null);
+                    setIsSearchMode(true);
+                    return;
+                  }
+                  const found = libraryTierButtons.find((t) => t.label === label);
+                  setLibraryRatingTier(found?.tier ?? null);
+                  setIsSearchMode(true);
+                }}
+              />
+              <SearchHeroBanner
+                buttonGroups={[
+                  { title: 'Release Date', labels: libraryReleaseButtons },
+                ]}
+                showDivider={false}
+                activeButtonsByGroup={{ 'Release Date': libraryReleaseBucket }}
+                onButtonClick={(label) => {
+                  setLibraryReleaseBucket(label);
+                  setIsSearchMode(true);
+                }}
+              />
+            </>
+          )}
+        </>
       }
     >
-      {isSearchMode ? (
+      {mode === 'library' ? (
+        <MotionWrapper index={1}>
+          <LibraryStack>
+            {isLibrarySearchActive ? null : (
+              <MovieSwimlane
+                genre={{ name: 'Recently added' }}
+                movies={libraryRecentlyAdded}
+                onMovieClick={handleMovieClick}
+              />
+            )}
+            <SearchResultsGrid
+              searchQuery={isLibrarySearchActive ? searchQuery : null}
+              searchContextText={isLibrarySearchActive ? activeSearchContextText : null}
+              movies={filteredLibraryMovies}
+              onMovieClick={handleMovieClick}
+            />
+          </LibraryStack>
+        </MotionWrapper>
+      ) : isSearchMode ? (
         <MotionWrapper index={1}>
           <SearchResultsGrid
             searchQuery={searchQuery}
