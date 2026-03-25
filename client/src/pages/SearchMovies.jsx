@@ -280,6 +280,7 @@ function SearchMovies() {
       isLoading={loading}
       loadingText="Loading movies"
       wide
+      containerSize="full"
       showHeader={false}
       heroSearchPrimaryBand
       heroBandBackgroundImage="/images/spotlight.jpeg"
