@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Rating from './Rating';
+import HeroTextStack from '@components/shared-sections/HeroTextStack';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -44,13 +45,7 @@ const OverlayContent = styled.div`
   max-width: 960px;
   width: 100%;
   text-align: center;
-`;
-
-const Pretitle = styled.p`
-  margin: 0 0 0.35rem 0;
-  color: var(--soft-white);
-  font-style: italic;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  color: rgba(248, 249, 250, 0.96);
 `;
 
 const Title = styled.h1`
@@ -63,6 +58,8 @@ const Subtitle = styled.h2`
   margin: 0 0 0.5rem 0;
   color: var(--soft-white);
   font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 `;
 
@@ -71,6 +68,8 @@ const LinkedSubtitleHeading = styled.h4`
   color: var(--soft-white);
   font-weight: 600;
   line-height: 1.25;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 `;
 
@@ -113,8 +112,15 @@ const RatingOverlayWrapper = styled.div`
   justify-content: center;
 `;
 
+const BelowMetaRow = styled.div`
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: inherit;
+  text-align: center;
+`;
+
 const PublishDate = styled.span`
-  color: var(--soft-white);
+  color: inherit;
 `;
 
 function CoverHeader({
@@ -150,15 +156,22 @@ function CoverHeader({
             title="Go to director page"
             onClick={() => navigate(subtitleLink)}
           >
-            <LinkedSubtitleText>
-              {subtitle}
-            </LinkedSubtitleText>
+            <LinkedSubtitleText>{subtitle}</LinkedSubtitleText>
           </LinkedSubtitle>
         </LinkedSubtitleHeading>
       );
     }
-    return subtitleAsTitle ? <Title>{subtitle}</Title> : <Subtitle>{subtitle}</Subtitle>;
+    const isDirectedBy =
+      typeof subtitle === 'string' && subtitle.toLowerCase().startsWith('directed by');
+    if (isDirectedBy) return <Subtitle>{subtitle}</Subtitle>;
+    return subtitleAsTitle ? (
+      <Title>{subtitle}</Title>
+    ) : (
+      <Subtitle>{subtitle}</Subtitle>
+    );
   };
+
+  const subtitleNode = renderSubtitle();
 
   // If we have an image, render the full hero with overlayed text
   if (imageUrl) {
@@ -168,18 +181,27 @@ function CoverHeader({
           <CoverImage src={imageUrl} alt={title || subtitle || 'cover image'} />
           <Overlay>
             <OverlayContent>
-              {pretitle && <Pretitle>{pretitle}</Pretitle>}
-              {title && <Title>{title}</Title>}
-              {renderSubtitle()}
+              <HeroTextStack
+                eyebrow={pretitle}
+                title={title}
+                subtitleNode={subtitleNode}
+                showDivider={Boolean(subtitleNode)}
+                size="inherit"
+                tone="inherit"
+              />
               {hasRating && (
                 <RatingOverlayWrapper>
                   <Rating rating={rating} />
                 </RatingOverlayWrapper>
               )}
-              {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
             </OverlayContent>
           </Overlay>
         </ImageWrapper>
+        {formattedDate ? (
+          <BelowMetaRow>
+            <PublishDate>Published on {formattedDate}</PublishDate>
+          </BelowMetaRow>
+        ) : null}
       </Wrapper>
     );
   }
@@ -190,18 +212,27 @@ function CoverHeader({
       <ImageWrapper style={{ minHeight: '200px' }}>
         <Overlay>
           <OverlayContent>
-            {pretitle && <Pretitle>{pretitle}</Pretitle>}
-            {title && <Title>{title}</Title>}
-            {renderSubtitle()}
+            <HeroTextStack
+              eyebrow={pretitle}
+              title={title}
+              subtitleNode={subtitleNode}
+              showDivider={Boolean(subtitleNode)}
+              size="inherit"
+              tone="inherit"
+            />
             {hasRating && (
               <RatingOverlayWrapper>
                 <Rating rating={rating} />
               </RatingOverlayWrapper>
             )}
-            {formattedDate && <PublishDate>Published on {formattedDate}</PublishDate>}
           </OverlayContent>
         </Overlay>
       </ImageWrapper>
+      {formattedDate ? (
+        <BelowMetaRow>
+          <PublishDate>Published on {formattedDate}</PublishDate>
+        </BelowMetaRow>
+      ) : null}
     </Wrapper>
   );
 }
