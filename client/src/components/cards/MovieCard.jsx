@@ -1,11 +1,5 @@
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import {
-  MediaCard,
-  CardContent,
-  CardOverlay,
-  CardDate,
-  CardTitle,
-} from '@styles/cards';
+import { MediaCard, CardContent, CardOverlay, CardDate } from '@styles/cards';
 import { useAdmin } from '@hooks/useAdmin';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { RatingOverlay } from '@features/reviews';
@@ -18,6 +12,25 @@ const MetadataContainer = styled.div`
   gap: 4px;
 `;
 
+const CardPrimaryLine = styled.div`
+  font-size: clamp(0.66rem, 1.65vw, 0.74rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--card-font);
+  opacity: 0.78;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  text-align: center;
+  width: 100%;
+
+  ${({ $isTitle }) =>
+    $isTitle
+      ? `
+    letter-spacing: 0.06em;
+    opacity: 0.86;
+  `
+      : ''}
+`;
+
 function MovieCard({
   movie,
   rating = null,
@@ -27,6 +40,10 @@ function MovieCard({
 }) {
   const { originalLanguage, originalTitle, overview, title, releaseDate, coverPhoto } =
     movie;
+  const directorName =
+    typeof movie?.director === 'object' ? movie.director?.name : movie?.director;
+  const year = releaseDate ? String(releaseDate).slice(0, 4) : '';
+  const titleWithYear = year ? `${title} (${year})` : title;
 
   const navigate = useNavigate();
   const { setMovies } = useOutletContext();
@@ -65,13 +82,12 @@ function MovieCard({
     >
       <img src={coverPhoto} alt={`${title} poster`} />
 
-      <CardDate>{releaseDate}</CardDate>
+      {directorName ? <CardDate>{`Directed by ${directorName}`}</CardDate> : null}
 
       <CardContent>
-        <CardTitle>
-          {title}
-          {rating && <RatingOverlay rating={rating} />}
-        </CardTitle>
+        {/* Title intentionally hidden for this card style */}
+        <CardPrimaryLine $isTitle>{titleWithYear}</CardPrimaryLine>
+        {rating ? <RatingOverlay rating={rating} /> : null}
       </CardContent>
 
       <CardOverlay>

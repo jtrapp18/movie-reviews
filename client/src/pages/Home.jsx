@@ -11,7 +11,7 @@ import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
-import HomeHero, { HomeHeroFilterPills } from './HomeHero';
+import HomeHero from './HomeHero';
 import {
   ActivityFeedList,
   ContinueReadingList,
@@ -140,7 +140,6 @@ export default function Home() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInputValue, setSearchInputValue] = useState('');
-  const [activeHeroFilter, setActiveHeroFilter] = useState('all');
   const [showDirectors, setShowDirectors] = useState([]);
 
   useEffect(() => {
@@ -164,7 +163,6 @@ export default function Home() {
       setIsSearching(false);
       setSearchQuery('');
       setSearchInputValue('');
-      setActiveHeroFilter('all');
       return;
     }
 
@@ -192,22 +190,6 @@ export default function Home() {
     }
   };
 
-  const HERO_FILTER_TO_QUERY = {
-    all: '',
-    reviews: 'reviews',
-    essays: 'essays',
-    directors: 'directors',
-    '1970s': '1970s',
-    cinematography: 'cinematography',
-  };
-
-  const handleHeroFilterSelect = (filterId) => {
-    const query = HERO_FILTER_TO_QUERY[filterId] ?? '';
-    setActiveHeroFilter(filterId);
-    setSearchInputValue(query);
-    unifiedSearch(query);
-  };
-
   const structuredData = generateWebsiteStructuredData();
 
   return (
@@ -228,11 +210,6 @@ export default function Home() {
           searchValue={searchInputValue}
           onSearchValueChange={(value) => {
             setSearchInputValue(value);
-            if (!value.trim()) {
-              setActiveHeroFilter('all');
-            } else {
-              setActiveHeroFilter('');
-            }
           }}
           isLoading={isSearching}
           loadingText="Searching"
@@ -241,12 +218,6 @@ export default function Home() {
           hero={<HomeHero />}
           heroSearchPrimaryBand
           heroBandBackgroundImage="/images/spotlight.jpeg"
-          heroBandFooter={
-            <HomeHeroFilterPills
-              activeFilter={activeHeroFilter}
-              onSelectFilter={handleHeroFilterSelect}
-            />
-          }
           searchBarVariant="hero"
           contentFlushTop
         >

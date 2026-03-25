@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import HeroTextStack from '@components/shared-sections/HeroTextStack';
 
 const Root = styled.section`
   width: 100%;
@@ -46,42 +47,6 @@ const Name = styled.p`
       text-shadow:
         0 2px 24px rgba(0, 0, 0, 0.45),
         0 1px 2px rgba(0, 0, 0, 0.35);
-    `}
-`;
-
-const Divider = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: min(100%, 22rem);
-  margin: 0 auto 1rem;
-`;
-
-const DividerLine = styled.span`
-  flex: 1;
-  height: 1px;
-  max-width: 8rem;
-  background: rgba(255, 255, 255, 0.38);
-
-  ${({ $onPrimary }) =>
-    !$onPrimary &&
-    css`
-      background: var(--font-color-3);
-    `}
-`;
-
-const Diamond = styled.span`
-  flex-shrink: 0;
-  width: 0.35rem;
-  height: 0.35rem;
-  background: rgba(255, 255, 255, 0.55);
-  transform: rotate(45deg);
-
-  ${({ $onPrimary }) =>
-    !$onPrimary &&
-    css`
-      background: var(--font-color-3);
     `}
 `;
 
@@ -183,16 +148,22 @@ export function HomeHeroFilterPills({ activeFilter = 'all', onSelectFilter }) {
 function HomeHero({ onPrimary = false }) {
   return (
     <Root $onPrimary={onPrimary} aria-labelledby="home-hero-title">
-      <Eyebrow $onPrimary={onPrimary}>Film criticism & analysis</Eyebrow>
-      <Name id="home-hero-title" $onPrimary={onPrimary}>
-        James Trapp
-      </Name>
-      <Divider aria-hidden="true">
-        <DividerLine $onPrimary={onPrimary} />
-        <Diamond $onPrimary={onPrimary} />
-        <DividerLine $onPrimary={onPrimary} />
-      </Divider>
-      <Categories $onPrimary={onPrimary}>Reviews · Essays · Directors</Categories>
+      <HeroTextStack
+        eyebrowNode={
+          <Eyebrow $onPrimary={onPrimary}>Film criticism &amp; analysis</Eyebrow>
+        }
+        titleNode={
+          <Name id="home-hero-title" $onPrimary={onPrimary}>
+            James Trapp
+          </Name>
+        }
+        subtitleNode={
+          <Categories $onPrimary={onPrimary}>Reviews · Essays · Directors</Categories>
+        }
+        showDivider
+        size="inherit"
+        tone={onPrimary ? 'onPrimary' : 'inherit'}
+      />
     </Root>
   );
 }
