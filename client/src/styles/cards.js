@@ -101,8 +101,8 @@ const MediaCard = styled.article`
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.85),
-      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0.92),
+      rgba(0, 0, 0, 0.36),
       transparent
     );
     z-index: 1;
@@ -159,15 +159,21 @@ const CardDate = styled.div`
   background: rgba(0, 0, 0, 0.65);
   padding: 3px 6px;
   border-radius: 4px;
+  max-width: calc(100% - 12px);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 const CardTitle = styled.h2`
   margin: 0;
   line-height: 1.2;
   font-weight: bold;
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: clamp(0.95rem, 2.3vw, 1.12rem);
   color: var(--card-font);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+  width: 100%;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;

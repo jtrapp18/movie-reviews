@@ -16,7 +16,10 @@ const StyledHeader = styled.div`
   background: var(--background-secondary);
   border-bottom: 1px solid rgba(0, 17, 61, 0.1);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.02);
-  padding: 1.5% 5% 0.5%;
+  padding-top: 1.5%;
+  padding-bottom: 0.5%;
+  padding-right: clamp(1rem, 4vw, 3.5rem);
+  padding-left: clamp(0.75rem, 3vw, 2.75rem);
   align-items: end;
   position: relative;
 `;
@@ -26,6 +29,7 @@ const LeftSection = styled.div`
   align-items: center;
   gap: 0.7rem;
   z-index: 1;
+  min-width: 0;
 `;
 
 const RightSection = styled.div`
@@ -42,26 +46,29 @@ const HeaderTitle = styled.div`
   justify-content: center;
   transform: translateY(2px);
   z-index: 1;
+  min-width: 0;
 
   h1 {
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 2.3vw, 1.5rem);
     font-weight: 500;
     // color: var(--font-color-1);
     margin: 0;
     line-height: 1;
     transform: rotate(-1deg);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
   }
 
   .subtitle {
     font-family: inherit;
-    font-size: 0.75rem;
+    font-size: clamp(0.6rem, 1.35vw, 0.75rem);
     color: var(--cinema-maroon);
     margin-top: 0;
     line-height: 1.1;
     font-weight: 400;
     font-style: italic;
+    white-space: nowrap;
   }
 `;
 

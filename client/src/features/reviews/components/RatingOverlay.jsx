@@ -22,7 +22,7 @@ const RatingLabel = styled.i`
   color: var(--cinema-gold);
   width: 100%;
   text-align: center;
-  font-size: clamp(0.78rem, 1.8vw, 0.95rem);
+  font-size: clamp(0.72rem, 1.65vw, 0.88rem);
   line-height: 1.1;
   text-wrap: balance;
   overflow-wrap: anywhere;
