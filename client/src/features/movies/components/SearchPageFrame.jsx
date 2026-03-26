@@ -177,6 +177,36 @@ const HeroSearchBandInner = styled.div`
   }
 `;
 
+const SearchRow = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 800px) auto 1fr;
+  align-items: center;
+  column-gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr minmax(0, 800px) 1fr;
+    row-gap: 0.5rem;
+  }
+`;
+
+const SearchRowCenter = styled.div`
+  grid-column: 2;
+  width: 100%;
+`;
+
+const SearchRowRight = styled.div`
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  @media (max-width: 768px) {
+    grid-column: 2;
+    justify-content: center;
+  }
+`;
+
 export default function SearchPageFrame({
   title,
   subtitle,
@@ -204,6 +234,8 @@ export default function SearchPageFrame({
   searchValue,
   /** Optional callback for controlled SearchBar updates */
   onSearchValueChange,
+  /** Optional right-side controls aligned with the SearchBar (e.g. Mode toggle) */
+  searchBarRightSlot,
   children,
 }) {
   const Container = wide ? PageContainer : SearchFrameShell;
@@ -233,26 +265,40 @@ export default function SearchPageFrame({
         <HeroSearchPrimaryBand $wide={wide} $heroImageUrl={heroBandBackgroundImage}>
           <HeroSearchBandInner $size={containerSize}>
             {heroForBand}
-            <SearchBar
-              enterSearch={onSearch}
-              placeholder={searchPlaceholder}
-              variant={searchBarVariant}
-              value={searchValue}
-              onValueChange={onSearchValueChange}
-            />
+            <SearchRow>
+              <SearchRowCenter>
+                <SearchBar
+                  enterSearch={onSearch}
+                  placeholder={searchPlaceholder}
+                  variant={searchBarVariant}
+                  value={searchValue}
+                  onValueChange={onSearchValueChange}
+                />
+              </SearchRowCenter>
+              {searchBarRightSlot ? (
+                <SearchRowRight>{searchBarRightSlot}</SearchRowRight>
+              ) : null}
+            </SearchRow>
             {heroBandFooter}
           </HeroSearchBandInner>
         </HeroSearchPrimaryBand>
       ) : (
         <>
           {hero ? <HeroSlot>{hero}</HeroSlot> : null}
-          <SearchBar
-            enterSearch={onSearch}
-            placeholder={searchPlaceholder}
-            variant={searchBarVariant}
-            value={searchValue}
-            onValueChange={onSearchValueChange}
-          />
+          <SearchRow>
+            <SearchRowCenter>
+              <SearchBar
+                enterSearch={onSearch}
+                placeholder={searchPlaceholder}
+                variant={searchBarVariant}
+                value={searchValue}
+                onValueChange={onSearchValueChange}
+              />
+            </SearchRowCenter>
+            {searchBarRightSlot ? (
+              <SearchRowRight>{searchBarRightSlot}</SearchRowRight>
+            ) : null}
+          </SearchRow>
         </>
       )}
 

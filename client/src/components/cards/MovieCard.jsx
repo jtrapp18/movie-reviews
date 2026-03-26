@@ -82,7 +82,7 @@ function MovieCard({
     >
       <img src={coverPhoto} alt={`${title} poster`} />
 
-      {directorName ? <CardDate>{`Directed by ${directorName}`}</CardDate> : null}
+      {directorName ? <CardDate>{directorName}</CardDate> : null}
 
       <CardContent>
         {/* Title intentionally hidden for this card style */}

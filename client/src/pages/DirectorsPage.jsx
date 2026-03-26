@@ -9,59 +9,51 @@ import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
 
 const Layout = styled.div`
   width: 100%;
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+`;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+const LetterRow = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.22rem;
+  padding: 0.15rem 0 0.35rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+
+  &::-webkit-scrollbar {
+    height: 4px;
   }
 `;
 
-const AZColumn = styled.aside`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-top: 4px;
-  font-size: 0.95rem;
-  color: var(--font-color-2);
+const LetterBtn = styled.button`
+  flex: 0 0 auto;
+  padding: 0.15rem 0.28rem;
+  border-radius: 8px;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+  border: 1px solid transparent;
+  background: transparent;
+  color: ${({ $active }) =>
+    $active ? 'rgba(248, 249, 250, 0.98)' : 'rgba(248, 249, 250, 0.78)'};
+  text-decoration: ${({ $active }) => ($active ? 'underline' : 'none')};
+  text-underline-offset: 0.22em;
 
-  button {
-    background: transparent;
-    border: none;
-    text-align: left;
-    padding: 2px 0;
-    cursor: pointer;
-    color: inherit;
-  }
-
-  button.active {
-    font-weight: 600;
-    color: var(--font-color-1);
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    padding-top: 0;
-    margin-bottom: 0.75rem;
-    overflow-x: auto;
-    padding-bottom: 4px;
-
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    & > strong {
-      flex-shrink: 0;
-    }
-
-    button {
-      flex-shrink: 0;
-      padding: 2px 6px;
-      font-size: 0.85rem;
-    }
+  &:hover {
+    color: rgba(248, 249, 250, 0.95);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
   }
 `;
 
@@ -84,7 +76,13 @@ function DirectorsPage() {
     let list = directors;
 
     if (letterFilter) {
-      list = list.filter((d) => (d.name || '').toUpperCase().startsWith(letterFilter));
+      list = list.filter((d) => {
+        const name = (d.name || '').toUpperCase();
+        if (letterFilter === 'XYZ') {
+          return name.startsWith('X') || name.startsWith('Y') || name.startsWith('Z');
+        }
+        return name.startsWith(letterFilter);
+      });
     }
 
     if (!searchQuery.trim()) return list;
@@ -121,30 +119,38 @@ function DirectorsPage() {
           subtitle="A movie is only as good as its director."
         />
       }
+      heroBandFooter={
+        <LetterRow aria-label="Filter directors by letter">
+          <LetterBtn
+            type="button"
+            $active={!letterFilter}
+            onClick={() => setLetterFilter(null)}
+          >
+            All
+          </LetterBtn>
+          {'ABCDEFGHIJKLMNOPQRSTUVW'.split('').map((letter) => (
+            <LetterBtn
+              key={letter}
+              type="button"
+              $active={letterFilter === letter}
+              onClick={() => setLetterFilter(letter)}
+            >
+              {letter}
+            </LetterBtn>
+          ))}
+          <LetterBtn
+            type="button"
+            $active={letterFilter === 'XYZ'}
+            onClick={() => setLetterFilter('XYZ')}
+            aria-label="X Y Z"
+          >
+            XYZ
+          </LetterBtn>
+        </LetterRow>
+      }
     >
       <MobilePageGutter>
         <Layout>
-          <AZColumn>
-            <strong>A–Z</strong>
-            <button
-              type="button"
-              className={!letterFilter ? 'active' : ''}
-              onClick={() => setLetterFilter(null)}
-            >
-              All
-            </button>
-            {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((letter) => (
-              <button
-                key={letter}
-                type="button"
-                className={letterFilter === letter ? 'active' : ''}
-                onClick={() => setLetterFilter(letter)}
-              >
-                {letter}
-              </button>
-            ))}
-          </AZColumn>
-
           <AccordionContainer>
             {filteredDirectors.map((director, index) => (
               <DirectorCard

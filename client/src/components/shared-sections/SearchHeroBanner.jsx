@@ -30,7 +30,7 @@ const PillsRow = styled.div`
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   width: 100%;
   margin: 0;
   padding: 0 0 0.15rem;
@@ -38,9 +38,9 @@ const PillsRow = styled.div`
 
 const Pill = styled.button`
   margin: 0;
-  padding: 0.4rem 0.85rem;
+  padding: 0.32rem 0.7rem;
   font-family: var(--default-font), system-ui, sans-serif;
-  font-size: clamp(0.68rem, 1.5vw, 0.78rem);
+  font-size: clamp(0.64rem, 1.35vw, 0.74rem);
   font-weight: 500;
   letter-spacing: 0.04em;
   border-radius: 9999px;
