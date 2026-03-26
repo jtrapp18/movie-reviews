@@ -1,6 +1,6 @@
 header:
-  title: 'About James Trapp'
-  subtitle: 'Film Critic'
+  title: 'About James'
+  subtitle: 'Film Enthusiest and Critic'
 
 aboutJames:
   personalStory: |
@@ -26,10 +26,8 @@ aboutJames:
     Kurosawa, Stanley Kubrick, Terence Malick, Jean Pierre Melville, Quentin
     Tarantino, David Fincher, and Park Chan-wook, among others.
 
-  intro: |
-    His approach to film criticism combines a mix of academic analysis and personal
-    reflection, with an accessible writing style that makes complex cinematic
-    concepts engaging for all readers.
+  criticismLine: |
+    His approach to film criticism combines a mix of academic analysis and personal reflection, with an accessible writing style that makes complex cinematic concepts engaging for all readers.
 
   closing: |
     Even with an interest in more serious filmmakers, he still loves a hilarious “so
