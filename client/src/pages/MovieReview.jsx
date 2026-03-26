@@ -9,7 +9,7 @@ import { ReviewForm } from '@features/reviews';
 import { CommentList } from '@features/comments';
 import { DirectorCard } from '@features/directors';
 import MovieTmdbInspector from '@components/forms/MovieTmdbInspector';
-import SEOHead from '@components/shared-sections/SEOHead';
+import SEOHead from '@components/sections/SEOHead';
 import { UserContext } from '@context/userProvider';
 import {
   buildMovieReviewDetailPageStructuredData,

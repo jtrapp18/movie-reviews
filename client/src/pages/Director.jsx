@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledContainer, Button } from '@styles';
 import { patchJSONToDb } from '@helper';
-import SEOHead from '@components/shared-sections/SEOHead';
+import SEOHead from '@components/sections/SEOHead';
 import Loading from '@components/ui/Loading';
 import { DirectorBio, DirectorTimeline } from '@features/directors';
 import { useDirector } from '@features/directors/useDirector';

@@ -1,6 +1,6 @@
 import { isValidElement, cloneElement } from 'react';
 import styled, { css } from 'styled-components';
-import SearchBar from '@components/shared-sections/SearchBar';
+import SearchBar from '@components/sections/SearchBar';
 import Loading from '@components/ui/Loading';
 import { StyledSizedContainer, CONTAINER_MAX_WIDTH } from '@styles';
 

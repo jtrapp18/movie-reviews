@@ -4,7 +4,7 @@ import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
-import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
 import { getAllGradingTiers } from '@utils/gradingTiers';
 

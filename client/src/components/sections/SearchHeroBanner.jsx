@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import HeroTextStack from '@components/shared-sections/HeroTextStack';
+import HeroTextStack from '@components/sections/HeroTextStack';
 
 const Root = styled.section`
   width: 100%;

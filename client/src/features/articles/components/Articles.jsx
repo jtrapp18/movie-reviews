@@ -1,7 +1,7 @@
 import { CardContainer, Button } from '@styles';
 import { ArticleCard } from '@features/articles';
 import styled from 'styled-components';
-import Carousel, { ArticleCarouselSlide } from '@components/shared-sections/Carousel';
+import Carousel, { ArticleCarouselSlide } from '@components/sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '@hooks/useAdmin';

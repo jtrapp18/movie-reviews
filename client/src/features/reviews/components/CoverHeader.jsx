@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Rating from './Rating';
-import HeroTextStack from '@components/shared-sections/HeroTextStack';
+import HeroTextStack from '@components/sections/HeroTextStack';
 
 const Wrapper = styled.div`
   width: 100%;
@@ -175,7 +175,8 @@ function CoverHeader({
 
   // If we have an image, render the full hero with overlayed text
   if (imageUrl) {
-    const isLocalImage = typeof imageUrl === 'string' && imageUrl.startsWith('/images/');
+    const isLocalImage =
+      typeof imageUrl === 'string' && imageUrl.startsWith('/images/');
     const isWebp = typeof imageUrl === 'string' && /\.webp(\?|#|$)/i.test(imageUrl);
     const localWebpCandidate =
       typeof imageUrl === 'string'

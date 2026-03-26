@@ -3,10 +3,10 @@ import { Link, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '@/data/aboutContent.yaml?raw';
-import AboutSection from '@components/shared-sections/AboutSection';
+import AboutSection from '@components/sections/AboutSection';
 import { StaticPageShell, Button } from '@styles';
 import GradingModal from '@components/about/GradingModal';
-import HeroTextStack from '@components/shared-sections/HeroTextStack';
+import HeroTextStack from '@components/sections/HeroTextStack';
 
 const aboutContent = yaml.load(aboutContentYaml);
 

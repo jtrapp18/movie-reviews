@@ -4,7 +4,7 @@ import { useArticle } from '@features/articles/useArticle';
 import { Articles as ArticlesCarousel } from '@features/articles';
 import { ArticleForm } from '@features/articles';
 import { CommentList } from '@features/comments';
-import SEOHead from '@components/shared-sections/SEOHead';
+import SEOHead from '@components/sections/SEOHead';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
 import {

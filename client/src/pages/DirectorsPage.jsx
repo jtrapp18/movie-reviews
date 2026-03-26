@@ -5,7 +5,7 @@ import { MobilePageGutter } from '@styles';
 import styled from 'styled-components';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDirectorsList } from '@features/directors/useDirectorsList';
-import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 
 const Layout = styled.div`
   width: 100%;
