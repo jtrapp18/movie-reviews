@@ -2,7 +2,7 @@
  * Simplified form submission using existing helper functions
  */
 
-import { postJSONToDb, patchJSONToDb } from '../helper';
+import { postJSONToDb, patchJSONToDb } from '@helper';
 import { devDebug } from './logger.js';
 
 /**

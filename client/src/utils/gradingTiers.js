@@ -1,7 +1,9 @@
 import yaml from 'js-yaml';
-import gradingTiersYaml from '../data/gradingTiers.yaml?raw';
+import gradingTiersYaml from '@/data/gradingTiers.yaml?raw';
 
-const tiers = (yaml.load(gradingTiersYaml)?.tiers || []).slice().sort((a, b) => b.tier - a.tier);
+const tiers = (yaml.load(gradingTiersYaml)?.tiers || [])
+  .slice()
+  .sort((a, b) => b.tier - a.tier);
 
 function normalizeTier(value) {
   const n = typeof value === 'string' ? Number(value) : value;

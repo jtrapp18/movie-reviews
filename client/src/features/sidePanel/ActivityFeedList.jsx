@@ -50,6 +50,17 @@ const BulletColumn = styled.div`
   min-width: 1.35em;
 `;
 
+const BulletBubble = styled.span`
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--background-tertiary);
+  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+`;
+
 const TextColumn = styled.div`
   flex: 1;
   min-width: 0;
@@ -142,7 +153,9 @@ function ActivityFeedList() {
         return (
           <Row key={`${item.type}-${item.id}`} to={path} title={fullTitle}>
             <BulletColumn>
-              <GlowBullet variant="column" />
+              <BulletBubble aria-hidden>
+                <GlowBullet variant="column" />
+              </BulletBubble>
             </BulletColumn>
             <TextColumn>
               <PrimaryLine>

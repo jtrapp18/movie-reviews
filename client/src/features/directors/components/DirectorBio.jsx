@@ -74,10 +74,16 @@ function DirectorBio({ director, isAdmin = false, onEdit = () => {} }) {
     ? `/api/directors/${id}/backdrop/view?v=${encodeURIComponent(backdrop)}`
     : DIRECTOR_CREW_FALLBACK;
 
-
   return (
     <BioContainer>
-      <Image src={imageSrc} alt={`Backdrop for ${name}`} />
+      {imageSrc === DIRECTOR_CREW_FALLBACK ? (
+        <picture>
+          <source srcSet="/images/crew.webp" type="image/webp" />
+          <Image src={DIRECTOR_CREW_FALLBACK} alt={`Backdrop for ${name}`} />
+        </picture>
+      ) : (
+        <Image src={imageSrc} alt={`Backdrop for ${name}`} />
+      )}
       <InfoShell>
         <Info>
           <NameBlock>

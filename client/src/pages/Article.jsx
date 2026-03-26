@@ -2,9 +2,9 @@ import { useContext } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useArticle } from '@features/articles/useArticle';
 import { Articles as ArticlesCarousel } from '@features/articles';
-import ArticleForm from '@forms/ArticleForm';
-import CommentList from '@components/comments/CommentList';
-import SEOHead from '@components/shared-sections/SEOHead';
+import { ArticleForm } from '@features/articles';
+import { CommentList } from '@features/comments';
+import SEOHead from '@components/sections/SEOHead';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { UserContext } from '@context/userProvider';
 import {

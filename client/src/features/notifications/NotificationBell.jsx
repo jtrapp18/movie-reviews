@@ -6,7 +6,6 @@ import { UserContext } from '@context/userProvider';
 
 const BellWrapper = styled.div`
   position: relative;
-  margin-left: 1rem;
 `;
 
 const BellButton = styled.button`
@@ -14,7 +13,7 @@ const BellButton = styled.button`
   border: none;
   background: none;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.45rem;
   color: var(--font-color);
   display: flex;
   align-items: center;
@@ -24,26 +23,10 @@ const BellButton = styled.button`
   }
 `;
 
-const BellIcon = styled.span`
+const BellIcon = styled.svg`
   width: 1.25rem;
   height: 1.25rem;
-  display: inline-block;
-  border-radius: 999px 999px 0 0;
-  border: 2px solid currentColor;
-  border-bottom: none;
-  position: relative;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -0.25rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0.45rem;
-    height: 0.3rem;
-    border-radius: 999px;
-    background: currentColor;
-  }
+  display: block;
 `;
 
 const Badge = styled.span`
@@ -66,6 +49,7 @@ const Dropdown = styled(DropdownPanel)`
   max-height: 70vh;
   display: flex;
   flex-direction: column;
+  margin-top: 0.4rem;
 `;
 
 const Empty = styled.div`
@@ -95,7 +79,18 @@ function NotificationBell() {
       onMouseOut={() => setIsOpen(false)}
     >
       <BellButton type="button" aria-label="Notifications">
-        <BellIcon aria-hidden />
+        <BellIcon
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
+          <path d="M13.73 21a2 2 0 01-3.46 0" />
+        </BellIcon>
         {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
       </BellButton>
       <Dropdown className={isOpen ? 'open' : 'closed'}>

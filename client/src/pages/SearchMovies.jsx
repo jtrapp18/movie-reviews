@@ -4,7 +4,7 @@ import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
-import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
 import { getAllGradingTiers } from '@utils/gradingTiers';
 
@@ -33,6 +33,37 @@ const LibraryStack = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
+`;
+
+const InlineModeToggle = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px;
+  border-radius: 9999px;
+  background: rgba(248, 249, 250, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+`;
+
+const ModeBtn = styled.button`
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  letter-spacing: 0.04em;
+  color: ${({ $active }) =>
+    $active ? 'rgba(248, 249, 250, 0.95)' : 'rgba(248, 249, 250, 0.68)'};
+  background: ${({ $active }) =>
+    $active ? 'rgba(248, 249, 250, 0.16)' : 'transparent'};
+  border: 1px solid
+    ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.22)' : 'transparent')};
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(248, 249, 250, 0.1);
+    color: rgba(248, 249, 250, 0.92);
+  }
 `;
 
 function SearchMovies() {
@@ -148,8 +179,6 @@ function SearchMovies() {
       ],
     },
   ];
-
-  const modeGroup = [{ title: 'Mode', labels: ['My Library', 'Discover'] }];
 
   const libraryTierButtons = (() => {
     // already sorted desc in util; we want highest tier first
@@ -283,23 +312,19 @@ function SearchMovies() {
       containerSize="full"
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
-      heroBandFooter={
-        <>
-          <SearchHeroBanner
-            buttonGroups={modeGroup}
-            showDivider={false}
-            activeButtonsByGroup={{
-              Mode: mode === 'library' ? 'My Library' : 'Discover',
-            }}
-            onButtonClick={(label) => {
-              const nextMode = label === 'My Library' ? 'library' : 'discover';
+      searchBarRightSlot={
+        <InlineModeToggle aria-label="Mode toggle">
+          <ModeBtn
+            type="button"
+            $active={mode === 'library'}
+            onClick={() => {
+              if (mode === 'library') return;
+              const nextMode = 'library';
               setMode(nextMode);
               setSearchQuery('');
-
-              // Reset discover-only state when switching modes.
               setActiveGenreId(null);
               setActiveDecade(null);
               setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
@@ -307,14 +332,35 @@ function SearchMovies() {
               setIsSearchMode(false);
               setLibraryRatingTier(null);
               setLibraryReleaseBucket('All');
-
-              if (nextMode === 'discover') {
-                setLoading(true);
-              } else {
-                setLoading(false);
-              }
+              setLoading(false);
             }}
-          />
+          >
+            Library
+          </ModeBtn>
+          <ModeBtn
+            type="button"
+            $active={mode === 'discover'}
+            onClick={() => {
+              if (mode === 'discover') return;
+              const nextMode = 'discover';
+              setMode(nextMode);
+              setSearchQuery('');
+              setActiveGenreId(null);
+              setActiveDecade(null);
+              setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+              setSearchResults([]);
+              setIsSearchMode(false);
+              setLibraryRatingTier(null);
+              setLibraryReleaseBucket('All');
+              setLoading(true);
+            }}
+          >
+            Discover
+          </ModeBtn>
+        </InlineModeToggle>
+      }
+      heroBandFooter={
+        <>
           {mode === 'discover' ? (
             <SearchHeroBanner
               buttonGroups={quickGroups}

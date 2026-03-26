@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import ArticleCard from '@components/cards/ArticleCard';
-import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import { ArticleCard } from '@features/articles';
+import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import { SearchPageFrame } from '@features/movies';
 import { CardContainer } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
@@ -70,7 +70,7 @@ function Articles() {
       loadingText="Loading articles..."
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={
         <SearchHeroBanner
