@@ -253,7 +253,7 @@ function About() {
         <HeroInner>
           <HeroTextStack
             title={aboutContent?.header?.title || 'About James'}
-            subtitle={aboutContent?.header?.subtitle || 'Film Enthusiest and Critic'}
+            subtitle={aboutContent?.header?.subtitle || 'Film Enthusiast and Critic'}
             showDivider
             size="hero"
             tone="onPrimary"
