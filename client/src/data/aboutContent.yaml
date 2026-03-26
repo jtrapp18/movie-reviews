@@ -22,9 +22,16 @@ aboutJames:
     French New Wave film he could find at the local libraries. His interest in
     international cinema skyrocketed from there and has not let up since.
 
-    His favorite filmmakers include Martin Scorsese, Alfred Hitchcock, Akira
-    Kurosawa, Stanley Kubrick, Terence Malick, Jean Pierre Melville, Quentin
-    Tarantino, David Fincher, and Park Chan-wook, among others.
+  favoriteFilmmakers:
+    - Martin Scorsese
+    - Alfred Hitchcock
+    - Akira Kurosawa
+    - Stanley Kubrick
+    - Terence Malick
+    - Jean Pierre Melville
+    - Quentin Tarantino
+    - David Fincher
+    - Park Chan-wook
 
   criticismLine: |
     His approach to film criticism combines a mix of academic analysis and personal reflection, with an accessible writing style that makes complex cinematic concepts engaging for all readers.

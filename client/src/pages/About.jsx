@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
 import aboutContentYaml from '../data/aboutContent.yaml?raw';
@@ -15,6 +15,12 @@ function splitParagraphs(text) {
     .split(/\n\s*\n/)
     .map((s) => s.trim().replace(/\n/g, ' '))
     .filter(Boolean);
+}
+
+function normalizeName(s) {
+  return String(s || '')
+    .trim()
+    .toLowerCase();
 }
 
 function Paragraphs({ text }) {
@@ -75,6 +81,23 @@ const AuthorPhoto = styled.img`
     width: 220px;
     margin: 0 auto;
   }
+`;
+
+const DirectorNameLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+`;
+
+// Global CSS sets `span { display: block; }` — force inline for sentence fragments.
+const Inline = styled.span`
+  display: inline;
 `;
 
 const ContentType = styled.div`
@@ -149,10 +172,80 @@ const ContactPageLink = styled(Link)`
 `;
 
 function About() {
+  const { directors: contextDirectors = [] } = useOutletContext() || {};
   const [isGradingOpen, setIsGradingOpen] = useState(false);
   const personalParas = splitParagraphs(aboutContent?.aboutJames?.personalStory);
   const personalLead = personalParas.slice(0, 2);
   const personalRemainder = personalParas.slice(2);
+  const favoriteNames = Array.isArray(aboutContent?.aboutJames?.favoriteFilmmakers)
+    ? aboutContent.aboutJames.favoriteFilmmakers
+    : [];
+
+  const directorsByName = useMemo(() => {
+    const m = new Map();
+    for (const d of contextDirectors || []) {
+      const key = normalizeName(d?.name);
+      const id = d?.id;
+      if (key && id != null) {
+        m.set(key, id);
+      }
+    }
+    return m;
+  }, [contextDirectors]);
+
+  const renderFilmmakerSentence = () => {
+    if (!favoriteNames.length) return null;
+
+    const renderName = (name) => {
+      const normalized = normalizeName(name);
+      const id = directorsByName.get(normalized);
+      return id ? (
+        <DirectorNameLink
+          to={`/directors/${id}`}
+          title={`View ${name} page`}
+          aria-label={`View ${name} page`}
+        >
+          {name}
+        </DirectorNameLink>
+      ) : (
+        <Inline>{name}</Inline>
+      );
+    };
+
+    if (favoriteNames.length === 1) {
+      return (
+        <p>
+          His favorite filmmakers include {renderName(favoriteNames[0])}, among others.
+        </p>
+      );
+    }
+
+    if (favoriteNames.length === 2) {
+      return (
+        <p>
+          His favorite filmmakers include {renderName(favoriteNames[0])} and{' '}
+          {renderName(favoriteNames[1])}, among others.
+        </p>
+      );
+    }
+
+    return (
+      <p>
+        His favorite filmmakers include{' '}
+        {favoriteNames.map((name, idx) => {
+          const isLast = idx === favoriteNames.length - 1;
+          const isSecondLast = idx === favoriteNames.length - 2;
+          return (
+            <Inline key={`${normalizeName(name) || name}-${idx}`}>
+              {renderName(name)}
+              {isLast ? null : isSecondLast ? ', and ' : ', '}
+            </Inline>
+          );
+        })}
+        , among others.
+      </p>
+    );
+  };
 
   return (
     <>
@@ -190,6 +283,8 @@ function About() {
           {personalRemainder.map((p, i) => (
             <p key={`rest-${i}`}>{p}</p>
           ))}
+
+          {renderFilmmakerSentence()}
 
           <p>{aboutContent?.aboutJames?.criticismLine}</p>
 
