@@ -283,7 +283,7 @@ function SearchMovies() {
       containerSize="full"
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
       heroBandFooter={

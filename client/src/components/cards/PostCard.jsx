@@ -107,7 +107,8 @@ const StyledCard = styled.article`
   `}
 `;
 
-const DEFAULT_POST_IMAGE = '/images/default-article.jpeg';
+const DEFAULT_POST_IMAGE_JPEG = '/images/default-article.jpeg';
+const DEFAULT_POST_IMAGE_WEBP = '/images/default-article.webp';
 
 const AUTHOR = 'James Trapp';
 
@@ -167,7 +168,14 @@ function PostCard({
 
   return (
     <StyledCard $compact={compact} onClick={onClick} onMouseEnter={onMouseEnter}>
-      <img src={photo || DEFAULT_POST_IMAGE} alt={title} />
+      {photo ? (
+        <img src={photo} alt={title} />
+      ) : (
+        <picture>
+          <source srcSet={DEFAULT_POST_IMAGE_WEBP} type="image/webp" />
+          <img src={DEFAULT_POST_IMAGE_JPEG} alt={title} />
+        </picture>
+      )}
       <div className="content">
         <h2>{title}</h2>
         {date && <small>{date}</small>}

@@ -217,7 +217,7 @@ export default function Home() {
           containerSize="medium"
           hero={<HomeHero />}
           heroSearchPrimaryBand
-          heroBandBackgroundImage="/images/spotlight.jpeg"
+          heroBandBackgroundImage="/images/spotlight.webp"
           searchBarVariant="hero"
           contentFlushTop
         >

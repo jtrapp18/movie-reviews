@@ -99,6 +99,8 @@ const HeroSearchPrimaryBand = styled.div`
 
   ${({ $heroImageUrl }) => {
     const heroBgSrc = $heroImageUrl;
+    const heroFallbackJpeg = heroBgSrc?.replace(/\.webp(\?|#|$)/i, '.jpeg$1');
+    const heroFallbackJpg = heroBgSrc?.replace(/\.webp(\?|#|$)/i, '.jpg$1');
     return (
       heroBgSrc &&
       css`
@@ -118,7 +120,23 @@ const HeroSearchPrimaryBand = styled.div`
             var(--hero-tint-primary) 0%,
             var(--hero-tint-secondary) 100%
           ),
-          url(${heroBgSrc});
+          url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc});
+        background-image:
+          linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.38) 0%,
+            rgba(0, 0, 0, 0.52) 45%,
+            rgba(0, 0, 0, 0.66) 100%
+          ),
+          linear-gradient(
+            180deg,
+            var(--hero-tint-primary) 0%,
+            var(--hero-tint-secondary) 100%
+          ),
+          image-set(
+            url(${heroBgSrc}) type('image/webp'),
+            url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc}) type('image/jpeg')
+          );
         background-size: cover;
         /* Anchor spotlight fixture to top-right; avoids vertically centered crop */
         background-position: right top;
@@ -176,7 +194,7 @@ export default function SearchPageFrame({
   heroSearchPrimaryBand = false,
   /** When true, no margin between hero/search and page content (e.g. Home flush with split) */
   contentFlushTop = false,
-  /** Optional URL for hero band background (e.g. `/images/spotlight.jpeg`); file lives under `public/` */
+  /** Optional URL for hero band background (e.g. `/images/spotlight.webp`); file lives under `public/` */
   heroBandBackgroundImage = null,
   /** Optional row below the search bar inside the hero band (e.g. filter pills) */
   heroBandFooter = null,

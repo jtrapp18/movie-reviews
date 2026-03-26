@@ -113,7 +113,7 @@ function DirectorsPage() {
       loadingText="Loading directors"
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={
         <SearchHeroBanner

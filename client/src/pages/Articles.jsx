@@ -70,7 +70,7 @@ function Articles() {
       loadingText="Loading articles..."
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={
         <SearchHeroBanner

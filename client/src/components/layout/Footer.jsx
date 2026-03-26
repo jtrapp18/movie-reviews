@@ -24,6 +24,10 @@ const StyledFooter = styled.footer`
         width: 100vw;
         height: 100px;
         background-image: url('/images/photo-roll.png');
+        background-image: image-set(
+          url('/images/photo-roll.webp') type('image/webp'),
+          url('/images/photo-roll.png') type('image/png')
+        );
         background-size: contain;
         background-position: center;
         background-repeat: no-repeat;

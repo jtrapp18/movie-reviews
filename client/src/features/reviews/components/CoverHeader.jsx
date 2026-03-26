@@ -175,10 +175,31 @@ function CoverHeader({
 
   // If we have an image, render the full hero with overlayed text
   if (imageUrl) {
+    const isLocalImage = typeof imageUrl === 'string' && imageUrl.startsWith('/images/');
+    const isWebp = typeof imageUrl === 'string' && /\.webp(\?|#|$)/i.test(imageUrl);
+    const localWebpCandidate =
+      typeof imageUrl === 'string'
+        ? imageUrl.replace(/\.(png|jpe?g)(\?|#|$)/i, '.webp$2')
+        : null;
+    const localJpegCandidate =
+      typeof imageUrl === 'string'
+        ? imageUrl.replace(/\.webp(\?|#|$)/i, '.jpeg$1')
+        : null;
+
     return (
       <Wrapper>
         <ImageWrapper>
-          <CoverImage src={imageUrl} alt={title || subtitle || 'cover image'} />
+          {isLocalImage ? (
+            <picture>
+              {isWebp ? null : <source srcSet={localWebpCandidate} type="image/webp" />}
+              <CoverImage
+                src={isWebp ? localJpegCandidate : imageUrl}
+                alt={title || subtitle || 'cover image'}
+              />
+            </picture>
+          ) : (
+            <CoverImage src={imageUrl} alt={title || subtitle || 'cover image'} />
+          )}
           <Overlay>
             <OverlayContent>
               <HeroTextStack
