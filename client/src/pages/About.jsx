@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import yaml from 'js-yaml';
-import aboutContentYaml from '../data/aboutContent.yaml?raw';
+import aboutContentYaml from '@/data/aboutContent.yaml?raw';
 import AboutSection from '@components/shared-sections/AboutSection';
 import { StaticPageShell, Button } from '@styles';
 import GradingModal from '@components/about/GradingModal';

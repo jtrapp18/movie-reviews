@@ -1,5 +1,5 @@
 import { CardContainer, Button } from '@styles';
-import ArticleCard from '@components/cards/ArticleCard';
+import { ArticleCard } from '@features/articles';
 import styled from 'styled-components';
 import Carousel, { ArticleCarouselSlide } from '@components/shared-sections/Carousel';
 import Loading from '@components/ui/Loading';

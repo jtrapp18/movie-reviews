@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import ArticleCard from '@components/cards/ArticleCard';
+import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
 import { SearchPageFrame } from '@features/movies';
 import { CardContainer } from '@styles';

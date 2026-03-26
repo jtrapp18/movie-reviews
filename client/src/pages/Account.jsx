@@ -1,11 +1,11 @@
 import { useContext, useState } from 'react';
 import styled from 'styled-components';
-import { StaticPageShell, StyledForm, Button } from '../styles';
-import { UserContext } from '../context/userProvider';
-import { patchJSONToDb, snakeToCamel } from '../helper';
-import Error from '../styles/Error';
+import { StaticPageShell, StyledForm, Button } from '@styles';
+import { UserContext } from '@context/userProvider';
+import { patchJSONToDb, snakeToCamel } from '@helper';
+import Error from '@styles/Error';
 import LoginMessage from '@components/feedback/LoginMessage';
-import { useTheme } from '../context/themeProvider';
+import { useTheme } from '@context/themeProvider';
 import {
   StaticPageHeader,
   StaticPageSubtitle,

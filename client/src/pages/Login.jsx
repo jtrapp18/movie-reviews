@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import LoginForm from '../forms/LoginForm';
-import SignUpForm from '../forms/SignUpForm';
-import { StyledContainer } from '../styles';
+import { LoginForm, SignUpForm } from '@features/auth';
+import { StyledContainer } from '@styles';
 import { useNavigate } from 'react-router-dom';
 
 const Header = styled.div`

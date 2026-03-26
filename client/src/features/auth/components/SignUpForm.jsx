@@ -1,14 +1,14 @@
 import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { snakeToCamel, postJSONToDb } from '../helper';
+import { snakeToCamel, postJSONToDb } from '@helper';
 import styled from 'styled-components';
-import { UserContext } from '../context/userProvider';
+import { UserContext } from '@context/userProvider';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import Error from '../styles/Error';
-import { StyledForm, Button } from '../styles';
-import { useTheme } from '../context/themeProvider';
-import { useToast } from '../context/toastContext';
+import Error from '@styles/Error';
+import { StyledForm, Button } from '@styles';
+import { useTheme } from '@context/themeProvider';
+import { useToast } from '@context/toastContext';
 
 const validationSchema = yup.object({
   firstName: yup.string(),

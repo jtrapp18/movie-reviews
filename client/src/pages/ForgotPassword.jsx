@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { StyledContainer, StyledForm, Button } from '../styles';
-import { postJSONToDb } from '../helper';
+import { StyledContainer, StyledForm, Button } from '@styles';
+import { postJSONToDb } from '@helper';
 
 const Header = styled.div`
   text-align: center;

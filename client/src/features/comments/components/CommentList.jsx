@@ -123,25 +123,22 @@ function CommentList({ reviewId }) {
     [reviewId]
   );
 
-  const handleNewComment = useCallback(
-    (rawComment) => {
-      if (!rawComment) return;
-      const camelComment = snakeToCamel(rawComment);
-      setFlatComments((prev) => {
-        const existingIndex = prev.findIndex((c) => c.id === camelComment.id);
-        if (existingIndex !== -1) {
-          const next = [...prev];
-          next[existingIndex] = { ...next[existingIndex], ...camelComment };
-          return next;
-        }
-        return [...prev, camelComment];
-      });
-      if (camelComment.parentCommentId == null) {
-        setTotal((t) => t + 1);
+  const handleNewComment = useCallback((rawComment) => {
+    if (!rawComment) return;
+    const camelComment = snakeToCamel(rawComment);
+    setFlatComments((prev) => {
+      const existingIndex = prev.findIndex((c) => c.id === camelComment.id);
+      if (existingIndex !== -1) {
+        const next = [...prev];
+        next[existingIndex] = { ...next[existingIndex], ...camelComment };
+        return next;
       }
-    },
-    []
-  );
+      return [...prev, camelComment];
+    });
+    if (camelComment.parentCommentId == null) {
+      setTotal((t) => t + 1);
+    }
+  }, []);
 
   const loadMore = () => {
     const topLevelLoaded = flatComments.filter((c) => c.parentCommentId == null).length;

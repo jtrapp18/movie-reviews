@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import PostCard from '@components/cards/PostCard';
+import { PostCard } from '@features/articles';
 import { Button } from '@styles';
 import { formatDate } from '@utils/formatting';
 import MotionWrapper from '@styles/MotionWrapper';

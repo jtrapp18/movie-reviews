@@ -1,12 +1,12 @@
 import { useContext } from 'react';
-import { snakeToCamel, postJSONToDb } from '../helper';
-import { UserContext } from '../context/userProvider';
+import { snakeToCamel, postJSONToDb } from '@helper';
+import { UserContext } from '@context/userProvider';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import Error from '../styles/Error';
-import { StyledForm, Button } from '../styles';
-import { useTheme } from '../context/themeProvider';
-import { useToast } from '../context/toastContext';
+import Error from '@styles/Error';
+import { StyledForm, Button } from '@styles';
+import { useTheme } from '@context/themeProvider';
+import { useToast } from '@context/toastContext';
 
 function LoginForm() {
   const { setUser } = useContext(UserContext);

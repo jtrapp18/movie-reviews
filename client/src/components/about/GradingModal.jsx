@@ -1,6 +1,6 @@
 import yaml from 'js-yaml';
-import gradingYaml from '../../data/gradingSystem.yaml?raw';
-import gradingTiersYaml from '../../data/gradingTiers.yaml?raw';
+import gradingYaml from '@/data/gradingSystem.yaml?raw';
+import gradingTiersYaml from '@/data/gradingTiers.yaml?raw';
 import Modal from '@components/shared/Modal';
 import { StyledTable } from '@styles';
 

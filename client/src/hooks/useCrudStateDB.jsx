@@ -1,4 +1,4 @@
-import { snakeToCamel, postJSONToDb, patchJSONToDb, deleteJSONFromDb } from '../helper';
+import { snakeToCamel, postJSONToDb, patchJSONToDb, deleteJSONFromDb } from '@helper';
 import useCrudState from './useCrudState';
 
 const useCrudStateDB = (setState, dbKey, optionalFunc = null, addFunc = null) => {

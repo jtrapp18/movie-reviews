@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer, StyledForm, Button } from '../styles';
-import Error from '../styles/Error';
-import { postJSONToDb } from '../helper';
+import { StyledContainer, StyledForm, Button } from '@styles';
+import Error from '@styles/Error';
+import { postJSONToDb } from '@helper';
 
 const Header = styled.div`
   text-align: center;

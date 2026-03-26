@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import DirectorCard from '@components/cards/DirectorCard';
+import { DirectorCard } from '@features/directors';
 import { SearchPageFrame } from '@features/movies';
 import { MobilePageGutter } from '@styles';
 import styled from 'styled-components';
