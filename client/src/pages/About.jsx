@@ -249,18 +249,18 @@ function About() {
 
   return (
     <>
+      <HeroBand>
+        <HeroInner>
+          <HeroTextStack
+            title={aboutContent?.header?.title || 'About James'}
+            subtitle={aboutContent?.header?.subtitle || 'Film Enthusiest and Critic'}
+            showDivider
+            size="hero"
+            tone="onPrimary"
+          />
+        </HeroInner>
+      </HeroBand>
       <StaticPageShell>
-        <HeroBand>
-          <HeroInner>
-            <HeroTextStack
-              title={aboutContent?.header?.title || 'About James'}
-              subtitle={aboutContent?.header?.subtitle || 'Film Enthusiest and Critic'}
-              showDivider
-              size="hero"
-              tone="onPrimary"
-            />
-          </HeroInner>
-        </HeroBand>
         <AfterHeroSpacer />
 
         <AboutSection>

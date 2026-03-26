@@ -11,7 +11,7 @@ import { SearchResultsHeader, SearchPageFrame } from '@features/movies';
 import { useOutletContext } from 'react-router-dom';
 import SEOHead from '@components/shared-sections/SEOHead';
 import { generateWebsiteStructuredData } from '@utils/seoUtils';
-import HomeHero from './HomeHero';
+import { HomeHero } from '@features/home';
 import {
   ActivityFeedList,
   ContinueReadingList,
