@@ -26,7 +26,7 @@ const StyledHeader = styled.div`
 
 const LeftSection = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.7rem;
   z-index: 1;
   min-width: 0;
@@ -44,7 +44,7 @@ const HeaderTitle = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  transform: translateY(2px);
+  transform: none;
   z-index: 1;
   min-width: 0;
 

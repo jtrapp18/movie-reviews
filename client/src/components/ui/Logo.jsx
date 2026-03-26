@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const LogoContainer = styled.div`
   height: fit-content;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   margin-top: 0;
 
   img {
