@@ -7,6 +7,7 @@ const HeroCombinedShell = styled.div`
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
+  /* Stretch the search field full width; LeadingSlot overrides with align-self */
   align-items: stretch;
 
   @media (min-width: 769px) {
@@ -25,12 +26,24 @@ const LeadingSlot = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  flex: none;
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-self: center;
+
+  & > * {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%;
+  }
 
   @media (min-width: 769px) {
+    align-self: stretch;
+    align-items: center;
+    justify-content: center;
     padding: 4px 8px 4px 10px;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
-    align-self: stretch;
   }
 `;
 
@@ -58,7 +71,8 @@ const SearchContainer = styled.div`
       max-width: min(100%, 800px);
     `}
 
-  div {
+  /* Only the direct wrapper — not LeadingSlot / other nested divs (width: 100% was stretching the mode pill) */
+  > div {
     width: 100%;
     position: relative;
   }
@@ -480,14 +494,14 @@ const SearchContainer = styled.div`
   }
 `;
 
-const SearchBar = ({
+export function SearchBar({
   enterSearch,
   placeholder = 'Search movies...',
   variant = 'default',
   value,
   onValueChange,
   accessory = null,
-}) => {
+}) {
   const [searchInput, setSearchInput] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const isControlled = typeof value === 'string';
@@ -575,6 +589,4 @@ const SearchBar = ({
       )}
     </SearchContainer>
   );
-};
-
-export default SearchBar;
+}

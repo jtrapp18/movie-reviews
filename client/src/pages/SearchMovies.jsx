@@ -1,5 +1,14 @@
 import { getMoviesByGenre, getMoviesByFilters } from '@helper';
-import { useState, useEffect, useContext, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { WindowWidthContext } from '@context/windowSize';
 import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate, useOutletContext } from 'react-router-dom';
@@ -37,6 +46,8 @@ const LibraryStack = styled.div`
 
 const InlineModeToggle = styled.div`
   display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
   align-items: center;
   gap: 6px;
   padding: 3px;
@@ -44,6 +55,210 @@ const InlineModeToggle = styled.div`
   background: rgba(248, 249, 250, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.16);
 `;
+
+const ModeDropdownRoot = styled.div`
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+`;
+
+/**
+ * Closed state matches the old flat <select> look (padding + BG chevron).
+ * Open list stays the custom portaled menu.
+ */
+const ModeTriggerButton = styled.button`
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  width: auto;
+  max-width: 100%;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: rgba(248, 249, 250, 0.96);
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* Tight right inset: chevron is 10px at right:2px — no extra dead space like full-width stretch */
+  padding: 12px 20px 12px 2px;
+  cursor: pointer;
+  line-height: 1.3;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(248,249,250,0.55)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 10px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 2px;
+  }
+`;
+
+/** Portaled so it isn’t clipped by the hero pill’s overflow:hidden; themed (not OS native) */
+const ModeMenuPanel = styled.div`
+  position: fixed;
+  z-index: 10002;
+  background: rgba(22, 24, 30, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+  padding: 6px;
+`;
+
+const ModeMenuItem = styled.button`
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: ${({ $active }) =>
+    $active ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+  color: rgba(248, 249, 250, 0.95);
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  letter-spacing: 0.02em;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 0;
+  }
+`;
+
+function DesktopModeDropdown({ mode, goLibrary, goDiscover }) {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 160 });
+  const rootRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const updatePosition = useCallback(() => {
+    if (!rootRef.current) return;
+    const r = rootRef.current.getBoundingClientRect();
+    setCoords({ top: r.bottom + 6, left: r.left, width: r.width });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    updatePosition();
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onScrollResize = () => updatePosition();
+    window.addEventListener('resize', onScrollResize);
+    window.addEventListener('scroll', onScrollResize, true);
+    return () => {
+      window.removeEventListener('resize', onScrollResize);
+      window.removeEventListener('scroll', onScrollResize, true);
+    };
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      const t = e.target;
+      if (rootRef.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const label = mode === 'library' ? 'Library' : 'Discover';
+
+  const menuPortal =
+    open &&
+    createPortal(
+      <ModeMenuPanel
+        ref={menuRef}
+        role="listbox"
+        aria-label="Search mode"
+        style={{
+          top: coords.top,
+          left: coords.left,
+          minWidth: Math.max(coords.width, 148),
+        }}
+      >
+        <ModeMenuItem
+          type="button"
+          role="option"
+          aria-selected={mode === 'library'}
+          $active={mode === 'library'}
+          onClick={() => {
+            goLibrary();
+            setOpen(false);
+          }}
+        >
+          Library
+        </ModeMenuItem>
+        <ModeMenuItem
+          type="button"
+          role="option"
+          aria-selected={mode === 'discover'}
+          $active={mode === 'discover'}
+          onClick={() => {
+            goDiscover();
+            setOpen(false);
+          }}
+        >
+          Discover
+        </ModeMenuItem>
+      </ModeMenuPanel>,
+      document.body
+    );
+
+  return (
+    <>
+      <ModeDropdownRoot ref={rootRef}>
+        <ModeTriggerButton
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-label="Search mode"
+          onClick={() => setOpen((o) => !o)}
+        >
+          {label}
+        </ModeTriggerButton>
+      </ModeDropdownRoot>
+      {menuPortal}
+    </>
+  );
+}
 
 const ModeBtn = styled.button`
   padding: 6px 10px;
@@ -70,6 +285,7 @@ function SearchMovies() {
   const navigate = useNavigate();
   const { movies: libraryMovies = [] } = useOutletContext();
   const { isAdmin } = useContext(AdminContext);
+  const { isMobile } = useContext(WindowWidthContext) || { isMobile: false };
   const [genreData, setGenreData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -294,6 +510,34 @@ function SearchMovies() {
     return hasQuery || hasRating || hasRelease;
   })();
 
+  const goLibrary = () => {
+    if (mode === 'library') return;
+    setMode('library');
+    setSearchQuery('');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setSearchResults([]);
+    setIsSearchMode(false);
+    setLibraryRatingTier(null);
+    setLibraryReleaseBucket('All');
+    setLoading(false);
+  };
+
+  const goDiscover = () => {
+    if (mode === 'discover') return;
+    setMode('discover');
+    setSearchQuery('');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setSearchResults([]);
+    setIsSearchMode(false);
+    setLibraryRatingTier(null);
+    setLibraryReleaseBucket('All');
+    setLoading(true);
+  };
+
   return (
     <SearchPageFrame
       title={null}
@@ -316,48 +560,18 @@ function SearchMovies() {
       searchBarVariant="hero"
       hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
       searchBarAccessory={
-        <InlineModeToggle aria-label="Mode toggle">
-          <ModeBtn
-            type="button"
-            $active={mode === 'library'}
-            onClick={() => {
-              if (mode === 'library') return;
-              const nextMode = 'library';
-              setMode(nextMode);
-              setSearchQuery('');
-              setActiveGenreId(null);
-              setActiveDecade(null);
-              setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
-              setSearchResults([]);
-              setIsSearchMode(false);
-              setLibraryRatingTier(null);
-              setLibraryReleaseBucket('All');
-              setLoading(false);
-            }}
-          >
-            Library
-          </ModeBtn>
-          <ModeBtn
-            type="button"
-            $active={mode === 'discover'}
-            onClick={() => {
-              if (mode === 'discover') return;
-              const nextMode = 'discover';
-              setMode(nextMode);
-              setSearchQuery('');
-              setActiveGenreId(null);
-              setActiveDecade(null);
-              setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
-              setSearchResults([]);
-              setIsSearchMode(false);
-              setLibraryRatingTier(null);
-              setLibraryReleaseBucket('All');
-              setLoading(true);
-            }}
-          >
-            Discover
-          </ModeBtn>
-        </InlineModeToggle>
+        isMobile ? (
+          <InlineModeToggle aria-label="Mode toggle">
+            <ModeBtn type="button" $active={mode === 'library'} onClick={goLibrary}>
+              Library
+            </ModeBtn>
+            <ModeBtn type="button" $active={mode === 'discover'} onClick={goDiscover}>
+              Discover
+            </ModeBtn>
+          </InlineModeToggle>
+        ) : (
+          <DesktopModeDropdown mode={mode} goLibrary={goLibrary} goDiscover={goDiscover} />
+        )
       }
       heroBandFooter={
         <>
