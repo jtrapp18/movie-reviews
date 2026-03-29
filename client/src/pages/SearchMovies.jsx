@@ -301,8 +301,11 @@ function SearchMovies() {
     Decade: 'All',
   });
 
-  const fetchAllGenres = useCallback(async () => {
-    setLoading(true);
+  const fetchAllGenres = useCallback(async (options = {}) => {
+    const silent = Boolean(options.silent);
+    if (!silent) {
+      setLoading(true);
+    }
     try {
       const promises = GENRES.map(async (genre) => {
         const movies = await getMoviesByGenre(genre.id);
@@ -320,7 +323,9 @@ function SearchMovies() {
       console.error('Error fetching movies by genre:', error);
       setGenreData([]);
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -342,11 +347,21 @@ function SearchMovies() {
   };
 
   useEffect(() => {
-    if (mode === 'discover') {
-      fetchAllGenres();
+    if (mode !== 'discover') {
+      setLoading(false);
       return;
     }
-    setLoading(false);
+    const q = searchQuery.trim();
+    if (q) {
+      setIsSearchMode(true);
+      fetchSearchResults(q, activeGenreId, activeDecade);
+      fetchAllGenres({ silent: true });
+    } else {
+      setIsSearchMode(false);
+      fetchAllGenres();
+    }
+    // Intentionally only [mode]: run when switching modes; searchQuery is read from latest render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, fetchAllGenres]);
 
   const enterSearch = (text) => {
@@ -513,29 +528,29 @@ function SearchMovies() {
   const goLibrary = () => {
     if (mode === 'library') return;
     setMode('library');
-    setSearchQuery('');
     setActiveGenreId(null);
     setActiveDecade(null);
     setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
     setSearchResults([]);
-    setIsSearchMode(false);
     setLibraryRatingTier(null);
     setLibraryReleaseBucket('All');
+    if (searchQuery.trim()) {
+      setIsSearchMode(true);
+    } else {
+      setIsSearchMode(false);
+    }
     setLoading(false);
   };
 
   const goDiscover = () => {
     if (mode === 'discover') return;
     setMode('discover');
-    setSearchQuery('');
     setActiveGenreId(null);
     setActiveDecade(null);
     setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
     setSearchResults([]);
-    setIsSearchMode(false);
     setLibraryRatingTier(null);
     setLibraryReleaseBucket('All');
-    setLoading(true);
   };
 
   return (
@@ -550,6 +565,8 @@ function SearchMovies() {
             : 'Search movies by title, director, year...'
       }
       onSearch={enterSearch}
+      searchValue={searchQuery}
+      onSearchValueChange={setSearchQuery}
       isLoading={loading}
       loadingText="Loading movies"
       wide
