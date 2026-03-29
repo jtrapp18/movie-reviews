@@ -236,6 +236,11 @@ export default function SearchPageFrame({
   onSearchValueChange,
   /** Optional right-side controls aligned with the SearchBar (e.g. Mode toggle) */
   searchBarRightSlot,
+  /**
+   * Optional control embedded in the search bar (e.g. Library / Discover on Search Movies).
+   * Desktop: rendered inside the hero pill on the left. Mobile: stacked below the bar (same as before).
+   */
+  searchBarAccessory,
   children,
 }) {
   const Container = wide ? PageContainer : SearchFrameShell;
@@ -273,6 +278,7 @@ export default function SearchPageFrame({
                   variant={searchBarVariant}
                   value={searchValue}
                   onValueChange={onSearchValueChange}
+                  accessory={searchBarAccessory}
                 />
               </SearchRowCenter>
               {searchBarRightSlot ? (
@@ -293,6 +299,7 @@ export default function SearchPageFrame({
                 variant={searchBarVariant}
                 value={searchValue}
                 onValueChange={onSearchValueChange}
+                accessory={searchBarAccessory}
               />
             </SearchRowCenter>
             {searchBarRightSlot ? (

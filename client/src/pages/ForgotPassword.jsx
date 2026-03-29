@@ -1,20 +1,11 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import { StyledContainer, StyledForm, Button } from '@styles';
+import { StaticPageShell, StyledForm, Button } from '@styles';
 import { postJSONToDb } from '@helper';
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 1.5rem;
-
-  h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    font-style: italic;
-  }
-`;
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const Message = styled.p`
   margin-top: 0.75rem;
@@ -51,13 +42,13 @@ function ForgotPassword() {
   };
 
   return (
-    <StyledContainer>
-      <Header>
+    <StaticPageShell>
+      <StaticPageHeader>
         <h1>Forgot password</h1>
-        <div className="subtitle">
-          <h3>Enter your email address or username to reset your password.</h3>
-        </div>
-      </Header>
+        <StaticPageSubtitle>
+          Enter your email address or username to reset your password.
+        </StaticPageSubtitle>
+      </StaticPageHeader>
       <StyledForm onSubmit={handleSubmit}>
         <div>
           <label htmlFor="identifier">Email or username</label>
@@ -77,7 +68,7 @@ function ForgotPassword() {
       </StyledForm>
       {message && <Message>{message}</Message>}
       {error && <Message $error>{error}</Message>}
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

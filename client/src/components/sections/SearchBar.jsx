@@ -1,6 +1,46 @@
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+/** Hero search + left accessory (Library / Discover). DOM order: input column first, leading second — mobile column shows search on top; desktop row-reverse puts the pill on the left. */
+const HeroCombinedShell = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: stretch;
+
+  @media (min-width: 769px) {
+    flex-direction: row-reverse;
+    align-items: stretch;
+    gap: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(20, 22, 28, 0.55);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+`;
+
+const LeadingSlot = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  @media (min-width: 769px) {
+    padding: 4px 8px 4px 10px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    align-self: stretch;
+  }
+`;
+
+const InputWrap = styled.div`
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+`;
+
 const SearchContainer = styled.div`
   width: 100%;
   max-width: ${(props) => (props.$isExpanded ? '100vw' : '800px')};
@@ -21,20 +61,15 @@ const SearchContainer = styled.div`
   div {
     width: 100%;
     position: relative;
-    color: white;
   }
 
-  input {
+  input:not(.hero-combined-input) {
     width: 100%;
     border-radius: 12px;
     font-size: 18px;
-    // border: 2px solid rgba(255, 255, 255, 0.2);
     border: 1px solid var(--border);
-    // border-bottom: ${(props) =>
-      props.$isExpanded ? '2px solid var(--border)' : '1px solid var(--border)'};
     padding: 16px 20px;
     padding-right: 50px;
-    // color: white;
     background: var(--background-secondary);
     backdrop-filter: blur(10px);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -61,7 +96,6 @@ const SearchContainer = styled.div`
     &:focus {
       border-color: var(--border);
       border-bottom: 2px solid var(--border);
-      // background: rgba(0, 0, 0, 0.5);
       box-shadow:
         0 0 0 3px rgba(255, 215, 0, 0.2),
         ${(props) =>
@@ -80,7 +114,7 @@ const SearchContainer = styled.div`
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    // color: rgba(255, 255, 255, 0.7);
+    color: var(--font-color-2);
     font-size: 16px;
     transition: all 0.2s ease;
     padding: 4px;
@@ -92,12 +126,12 @@ const SearchContainer = styled.div`
     height: 24px;
 
     &:hover {
-      color: var(--font-color-2);
+      color: var(--font-color-1);
       background: var(--background-tertiary);
     }
   }
 
-  input:not(:placeholder-shown) + span {
+  input:not(.hero-combined-input):not(:placeholder-shown) + span {
     font-size: clamp(1.2rem, 3vw, 1.8rem);
     padding: 8px;
     width: 40px;
@@ -105,10 +139,11 @@ const SearchContainer = styled.div`
     right: 20px;
   }
 
-  ${({ $variant }) =>
+  ${({ $variant, $hasHeroAccessory }) =>
     $variant === 'hero' &&
+    !$hasHeroAccessory &&
     css`
-      input {
+      input:not(.hero-combined-input) {
         border-radius: 9999px;
         padding: 14px 22px;
         padding-right: 48px;
@@ -129,14 +164,36 @@ const SearchContainer = styled.div`
           font-weight: 500;
           padding: 14px 22px;
           padding-right: 48px;
+          background: rgba(228, 226, 218, 0.94);
+          color: #1a1d26;
+          -webkit-text-fill-color: #1a1d26;
+          caret-color: #1a1d26;
+          border-color: rgba(32, 36, 44, 0.22);
         }
 
-        &:hover {
+        &:not(:placeholder-shown):hover {
+          background: rgba(222, 219, 210, 0.96);
+          color: #12151c;
+          -webkit-text-fill-color: #12151c;
+        }
+
+        &:not(:placeholder-shown):focus {
+          border-color: rgba(32, 36, 44, 0.35);
+          border-bottom: 1px solid rgba(32, 36, 44, 0.35);
+          box-shadow: 0 0 0 2px rgba(32, 36, 44, 0.12);
+        }
+
+        &:hover:not(:placeholder-shown) {
+          color: #12151c;
+          -webkit-text-fill-color: #12151c;
+        }
+
+        &:hover:placeholder-shown {
           color: var(--soft-white);
           background: rgba(28, 30, 38, 0.65);
         }
 
-        &:focus {
+        &:focus:placeholder-shown {
           border-color: rgba(255, 255, 255, 0.35);
           border-bottom: 1px solid rgba(255, 255, 255, 0.35);
           box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
@@ -144,24 +201,162 @@ const SearchContainer = styled.div`
       }
 
       span {
-        color: rgba(248, 249, 250, 0.65);
+        color: rgba(248, 249, 250, 0.75);
       }
 
-      input:not(:placeholder-shown) + span {
+      input:not(.hero-combined-input):not(:placeholder-shown) + span {
         font-size: 1rem;
         padding: 0;
         width: 28px;
         height: 28px;
         right: 16px;
+        color: rgba(38, 42, 52, 0.65);
+
+        &:hover {
+          color: rgba(22, 24, 32, 0.95);
+          background: rgba(0, 0, 0, 0.07);
+        }
       }
     `}
 
+  ${HeroCombinedShell} {
+    input.hero-combined-input {
+      width: 100%;
+      border-radius: 9999px;
+      padding: 14px 22px;
+      padding-right: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(20, 22, 28, 0.55);
+      backdrop-filter: blur(10px);
+      color: var(--soft-white);
+      font-size: 0.95rem;
+      box-shadow: none;
+      outline: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 400;
+      line-height: 1.4;
+
+      &::placeholder {
+        color: rgba(248, 249, 250, 0.55);
+        font-size: 0.95rem;
+      }
+
+      &:not(:placeholder-shown) {
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 14px 22px;
+        padding-right: 48px;
+        background: rgba(228, 226, 218, 0.94);
+        color: #1a1d26;
+        -webkit-text-fill-color: #1a1d26;
+        caret-color: #1a1d26;
+        border-color: rgba(32, 36, 44, 0.22);
+      }
+
+      &:not(:placeholder-shown):hover {
+        background: rgba(222, 219, 210, 0.96);
+        color: #12151c;
+        -webkit-text-fill-color: #12151c;
+      }
+
+      &:not(:placeholder-shown):focus {
+        border-color: rgba(32, 36, 44, 0.35);
+        border-bottom: 1px solid rgba(32, 36, 44, 0.35);
+        box-shadow: 0 0 0 2px rgba(32, 36, 44, 0.12);
+      }
+
+      &:hover:not(:placeholder-shown) {
+        color: #12151c;
+        -webkit-text-fill-color: #12151c;
+      }
+
+      &:hover:placeholder-shown {
+        color: var(--soft-white);
+        background: rgba(28, 30, 38, 0.65);
+      }
+
+      &:focus:placeholder-shown {
+        border-color: rgba(255, 255, 255, 0.35);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+      }
+
+      @media (min-width: 769px) {
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        backdrop-filter: none;
+        box-shadow: none;
+
+        &::placeholder {
+          color: rgba(248, 249, 250, 0.55);
+        }
+
+        &:not(:placeholder-shown) {
+          background: rgba(228, 226, 218, 0.94);
+        }
+
+        &:not(:placeholder-shown):hover {
+          background: rgba(222, 219, 210, 0.96);
+        }
+
+        &:hover:placeholder-shown {
+          background: transparent;
+        }
+
+        &:focus:placeholder-shown {
+          box-shadow: none;
+        }
+
+        &:not(:placeholder-shown):focus {
+          box-shadow: none;
+        }
+      }
+    }
+
+    span {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      padding: 4px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: rgba(248, 249, 250, 0.75);
+
+      &:hover {
+        color: rgba(248, 249, 250, 0.95);
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    input.hero-combined-input:not(:placeholder-shown) + span {
+      font-size: 1rem;
+      padding: 0;
+      width: 28px;
+      height: 28px;
+      right: 16px;
+      color: rgba(38, 42, 52, 0.65);
+
+      &:hover {
+        color: rgba(22, 24, 32, 0.95);
+        background: rgba(0, 0, 0, 0.07);
+      }
+    }
+  }
+
   @media (max-width: 768px) {
-    /* Tighter stack under title/subtitle; PageHeader also trims margin on small screens */
     margin: 0.5rem auto 1.5rem;
     padding: 0 1rem;
 
-    input {
+    input:not(.hero-combined-input) {
       font-size: 16px;
       padding: 14px 18px;
       padding-right: 45px;
@@ -187,7 +382,7 @@ const SearchContainer = styled.div`
       padding: 2px;
     }
 
-    input:not(:placeholder-shown) + span {
+    input:not(.hero-combined-input):not(:placeholder-shown) + span {
       font-size: clamp(1rem, 4vw, 1.4rem);
       width: 36px;
       height: 36px;
@@ -195,12 +390,13 @@ const SearchContainer = styled.div`
       right: 16px;
     }
 
-    ${({ $variant }) =>
+    ${({ $variant, $hasHeroAccessory }) =>
       $variant === 'hero' &&
+      !$hasHeroAccessory &&
       css`
         margin: 0 auto 0.5rem;
 
-        input {
+        input:not(.hero-combined-input) {
           font-size: 0.9rem;
           padding: 0.85rem 1.1rem;
           padding-right: 2.75rem;
@@ -215,15 +411,70 @@ const SearchContainer = styled.div`
             line-height: 1.35;
             padding: 0.85rem 1.1rem;
             padding-right: 2.75rem;
+            background: rgba(228, 226, 218, 0.94);
+            color: #1a1d26;
+            -webkit-text-fill-color: #1a1d26;
+            caret-color: #1a1d26;
+            border-color: rgba(32, 36, 44, 0.22);
           }
         }
 
-        input:not(:placeholder-shown) + span {
+        input:not(.hero-combined-input):not(:placeholder-shown) + span {
           font-size: 0.95rem;
           width: 26px;
           height: 26px;
           padding: 0;
           right: 14px;
+          color: rgba(38, 42, 52, 0.65);
+
+          &:hover {
+            color: rgba(22, 24, 32, 0.95);
+            background: rgba(0, 0, 0, 0.07);
+          }
+        }
+      `}
+
+    ${({ $variant, $hasHeroAccessory }) =>
+      $variant === 'hero' &&
+      $hasHeroAccessory &&
+      css`
+        margin: 0 auto 0.5rem;
+
+        ${HeroCombinedShell} input.hero-combined-input {
+          font-size: 0.9rem;
+          padding: 0.85rem 1.1rem;
+          padding-right: 2.75rem;
+
+          &::placeholder {
+            font-size: 0.9rem;
+          }
+
+          &:not(:placeholder-shown) {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.35;
+            padding: 0.85rem 1.1rem;
+            padding-right: 2.75rem;
+            background: rgba(228, 226, 218, 0.94);
+            color: #1a1d26;
+            -webkit-text-fill-color: #1a1d26;
+            caret-color: #1a1d26;
+            border-color: rgba(32, 36, 44, 0.22);
+          }
+        }
+
+        ${HeroCombinedShell} input.hero-combined-input:not(:placeholder-shown) + span {
+          font-size: 0.95rem;
+          width: 26px;
+          height: 26px;
+          padding: 0;
+          right: 14px;
+          color: rgba(38, 42, 52, 0.65);
+
+          &:hover {
+            color: rgba(22, 24, 32, 0.95);
+            background: rgba(0, 0, 0, 0.07);
+          }
         }
       `}
   }
@@ -235,10 +486,12 @@ const SearchBar = ({
   variant = 'default',
   value,
   onValueChange,
+  accessory = null,
 }) => {
   const [searchInput, setSearchInput] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const isControlled = typeof value === 'string';
+  const hasHeroAccessory = Boolean(accessory && variant === 'hero');
 
   useEffect(() => {
     if (isControlled) {
@@ -264,7 +517,6 @@ const SearchBar = ({
   };
 
   const handleKeyDown = (event) => {
-    // Check if "Enter" key is pressed
     if (event.key === 'Enter') {
       const submittedValue = isControlled ? value : searchInput;
       enterSearch(submittedValue ?? '');
@@ -276,27 +528,51 @@ const SearchBar = ({
   };
 
   const handleBlur = () => {
-    // Small delay to allow for clicking on clear button
     setTimeout(() => {
       setIsExpanded(false);
     }, 200);
   };
 
+  const inputProps = {
+    value: isControlled ? value : searchInput,
+    type: 'text',
+    id: 'search',
+    placeholder,
+    onChange: handleChangeSearch,
+    onKeyDown: handleKeyDown,
+    onFocus: handleFocus,
+    onBlur: handleBlur,
+    className: hasHeroAccessory ? 'hero-combined-input' : undefined,
+  };
+
+  const inputEl = <input {...inputProps} />;
+  const clearEl = (
+    <span onClick={handleClearSearch} role="presentation">
+      ✖
+    </span>
+  );
+
   return (
-    <SearchContainer $isExpanded={isExpanded} $variant={variant} className="search-bar">
-      <div>
-        <input
-          value={isControlled ? value : searchInput}
-          type="text"
-          id="search"
-          placeholder={placeholder}
-          onChange={handleChangeSearch}
-          onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-        <span onClick={handleClearSearch}>✖</span>
-      </div>
+    <SearchContainer
+      $isExpanded={isExpanded}
+      $variant={variant}
+      $hasHeroAccessory={hasHeroAccessory}
+      className="search-bar"
+    >
+      {hasHeroAccessory ? (
+        <HeroCombinedShell>
+          <InputWrap>
+            {inputEl}
+            {clearEl}
+          </InputWrap>
+          <LeadingSlot>{accessory}</LeadingSlot>
+        </HeroCombinedShell>
+      ) : (
+        <div>
+          {inputEl}
+          {clearEl}
+        </div>
+      )}
     </SearchContainer>
   );
 };

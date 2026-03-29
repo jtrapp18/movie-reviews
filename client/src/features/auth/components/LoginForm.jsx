@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { snakeToCamel, postJSONToDb } from '@helper';
 import { UserContext } from '@context/userProvider';
 import { useFormik } from 'formik';
@@ -7,12 +7,19 @@ import Error from '@styles/Error';
 import { StyledForm, Button } from '@styles';
 import { useTheme } from '@context/themeProvider';
 import { useToast } from '@context/toastContext';
+import {
+  PasswordWrapper,
+  ToggleVisibility,
+  EyeOpen,
+  EyeClosed,
+} from './passwordFieldToggle';
 
 function LoginForm() {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { setTheme } = useTheme();
   const { showToast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -67,15 +74,24 @@ function LoginForm() {
       </div>
       <div>
         <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          autoComplete="current-password"
-          value={formik.values.password}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
+        <PasswordWrapper>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          <ToggleVisibility
+            type="button"
+            onClick={() => setShowPassword((s) => !s)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeClosed /> : <EyeOpen />}
+          </ToggleVisibility>
+        </PasswordWrapper>
         {formik.touched.password && formik.errors.password ? (
           <Error>{formik.errors.password}</Error>
         ) : null}
