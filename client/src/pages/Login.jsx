@@ -1,21 +1,12 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { LoginForm, SignUpForm } from '@features/auth';
-import { StyledContainer } from '@styles';
+import { StaticPageShell } from '@styles';
 import { useNavigate } from 'react-router-dom';
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 1.5rem;
-
-  h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    font-style: italic;
-  }
-`;
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const InlineToggle = styled.p`
   margin-top: 1rem;
@@ -47,13 +38,13 @@ function Login() {
   const isLogin = mode === 'login';
 
   return (
-    <StyledContainer>
-      <Header>
+    <StaticPageShell>
+      <StaticPageHeader>
         <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
-        <div className="subtitle">
-          <h3>{isLogin ? 'Sign in to access your account' : 'Create a new account'}</h3>
-        </div>
-      </Header>
+        <StaticPageSubtitle>
+          {isLogin ? 'Sign in to access your account' : 'Create a new account'}
+        </StaticPageSubtitle>
+      </StaticPageHeader>
 
       {isLogin ? (
         <>
@@ -93,7 +84,7 @@ function Login() {
           </InlineToggle>
         </>
       )}
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

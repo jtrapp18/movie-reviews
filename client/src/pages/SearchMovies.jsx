@@ -315,7 +315,7 @@ function SearchMovies() {
       heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
-      searchBarRightSlot={
+      searchBarAccessory={
         <InlineModeToggle aria-label="Mode toggle">
           <ModeBtn
             type="button"
