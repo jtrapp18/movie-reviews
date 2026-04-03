@@ -104,11 +104,21 @@ const HeroSearchPrimaryBand = styled.div`
     return (
       heroBgSrc &&
       css`
+        /* Matches empty / shadow areas in spotlight.webp; left side stays solid */
+        --hero-band-base: #070d18;
         /* Matches light-theme --blue / --navy-blue so the hero matches header branding */
         --hero-tint-primary: rgba(2, 38, 88, 0.38);
         --hero-tint-secondary: rgba(0, 17, 61, 0.48);
-        background-color: #070d18;
+        background-color: var(--hero-band-base);
         background-image:
+          /* Smooth blend: solid base on the left → image on the right */
+          linear-gradient(
+            to right,
+            var(--hero-band-base) 0%,
+            rgba(7, 13, 24, 0.92) min(28%, 12rem),
+            rgba(7, 13, 24, 0.35) min(52%, 28rem),
+            transparent 72%
+          ),
           linear-gradient(
             180deg,
             rgba(0, 0, 0, 0.38) 0%,
@@ -122,6 +132,13 @@ const HeroSearchPrimaryBand = styled.div`
           ),
           url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc});
         background-image:
+          linear-gradient(
+            to right,
+            var(--hero-band-base) 0%,
+            rgba(7, 13, 24, 0.92) min(28%, 12rem),
+            rgba(7, 13, 24, 0.35) min(52%, 28rem),
+            transparent 72%
+          ),
           linear-gradient(
             180deg,
             rgba(0, 0, 0, 0.38) 0%,
@@ -137,10 +154,26 @@ const HeroSearchPrimaryBand = styled.div`
             url(${heroBgSrc}) type('image/webp'),
             url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc}) type('image/jpeg')
           );
-        background-size: cover;
-        /* Anchor spotlight fixture to top-right; avoids vertically centered crop */
-        background-position: right top;
+        /* Cap image size, pin to top-right; empty area shows --hero-band-base */
+        background-size:
+          100% 100%,
+          100% 100%,
+          100% 100%,
+          min(1040px, 104vw) auto;
+        background-position:
+          0 0,
+          0 0,
+          0 0,
+          right top;
         background-repeat: no-repeat;
+
+        @media (max-width: 768px) {
+          background-size:
+            100% 100%,
+            100% 100%,
+            100% 100%,
+            min(600px, 95vw) auto;
+        }
       `
     );
   }}
@@ -162,6 +195,8 @@ const HeroSearchPrimaryBand = styled.div`
 `;
 
 const HeroSearchBandInner = styled.div`
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: ${({ $size }) => CONTAINER_MAX_WIDTH[$size] ?? CONTAINER_MAX_WIDTH.narrow};
   margin: 0 auto;
