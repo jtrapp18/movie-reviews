@@ -126,6 +126,29 @@ def _fetch_tmdb_earliest_release_date(external_movie_id):
     return _extract_earliest_tmdb_release_date(response.json() or {})
 
 
+def _fetch_tmdb_primary_origin_country(external_movie_id):
+    """First TMDb production origin_country code (ISO 3166-1 alpha-2) for a movie."""
+    api_key = os.getenv("MOVIE_API_KEY")
+    base_url = "https://api.themoviedb.org/3"
+    if not api_key or not external_movie_id:
+        return None
+    url = f"{base_url}/movie/{external_movie_id}?api_key={api_key}&language=en-US"
+    try:
+        response = requests.get(url, timeout=12)
+    except Exception:
+        return None
+    if response.status_code != 200:
+        return None
+    data = response.json() or {}
+    oc = data.get("origin_country") or []
+    if isinstance(oc, list) and oc:
+        s = str(oc[0]).strip()
+        return s[:10] if s else None
+    if isinstance(oc, str) and oc.strip():
+        return oc.strip()[:10]
+    return None
+
+
 def _get_or_create_director_for_movie(external_movie_id):
     """Ensure there is a Director row for the given TMDb movie external_id."""
     director_data = _fetch_tmdb_director_for_movie(external_movie_id)
@@ -330,6 +353,9 @@ class Movies(Resource):
         else:
             s = str(raw_country).strip()
             primary_origin_country = s[:10] if s else None
+
+        if primary_origin_country is None and external_id:
+            primary_origin_country = _fetch_tmdb_primary_origin_country(external_id)
 
         try:
             new_movie = Movie(

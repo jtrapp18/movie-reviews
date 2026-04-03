@@ -157,6 +157,18 @@ function deleteJSONFromDb(dbKey, Id) {
     .catch((e) => console.error(e));
 }
 
+/** First ISO origin country from a TMDb movie object (after snakeToCamel → originCountry). */
+function primaryOriginCountryFromTmdbMovie(m) {
+  if (!m || typeof m !== 'object') return undefined;
+  const oc = m.originCountry;
+  if (Array.isArray(oc) && oc.length > 0) {
+    const c = String(oc[0]).trim();
+    return c ? c.slice(0, 10) : undefined;
+  }
+  if (typeof oc === 'string' && oc.trim()) return oc.trim().slice(0, 10);
+  return undefined;
+}
+
 async function getMovieInfo(searchQuery = null) {
   const queryText = searchQuery ? `?search=${searchQuery}` : '';
   const imgUrl = 'https://image.tmdb.org/t/p/w1280';
@@ -181,6 +193,7 @@ async function getMovieInfo(searchQuery = null) {
       releaseDate: m.releaseDate,
       coverPhoto: `${imgUrl}${m.posterPath}`,
       backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
+      primaryOriginCountry: primaryOriginCountryFromTmdbMovie(m),
     }));
     return movieInfo;
   } catch (err) {
@@ -222,6 +235,7 @@ async function getMoviesByGenre(genreId, searchQuery = null) {
       backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
       voteAverage: m.voteAverage,
       genreIds: m.genreIds,
+      primaryOriginCountry: primaryOriginCountryFromTmdbMovie(m),
     }));
     return movieInfo;
   } catch (err) {
@@ -263,6 +277,7 @@ async function getMoviesByFilters({
       backdrop: m.backdropPath ? `${imgUrl}${m.backdropPath}` : null,
       voteAverage: m.voteAverage,
       genreIds: m.genreIds,
+      primaryOriginCountry: primaryOriginCountryFromTmdbMovie(m),
     }));
   } catch (err) {
     console.error('Request failed for filters', { genreId, decade, searchQuery, err });

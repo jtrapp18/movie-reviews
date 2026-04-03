@@ -76,7 +76,12 @@ function Articles() {
         <SearchHeroBanner
           title="Articles"
           subtitle="Browse theme-based articles and essays"
+        />
+      }
+      heroBandFooter={
+        <SearchHeroBanner
           buttonLabels={quickButtons}
+          showDivider={false}
           activeButton={activeQuickSearch}
           onButtonClick={(label) => {
             setActiveQuickSearch(label);

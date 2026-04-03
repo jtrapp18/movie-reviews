@@ -216,6 +216,27 @@ class BatchImportClient:
 
         return candidates[0]
 
+    def _fetch_tmdb_movie_details(
+        self, external_movie_id: int
+    ) -> Optional[Dict[str, Any]]:
+        """Full TMDb /movie/{id} object (includes origin_country; search hits often omit it)."""
+        api_key = os.getenv("MOVIE_API_KEY")
+        if not api_key:
+            return None
+        url = (
+            f"https://api.themoviedb.org/3/movie/{int(external_movie_id)}"
+            f"?api_key={api_key}&language=en-US"
+        )
+        try:
+            resp = requests.get(url, timeout=self.timeout)
+            if resp.status_code != 200:
+                return None
+            body = resp.json()
+            return body if isinstance(body, dict) else None
+        except Exception as exc:
+            print(f"   -> WARNING: TMDb movie details fetch failed: {exc}")
+            return None
+
     def _fetch_tmdb_director_name(self, external_movie_id: int) -> Optional[str]:
         """Primary Director credit from TMDb (same source of truth as the API server)."""
         api_key = os.getenv("MOVIE_API_KEY")
@@ -441,6 +462,16 @@ class BatchImportClient:
             tmdb_movie = self._search_tmdb_movie_by_title(str(entry.get("movie_title")))
             if tmdb_movie and int(tmdb_movie.get("id") or 0) != external_id:
                 tmdb_movie = None
+
+        details = self._fetch_tmdb_movie_details(external_id) or {}
+        slim = tmdb_movie or {}
+        merged: Dict[str, Any] = {**details, **slim}
+        oc_slim = slim.get("origin_country")
+        if not oc_slim or (isinstance(oc_slim, list) and len(oc_slim) == 0):
+            oc_det = details.get("origin_country")
+            if oc_det:
+                merged["origin_country"] = oc_det
+        tmdb_movie = merged
 
         payload = self._build_movie_payload(external_id, tmdb_movie, entry)
 

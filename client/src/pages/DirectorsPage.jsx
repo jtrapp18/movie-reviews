@@ -17,12 +17,15 @@ const LetterRow = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  /* flex-start: when row overflows, scroll begins at All/A — center clips the start on mobile */
+  justify-content: flex-start;
   gap: 0.22rem;
-  padding: 0.15rem 0 0.35rem;
+  padding: 0.15rem 1rem 0.35rem;
+  box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
   flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     height: 4px;
