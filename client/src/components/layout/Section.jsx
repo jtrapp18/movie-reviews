@@ -1,6 +1,30 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import MotionWrapper from '@styles/MotionWrapper';
 import { SearchBar } from '@components/sections/SearchBar';
+
+/** Global `a { font-size: … }` would shrink the title; inherit h1 sizing explicitly */
+const SectionTitleLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  font-size: inherit;
+  font-weight: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+`;
 
 const SectionContainer = styled.div`
   display: flex;
@@ -12,6 +36,9 @@ const SectionContainer = styled.div`
 
 const Section = ({
   title,
+  /** When set, section title is a client route link (e.g. home carousel headers) */
+  titleTo,
+  titleHint,
   subtitle,
   searchPlaceholder,
   onSearch,
@@ -20,9 +47,19 @@ const Section = ({
 }) => {
   return (
     <SectionContainer>
-      <MotionWrapper index={1}>
-        <h1>{title}</h1>
-      </MotionWrapper>
+      {title ? (
+        <MotionWrapper index={1}>
+          <h1>
+            {titleTo ? (
+              <SectionTitleLink to={titleTo} title={titleHint}>
+                {title}
+              </SectionTitleLink>
+            ) : (
+              title
+            )}
+          </h1>
+        </MotionWrapper>
+      ) : null}
       {subtitle && (
         <MotionWrapper index={2}>
           <h3>
