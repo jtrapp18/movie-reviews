@@ -24,6 +24,9 @@ const ModalOverlay = styled.div`
 `;
 
 const ModalContent = styled.div`
+  /* Portaled to body — outside #root, so set app typography explicitly */
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: var(--default-font-size);
   background: var(--background);
   color: var(--text);
   border-radius: 0.75rem;

@@ -292,7 +292,7 @@ function About() {
             onClick={() => setIsGradingOpen(true)}
             style={{ marginTop: '0.05rem', marginBottom: '0.9rem' }}
           >
-            View James&apos; Film Grading System
+            ★ View James&apos; Film Grading System
           </Button>
 
           <Paragraphs text={aboutContent.aboutJames.closing} />
