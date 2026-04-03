@@ -9,7 +9,7 @@ const StyledNavBar = styled.nav`
   align-items: center;
   height: fit-content;
 
-  & > .nav-link {
+  & .nav-link {
     font-size: clamp(1.5rem, 1.5vw, 2.5rem);
   }
 `;

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import MotionWrapper from '@styles/MotionWrapper';
-import SearchBar from '@components/shared-sections/SearchBar';
+import { SearchBar } from '@components/sections/SearchBar';
 
 const SectionContainer = styled.div`
   display: flex;

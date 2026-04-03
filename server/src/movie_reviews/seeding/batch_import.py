@@ -343,7 +343,21 @@ class BatchImportClient:
             else entry.get("backdrop")
         )
 
-        return {
+        primary_origin_country = None
+        entry_country = entry.get("primary_origin_country")
+        if entry_country is None:
+            entry_country = entry.get("primaryOriginCountry")
+        if entry_country is not None:
+            s = str(entry_country).strip()
+            primary_origin_country = s[:10] if s else None
+        else:
+            oc = tmdb_movie.get("origin_country")
+            if isinstance(oc, list) and oc:
+                primary_origin_country = str(oc[0]).strip()[:10]
+            elif isinstance(oc, str) and oc.strip():
+                primary_origin_country = oc.strip()[:10]
+
+        payload = {
             "external_id": external_id,
             "original_language": tmdb_movie.get("original_language")
             or entry.get("original_language")
@@ -364,6 +378,9 @@ class BatchImportClient:
             "cover_photo": cover_photo,
             "backdrop": backdrop,
         }
+        if primary_origin_country:
+            payload["primary_origin_country"] = primary_origin_country
+        return payload
 
     def _require_movie_director(
         self, movie_obj: Dict[str, Any], external_id: int, entry: Dict[str, Any]

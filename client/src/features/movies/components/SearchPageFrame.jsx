@@ -1,6 +1,6 @@
 import { isValidElement, cloneElement } from 'react';
 import styled, { css } from 'styled-components';
-import SearchBar from '@components/shared-sections/SearchBar';
+import { SearchBar } from '@components/sections/SearchBar';
 import Loading from '@components/ui/Loading';
 import { StyledSizedContainer, CONTAINER_MAX_WIDTH } from '@styles';
 
@@ -99,14 +99,26 @@ const HeroSearchPrimaryBand = styled.div`
 
   ${({ $heroImageUrl }) => {
     const heroBgSrc = $heroImageUrl;
+    const heroFallbackJpeg = heroBgSrc?.replace(/\.webp(\?|#|$)/i, '.jpeg$1');
+    const heroFallbackJpg = heroBgSrc?.replace(/\.webp(\?|#|$)/i, '.jpg$1');
     return (
       heroBgSrc &&
       css`
+        /* Matches empty / shadow areas in spotlight.webp; left side stays solid */
+        --hero-band-base: #070d18;
         /* Matches light-theme --blue / --navy-blue so the hero matches header branding */
         --hero-tint-primary: rgba(2, 38, 88, 0.38);
         --hero-tint-secondary: rgba(0, 17, 61, 0.48);
-        background-color: #070d18;
+        background-color: var(--hero-band-base);
         background-image:
+          /* Smooth blend: solid base on the left → image on the right */
+          linear-gradient(
+            to right,
+            var(--hero-band-base) 0%,
+            rgba(7, 13, 24, 0.92) min(28%, 12rem),
+            rgba(7, 13, 24, 0.35) min(52%, 28rem),
+            transparent 72%
+          ),
           linear-gradient(
             180deg,
             rgba(0, 0, 0, 0.38) 0%,
@@ -118,11 +130,50 @@ const HeroSearchPrimaryBand = styled.div`
             var(--hero-tint-primary) 0%,
             var(--hero-tint-secondary) 100%
           ),
-          url(${heroBgSrc});
-        background-size: cover;
-        /* Anchor spotlight fixture to top-right; avoids vertically centered crop */
-        background-position: right top;
+          url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc});
+        background-image:
+          linear-gradient(
+            to right,
+            var(--hero-band-base) 0%,
+            rgba(7, 13, 24, 0.92) min(28%, 12rem),
+            rgba(7, 13, 24, 0.35) min(52%, 28rem),
+            transparent 72%
+          ),
+          linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.38) 0%,
+            rgba(0, 0, 0, 0.52) 45%,
+            rgba(0, 0, 0, 0.66) 100%
+          ),
+          linear-gradient(
+            180deg,
+            var(--hero-tint-primary) 0%,
+            var(--hero-tint-secondary) 100%
+          ),
+          image-set(
+            url(${heroBgSrc}) type('image/webp'),
+            url(${heroFallbackJpeg || heroFallbackJpg || heroBgSrc}) type('image/jpeg')
+          );
+        /* Cap image size, pin to top-right; empty area shows --hero-band-base */
+        background-size:
+          100% 100%,
+          100% 100%,
+          100% 100%,
+          min(1040px, 104vw) auto;
+        background-position:
+          0 0,
+          0 0,
+          0 0,
+          right top;
         background-repeat: no-repeat;
+
+        @media (max-width: 768px) {
+          background-size:
+            100% 100%,
+            100% 100%,
+            100% 100%,
+            min(600px, 95vw) auto;
+        }
       `
     );
   }}
@@ -144,6 +195,8 @@ const HeroSearchPrimaryBand = styled.div`
 `;
 
 const HeroSearchBandInner = styled.div`
+  position: relative;
+  z-index: 1;
   width: 100%;
   max-width: ${({ $size }) => CONTAINER_MAX_WIDTH[$size] ?? CONTAINER_MAX_WIDTH.narrow};
   margin: 0 auto;
@@ -156,6 +209,36 @@ const HeroSearchBandInner = styled.div`
 
   @media (max-width: 768px) {
     padding: 0;
+  }
+`;
+
+const SearchRow = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 800px) auto 1fr;
+  align-items: center;
+  column-gap: 0.75rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr minmax(0, 800px) 1fr;
+    row-gap: 0.5rem;
+  }
+`;
+
+const SearchRowCenter = styled.div`
+  grid-column: 2;
+  width: 100%;
+`;
+
+const SearchRowRight = styled.div`
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  @media (max-width: 768px) {
+    grid-column: 2;
+    justify-content: center;
   }
 `;
 
@@ -176,7 +259,7 @@ export default function SearchPageFrame({
   heroSearchPrimaryBand = false,
   /** When true, no margin between hero/search and page content (e.g. Home flush with split) */
   contentFlushTop = false,
-  /** Optional URL for hero band background (e.g. `/images/spotlight.jpeg`); file lives under `public/` */
+  /** Optional URL for hero band background (e.g. `/images/spotlight.webp`); file lives under `public/` */
   heroBandBackgroundImage = null,
   /** Optional row below the search bar inside the hero band (e.g. filter pills) */
   heroBandFooter = null,
@@ -186,6 +269,13 @@ export default function SearchPageFrame({
   searchValue,
   /** Optional callback for controlled SearchBar updates */
   onSearchValueChange,
+  /** Optional right-side controls aligned with the SearchBar (e.g. Mode toggle) */
+  searchBarRightSlot,
+  /**
+   * Optional control embedded in the search bar (e.g. Library / Discover on Search Movies).
+   * Desktop: rendered inside the hero pill on the left. Mobile: stacked below the bar (same as before).
+   */
+  searchBarAccessory,
   children,
 }) {
   const Container = wide ? PageContainer : SearchFrameShell;
@@ -215,26 +305,42 @@ export default function SearchPageFrame({
         <HeroSearchPrimaryBand $wide={wide} $heroImageUrl={heroBandBackgroundImage}>
           <HeroSearchBandInner $size={containerSize}>
             {heroForBand}
-            <SearchBar
-              enterSearch={onSearch}
-              placeholder={searchPlaceholder}
-              variant={searchBarVariant}
-              value={searchValue}
-              onValueChange={onSearchValueChange}
-            />
+            <SearchRow>
+              <SearchRowCenter>
+                <SearchBar
+                  enterSearch={onSearch}
+                  placeholder={searchPlaceholder}
+                  variant={searchBarVariant}
+                  value={searchValue}
+                  onValueChange={onSearchValueChange}
+                  accessory={searchBarAccessory}
+                />
+              </SearchRowCenter>
+              {searchBarRightSlot ? (
+                <SearchRowRight>{searchBarRightSlot}</SearchRowRight>
+              ) : null}
+            </SearchRow>
             {heroBandFooter}
           </HeroSearchBandInner>
         </HeroSearchPrimaryBand>
       ) : (
         <>
           {hero ? <HeroSlot>{hero}</HeroSlot> : null}
-          <SearchBar
-            enterSearch={onSearch}
-            placeholder={searchPlaceholder}
-            variant={searchBarVariant}
-            value={searchValue}
-            onValueChange={onSearchValueChange}
-          />
+          <SearchRow>
+            <SearchRowCenter>
+              <SearchBar
+                enterSearch={onSearch}
+                placeholder={searchPlaceholder}
+                variant={searchBarVariant}
+                value={searchValue}
+                onValueChange={onSearchValueChange}
+                accessory={searchBarAccessory}
+              />
+            </SearchRowCenter>
+            {searchBarRightSlot ? (
+              <SearchRowRight>{searchBarRightSlot}</SearchRowRight>
+            ) : null}
+          </SearchRow>
         </>
       )}
 

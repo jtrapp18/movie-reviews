@@ -217,51 +217,10 @@ div.star-ratings {
 
 @font-face {
   font-family: 'Merriweather';
-  src: url('/fonts/Merriweather-VariableFont_opsz,wdth,wght.ttf') format('truetype');
+  src: url('/fonts/Merriweather_120pt-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
-
-@font-face {
-  font-family: 'ComforterBrush';
-  src: url('/fonts/ComforterBrush-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'BungeeInline';
-  src: url('/fonts/BungeeInline-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'BungeeOutline';
-  src: url('/fonts/BungeeOutline-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Codystar';
-  src: url('/fonts/Codystar-Light.ttf') format('truetype');
-  font-weight: 300;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Codystar';
-  src: url('/fonts/Codystar-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'FrancoisOne';
-  src: url('/fonts/FrancoisOne-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -269,41 +228,7 @@ div.star-ratings {
   src: url('/fonts/Mogra-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-}
-
-@font-face {
-  font-family: 'Nosifer';
-  src: url('/fonts/Nosifer-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'RobotoCondensed';
-  src: url('/fonts/RobotoCondensed-Italic-VariableFont_wght.ttf') format('truetype');
-  font-style: italic;
-  font-weight: 100 900;
-}
-
-@font-face {
-  font-family: 'RobotoCondensed';
-  src: url('/fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype');
-  font-style: normal;
-  font-weight: 100 900;
-}
-
-@font-face {
-  font-family: 'RopaSans';
-  src: url('/fonts/RopaSans-Italic.ttf') format('truetype');
-  font-style: italic;
-  font-weight: normal;
-}
-
-@font-face {
-  font-family: 'RopaSans';
-  src: url('/fonts/RopaSans-Regular.ttf') format('truetype');
-  font-style: normal;
-  font-weight: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -311,6 +236,7 @@ div.star-ratings {
   src: url('/fonts/Rubik-Italic-VariableFont_wght.ttf') format('truetype');
   font-style: italic;
   font-weight: 100 900;
+  font-display: swap;
 }
 
 @font-face {
@@ -318,6 +244,7 @@ div.star-ratings {
   src: url('/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
   font-style: normal;
   font-weight: 100 900;
+  font-display: swap;
 }
 
 @font-face {
@@ -325,6 +252,7 @@ div.star-ratings {
   src: url('/fonts/NotoSerif-VariableFont_wdth,wght.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -332,6 +260,7 @@ div.star-ratings {
   src: url('/fonts/Caveat-VariableFont_wght.ttf') format('truetype');
   font-weight: 100 900;
   font-style: normal;
+  font-display: swap;
 }
 
 body {

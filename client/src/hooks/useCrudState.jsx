@@ -1,9 +1,11 @@
-import { snakeToCamel } from "../helper";
+import { snakeToCamel } from '@helper';
 
-const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
+const useCrudState = (setState, optionalFunc = null, addFunc = null) => {
   const addToState = (item) => {
-    setState(prevItems => {
-      const updatedState = Array.isArray(prevItems) ? [...prevItems, item] : [prevItems, item];
+    setState((prevItems) => {
+      const updatedState = Array.isArray(prevItems)
+        ? [...prevItems, item]
+        : [prevItems, item];
 
       optionalFunc?.(updatedState);
       addFunc?.(item);
@@ -13,9 +15,10 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
   };
 
   const updateState = (updatedItem, itemId) => {
-    const updateItem = (item) => (item.id === itemId ? { ...item, ...updatedItem } : item);
+    const updateItem = (item) =>
+      item.id === itemId ? { ...item, ...updatedItem } : item;
 
-    setState(prevItems => {
+    setState((prevItems) => {
       const updatedState = Array.isArray(prevItems)
         ? prevItems.map(updateItem)
         : updateItem(prevItems);
@@ -28,10 +31,12 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
   };
 
   const deleteFromState = (itemId) => {
-    setState(prevItems => {
+    setState((prevItems) => {
       const updatedState = Array.isArray(prevItems)
-        ? prevItems.filter(item => item.id !== itemId)
-        : prevItems.id === itemId ? null : prevItems;
+        ? prevItems.filter((item) => item.id !== itemId)
+        : prevItems.id === itemId
+          ? null
+          : prevItems;
 
       optionalFunc?.(updatedState);
 
@@ -47,9 +52,9 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
       [stateArrayKey]: [...(item[stateArrayKey] || []), newObj], // Ensure array exists
     });
 
-    setState(prevItems => {
+    setState((prevItems) => {
       const updatedState = Array.isArray(prevItems)
-        ? prevItems.map(item => (item.id === itemId ? updateStateArray(item) : item))
+        ? prevItems.map((item) => (item.id === itemId ? updateStateArray(item) : item))
         : updateStateArray(prevItems);
 
       optionalFunc?.(updatedState);
@@ -59,27 +64,27 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
     });
   };
 
-    const updateKeyInState = (arrayKey, updatedObj, itemId) => {
-      const stateArrayKey = snakeToCamel(arrayKey);
+  const updateKeyInState = (arrayKey, updatedObj, itemId) => {
+    const stateArrayKey = snakeToCamel(arrayKey);
 
-      const updateStateArray = (item) => ({
-        ...item,
-        [stateArrayKey]: Array.isArray(item[stateArrayKey])
-          ? item[stateArrayKey].map(subItem =>
-              subItem.id === updatedObj.id ? { ...subItem, ...updatedObj } : subItem
-            )
-          : updatedObj // Directly update if not an array
-      });
+    const updateStateArray = (item) => ({
+      ...item,
+      [stateArrayKey]: Array.isArray(item[stateArrayKey])
+        ? item[stateArrayKey].map((subItem) =>
+            subItem.id === updatedObj.id ? { ...subItem, ...updatedObj } : subItem
+          )
+        : updatedObj, // Directly update if not an array
+    });
 
-      setState(prevItems => {
-        const updatedState = Array.isArray(prevItems)
-        ? prevItems.map(item => (item.id === itemId ? updateStateArray(item) : item))
+    setState((prevItems) => {
+      const updatedState = Array.isArray(prevItems)
+        ? prevItems.map((item) => (item.id === itemId ? updateStateArray(item) : item))
         : updateStateArray(prevItems);
 
-          optionalFunc?.(updatedState);
-          addFunc?.(updatedObj);
-          return updatedState;
-      })
+      optionalFunc?.(updatedState);
+      addFunc?.(updatedObj);
+      return updatedState;
+    });
   };
 
   const deleteFromKeyInState = (arrayKey, arrayId, itemId) => {
@@ -87,12 +92,14 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
 
     const updateStateArray = (item) => ({
       ...item,
-      [stateArrayKey]: item[stateArrayKey].filter(arrayObj => arrayObj.id !== arrayId),
+      [stateArrayKey]: item[stateArrayKey].filter(
+        (arrayObj) => arrayObj.id !== arrayId
+      ),
     });
 
-    setState(prevItems => {
+    setState((prevItems) => {
       const updatedState = Array.isArray(prevItems)
-        ? prevItems.map(item => (item.id === itemId ? updateStateArray(item) : item))
+        ? prevItems.map((item) => (item.id === itemId ? updateStateArray(item) : item))
         : updateStateArray(prevItems);
 
       optionalFunc?.(updatedState);
@@ -106,18 +113,18 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
 
     const updateStateArray = (item) => ({
       ...item,
-      [stateArrayKey]: item[stateArrayKey].map(subItem =>
+      [stateArrayKey]: item[stateArrayKey].map((subItem) =>
         subItem.id === arrayId
           ? { ...subItem, [stateNestedKey]: [...subItem[stateNestedKey], newObj] }
           : subItem
       ),
     });
 
-    setState(prevItems => {
+    setState((prevItems) => {
       console.log(prevItems); // Check if prevItems is an array
       const updatedState = Array.isArray(prevItems)
-        ? prevItems.map(item => {
-            return (item.id === itemId ? updateStateArray(item) : item);
+        ? prevItems.map((item) => {
+            return item.id === itemId ? updateStateArray(item) : item;
           })
         : updateStateArray(prevItems);
 
@@ -127,27 +134,36 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
     });
   };
 
-  const updateNestedKeyInState = (arrayKey, arrayId, nestedKey, nestedId, updatedObj, itemId) => {
+  const updateNestedKeyInState = (
+    arrayKey,
+    arrayId,
+    nestedKey,
+    nestedId,
+    updatedObj,
+    itemId
+  ) => {
     const stateArrayKey = snakeToCamel(arrayKey);
     const stateNestedKey = snakeToCamel(nestedKey);
 
     const updateStateArray = (item) => ({
       ...item,
-      [stateArrayKey]: item[stateArrayKey].map(subItem =>
+      [stateArrayKey]: item[stateArrayKey].map((subItem) =>
         subItem.id === arrayId
           ? {
               ...subItem,
-              [stateNestedKey]: subItem[stateNestedKey].map(nestedSubItem =>
-                nestedSubItem.id === nestedId ? { ...nestedSubItem, ...updatedObj } : nestedSubItem
+              [stateNestedKey]: subItem[stateNestedKey].map((nestedSubItem) =>
+                nestedSubItem.id === nestedId
+                  ? { ...nestedSubItem, ...updatedObj }
+                  : nestedSubItem
               ),
             }
           : subItem
       ),
     });
 
-    setState(prevItems => {
+    setState((prevItems) => {
       const updatedState = Array.isArray(prevItems)
-        ? prevItems.map(item => (item.id === itemId ? updateStateArray(item) : item))
+        ? prevItems.map((item) => (item.id === itemId ? updateStateArray(item) : item))
         : updateStateArray(prevItems);
 
       optionalFunc?.(updatedState);
@@ -156,37 +172,45 @@ const useCrudState = (setState, optionalFunc=null, addFunc=null) => {
     });
   };
 
-    const deleteNestedKeyInState = (arrayKey, arrayId, nestedKey, nestedId, itemId) => {
-      const stateArrayKey = snakeToCamel(arrayKey);
-      const stateNestedKey = snakeToCamel(nestedKey);
+  const deleteNestedKeyInState = (arrayKey, arrayId, nestedKey, nestedId, itemId) => {
+    const stateArrayKey = snakeToCamel(arrayKey);
+    const stateNestedKey = snakeToCamel(nestedKey);
 
-      const updateStateArray = (item) => ({
-        ...item,
-        [stateArrayKey]: item[stateArrayKey].map(subItem =>
-          subItem.id === arrayId
-            ? {
-                ...subItem,
-                [stateNestedKey]: subItem[stateNestedKey].filter(nestedSubItem => nestedSubItem.id !== nestedId)
-              }
-            : subItem
-        ),
-      });
+    const updateStateArray = (item) => ({
+      ...item,
+      [stateArrayKey]: item[stateArrayKey].map((subItem) =>
+        subItem.id === arrayId
+          ? {
+              ...subItem,
+              [stateNestedKey]: subItem[stateNestedKey].filter(
+                (nestedSubItem) => nestedSubItem.id !== nestedId
+              ),
+            }
+          : subItem
+      ),
+    });
 
-      setState(prevItems => {
-        const updatedState = Array.isArray(prevItems)
-          ? prevItems.map(item => (item.id === itemId ? updateStateArray(item) : item))
-          : updateStateArray(prevItems);
+    setState((prevItems) => {
+      const updatedState = Array.isArray(prevItems)
+        ? prevItems.map((item) => (item.id === itemId ? updateStateArray(item) : item))
+        : updateStateArray(prevItems);
 
-        optionalFunc?.(updatedState);
-        return updatedState;
-      });
-    };
+      optionalFunc?.(updatedState);
+      return updatedState;
+    });
+  };
 
-
-    return {addToState, updateState, deleteFromState,
-      addToKeyInState, updateKeyInState, deleteFromKeyInState,
-      addNestedToKeyInState, updateNestedKeyInState, deleteNestedKeyInState
-    }
-}
+  return {
+    addToState,
+    updateState,
+    deleteFromState,
+    addToKeyInState,
+    updateKeyInState,
+    deleteFromKeyInState,
+    addNestedToKeyInState,
+    updateNestedKeyInState,
+    deleteNestedKeyInState,
+  };
+};
 
 export default useCrudState;

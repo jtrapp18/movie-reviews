@@ -8,6 +8,7 @@ import { WindowWidthContext } from '@context/windowSize';
 import Loading from '@components/ui/Loading';
 import { StyledMain } from '@styles';
 import { useTheme } from '@context/themeProvider';
+import ScrollToTop from '@components/routing/ScrollToTop';
 
 function App() {
   const { isMobile } = useContext(WindowWidthContext);
@@ -75,6 +76,7 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <ScrollToTop />
       <Header />
       <StyledMain isMobile={isMobile} style={{ flex: 1 }}>
         <Suspense fallback={<Loading />}>

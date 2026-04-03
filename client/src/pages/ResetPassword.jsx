@@ -1,22 +1,13 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { StyledContainer, StyledForm, Button } from '../styles';
-import Error from '../styles/Error';
-import { postJSONToDb } from '../helper';
-
-const Header = styled.div`
-  text-align: center;
-  margin-bottom: 1.5rem;
-
-  h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    font-style: italic;
-  }
-`;
+import { StaticPageShell, StyledForm, Button } from '@styles';
+import Error from '@styles/Error';
+import { postJSONToDb } from '@helper';
+import {
+  StaticPageHeader,
+  StaticPageSubtitle,
+} from '@components/layout/staticPageStyles';
 
 const SuccessText = styled.p`
   margin-top: 0.75rem;
@@ -39,12 +30,12 @@ function ResetPassword() {
 
   if (!token) {
     return (
-      <StyledContainer>
-        <Header>
+      <StaticPageShell>
+        <StaticPageHeader>
           <h1>Reset password</h1>
-          <div className="subtitle">This reset link is invalid.</div>
-        </Header>
-      </StyledContainer>
+          <StaticPageSubtitle>This reset link is invalid.</StaticPageSubtitle>
+        </StaticPageHeader>
+      </StaticPageShell>
     );
   }
 
@@ -72,11 +63,11 @@ function ResetPassword() {
   };
 
   return (
-    <StyledContainer>
-      <Header>
+    <StaticPageShell>
+      <StaticPageHeader>
         <h1>Reset password</h1>
-        <div className="subtitle">Choose a new password for your account.</div>
-      </Header>
+        <StaticPageSubtitle>Choose a new password for your account.</StaticPageSubtitle>
+      </StaticPageHeader>
       <StyledForm onSubmit={handleSubmit}>
         <div>
           <label htmlFor="password">New password</label>
@@ -106,7 +97,7 @@ function ResetPassword() {
         </div>
       </StyledForm>
       {success && <SuccessText>{success}</SuccessText>}
-    </StyledContainer>
+    </StaticPageShell>
   );
 }
 

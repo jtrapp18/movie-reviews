@@ -1,10 +1,19 @@
 import { getMoviesByGenre, getMoviesByFilters } from '@helper';
-import { useState, useEffect, useContext, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { WindowWidthContext } from '@context/windowSize';
 import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
-import SearchHeroBanner from '@components/shared-sections/SearchHeroBanner';
+import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
 import { getAllGradingTiers } from '@utils/gradingTiers';
 
@@ -35,10 +44,248 @@ const LibraryStack = styled.div`
   flex-direction: column;
 `;
 
+const InlineModeToggle = styled.div`
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  padding: 3px;
+  border-radius: 9999px;
+  background: rgba(248, 249, 250, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+`;
+
+const ModeDropdownRoot = styled.div`
+  position: relative;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+`;
+
+/**
+ * Closed state matches the old flat <select> look (padding + BG chevron).
+ * Open list stays the custom portaled menu.
+ */
+const ModeTriggerButton = styled.button`
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  width: auto;
+  max-width: 100%;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: rgba(248, 249, 250, 0.96);
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  /* Tight right inset: chevron is 10px at right:2px — no extra dead space like full-width stretch */
+  padding: 12px 20px 12px 2px;
+  cursor: pointer;
+  line-height: 1.3;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(248,249,250,0.55)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 10px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 2px;
+  }
+`;
+
+/** Portaled so it isn’t clipped by the hero pill’s overflow:hidden; themed (not OS native) */
+const ModeMenuPanel = styled.div`
+  position: fixed;
+  z-index: 10002;
+  background: rgba(22, 24, 30, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+  padding: 6px;
+`;
+
+const ModeMenuItem = styled.button`
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: ${({ $active }) =>
+    $active ? 'rgba(255, 255, 255, 0.1)' : 'transparent'};
+  color: rgba(248, 249, 250, 0.95);
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.82rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  letter-spacing: 0.02em;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 0;
+  }
+`;
+
+function DesktopModeDropdown({ mode, goLibrary, goDiscover }) {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 160 });
+  const rootRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const updatePosition = useCallback(() => {
+    if (!rootRef.current) return;
+    const r = rootRef.current.getBoundingClientRect();
+    setCoords({ top: r.bottom + 6, left: r.left, width: r.width });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    updatePosition();
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onScrollResize = () => updatePosition();
+    window.addEventListener('resize', onScrollResize);
+    window.addEventListener('scroll', onScrollResize, true);
+    return () => {
+      window.removeEventListener('resize', onScrollResize);
+      window.removeEventListener('scroll', onScrollResize, true);
+    };
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      const t = e.target;
+      if (rootRef.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  const label = mode === 'library' ? 'Library' : 'Discover';
+
+  const menuPortal =
+    open &&
+    createPortal(
+      <ModeMenuPanel
+        ref={menuRef}
+        role="listbox"
+        aria-label="Search mode"
+        style={{
+          top: coords.top,
+          left: coords.left,
+          minWidth: Math.max(coords.width, 148),
+        }}
+      >
+        <ModeMenuItem
+          type="button"
+          role="option"
+          aria-selected={mode === 'library'}
+          $active={mode === 'library'}
+          onClick={() => {
+            goLibrary();
+            setOpen(false);
+          }}
+        >
+          Library
+        </ModeMenuItem>
+        <ModeMenuItem
+          type="button"
+          role="option"
+          aria-selected={mode === 'discover'}
+          $active={mode === 'discover'}
+          onClick={() => {
+            goDiscover();
+            setOpen(false);
+          }}
+        >
+          Discover
+        </ModeMenuItem>
+      </ModeMenuPanel>,
+      document.body
+    );
+
+  return (
+    <>
+      <ModeDropdownRoot ref={rootRef}>
+        <ModeTriggerButton
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-label="Search mode"
+          onClick={() => setOpen((o) => !o)}
+        >
+          {label}
+        </ModeTriggerButton>
+      </ModeDropdownRoot>
+      {menuPortal}
+    </>
+  );
+}
+
+const ModeBtn = styled.button`
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
+  letter-spacing: 0.04em;
+  color: ${({ $active }) =>
+    $active ? 'rgba(248, 249, 250, 0.95)' : 'rgba(248, 249, 250, 0.68)'};
+  background: ${({ $active }) =>
+    $active ? 'rgba(248, 249, 250, 0.16)' : 'transparent'};
+  border: 1px solid
+    ${({ $active }) => ($active ? 'rgba(255, 255, 255, 0.22)' : 'transparent')};
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(248, 249, 250, 0.1);
+    color: rgba(248, 249, 250, 0.92);
+  }
+`;
+
 function SearchMovies() {
   const navigate = useNavigate();
   const { movies: libraryMovies = [] } = useOutletContext();
   const { isAdmin } = useContext(AdminContext);
+  const { isMobile } = useContext(WindowWidthContext) || { isMobile: false };
   const [genreData, setGenreData] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,8 +301,11 @@ function SearchMovies() {
     Decade: 'All',
   });
 
-  const fetchAllGenres = useCallback(async () => {
-    setLoading(true);
+  const fetchAllGenres = useCallback(async (options = {}) => {
+    const silent = Boolean(options.silent);
+    if (!silent) {
+      setLoading(true);
+    }
     try {
       const promises = GENRES.map(async (genre) => {
         const movies = await getMoviesByGenre(genre.id);
@@ -73,7 +323,9 @@ function SearchMovies() {
       console.error('Error fetching movies by genre:', error);
       setGenreData([]);
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -95,11 +347,21 @@ function SearchMovies() {
   };
 
   useEffect(() => {
-    if (mode === 'discover') {
-      fetchAllGenres();
+    if (mode !== 'discover') {
+      setLoading(false);
       return;
     }
-    setLoading(false);
+    const q = searchQuery.trim();
+    if (q) {
+      setIsSearchMode(true);
+      fetchSearchResults(q, activeGenreId, activeDecade);
+      fetchAllGenres({ silent: true });
+    } else {
+      setIsSearchMode(false);
+      fetchAllGenres();
+    }
+    // Intentionally only [mode]: run when switching modes; searchQuery is read from latest render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, fetchAllGenres]);
 
   const enterSearch = (text) => {
@@ -148,8 +410,6 @@ function SearchMovies() {
       ],
     },
   ];
-
-  const modeGroup = [{ title: 'Mode', labels: ['My Library', 'Discover'] }];
 
   const libraryTierButtons = (() => {
     // already sorted desc in util; we want highest tier first
@@ -265,6 +525,34 @@ function SearchMovies() {
     return hasQuery || hasRating || hasRelease;
   })();
 
+  const goLibrary = () => {
+    if (mode === 'library') return;
+    setMode('library');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setSearchResults([]);
+    setLibraryRatingTier(null);
+    setLibraryReleaseBucket('All');
+    if (searchQuery.trim()) {
+      setIsSearchMode(true);
+    } else {
+      setIsSearchMode(false);
+    }
+    setLoading(false);
+  };
+
+  const goDiscover = () => {
+    if (mode === 'discover') return;
+    setMode('discover');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setSearchResults([]);
+    setLibraryRatingTier(null);
+    setLibraryReleaseBucket('All');
+  };
+
   return (
     <SearchPageFrame
       title={null}
@@ -277,44 +565,33 @@ function SearchMovies() {
             : 'Search movies by title, director, year...'
       }
       onSearch={enterSearch}
+      searchValue={searchQuery}
+      onSearchValueChange={setSearchQuery}
       isLoading={loading}
       loadingText="Loading movies"
       wide
       containerSize="full"
       showHeader={false}
       heroSearchPrimaryBand
-      heroBandBackgroundImage="/images/spotlight.jpeg"
+      heroBandBackgroundImage="/images/spotlight.webp"
       searchBarVariant="hero"
       hero={<SearchHeroBanner title="Search Movies" subtitle={introText} />}
+      searchBarAccessory={
+        isMobile ? (
+          <InlineModeToggle aria-label="Mode toggle">
+            <ModeBtn type="button" $active={mode === 'library'} onClick={goLibrary}>
+              Library
+            </ModeBtn>
+            <ModeBtn type="button" $active={mode === 'discover'} onClick={goDiscover}>
+              Discover
+            </ModeBtn>
+          </InlineModeToggle>
+        ) : (
+          <DesktopModeDropdown mode={mode} goLibrary={goLibrary} goDiscover={goDiscover} />
+        )
+      }
       heroBandFooter={
         <>
-          <SearchHeroBanner
-            buttonGroups={modeGroup}
-            showDivider={false}
-            activeButtonsByGroup={{
-              Mode: mode === 'library' ? 'My Library' : 'Discover',
-            }}
-            onButtonClick={(label) => {
-              const nextMode = label === 'My Library' ? 'library' : 'discover';
-              setMode(nextMode);
-              setSearchQuery('');
-
-              // Reset discover-only state when switching modes.
-              setActiveGenreId(null);
-              setActiveDecade(null);
-              setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
-              setSearchResults([]);
-              setIsSearchMode(false);
-              setLibraryRatingTier(null);
-              setLibraryReleaseBucket('All');
-
-              if (nextMode === 'discover') {
-                setLoading(true);
-              } else {
-                setLoading(false);
-              }
-            }}
-          />
           {mode === 'discover' ? (
             <SearchHeroBanner
               buttonGroups={quickGroups}

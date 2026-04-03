@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import ArticleForm from '../forms/ArticleForm';
-import { StyledContainer } from '../styles';
+import { ArticleForm } from '@features/articles';
+import { StyledContainer } from '@styles';
 
 function NewArticle() {
   const [newArticle] = useState(null);

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import PostCard from '@components/cards/PostCard';
+import { PostCard } from '@features/articles';
 import { formatDate } from '@utils/formatting';
 import { prefetchEntity } from '@features/cache/prefetchEntity';
 import { appendContinueReading, useContinueReading } from '@features/sidePanel';

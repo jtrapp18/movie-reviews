@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, StaticPageShell, StyledForm } from '@styles';
 import yaml from 'js-yaml';
-import aboutContentYaml from '../data/aboutContent.yaml?raw';
+import aboutContentYaml from '@/data/aboutContent.yaml?raw';
 import {
   StaticPageHeader,
   StaticPageSubtitle,

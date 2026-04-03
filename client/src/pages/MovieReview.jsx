@@ -5,11 +5,11 @@ import { StyledContainer, StyledForm } from '@styles';
 import { CoverHeader, LikeButton } from '@features/reviews';
 import { useMovieReview } from '@features/reviews/useMovieReview';
 import { Movies } from '@features/movies';
-import ReviewForm from '@forms/ReviewForm';
-import CommentList from '@components/comments/CommentList';
-import DirectorCard from '@components/cards/DirectorCard';
+import { ReviewForm } from '@features/reviews';
+import { CommentList } from '@features/comments';
+import { DirectorCard } from '@features/directors';
 import MovieTmdbInspector from '@components/forms/MovieTmdbInspector';
-import SEOHead from '@components/shared-sections/SEOHead';
+import SEOHead from '@components/sections/SEOHead';
 import { UserContext } from '@context/userProvider';
 import {
   buildMovieReviewDetailPageStructuredData,
