@@ -55,34 +55,6 @@ const AfterHeroSpacer = styled.div`
   height: clamp(0.75rem, 2.2vh, 1.25rem);
 `;
 
-const AboveFold = styled.div`
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: 1.25rem;
-  align-items: start;
-  margin-bottom: 1rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const AuthorPhoto = styled.img`
-  width: 220px;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.35),
-    0 2px 10px rgba(0, 0, 0, 0.35);
-
-  @media (max-width: 768px) {
-    width: 220px;
-    margin: 0 auto;
-  }
-`;
-
 const DirectorNameLink = styled(Link)`
   color: inherit;
   text-decoration: none;
@@ -264,21 +236,9 @@ function About() {
         <AfterHeroSpacer />
 
         <AboutSection>
-          <AboveFold>
-            <div>
-              {/* Placeholder image path; add file at `client/public/images/james-trapp.png` */}
-              <AuthorPhoto
-                src="/images/james-trapp.png"
-                alt="James Trapp"
-                loading="lazy"
-              />
-            </div>
-            <div>
-              {personalLead.map((p, i) => (
-                <p key={`lead-${i}`}>{p}</p>
-              ))}
-            </div>
-          </AboveFold>
+          {personalLead.map((p, i) => (
+            <p key={`lead-${i}`}>{p}</p>
+          ))}
 
           {personalRemainder.map((p, i) => (
             <p key={`rest-${i}`}>{p}</p>
@@ -292,7 +252,7 @@ function About() {
             onClick={() => setIsGradingOpen(true)}
             style={{ marginTop: '0.05rem', marginBottom: '0.9rem' }}
           >
-            View James&apos; Film Grading System
+            ★ View James&apos; Film Grading System
           </Button>
 
           <Paragraphs text={aboutContent.aboutJames.closing} />

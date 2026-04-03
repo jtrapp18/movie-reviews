@@ -322,9 +322,19 @@ class Movies(Resource):
             if earliest_release_date:
                 release_date = earliest_release_date
 
+        raw_country = data.get("primary_origin_country") or data.get(
+            "primaryOriginCountry"
+        )
+        if raw_country is None:
+            primary_origin_country = None
+        else:
+            s = str(raw_country).strip()
+            primary_origin_country = s[:10] if s else None
+
         try:
             new_movie = Movie(
                 external_id=external_id,
+                primary_origin_country=primary_origin_country,
                 original_language=data.get("original_language"),
                 original_title=data.get("original_title"),
                 overview=data.get("overview"),
