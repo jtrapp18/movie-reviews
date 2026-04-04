@@ -12,11 +12,19 @@ import {
 import { formatDate } from '@utils/formatting';
 
 const LikeCount = styled.span`
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
   font-size: 0.8rem;
-  color: var(--font-color-2);
+  font-weight: 500;
+  color: var(--card-font);
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 3px 6px;
+  border-radius: 4px;
 `;
 
 const backdrop = '/images/card-backdrop.jpeg';

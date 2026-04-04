@@ -1,10 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import styled from 'styled-components';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
 import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
+
+/** Matches SearchResultsGrid `GridContainer` so article cards size/spacing match library grid. */
+const ArticlesGridSection = styled.div`
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
+`;
 
 const ARTICLE_QUICK_FILTERS = ['analysis', 'horror', 'hitchcock', 'cinematography'];
 
@@ -42,9 +50,7 @@ function Articles() {
         return;
       }
 
-      setActiveQuickSearch(
-        ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null
-      );
+      setActiveQuickSearch(ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null);
       setIsSearching(true);
       try {
         const data = await fetchArticles(trimmed);
@@ -105,23 +111,25 @@ function Articles() {
       }
     >
       <CardContainer>
-        {!isLoading && (
-          <SearchResultsHeader
-            searchQuery={submittedQuery}
-            articleCount={filteredArticles.length}
-            isLoading={isSearching}
-            showNoResults={showArticleNoResults}
-          />
-        )}
-        {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
-          <MediaCardGrid>
-            {filteredArticles.map((article) => (
-              <MediaCardCell key={article.id}>
-                <ArticleCard article={article} fillGridCell />
-              </MediaCardCell>
-            ))}
-          </MediaCardGrid>
-        ) : null}
+        <ArticlesGridSection>
+          {!isLoading && (
+            <SearchResultsHeader
+              searchQuery={submittedQuery}
+              articleCount={filteredArticles.length}
+              isLoading={isSearching}
+              showNoResults={showArticleNoResults}
+            />
+          )}
+          {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
+            <MediaCardGrid>
+              {filteredArticles.map((article) => (
+                <MediaCardCell key={article.id}>
+                  <ArticleCard article={article} fillGridCell />
+                </MediaCardCell>
+              ))}
+            </MediaCardGrid>
+          ) : null}
+        </ArticlesGridSection>
       </CardContainer>
     </SearchPageFrame>
   );
