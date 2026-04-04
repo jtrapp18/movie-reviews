@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
-import { StyledForm } from '@styles';
+import { StyledForm, MobilePageGutter } from '@styles';
 import Error from '@styles/Error';
 import ContentDisplay from '@components/forms/FormSubmit';
 import TagInput from '@components/forms/TagInput';
@@ -223,6 +223,7 @@ const ArticleForm = ({ initObj }) => {
   return (
     <>
       {isEditing ? (
+        <MobilePageGutter>
         <StyledForm onSubmit={formik.handleSubmit}>
           <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
           {submitError && <Error>{submitError}</Error>}
@@ -340,6 +341,7 @@ const ArticleForm = ({ initObj }) => {
             }
           />
         </StyledForm>
+        </MobilePageGutter>
       ) : (
         <ContentDisplay
           formValues={buildArticleFormContentDisplayValues({

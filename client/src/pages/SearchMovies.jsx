@@ -6,6 +6,7 @@ import {
   useRef,
   useContext,
   useCallback,
+  useMemo,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { WindowWidthContext } from '@context/windowSize';
@@ -296,10 +297,30 @@ function SearchMovies() {
   const [mode, setMode] = useState('library'); // 'discover' | 'library'
   const [libraryRatingTier, setLibraryRatingTier] = useState(null); // number (1..7) or null
   const [libraryReleaseBucket, setLibraryReleaseBucket] = useState('All'); // All | Pre-1960s | 1960s...
+  /** ISO 3166-1 alpha-2 from movie.primaryOriginCountry, or 'All' */
+  const [libraryCountry, setLibraryCountry] = useState('All');
   const [activeFiltersByGroup, setActiveFiltersByGroup] = useState({
     Genre: 'All',
     Decade: 'All',
   });
+
+  const libraryCountryButtonLabels = useMemo(() => {
+    const codes = new Set();
+    for (const m of libraryMovies || []) {
+      const c = m?.primaryOriginCountry;
+      if (c != null && String(c).trim()) {
+        codes.add(String(c).trim().toUpperCase());
+      }
+    }
+    return ['All', ...[...codes].sort()];
+  }, [libraryMovies]);
+
+  useEffect(() => {
+    if (libraryCountry === 'All') return;
+    if (!libraryCountryButtonLabels.includes(libraryCountry)) {
+      setLibraryCountry('All');
+    }
+  }, [libraryCountry, libraryCountryButtonLabels]);
 
   const fetchAllGenres = useCallback(async (options = {}) => {
     const silent = Boolean(options.silent);
@@ -454,6 +475,9 @@ function SearchMovies() {
     if (mode === 'library' && libraryReleaseBucket && libraryReleaseBucket !== 'All') {
       parts.push(`Release: ${libraryReleaseBucket}`);
     }
+    if (mode === 'library' && libraryCountry && libraryCountry !== 'All') {
+      parts.push(`Country: ${libraryCountry}`);
+    }
     return parts.join(' • ') || (mode === 'library' ? 'My Library' : 'All Movies');
   })();
 
@@ -499,7 +523,16 @@ function SearchMovies() {
             return false;
           });
 
-    return [...byRelease].sort((a, b) =>
+    const countrySel = (libraryCountry || 'All').toUpperCase();
+    const byCountry =
+      countrySel === 'ALL'
+        ? byRelease
+        : byRelease.filter((m) => {
+            const c = (m?.primaryOriginCountry || '').toString().trim().toUpperCase();
+            return c === countrySel;
+          });
+
+    return [...byCountry].sort((a, b) =>
       String(a?.title || '').localeCompare(String(b?.title || ''))
     );
   })();
@@ -522,7 +555,8 @@ function SearchMovies() {
     const hasQuery = Boolean(searchQuery && searchQuery.trim());
     const hasRating = libraryRatingTier != null;
     const hasRelease = Boolean(libraryReleaseBucket && libraryReleaseBucket !== 'All');
-    return hasQuery || hasRating || hasRelease;
+    const hasCountry = Boolean(libraryCountry && libraryCountry !== 'All');
+    return hasQuery || hasRating || hasRelease || hasCountry;
   })();
 
   const goLibrary = () => {
@@ -534,6 +568,7 @@ function SearchMovies() {
     setSearchResults([]);
     setLibraryRatingTier(null);
     setLibraryReleaseBucket('All');
+    setLibraryCountry('All');
     if (searchQuery.trim()) {
       setIsSearchMode(true);
     } else {
@@ -551,6 +586,7 @@ function SearchMovies() {
     setSearchResults([]);
     setLibraryRatingTier(null);
     setLibraryReleaseBucket('All');
+    setLibraryCountry('All');
   };
 
   return (
@@ -587,7 +623,11 @@ function SearchMovies() {
             </ModeBtn>
           </InlineModeToggle>
         ) : (
-          <DesktopModeDropdown mode={mode} goLibrary={goLibrary} goDiscover={goDiscover} />
+          <DesktopModeDropdown
+            mode={mode}
+            goLibrary={goLibrary}
+            goDiscover={goDiscover}
+          />
         )
       }
       heroBandFooter={
@@ -662,6 +702,19 @@ function SearchMovies() {
                 activeButtonsByGroup={{ 'Release Date': libraryReleaseBucket }}
                 onButtonClick={(label) => {
                   setLibraryReleaseBucket(label);
+                  setIsSearchMode(true);
+                }}
+              />
+              <SearchHeroBanner
+                buttonGroups={[
+                  { title: 'Country', labels: libraryCountryButtonLabels },
+                ]}
+                showDivider={false}
+                activeButtonsByGroup={{ Country: libraryCountry }}
+                onButtonClick={(label) => {
+                  setLibraryCountry(
+                    label === 'All' ? 'All' : String(label).toUpperCase()
+                  );
                   setIsSearchMode(true);
                 }}
               />

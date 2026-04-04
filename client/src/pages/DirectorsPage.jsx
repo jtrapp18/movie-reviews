@@ -13,20 +13,42 @@ const Layout = styled.div`
   flex-direction: column;
 `;
 
-const LetterRow = styled.div`
+/**
+ * Outer = scroll viewport; inner = one shrink-wrapped row (`max-content`).
+ * `justify-content: safe center` centers when the cluster fits; if centering would overflow,
+ * alignment falls back to start (All / A stay reachable). No refs.
+ * ≤768px: always `flex-start` for touch + engines that mishandle `safe`.
+ */
+const LetterRowViewport = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0.22rem;
-  padding: 0.15rem 0 0.35rem;
+  justify-content: safe center;
+  box-sizing: border-box;
   overflow-x: auto;
   overflow-y: hidden;
-  flex-wrap: nowrap;
+  padding: 0.15rem 1rem 0.35rem;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
 
   &::-webkit-scrollbar {
     height: 4px;
   }
+`;
+
+const LetterRowCluster = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.22rem;
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: min-content;
 `;
 
 const LetterBtn = styled.button`
@@ -120,33 +142,35 @@ function DirectorsPage() {
         />
       }
       heroBandFooter={
-        <LetterRow aria-label="Filter directors by letter">
-          <LetterBtn
-            type="button"
-            $active={!letterFilter}
-            onClick={() => setLetterFilter(null)}
-          >
-            All
-          </LetterBtn>
-          {'ABCDEFGHIJKLMNOPQRSTUVW'.split('').map((letter) => (
+        <LetterRowViewport aria-label="Filter directors by letter">
+          <LetterRowCluster>
             <LetterBtn
-              key={letter}
               type="button"
-              $active={letterFilter === letter}
-              onClick={() => setLetterFilter(letter)}
+              $active={!letterFilter}
+              onClick={() => setLetterFilter(null)}
             >
-              {letter}
+              All
             </LetterBtn>
-          ))}
-          <LetterBtn
-            type="button"
-            $active={letterFilter === 'XYZ'}
-            onClick={() => setLetterFilter('XYZ')}
-            aria-label="X Y Z"
-          >
-            XYZ
-          </LetterBtn>
-        </LetterRow>
+            {'ABCDEFGHIJKLMNOPQRSTUVW'.split('').map((letter) => (
+              <LetterBtn
+                key={letter}
+                type="button"
+                $active={letterFilter === letter}
+                onClick={() => setLetterFilter(letter)}
+              >
+                {letter}
+              </LetterBtn>
+            ))}
+            <LetterBtn
+              type="button"
+              $active={letterFilter === 'XYZ'}
+              onClick={() => setLetterFilter('XYZ')}
+              aria-label="X Y Z"
+            >
+              XYZ
+            </LetterBtn>
+          </LetterRowCluster>
+        </LetterRowViewport>
       }
     >
       <MobilePageGutter>

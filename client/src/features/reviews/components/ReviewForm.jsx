@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import RichTextEditor from '@components/forms/RichTextEditor';
 import styled from 'styled-components';
-import { StyledForm } from '@styles';
+import { StyledForm, MobilePageGutter } from '@styles';
 import Error from '@styles/Error';
 import { Rating } from '@features/reviews';
 import ContentDisplay from '@components/forms/FormSubmit';
@@ -290,160 +290,164 @@ const ReviewForm = ({
   return (
     <>
       {isEditing ? (
-        <StyledForm onSubmit={formik.handleSubmit}>
-          <h1>{initObj ? 'Edit Review' : 'Create New Review'}</h1>
-          {submitError && <Error>{submitError}</Error>}
+        <MobilePageGutter>
+          <StyledForm onSubmit={formik.handleSubmit}>
+            <h1>{initObj ? 'Edit Review' : 'Create New Review'}</h1>
+            {submitError && <Error>{submitError}</Error>}
 
-          <ReviewBackdropSection
-            movieBackdropUrl={movie?.backdrop || null}
-            uploadUrl={initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined}
-            backdropKey={backdropKey}
-            reviewPersisted={Boolean(initObj?.id)}
-            showReviewBackdrop={backdropPreference}
-            onShowReviewBackdropChange={onBackdropPreferenceChange}
-            onUploaded={(url) => {
-              setBackdropKey(url);
-              if (initObj) {
-                initObj.backdrop = url;
+            <ReviewBackdropSection
+              movieBackdropUrl={movie?.backdrop || null}
+              uploadUrl={
+                initObj?.id ? `/api/reviews/${initObj.id}/backdrop` : undefined
               }
-              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
-              setPosts((prev) =>
-                Array.isArray(prev)
-                  ? prev.map((post) =>
-                      post.id === initObj?.id ? { ...post, backdrop: url } : post
-                    )
-                  : prev
-              );
-            }}
-            onReviewBackdropDeleted={() => {
-              setBackdropKey(null);
-              if (initObj) {
-                initObj.backdrop = null;
-              }
-              setUpdatedReview((prev) => (prev ? { ...prev, backdrop: null } : prev));
-              setPosts((prev) =>
-                Array.isArray(prev)
-                  ? prev.map((post) =>
-                      post.id === initObj?.id ? { ...post, backdrop: null } : post
-                    )
-                  : prev
-              );
-            }}
-          />
-
-          {/* Rating Stars */}
-          <RatingOverlayWrapper>
-            <Rating rating={formik.values.rating} handleStarClick={updateRating} />
-            {formik.touched.rating && formik.errors.rating && (
-              <Error>{formik.errors.rating}</Error>
-            )}
-          </RatingOverlayWrapper>
-
-          {/* Title Input */}
-          <div>
-            <label htmlFor="title">Review Title:</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter a title for your review..."
+              backdropKey={backdropKey}
+              reviewPersisted={Boolean(initObj?.id)}
+              showReviewBackdrop={backdropPreference}
+              onShowReviewBackdropChange={onBackdropPreferenceChange}
+              onUploaded={(url) => {
+                setBackdropKey(url);
+                if (initObj) {
+                  initObj.backdrop = url;
+                }
+                setUpdatedReview((prev) => (prev ? { ...prev, backdrop: url } : prev));
+                setPosts((prev) =>
+                  Array.isArray(prev)
+                    ? prev.map((post) =>
+                        post.id === initObj?.id ? { ...post, backdrop: url } : post
+                      )
+                    : prev
+                );
+              }}
+              onReviewBackdropDeleted={() => {
+                setBackdropKey(null);
+                if (initObj) {
+                  initObj.backdrop = null;
+                }
+                setUpdatedReview((prev) => (prev ? { ...prev, backdrop: null } : prev));
+                setPosts((prev) =>
+                  Array.isArray(prev)
+                    ? prev.map((post) =>
+                        post.id === initObj?.id ? { ...post, backdrop: null } : post
+                      )
+                    : prev
+                );
+              }}
             />
-            {formik.touched.title && formik.errors.title && (
-              <Error>{formik.errors.title}</Error>
-            )}
-          </div>
 
-          <div>
-            <label htmlFor="description">Review Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Short summary shown in list/card hover..."
-              rows="3"
+            {/* Rating Stars */}
+            <RatingOverlayWrapper>
+              <Rating rating={formik.values.rating} handleStarClick={updateRating} />
+              {formik.touched.rating && formik.errors.rating && (
+                <Error>{formik.errors.rating}</Error>
+              )}
+            </RatingOverlayWrapper>
+
+            {/* Title Input */}
+            <div>
+              <label htmlFor="title">Review Title:</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter a title for your review..."
+              />
+              {formik.touched.title && formik.errors.title && (
+                <Error>{formik.errors.title}</Error>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="description">Review Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Short summary shown in list/card hover..."
+                rows="3"
+              />
+              {formik.touched.description && formik.errors.description && (
+                <Error>{formik.errors.description}</Error>
+              )}
+            </div>
+
+            <FormDocumentUploadSection
+              reviewId={initObj?.id || (initObj === null ? 'new' : null)}
+              hasDocument={hasDocument}
+              selectedFile={selectedFile}
+              existingDocumentSource={initObj}
+              onUploadSuccess={handleDocumentUploadSuccess}
+              onUploadError={handleDocumentUploadError}
+              onFileSelect={handleFileSelect}
+              onRemoveDocument={() => {
+                setHasDocument(false);
+                if (initObj) {
+                  initObj.hasDocument = false;
+                  initObj.documentFilename = null;
+                  initObj.documentType = null;
+                }
+              }}
+              onExtractText={handleExtractText}
+              isExtracting={isExtracting}
+              extractHint="Click to extract text from the uploaded document into the review field below"
             />
-            {formik.touched.description && formik.errors.description && (
-              <Error>{formik.errors.description}</Error>
-            )}
-          </div>
 
-          <FormDocumentUploadSection
-            reviewId={initObj?.id || (initObj === null ? 'new' : null)}
-            hasDocument={hasDocument}
-            selectedFile={selectedFile}
-            existingDocumentSource={initObj}
-            onUploadSuccess={handleDocumentUploadSuccess}
-            onUploadError={handleDocumentUploadError}
-            onFileSelect={handleFileSelect}
-            onRemoveDocument={() => {
-              setHasDocument(false);
-              if (initObj) {
-                initObj.hasDocument = false;
-                initObj.documentFilename = null;
-                initObj.documentType = null;
+            <RichTextEditor
+              value={formik.values.reviewText}
+              onChange={(value) => formik.setFieldValue('reviewText', value)}
+              onBlur={() => formik.setFieldTouched('reviewText', true)}
+              placeholder={
+                hasDocument
+                  ? 'Add additional review text (optional)...'
+                  : 'Write your review here...'
               }
-            }}
-            onExtractText={handleExtractText}
-            isExtracting={isExtracting}
-            extractHint="Click to extract text from the uploaded document into the review field below"
-          />
-
-          <RichTextEditor
-            value={formik.values.reviewText}
-            onChange={(value) => formik.setFieldValue('reviewText', value)}
-            onBlur={() => formik.setFieldTouched('reviewText', true)}
-            placeholder={
-              hasDocument
-                ? 'Add additional review text (optional)...'
-                : 'Write your review here...'
-            }
-            hasDocument={hasDocument}
-            label="Review"
-            error={formik.errors.reviewText}
-            touched={formik.touched.reviewText}
-          />
-
-          {/* Tags Input */}
-          <div>
-            <label htmlFor="tags">Tags (optional):</label>
-            <TagInput
-              tags={tags}
-              onTagsChange={setTags}
-              placeholder="Add tags to categorize your review..."
+              hasDocument={hasDocument}
+              label="Review"
+              error={formik.errors.reviewText}
+              touched={formik.touched.reviewText}
             />
-          </div>
 
-          <FormActionRow
-            marginTop="30px"
-            marginBottom="20px"
-            onCancel={() => {
-              if (initObj) {
-                setIsEditing(false);
-              } else {
-                navigate(-1);
+            {/* Tags Input */}
+            <div>
+              <label htmlFor="tags">Tags (optional):</label>
+              <TagInput
+                tags={tags}
+                onTagsChange={setTags}
+                placeholder="Add tags to categorize your review..."
+              />
+            </div>
+
+            <FormActionRow
+              marginTop="30px"
+              marginBottom="20px"
+              onCancel={() => {
+                if (initObj) {
+                  setIsEditing(false);
+                } else {
+                  navigate(-1);
+                }
+              }}
+              isSubmitting={isSubmitting}
+              isEdit={isEdit}
+              editText="Save Changes"
+              createText="Submit Review"
+              deleteConfig={
+                isAdmin && initObj
+                  ? {
+                      onClick: () => setShowDeleteModal(true),
+                      isDeleting,
+                      label: 'Delete Movie',
+                      pendingLabel: 'Deleting...',
+                    }
+                  : null
               }
-            }}
-            isSubmitting={isSubmitting}
-            isEdit={isEdit}
-            editText="Save Changes"
-            createText="Submit Review"
-            deleteConfig={
-              isAdmin && initObj
-                ? {
-                    onClick: () => setShowDeleteModal(true),
-                    isDeleting,
-                    label: 'Delete Movie',
-                    pendingLabel: 'Deleting...',
-                  }
-                : null
-            }
-          />
-        </StyledForm>
+            />
+          </StyledForm>
+        </MobilePageGutter>
       ) : (
         <ContentDisplay
           formValues={buildReviewFormContentDisplayValues({

@@ -284,6 +284,8 @@ export default function Home() {
 
                 <Section
                   title="Directors"
+                  titleTo="/directors"
+                  titleHint="Browse film directors"
                   subtitle={searchQuery ? '' : 'Explore directors in the collection'}
                   showSearch={false}
                 >
@@ -292,6 +294,8 @@ export default function Home() {
 
                 <Section
                   title={searchQuery ? 'Movies' : 'Movie Reviews'}
+                  titleTo="/search_movies"
+                  titleHint="Browse movie reviews and search films"
                   subtitle={searchQuery ? '' : 'Click movie to view review'}
                   showSearch={false}
                 >
@@ -299,7 +303,9 @@ export default function Home() {
                 </Section>
 
                 <Section
-                  title={searchQuery ? 'Articles' : 'Articles'}
+                  title="Articles"
+                  titleTo="/articles"
+                  titleHint="Browse articles and essays"
                   subtitle={searchQuery ? '' : 'Browse theme-based articles and essays'}
                   showSearch={false}
                 >

@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
 import HeroTextStack from '@components/sections/HeroTextStack';
 
 const Root = styled.section`
@@ -65,6 +66,29 @@ const Categories = styled.p`
     css`
       color: var(--font-color-2);
     `}
+`;
+
+/** Same typography as surrounding line; only hover/focus differ from plain text */
+const CategoryLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  border-radius: 2px;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
 `;
 
 const PillsRow = styled.div`
@@ -158,7 +182,19 @@ function HomeHero({ onPrimary = false }) {
           </Name>
         }
         subtitleNode={
-          <Categories $onPrimary={onPrimary}>Reviews · Essays · Directors</Categories>
+          <Categories $onPrimary={onPrimary}>
+            <CategoryLink to="/search_movies" title="Browse movie reviews and search films">
+              Reviews
+            </CategoryLink>
+            {' · '}
+            <CategoryLink to="/articles" title="Browse articles and essays">
+              Essays
+            </CategoryLink>
+            {' · '}
+            <CategoryLink to="/directors" title="Browse film directors">
+              Directors
+            </CategoryLink>
+          </Categories>
         }
         showDivider
         size="inherit"
