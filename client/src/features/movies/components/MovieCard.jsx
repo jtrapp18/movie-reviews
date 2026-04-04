@@ -37,6 +37,9 @@ function MovieCard({
   hasReview = false,
   clickable = true,
   size = 'default',
+  fillGridCell = false,
+  /** When set (e.g. Search Movies), overrides default navigate / admin create flow */
+  onMovieClick = null,
 }) {
   const { originalLanguage, originalTitle, overview, title, releaseDate, coverPhoto } =
     movie;
@@ -51,6 +54,11 @@ function MovieCard({
   const { addItem } = useCrudStateDB(setMovies, 'movies');
 
   const handleClick = async () => {
+    if (typeof onMovieClick === 'function') {
+      onMovieClick(movie);
+      return;
+    }
+
     if (hasReview) {
       navigate(`/movies/${movie.id}`);
       return;
@@ -72,6 +80,7 @@ function MovieCard({
 
   return (
     <MediaCard
+      $fillGridCell={fillGridCell}
       onClick={clickable ? handleClick : undefined}
       onMouseEnter={() => {
         if (movie?.id != null) {

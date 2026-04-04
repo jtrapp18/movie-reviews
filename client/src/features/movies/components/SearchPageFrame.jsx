@@ -4,11 +4,15 @@ import { SearchBar } from '@components/sections/SearchBar';
 import Loading from '@components/ui/Loading';
 import { StyledSizedContainer, CONTAINER_MAX_WIDTH } from '@styles';
 
+/** Shared footer gap below search-frame content (narrow `SearchFrameShell` + wide `PageContainer`). */
+const SEARCH_FRAME_BOTTOM_PADDING = '40px';
+/** Mobile top inset when the full-width band is off (narrow shell only). */
+const SEARCH_FRAME_MOBILE_TOP_WHEN_NO_BAND = '20px';
+
 /**
  * Narrow search pages (default). Matches `containerShell` but restores vertical
- * padding on small screens: the base shell sets `padding: 0` on mobile, which
- * made pages like Director Highlights flush to the header while `wide` pages
- * (Search Movies) kept `PageContainer`’s top/bottom padding.
+ * padding on small screens: the base shell sets `padding: 0` on mobile.
+ * Bottom spacing matches `PageContainer` via shared constants.
  */
 const SearchFrameShell = styled(StyledSizedContainer)`
   ${({ $heroSearchPrimaryBand }) =>
@@ -24,12 +28,11 @@ const SearchFrameShell = styled(StyledSizedContainer)`
     ${({ $heroSearchPrimaryBand }) =>
       $heroSearchPrimaryBand
         ? css`
-            padding-bottom: 0;
+            padding-bottom: ${SEARCH_FRAME_BOTTOM_PADDING};
           `
         : css`
-            /* Align with PageContainer (wide search pages): breathing room below header */
-            padding-top: 20px;
-            padding-bottom: 40px;
+            padding-top: ${SEARCH_FRAME_MOBILE_TOP_WHEN_NO_BAND};
+            padding-bottom: ${SEARCH_FRAME_BOTTOM_PADDING};
           `}
   }
 `;
@@ -37,7 +40,9 @@ const SearchFrameShell = styled(StyledSizedContainer)`
 const PageContainer = styled.div`
   min-height: 100%;
   padding: ${({ $heroSearchPrimaryBand }) =>
-    $heroSearchPrimaryBand ? '0 0 40px 0' : '20px 0 40px 0'};
+    $heroSearchPrimaryBand
+      ? `0 0 ${SEARCH_FRAME_BOTTOM_PADDING} 0`
+      : `${SEARCH_FRAME_MOBILE_TOP_WHEN_NO_BAND} 0 ${SEARCH_FRAME_BOTTOM_PADDING} 0`};
   margin: 0;
   width: 100vw;
   display: flex;

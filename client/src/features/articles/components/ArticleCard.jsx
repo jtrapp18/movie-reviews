@@ -21,7 +21,7 @@ const LikeCount = styled.span`
 
 const backdrop = '/images/card-backdrop.jpeg';
 
-function ArticleCard({ article }) {
+function ArticleCard({ article, fillGridCell = false }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -29,7 +29,7 @@ function ArticleCard({ article }) {
   };
 
   return (
-    <MediaCard onClick={handleClick}>
+    <MediaCard $fillGridCell={fillGridCell} onClick={handleClick}>
       <img src={backdrop} alt="article backdrop" />
 
       <CardDate>{formatDate(article.dateAdded)}</CardDate>

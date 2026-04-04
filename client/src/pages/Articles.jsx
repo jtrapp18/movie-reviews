@@ -1,23 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
-import { SearchPageFrame } from '@features/movies';
-import { CardContainer } from '@styles';
+import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
+import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
-import styled from 'styled-components';
 
-const ArticlesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  width: 100%;
-`;
-
-const ArticleCardWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
+const ARTICLE_QUICK_FILTERS = ['analysis', 'horror', 'hitchcock', 'cinematography'];
 
 function Articles() {
   const {
@@ -29,22 +18,43 @@ function Articles() {
   const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
   const [isSearching, setIsSearching] = useState(false);
   const [activeQuickSearch, setActiveQuickSearch] = useState(null);
+  /** Bar contents (typing updates this; submit / pill sync the same as an Enter search). */
+  const [searchInput, setSearchInput] = useState('');
+  /** Last term actually searched (empty = browsing full list). Drives results header. */
+  const [submittedQuery, setSubmittedQuery] = useState('');
 
   useEffect(() => {
-    setFilteredArticles(articles ?? []);
-  }, [articles]);
-
-  const handleSearch = async (searchText) => {
-    if (!searchText.trim()) {
-      setFilteredArticles(articles);
-      setActiveQuickSearch(null);
-    } else {
-      setIsSearching(true);
-      const data = await fetchArticles(searchText);
-      setFilteredArticles(data);
-      setIsSearching(false);
+    if (!submittedQuery.trim()) {
+      setFilteredArticles(articles ?? []);
     }
-  };
+  }, [articles, submittedQuery]);
+
+  const handleSearch = useCallback(
+    async (searchText) => {
+      const trimmed = typeof searchText === 'string' ? searchText.trim() : '';
+      setSearchInput(trimmed);
+      setSubmittedQuery(trimmed);
+
+      if (!trimmed) {
+        setFilteredArticles(articles ?? []);
+        setActiveQuickSearch(null);
+        setIsSearching(false);
+        return;
+      }
+
+      setActiveQuickSearch(
+        ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null
+      );
+      setIsSearching(true);
+      try {
+        const data = await fetchArticles(trimmed);
+        setFilteredArticles(Array.isArray(data) ? data : []);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [articles, fetchArticles]
+  );
 
   useEffect(() => {
     if (!loading && articles && articles.length && setContextArticles) {
@@ -54,7 +64,10 @@ function Articles() {
 
   const isLoading =
     (!coreDataLoaded && (!articles || articles.length === 0)) || loading;
-  const quickButtons = ['analysis', 'horror', 'hitchcock', 'cinematography'];
+
+  const hasSubmittedSearch = Boolean(submittedQuery.trim());
+  const showArticleNoResults =
+    hasSubmittedSearch && !isSearching && filteredArticles.length === 0;
 
   return (
     <SearchPageFrame
@@ -66,6 +79,8 @@ function Articles() {
           : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
       }
       onSearch={handleSearch}
+      searchValue={searchInput}
+      onSearchValueChange={setSearchInput}
       isLoading={isLoading}
       loadingText="Loading articles..."
       showHeader={false}
@@ -80,28 +95,33 @@ function Articles() {
       }
       heroBandFooter={
         <SearchHeroBanner
-          buttonLabels={quickButtons}
+          buttonLabels={ARTICLE_QUICK_FILTERS}
           showDivider={false}
           activeButton={activeQuickSearch}
           onButtonClick={(label) => {
-            setActiveQuickSearch(label);
             handleSearch(label);
           }}
         />
       }
     >
       <CardContainer>
-        {Array.isArray(filteredArticles) && filteredArticles.length > 0 ? (
-          <ArticlesGrid>
-            {filteredArticles.map((article) => (
-              <ArticleCardWrapper key={article.id}>
-                <ArticleCard article={article} />
-              </ArticleCardWrapper>
-            ))}
-          </ArticlesGrid>
-        ) : (
-          <p>No articles match your search.</p>
+        {!isLoading && (
+          <SearchResultsHeader
+            searchQuery={submittedQuery}
+            articleCount={filteredArticles.length}
+            isLoading={isSearching}
+            showNoResults={showArticleNoResults}
+          />
         )}
+        {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
+          <MediaCardGrid>
+            {filteredArticles.map((article) => (
+              <MediaCardCell key={article.id}>
+                <ArticleCard article={article} fillGridCell />
+              </MediaCardCell>
+            ))}
+          </MediaCardGrid>
+        ) : null}
       </CardContainer>
     </SearchPageFrame>
   );

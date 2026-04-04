@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const BorderGlow = styled.span`
   position: absolute;
@@ -68,7 +68,9 @@ const DocumentContent = styled.div`
   }
 `;
 
-const MediaCard = styled.article`
+const MediaCard = styled.article.withConfig({
+  shouldForwardProp: (prop) => prop !== '$fillGridCell',
+})`
   position: relative;
   width: 200px;
   height: 280px;
@@ -107,6 +109,17 @@ const MediaCard = styled.article`
     );
     z-index: 1;
   }
+
+  ${({ $fillGridCell }) =>
+    $fillGridCell &&
+    css`
+      @media (max-width: 768px) {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 200 / 280;
+        min-width: 0;
+      }
+    `}
 `;
 
 const CardContent = styled.div`

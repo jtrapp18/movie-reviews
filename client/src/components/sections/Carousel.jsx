@@ -11,11 +11,26 @@ const CarouselContainer = styled.div`
   margin: 0 auto;
   height: 300px;
   overflow: hidden;
+  box-sizing: border-box;
+
+  /* Break out of padded / max-width parents so the track uses the full viewport on phones */
+  @media (max-width: 768px) {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+  }
 `;
 
 const CarouselStyles = styled.div`
   .slick-slide > div {
     margin: 0 6px;
+  }
+
+  @media (max-width: 768px) {
+    .slick-slide > div {
+      margin: 0 4px;
+    }
   }
 
   /* Hide arrows unless $showArrows */
