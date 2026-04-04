@@ -3,21 +3,8 @@ import { useOutletContext } from 'react-router-dom';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import { SearchPageFrame } from '@features/movies';
-import { CardContainer } from '@styles';
+import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
-import styled from 'styled-components';
-
-const ArticlesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  width: 100%;
-`;
-
-const ArticleCardWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
 
 function Articles() {
   const {
@@ -92,13 +79,13 @@ function Articles() {
     >
       <CardContainer>
         {Array.isArray(filteredArticles) && filteredArticles.length > 0 ? (
-          <ArticlesGrid>
+          <MediaCardGrid>
             {filteredArticles.map((article) => (
-              <ArticleCardWrapper key={article.id}>
-                <ArticleCard article={article} />
-              </ArticleCardWrapper>
+              <MediaCardCell key={article.id}>
+                <ArticleCard article={article} fillGridCell />
+              </MediaCardCell>
             ))}
-          </ArticlesGrid>
+          </MediaCardGrid>
         ) : (
           <p>No articles match your search.</p>
         )}

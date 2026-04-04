@@ -1,20 +1,7 @@
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { MovieCard } from '@features/movies';
 import { getMovieRatings } from '@helper';
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 0;
-  max-width: 100%;
-`;
-
-const MovieCardWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`;
+import { MediaCardGrid, MediaCardCell } from '@styles';
 
 const MoviesGrid = ({ movies, onMovieClick }) => {
   const [ratingsMap, setRatingsMap] = useState({});
@@ -36,7 +23,7 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
   }, [movies]);
 
   return (
-    <Grid>
+    <MediaCardGrid>
       {movies.map((movie) => {
         const movieData = ratingsMap[movie.externalId];
         const rating = movieData?.rating ?? null;
@@ -48,17 +35,18 @@ const MoviesGrid = ({ movies, onMovieClick }) => {
         const movieWithCorrectId = localId ? { ...movie, id: localId } : movie;
 
         return (
-          <MovieCardWrapper key={movie.externalId || movie.id}>
+          <MediaCardCell key={movie.externalId || movie.id}>
             <MovieCard
               movie={movieWithCorrectId}
               rating={rating}
               hasReview={hasReview}
-              onClick={() => onMovieClick(movie)}
+              fillGridCell
+              onMovieClick={onMovieClick}
             />
-          </MovieCardWrapper>
+          </MediaCardCell>
         );
       })}
-    </Grid>
+    </MediaCardGrid>
   );
 };
 
