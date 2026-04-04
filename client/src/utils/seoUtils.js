@@ -6,7 +6,7 @@ export const generateMovieReviewStructuredData = (movie, review) => {
   if (!movie || !review) return null;
 
   const baseUrl = window.location.origin;
-  const reviewUrl = `${baseUrl}/#/movies/${movie.id}`;
+  const reviewUrl = `${baseUrl}/movies/${movie.id}`;
 
   // Calculate average rating if multiple reviews exist
   const reviews = movie.reviews || [];
@@ -71,7 +71,7 @@ export const generateArticleStructuredData = (article) => {
   if (!article) return null;
 
   const baseUrl = window.location.origin;
-  const articleUrl = `${baseUrl}/#/articles/${article.id}`;
+  const articleUrl = `${baseUrl}/articles/${article.id}`;
 
   return {
     '@context': 'https://schema.org',
@@ -112,7 +112,7 @@ export const generateWebsiteStructuredData = () => {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${baseUrl}/#/search_movies?q={search_term_string}`,
+        urlTemplate: `${baseUrl}/search_movies?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -141,15 +141,15 @@ function siteOrigin() {
 }
 
 function breadcrumbHome() {
-  return { name: 'Home', url: `${siteOrigin()}/#/` };
+  return { name: 'Home', url: `${siteOrigin()}/` };
 }
 
 function breadcrumbArticlesIndex() {
-  return { name: 'Articles', url: `${siteOrigin()}/#/articles` };
+  return { name: 'Articles', url: `${siteOrigin()}/articles` };
 }
 
 function breadcrumbMoviesSearch() {
-  return { name: 'Movies', url: `${siteOrigin()}/#/search_movies` };
+  return { name: 'Movies', url: `${siteOrigin()}/search_movies` };
 }
 
 /**
@@ -198,7 +198,7 @@ export function buildMovieReviewDetailPageStructuredData(movie, review) {
   ].filter(Boolean);
 }
 
-/** Title, description, keywords, hash path for article detail pages. */
+/** Title, description, keywords, path for article detail pages. */
 export function buildArticleDetailSeoCopy(article) {
   if (!article) {
     return {
@@ -212,11 +212,11 @@ export function buildArticleDetailSeoCopy(article) {
     title: article.title,
     description: article.description || article.title,
     keywords: `${article.title}, movie article, film analysis, cinema`,
-    canonicalPath: `/#/articles/${article.id}`,
+    canonicalPath: `/articles/${article.id}`,
   };
 }
 
-/** Title, description, keywords, hash path for movie review detail pages. */
+/** Title, description, keywords, path for movie review detail pages. */
 export function buildMovieReviewDetailSeoCopy(movie, review) {
   if (!movie) {
     return {
@@ -237,6 +237,6 @@ export function buildMovieReviewDetailSeoCopy(movie, review) {
     title,
     description,
     keywords: `${movie.title}, movie review, ${movie.originalLanguage}, ${movie.releaseDate}, film analysis`,
-    canonicalPath: `/#/movies/${movie.id}`,
+    canonicalPath: `/movies/${movie.id}`,
   };
 }
