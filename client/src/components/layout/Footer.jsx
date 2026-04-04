@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const StyledFooter = styled.footer`
@@ -56,7 +57,9 @@ const StyledFooter = styled.footer`
   .footer-nav a {
     color: rgba(255, 255, 255, 0.78);
     text-decoration: none;
-    transition: color 0.2s ease, font-weight 0.2s ease;
+    transition:
+      color 0.2s ease,
+      font-weight 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     font-weight: 500;
@@ -109,11 +112,11 @@ const Footer = () => {
       <section>
         <div className="footer-inner">
           <nav className="footer-nav" aria-label="Footer">
-            <a href="/#/">Home</a>
-            <a href="/#/search_movies">Search Movies</a>
-            <a href="/#/directors">Directors</a>
-            <a href="/#/about">About</a>
-            <a href="/#/contact">Contact</a>
+            <Link to="/">Home</Link>
+            <Link to="/search_movies">Search Movies</Link>
+            <Link to="/directors">Directors</Link>
+            <Link to="/about">About</Link>
+            <Link to="/contact">Contact</Link>
           </nav>
 
           <p className="footer-tagline">

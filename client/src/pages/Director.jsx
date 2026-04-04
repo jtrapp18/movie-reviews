@@ -106,7 +106,7 @@ function Director() {
         description={pageDescription}
         keywords={`${director.name}, film director, movies by ${director.name}`}
         image={director.coverPhoto}
-        url={`/#/directors/${director.id}`}
+        url={`/directors/${director.id}`}
         type="profile"
         structuredData={null}
       />

@@ -76,7 +76,7 @@ const ArticleForm = ({ initObj }) => {
         deleteItem(initObj.id);
 
         // Navigate back to the articles list
-        navigate('/#/articles');
+        navigate('/articles');
       } else {
         const errorData = await response.json();
         setSubmitError(errorData.error || 'Failed to delete article');
@@ -224,123 +224,125 @@ const ArticleForm = ({ initObj }) => {
     <>
       {isEditing ? (
         <MobilePageGutter>
-        <StyledForm onSubmit={formik.handleSubmit}>
-          <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
-          {submitError && <Error>{submitError}</Error>}
-          <FormBackdropField
-            uploadUrl={initObj?.id ? `/api/articles/${initObj.id}/backdrop` : undefined}
-            backdropKey={backdropKey}
-            onUploaded={(url) => {
-              setBackdropKey(url);
-              if (initObj) {
-                initObj.backdrop = url;
+          <StyledForm onSubmit={formik.handleSubmit}>
+            <h1>{initObj ? 'Edit Article' : 'Create New Article'}</h1>
+            {submitError && <Error>{submitError}</Error>}
+            <FormBackdropField
+              uploadUrl={
+                initObj?.id ? `/api/articles/${initObj.id}/backdrop` : undefined
               }
-            }}
-          />
-          <div>
-            <label htmlFor="title">Article Title *</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter article title..."
+              backdropKey={backdropKey}
+              onUploaded={(url) => {
+                setBackdropKey(url);
+                if (initObj) {
+                  initObj.backdrop = url;
+                }
+              }}
             />
-            {formik.touched.title && formik.errors.title && (
-              <Error>{formik.errors.title}</Error>
-            )}
-          </div>
+            <div>
+              <label htmlFor="title">Article Title *</label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter article title..."
+              />
+              {formik.touched.title && formik.errors.title && (
+                <Error>{formik.errors.title}</Error>
+              )}
+            </div>
 
-          <div>
-            <label htmlFor="description">Article Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Enter a brief description of your article..."
-              rows="3"
+            <div>
+              <label htmlFor="description">Article Description</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter a brief description of your article..."
+                rows="3"
+              />
+              {formik.touched.description && formik.errors.description && (
+                <Error>{formik.errors.description}</Error>
+              )}
+            </div>
+
+            <FormDocumentUploadSection
+              reviewId={initObj?.id}
+              hasDocument={hasDocument}
+              selectedFile={selectedFile}
+              existingDocumentSource={initObj}
+              onUploadSuccess={handleDocumentUploadSuccess}
+              onUploadError={handleDocumentUploadError}
+              onFileSelect={handleFileSelect}
+              onRemoveDocument={() => {
+                setHasDocument(false);
+                if (initObj) {
+                  initObj.hasDocument = false;
+                  initObj.documentFilename = null;
+                  initObj.documentType = null;
+                }
+              }}
+              onExtractText={handleExtractText}
+              isExtracting={isExtracting}
+              extractHint="Click to extract text from the selected document into the article content field below"
             />
-            {formik.touched.description && formik.errors.description && (
-              <Error>{formik.errors.description}</Error>
-            )}
-          </div>
 
-          <FormDocumentUploadSection
-            reviewId={initObj?.id}
-            hasDocument={hasDocument}
-            selectedFile={selectedFile}
-            existingDocumentSource={initObj}
-            onUploadSuccess={handleDocumentUploadSuccess}
-            onUploadError={handleDocumentUploadError}
-            onFileSelect={handleFileSelect}
-            onRemoveDocument={() => {
-              setHasDocument(false);
-              if (initObj) {
-                initObj.hasDocument = false;
-                initObj.documentFilename = null;
-                initObj.documentType = null;
+            <RichTextEditor
+              value={formik.values.reviewText}
+              onChange={(value) => formik.setFieldValue('reviewText', value)}
+              onBlur={() => formik.setFieldTouched('reviewText', true)}
+              placeholder={
+                hasDocument
+                  ? 'Optional: Add additional content here...'
+                  : 'Write your article content here...'
               }
-            }}
-            onExtractText={handleExtractText}
-            isExtracting={isExtracting}
-            extractHint="Click to extract text from the selected document into the article content field below"
-          />
-
-          <RichTextEditor
-            value={formik.values.reviewText}
-            onChange={(value) => formik.setFieldValue('reviewText', value)}
-            onBlur={() => formik.setFieldTouched('reviewText', true)}
-            placeholder={
-              hasDocument
-                ? 'Optional: Add additional content here...'
-                : 'Write your article content here...'
-            }
-            hasDocument={hasDocument}
-            label="Article Content"
-            error={formik.errors.reviewText}
-            touched={formik.touched.reviewText}
-          />
-
-          <div>
-            <label htmlFor="tags">Tags</label>
-            <TagInput
-              tags={tags}
-              onTagsChange={setTags}
-              placeholder="Add tags to categorize your article..."
-              maxTags={8}
+              hasDocument={hasDocument}
+              label="Article Content"
+              error={formik.errors.reviewText}
+              touched={formik.touched.reviewText}
             />
-          </div>
 
-          <FormActionRow
-            marginTop="30px"
-            marginBottom="20px"
-            onCancel={() => {
-              if (initObj) {
-                setIsEditing(false);
-              } else {
-                navigate(-1);
+            <div>
+              <label htmlFor="tags">Tags</label>
+              <TagInput
+                tags={tags}
+                onTagsChange={setTags}
+                placeholder="Add tags to categorize your article..."
+                maxTags={8}
+              />
+            </div>
+
+            <FormActionRow
+              marginTop="30px"
+              marginBottom="20px"
+              onCancel={() => {
+                if (initObj) {
+                  setIsEditing(false);
+                } else {
+                  navigate(-1);
+                }
+              }}
+              isSubmitting={isSubmitting}
+              isEdit={isEdit}
+              editText="Save Changes"
+              createText="Create Article"
+              deleteConfig={
+                isAdmin && initObj
+                  ? {
+                      onClick: () => setShowDeleteModal(true),
+                      isDeleting,
+                      label: 'Delete Article',
+                      pendingLabel: 'Deleting...',
+                    }
+                  : null
               }
-            }}
-            isSubmitting={isSubmitting}
-            isEdit={isEdit}
-            editText="Save Changes"
-            createText="Create Article"
-            deleteConfig={
-              isAdmin && initObj
-                ? {
-                    onClick: () => setShowDeleteModal(true),
-                    isDeleting,
-                    label: 'Delete Article',
-                    pendingLabel: 'Deleting...',
-                  }
-                : null
-            }
-          />
-        </StyledForm>
+            />
+          </StyledForm>
         </MobilePageGutter>
       ) : (
         <ContentDisplay
