@@ -21,7 +21,7 @@ function Logo() {
   return (
     <LogoContainer>
       <NavLink to="/" className="home">
-        <img src={`images/clapperboard.png`} alt="clapperboard" />
+        <img src="/images/clapperboard.png" alt="clapperboard" />
       </NavLink>
     </LogoContainer>
   );
