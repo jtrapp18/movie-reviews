@@ -282,6 +282,33 @@ const ModeBtn = styled.button`
   }
 `;
 
+/** Hero band: plain control; color only shifts on hover */
+const ResetFiltersButton = styled.button`
+  appearance: none;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 4px 6px;
+  font-family: var(--default-font), system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: rgba(248, 249, 250, 0.42);
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    color: rgba(248, 249, 250, 0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.45);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+`;
+
 function SearchMovies() {
   const navigate = useNavigate();
   const { movies: libraryMovies = [] } = useOutletContext();
@@ -559,6 +586,35 @@ function SearchMovies() {
     return hasQuery || hasRating || hasRelease || hasCountry;
   })();
 
+  const hasDiscoverFilters = useMemo(() => {
+    return (
+      Boolean(searchQuery?.trim()) ||
+      activeFiltersByGroup.Genre !== 'All' ||
+      activeFiltersByGroup.Decade !== 'All'
+    );
+  }, [searchQuery, activeFiltersByGroup.Genre, activeFiltersByGroup.Decade]);
+
+  const hasClearableFilters =
+    mode === 'library' ? isLibrarySearchActive : hasDiscoverFilters;
+
+  const clearFilters = useCallback(() => {
+    if (mode === 'library') {
+      setSearchQuery('');
+      setLibraryRatingTier(null);
+      setLibraryReleaseBucket('All');
+      setLibraryCountry('All');
+      setIsSearchMode(false);
+      return;
+    }
+    setSearchQuery('');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setIsSearchMode(false);
+    setSearchResults([]);
+    fetchAllGenres();
+  }, [mode, fetchAllGenres]);
+
   const goLibrary = () => {
     if (mode === 'library') return;
     setMode('library');
@@ -629,6 +685,17 @@ function SearchMovies() {
             goDiscover={goDiscover}
           />
         )
+      }
+      searchBarRightSlot={
+        hasClearableFilters ? (
+          <ResetFiltersButton
+            type="button"
+            onClick={clearFilters}
+            aria-label="Clear all filters"
+          >
+            reset
+          </ResetFiltersButton>
+        ) : null
       }
       heroBandFooter={
         <>
