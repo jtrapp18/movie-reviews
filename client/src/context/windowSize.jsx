@@ -2,18 +2,31 @@ import { createContext, useState, useEffect } from 'react';
 
 const WindowWidthContext = createContext();
 
+function layoutFlagsForWidth(width) {
+  return {
+    isMobile: width <= 768,
+    isTablet: width >= 769 && width <= 1024,
+  };
+}
+
 const WindowWidthProvider = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [layoutFlags, setLayoutFlags] = useState(() =>
+    layoutFlagsForWidth(window.innerWidth)
+  );
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => setLayoutFlags(layoutFlagsForWidth(window.innerWidth));
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Pass an object with isMobile to match usage
   return (
-    <WindowWidthContext.Provider value={{ isMobile }}>
+    <WindowWidthContext.Provider
+      value={{
+        isMobile: layoutFlags.isMobile,
+        isTablet: layoutFlags.isTablet,
+      }}
+    >
       {children}
     </WindowWidthContext.Provider>
   );

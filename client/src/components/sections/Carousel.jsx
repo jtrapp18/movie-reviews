@@ -13,8 +13,8 @@ const CarouselContainer = styled.div`
   overflow: hidden;
   box-sizing: border-box;
 
-  /* Break out of padded / max-width parents so the track uses the full viewport on phones */
-  @media (max-width: 768px) {
+  /* Break out of padded / max-width parents so the track is edge-to-edge (matches mobile + tablet; desktop from 1025px stays inset) */
+  @media (max-width: 1024px) {
     width: 100vw;
     max-width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -27,7 +27,7 @@ const CarouselStyles = styled.div`
     margin: 0 6px;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .slick-slide > div {
       margin: 0 4px;
     }
