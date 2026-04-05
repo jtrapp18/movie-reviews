@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import MotionWrapper from '@styles/MotionWrapper';
 import { SearchBar } from '@components/sections/SearchBar';
 
-/** Global `a { font-size: … }` would shrink the title; inherit h1 sizing explicitly */
-const SectionTitleLink = styled(Link)`
+/** Global `a { font-size: … }` would shrink the title; inherit heading sizing explicitly */
+export const SectionTitleLink = styled(Link)`
   color: inherit;
   text-decoration: none;
   font-size: inherit;

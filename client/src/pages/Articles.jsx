@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
-import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
+import { CardContainer, MediaCardGrid, MediaCardCell, Button } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
+import { useAdmin } from '@hooks/useAdmin';
 
 /**
  * Matches SearchResultsGrid horizontal inset; bottom padding so the grid stops before the
@@ -20,7 +21,18 @@ const ArticlesGridSection = styled.div`
 
 const ARTICLE_QUICK_FILTERS = ['analysis', 'horror', 'hitchcock', 'cinematography'];
 
+const AddButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 2% auto 20px auto;
+  flex-wrap: wrap;
+`;
+
 function Articles() {
+  const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
   const {
     articles: contextArticles,
     setArticles: setContextArticles,
@@ -123,6 +135,13 @@ function Articles() {
               isLoading={isSearching}
               showNoResults={showArticleNoResults}
             />
+          )}
+          {isAdmin && (
+            <AddButtonContainer>
+              <Button type="button" onClick={() => navigate('/articles/new')}>
+                + Add New Article
+              </Button>
+            </AddButtonContainer>
           )}
           {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
             <MediaCardGrid>
