@@ -7,10 +7,14 @@ import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
 import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
 
-/** Matches SearchResultsGrid `GridContainer` so article cards size/spacing match library grid. */
+/**
+ * Matches SearchResultsGrid horizontal inset; bottom padding so the grid stops before the
+ * page edge instead of the last row hugging the viewport bottom.
+ */
 const ArticlesGridSection = styled.div`
   width: 100%;
-  padding: 0 20px;
+  max-width: 100%;
+  padding: 0 20px 24px;
   box-sizing: border-box;
 `;
 
