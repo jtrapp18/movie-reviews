@@ -1,25 +1,46 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import styled from 'styled-components';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
-import { SearchPageFrame } from '@features/movies';
-import { CardContainer } from '@styles';
+import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
+import { CardContainer, MediaCardGrid, MediaCardCell, Button } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
-import styled from 'styled-components';
+import { useAdmin } from '@hooks/useAdmin';
 
-const ArticlesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+/**
+ * Matches SearchResultsGrid horizontal inset; bottom padding so the grid stops before the
+ * page edge instead of the last row hugging the viewport bottom.
+ */
+const ArticlesGridSection = styled.div`
   width: 100%;
+  max-width: 100%;
+  padding: 0 20px 24px;
+  box-sizing: border-box;
 `;
 
-const ArticleCardWrapper = styled.div`
+/** Quick pills → `/api/articles?search=` (matches title, body, or tag name). Tune to your corpus. */
+const ARTICLE_QUICK_FILTERS = [
+  'auteur',
+  'theory',
+  'cinema',
+  'form',
+  'historical',
+  'criticism',
+];
+
+const AddButtonContainer = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 2% auto 20px auto;
+  flex-wrap: wrap;
 `;
 
 function Articles() {
+  const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
   const {
     articles: contextArticles,
     setArticles: setContextArticles,
@@ -29,22 +50,41 @@ function Articles() {
   const [filteredArticles, setFilteredArticles] = useState(articles ?? []);
   const [isSearching, setIsSearching] = useState(false);
   const [activeQuickSearch, setActiveQuickSearch] = useState(null);
+  /** Bar contents (typing updates this; submit / pill sync the same as an Enter search). */
+  const [searchInput, setSearchInput] = useState('');
+  /** Last term actually searched (empty = browsing full list). Drives results header. */
+  const [submittedQuery, setSubmittedQuery] = useState('');
 
   useEffect(() => {
-    setFilteredArticles(articles ?? []);
-  }, [articles]);
-
-  const handleSearch = async (searchText) => {
-    if (!searchText.trim()) {
-      setFilteredArticles(articles);
-      setActiveQuickSearch(null);
-    } else {
-      setIsSearching(true);
-      const data = await fetchArticles(searchText);
-      setFilteredArticles(data);
-      setIsSearching(false);
+    if (!submittedQuery.trim()) {
+      setFilteredArticles(articles ?? []);
     }
-  };
+  }, [articles, submittedQuery]);
+
+  const handleSearch = useCallback(
+    async (searchText) => {
+      const trimmed = typeof searchText === 'string' ? searchText.trim() : '';
+      setSearchInput(trimmed);
+      setSubmittedQuery(trimmed);
+
+      if (!trimmed) {
+        setFilteredArticles(articles ?? []);
+        setActiveQuickSearch(null);
+        setIsSearching(false);
+        return;
+      }
+
+      setActiveQuickSearch(ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null);
+      setIsSearching(true);
+      try {
+        const data = await fetchArticles(trimmed);
+        setFilteredArticles(Array.isArray(data) ? data : []);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [articles, fetchArticles]
+  );
 
   useEffect(() => {
     if (!loading && articles && articles.length && setContextArticles) {
@@ -54,7 +94,10 @@ function Articles() {
 
   const isLoading =
     (!coreDataLoaded && (!articles || articles.length === 0)) || loading;
-  const quickButtons = ['analysis', 'horror', 'hitchcock', 'cinematography'];
+
+  const hasSubmittedSearch = Boolean(submittedQuery.trim());
+  const showArticleNoResults =
+    hasSubmittedSearch && !isSearching && filteredArticles.length === 0;
 
   return (
     <SearchPageFrame
@@ -63,9 +106,11 @@ function Articles() {
       searchPlaceholder={
         isSearching
           ? 'Searching...'
-          : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
+          : "Search articles by title, content, or tags (e.g., 'auteur', 'theory', 'form')..."
       }
       onSearch={handleSearch}
+      searchValue={searchInput}
+      onSearchValueChange={setSearchInput}
       isLoading={isLoading}
       loadingText="Loading articles..."
       showHeader={false}
@@ -80,28 +125,42 @@ function Articles() {
       }
       heroBandFooter={
         <SearchHeroBanner
-          buttonLabels={quickButtons}
+          buttonLabels={ARTICLE_QUICK_FILTERS}
           showDivider={false}
           activeButton={activeQuickSearch}
           onButtonClick={(label) => {
-            setActiveQuickSearch(label);
             handleSearch(label);
           }}
         />
       }
     >
       <CardContainer>
-        {Array.isArray(filteredArticles) && filteredArticles.length > 0 ? (
-          <ArticlesGrid>
-            {filteredArticles.map((article) => (
-              <ArticleCardWrapper key={article.id}>
-                <ArticleCard article={article} />
-              </ArticleCardWrapper>
-            ))}
-          </ArticlesGrid>
-        ) : (
-          <p>No articles match your search.</p>
-        )}
+        <ArticlesGridSection>
+          {!isLoading && (
+            <SearchResultsHeader
+              searchQuery={submittedQuery}
+              articleCount={filteredArticles.length}
+              isLoading={isSearching}
+              showNoResults={showArticleNoResults}
+            />
+          )}
+          {isAdmin && (
+            <AddButtonContainer>
+              <Button type="button" onClick={() => navigate('/articles/new')}>
+                + Add New Article
+              </Button>
+            </AddButtonContainer>
+          )}
+          {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
+            <MediaCardGrid>
+              {filteredArticles.map((article) => (
+                <MediaCardCell key={article.id}>
+                  <ArticleCard article={article} fillGridCell />
+                </MediaCardCell>
+              ))}
+            </MediaCardGrid>
+          ) : null}
+        </ArticlesGridSection>
       </CardContainer>
     </SearchPageFrame>
   );

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const TextContainer = styled.div`
   display: ${(props) => (props.size ? 'flex' : 'inline-flex')};
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   padding: ${(props) => {
@@ -21,12 +21,22 @@ const TextContainer = styled.div`
       return props.compact ? '16px' : 'clamp(1.7rem, 4vw, 2rem)';
     }};
     margin: 0;
+    /* Keep label + dots one horizontal band; avoids dots stacking per line on narrow viewports */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    column-gap: 0;
   }
 
   & .dots {
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
     color: inherit;
-    font-size: inherit; // Use the same size as the parent p element
+    font-size: inherit;
     white-space: nowrap;
     margin-left: ${(props) => {
       if (!props.size) return '0.2em';
@@ -37,7 +47,7 @@ const TextContainer = styled.div`
   & .dot {
     font-size: inherit;
     color: inherit;
-    display: inline-block;
+    flex: none;
     opacity: 0;
     animation: dotAnimation 1.5s forwards;
     animation-timing-function: ease-in-out;

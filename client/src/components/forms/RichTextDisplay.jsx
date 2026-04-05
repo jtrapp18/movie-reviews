@@ -6,6 +6,18 @@ import {
   logWordPipeline,
 } from '@utils/enrichedDocCache';
 
+/** Word/Mammoth often puts inline font-size on headings; strip so h3–h6 follow our CSS scale. */
+let dompurifyHeadingStyleHookInstalled = false;
+function ensureStripHeadingInlineStyles() {
+  if (dompurifyHeadingStyleHookInstalled) return;
+  dompurifyHeadingStyleHookInstalled = true;
+  DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    if (data.attrName === 'style' && /^H[1-6]$/i.test(node.nodeName)) {
+      data.keepAttr = false;
+    }
+  });
+}
+
 const RichTextContainer = styled.div`
   /* Enhanced typography for better readability */
   font-family:
@@ -360,6 +372,8 @@ const RichTextDisplay = ({ content }) => {
   if (!content || !content.trim()) {
     return null;
   }
+
+  ensureStripHeadingInlineStyles();
 
   // Sanitize HTML content using DOMPurify for security
   const sanitizedContent = DOMPurify.sanitize(content, {

@@ -105,7 +105,7 @@ const ReviewForm = ({
         setMovies(movies);
 
         // Navigate back to the movie list or home
-        navigate('/#/search_movies');
+        navigate('/search_movies');
       } else {
         const errorData = await response.json();
         setSubmitError(errorData.error || 'Failed to delete movie');

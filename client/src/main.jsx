@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import { UserProvider } from './context/userProvider';
 import { AdminProvider } from './context/adminProvider';
-import { createHashRouter, RouterProvider } from 'react-router-dom'; // Import HashRouter
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import routes from './routes'; // Import your routes configuration
 import { WindowWidthProvider } from './context/windowSize';
 import { AdminIndicator } from '@features/auth';
@@ -11,8 +11,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/themeProvider';
 import { ToastProvider } from './context/toastContext';
 
-// Create the hash-based router
-const router = createHashRouter(routes);
+const router = createBrowserRouter(routes);
 
 // Create the root and render the app with the router
 const root = ReactDOM.createRoot(document.getElementById('root'));

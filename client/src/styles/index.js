@@ -5,5 +5,6 @@ export * from './buttons';
 export * from './forms';
 export * from './navigation';
 export * from './layout';
+export * from './cardGrid';
 export * from './cards';
 export * from './tables';

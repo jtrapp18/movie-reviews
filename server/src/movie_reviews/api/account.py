@@ -228,7 +228,7 @@ class PasswordResetRequest(Resource):
         db.session.add(reset_token)
         db.session.commit()
 
-        reset_url = f"{request.url_root.rstrip('/')}/#/reset-password?token={token}"
+        reset_url = f"{request.url_root.rstrip('/')}/reset-password?token={token}"
         print(f"[PasswordReset] Generated reset link for user {user.id}: {reset_url}")
 
         # NOTE: In production, you would email this link to the user instead of returning the token.
@@ -295,7 +295,7 @@ class Sitemap(Resource):
             # Add search page
             search_url = ET.SubElement(root, "url")
             ET.SubElement(search_url, "loc").text = (
-                f"{request.url_root.rstrip('/')}/#/search_movies"
+                f"{request.url_root.rstrip('/')}/search_movies"
             )
             ET.SubElement(search_url, "changefreq").text = "weekly"
             ET.SubElement(search_url, "priority").text = "0.8"
@@ -303,7 +303,7 @@ class Sitemap(Resource):
             # Add articles page
             articles_url = ET.SubElement(root, "url")
             ET.SubElement(articles_url, "loc").text = (
-                f"{request.url_root.rstrip('/')}/#/articles"
+                f"{request.url_root.rstrip('/')}/articles"
             )
             ET.SubElement(articles_url, "changefreq").text = "weekly"
             ET.SubElement(articles_url, "priority").text = "0.8"
@@ -312,7 +312,7 @@ class Sitemap(Resource):
             for movie in movies:
                 movie_url = ET.SubElement(root, "url")
                 ET.SubElement(movie_url, "loc").text = (
-                    f"{request.url_root.rstrip('/')}/#/movies/{movie.id}"
+                    f"{request.url_root.rstrip('/')}/movies/{movie.id}"
                 )
                 ET.SubElement(movie_url, "lastmod").text = movie.release_date.strftime(
                     "%Y-%m-%d"
@@ -324,7 +324,7 @@ class Sitemap(Resource):
             for article in articles:
                 article_url = ET.SubElement(root, "url")
                 ET.SubElement(article_url, "loc").text = (
-                    f"{request.url_root.rstrip('/')}/#/articles/{article.id}"
+                    f"{request.url_root.rstrip('/')}/articles/{article.id}"
                 )
                 ET.SubElement(article_url, "lastmod").text = (
                     article.date_added.strftime("%Y-%m-%d")

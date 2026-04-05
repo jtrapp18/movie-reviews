@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://jamestrappreviews.com/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /admin
