@@ -95,7 +95,7 @@ function ArticleBody({ article, articles, user, setArticle }) {
               }}
             />
           </LikeBar>
-          <ArticleForm initObj={article} />
+          <ArticleForm initObj={article} setArticle={setArticle} />
         </DetailContentCard>
         <DetailBelowFold>
           <CommentList reviewId={article.id} />

@@ -21,7 +21,7 @@ import { extractTextFromFile } from '@utils/textExtraction';
 import useCrudStateDB from '@hooks/useCrudStateDB';
 import { useAdmin } from '@hooks/useAdmin';
 
-const ArticleForm = ({ initObj }) => {
+const ArticleForm = ({ initObj, setArticle }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   // Check if we're creating a new article (no id and no existing article data)
@@ -41,7 +41,7 @@ const ArticleForm = ({ initObj }) => {
   const [isExtracting, setIsExtracting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setArticles } = useOutletContext();
+  const { setArticles, setPosts } = useOutletContext();
   const { deleteItem } = useCrudStateDB(setArticles, 'reviews');
   const { isAdmin } = useAdmin();
   const [backdropKey, setBackdropKey] = useState(initObj?.backdrop || null);
@@ -248,14 +248,58 @@ const ArticleForm = ({ initObj }) => {
               backdropKey={backdropKey}
               onUploaded={(url) => {
                 setBackdropKey(url);
+                const articleId = initObj?.id;
                 if (initObj) {
                   initObj.backdrop = url;
+                }
+                setArticle?.((prev) =>
+                  prev && articleId != null && prev.id === articleId
+                    ? { ...prev, backdrop: url }
+                    : prev
+                );
+                if (articleId != null) {
+                  setArticles((prev) =>
+                    Array.isArray(prev)
+                      ? prev.map((a) =>
+                          a.id === articleId ? { ...a, backdrop: url } : a
+                        )
+                      : prev
+                  );
+                  setPosts((prev) =>
+                    Array.isArray(prev)
+                      ? prev.map((p) =>
+                          p.id === articleId ? { ...p, backdrop: url } : p
+                        )
+                      : prev
+                  );
                 }
               }}
               onDeleted={() => {
                 setBackdropKey(null);
+                const articleId = initObj?.id;
                 if (initObj) {
                   initObj.backdrop = null;
+                }
+                setArticle?.((prev) =>
+                  prev && articleId != null && prev.id === articleId
+                    ? { ...prev, backdrop: null }
+                    : prev
+                );
+                if (articleId != null) {
+                  setArticles((prev) =>
+                    Array.isArray(prev)
+                      ? prev.map((a) =>
+                          a.id === articleId ? { ...a, backdrop: null } : a
+                        )
+                      : prev
+                  );
+                  setPosts((prev) =>
+                    Array.isArray(prev)
+                      ? prev.map((p) =>
+                          p.id === articleId ? { ...p, backdrop: null } : p
+                        )
+                      : prev
+                  );
                 }
               }}
               deleteConfirmMessage="Remove this article cover image?"
