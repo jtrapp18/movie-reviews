@@ -1,14 +1,46 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import styled from 'styled-components';
 import { ArticleCard } from '@features/articles';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import { SearchPageFrame, SearchResultsHeader } from '@features/movies';
-import { CardContainer, MediaCardGrid, MediaCardCell } from '@styles';
+import { CardContainer, MediaCardGrid, MediaCardCell, Button } from '@styles';
 import { useArticlesList } from '@features/articles/useArticlesList';
+import { useAdmin } from '@hooks/useAdmin';
 
-const ARTICLE_QUICK_FILTERS = ['analysis', 'horror', 'hitchcock', 'cinematography'];
+/**
+ * Matches SearchResultsGrid horizontal inset; bottom padding so the grid stops before the
+ * page edge instead of the last row hugging the viewport bottom.
+ */
+const ArticlesGridSection = styled.div`
+  width: 100%;
+  max-width: 100%;
+  padding: 0 20px 24px;
+  box-sizing: border-box;
+`;
+
+/** Quick pills → `/api/articles?search=` (matches title, body, or tag name). Tune to your corpus. */
+const ARTICLE_QUICK_FILTERS = [
+  'auteur',
+  'theory',
+  'cinema',
+  'form',
+  'historical',
+  'criticism',
+];
+
+const AddButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin: 2% auto 20px auto;
+  flex-wrap: wrap;
+`;
 
 function Articles() {
+  const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
   const {
     articles: contextArticles,
     setArticles: setContextArticles,
@@ -42,9 +74,7 @@ function Articles() {
         return;
       }
 
-      setActiveQuickSearch(
-        ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null
-      );
+      setActiveQuickSearch(ARTICLE_QUICK_FILTERS.includes(trimmed) ? trimmed : null);
       setIsSearching(true);
       try {
         const data = await fetchArticles(trimmed);
@@ -76,7 +106,7 @@ function Articles() {
       searchPlaceholder={
         isSearching
           ? 'Searching...'
-          : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
+          : "Search articles by title, content, or tags (e.g., 'auteur', 'theory', 'form')..."
       }
       onSearch={handleSearch}
       searchValue={searchInput}
@@ -105,23 +135,32 @@ function Articles() {
       }
     >
       <CardContainer>
-        {!isLoading && (
-          <SearchResultsHeader
-            searchQuery={submittedQuery}
-            articleCount={filteredArticles.length}
-            isLoading={isSearching}
-            showNoResults={showArticleNoResults}
-          />
-        )}
-        {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
-          <MediaCardGrid>
-            {filteredArticles.map((article) => (
-              <MediaCardCell key={article.id}>
-                <ArticleCard article={article} fillGridCell />
-              </MediaCardCell>
-            ))}
-          </MediaCardGrid>
-        ) : null}
+        <ArticlesGridSection>
+          {!isLoading && (
+            <SearchResultsHeader
+              searchQuery={submittedQuery}
+              articleCount={filteredArticles.length}
+              isLoading={isSearching}
+              showNoResults={showArticleNoResults}
+            />
+          )}
+          {isAdmin && (
+            <AddButtonContainer>
+              <Button type="button" onClick={() => navigate('/articles/new')}>
+                + Add New Article
+              </Button>
+            </AddButtonContainer>
+          )}
+          {!isSearching && !showArticleNoResults && filteredArticles.length > 0 ? (
+            <MediaCardGrid>
+              {filteredArticles.map((article) => (
+                <MediaCardCell key={article.id}>
+                  <ArticleCard article={article} fillGridCell />
+                </MediaCardCell>
+              ))}
+            </MediaCardGrid>
+          ) : null}
+        </ArticlesGridSection>
       </CardContainer>
     </SearchPageFrame>
   );

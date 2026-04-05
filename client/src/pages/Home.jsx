@@ -185,6 +185,7 @@ export default function Home() {
       // Fallback to showing all content on error
       setShowMovies(movies);
       setShowArticles(articles);
+      setShowDirectors(directors);
     } finally {
       setIsSearching(false);
     }

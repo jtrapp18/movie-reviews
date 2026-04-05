@@ -722,6 +722,7 @@ class DirectorBackdropView(Resource):
 def register_routes(api):
     api.add_resource(EnrichReviewHtml, "/api/enrich_review_html")
     api.add_resource(ExtractText, "/api/extract_text")
+    api.add_resource(DocumentUpload, "/api/upload_document")
     api.add_resource(ReviewWithDocument, "/api/reviews_with_document")
     api.add_resource(
         ReviewWithDocumentById, "/api/reviews_with_document/<int:review_id>"

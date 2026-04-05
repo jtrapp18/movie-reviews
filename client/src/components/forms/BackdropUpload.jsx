@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Button } from '@styles';
 import { FaImage, FaEdit, FaTrash } from 'react-icons/fa';
 
@@ -7,18 +7,29 @@ const Container = styled.div`
   margin: 16px 0;
 `;
 
+/** Empty: same treatment as DocumentUpload (readable on light + dark themes). Filled: dark letterbox behind image. */
 const Frame = styled.div`
   position: relative;
   width: 100%;
   padding-top: 40%; /* 2.5:1 aspect ratio banner */
   border-radius: 10px;
   overflow: hidden;
-  background: radial-gradient(circle at top left, #222 0%, #111 40%, #050505 100%);
-  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--font-color-2);
+
+  ${({ $empty }) =>
+    $empty
+      ? css`
+          background-color: var(--background-secondary);
+          border: 2px dashed var(--border);
+          color: var(--font-color-2);
+        `
+      : css`
+          background: radial-gradient(circle at top left, #222 0%, #111 40%, #050505 100%);
+          border: 1px solid var(--border);
+          color: rgba(248, 249, 250, 0.92);
+        `}
 `;
 
 const PreviewImage = styled.img`
@@ -38,8 +49,18 @@ const Placeholder = styled.div`
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: var(--font-color-2);
   font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 12px;
+  box-sizing: border-box;
+`;
+
+const PlaceholderHint = styled.small`
+  font-weight: 400;
+  color: var(--font-color-3);
+  max-width: 16rem;
+  line-height: 1.35;
 `;
 
 const IconCircle = styled.div`
@@ -49,8 +70,10 @@ const IconCircle = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  // background: rgba(0, 0, 0, 0.6);
+  background: var(--cinema-gold-ultra-light);
   border: 1px solid var(--border);
+  color: var(--primary);
+  font-size: 1.1rem;
 `;
 
 const OverlayLabel = styled.div`
@@ -59,10 +82,11 @@ const OverlayLabel = styled.div`
   left: 12px;
   padding: 4px 10px;
   border-radius: 999px;
-  // background: rgba(0, 0, 0, 0.6);
-  background: var(--background-tertiary);
+  background: rgba(12, 12, 19, 0.72);
+  backdrop-filter: blur(6px);
   font-size: 0.8rem;
-  color: var(--font-color-2);
+  color: rgba(248, 249, 250, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 `;
 
 const Controls = styled.div`
@@ -171,17 +195,19 @@ function BackdropUpload({
 
   const displayUrl = previewUrl || currentUrl;
 
+  const showEmpty = !displayUrl;
+
   return (
     <Container>
-      <Frame>
+      <Frame $empty={showEmpty}>
         {displayUrl && <PreviewImage src={displayUrl} alt="Backdrop preview" />}
-        {!displayUrl && (
+        {showEmpty && (
           <Placeholder>
-            <IconCircle>
+            <IconCircle aria-hidden>
               <FaImage />
             </IconCircle>
             <span>No cover photo</span>
-            <small>Click below to add one</small>
+            <PlaceholderHint>Click below to add one</PlaceholderHint>
           </Placeholder>
         )}
         {displayUrl && (
@@ -225,7 +251,7 @@ function BackdropUpload({
           </Button>
         )}
         {selectedFile && (
-          <span style={{ fontSize: '0.85rem', color: '#ccc' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--font-color-3)' }}>
             {selectedFile.name}
           </span>
         )}

@@ -9,31 +9,42 @@ export function useArticlesList(initialArticles) {
   const [error, setError] = useState(null);
 
   const fetchArticles = useCallback(async (searchText = null) => {
-    setLoading(true);
+    const trimmed =
+      typeof searchText === 'string' ? searchText.trim() : '';
+    const isSearch = Boolean(trimmed);
+
+    // Full-list loads drive page-level loading; search is handled by the page (isSearching).
+    if (!isSearch) {
+      setLoading(true);
+    }
     setError(null);
     try {
       let url = '/api/articles';
-      if (searchText) {
-        url += `?search=${encodeURIComponent(searchText)}`;
+      if (isSearch) {
+        url += `?search=${encodeURIComponent(trimmed)}`;
       }
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`Failed to load articles (${res.status})`);
       }
       const data = await res.json();
-      setArticles(data);
-      if (!searchText) {
-        // Only cache the base list, not searched subsets
+      // Keep `articles` as the full catalog; search results are only returned to the caller.
+      if (!isSearch) {
+        setArticles(data);
         setEntity(LIST_KEY, 'default', data);
       }
       return data;
     } catch (err) {
       console.error('Error fetching articles:', err);
       setError('Failed to load articles.');
-      setArticles([]);
+      if (!isSearch) {
+        setArticles([]);
+      }
       return [];
     } finally {
-      setLoading(false);
+      if (!isSearch) {
+        setLoading(false);
+      }
     }
   }, []);
 

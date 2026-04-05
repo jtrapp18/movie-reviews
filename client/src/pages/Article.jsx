@@ -12,6 +12,7 @@ import {
   buildArticleDetailSeoCopy,
 } from '@utils/seoUtils';
 import { StyledContainer } from '@styles';
+import { SectionTitleLink } from '@components/layout/Section';
 import EntityDetailState from '@components/layout/EntityDetailState';
 import {
   DetailContentCard,
@@ -100,7 +101,11 @@ function ArticleBody({ article, articles, user, setArticle }) {
           <CommentList reviewId={article.id} />
           {relatedArticles.length > 0 && (
             <RelatedSection>
-              <RelatedHeading>More Articles</RelatedHeading>
+              <RelatedHeading>
+                <SectionTitleLink to="/articles" title="Browse articles and essays">
+                  More Articles
+                </SectionTitleLink>
+              </RelatedHeading>
               <ArticlesCarousel showArticles={relatedArticles} />
             </RelatedSection>
           )}
