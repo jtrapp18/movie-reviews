@@ -6,7 +6,12 @@ import Carousel from '@components/sections/Carousel';
 import Loading from '@components/ui/Loading';
 import { getMovieRatings } from '@helper';
 
-function Movies({ showMovies, cardSize = 'default' }) {
+function Movies({
+  showMovies,
+  cardSize = 'default',
+  /** false when carousel is inside a sidebar/column (full-bleed math uses wrong containing width). */
+  carouselFullBleed = true,
+}) {
   const [ratingsMap, setRatingsMap] = useState({});
 
   useEffect(() => {
@@ -28,7 +33,7 @@ function Movies({ showMovies, cardSize = 'default' }) {
 
   return (
     <CardContainer>
-      <Carousel noResultsMessage="No movies found">
+      <Carousel noResultsMessage="No movies found" fullBleed={carouselFullBleed}>
         {showMovies.map((movie, index) => {
           const movieData = movie.externalId
             ? ratingsMap[movie.externalId]

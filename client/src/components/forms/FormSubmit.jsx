@@ -33,7 +33,8 @@ const ContentBody = styled.div`
   --content-inline-padding: 1rem;
   width: 100%;
   min-width: 0;
-  padding: 2rem var(--content-inline-padding);
+  /* Tighter under like bar / tags on narrow viewports; caps at 2rem on large screens */
+  padding: clamp(0.75rem, 4vw, 2rem) var(--content-inline-padding) 2rem;
   margin-bottom: 2rem;
 `;
 

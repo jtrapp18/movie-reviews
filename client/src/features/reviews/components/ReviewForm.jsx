@@ -67,12 +67,16 @@ const ReviewForm = ({
         reviewText: initObj.reviewText || '',
         title: initObj.title || '',
         description: initObj.description || '',
+        mainCast: initObj.mainCast ?? initObj.main_cast ?? null,
+        lineNotes: initObj.lineNotes ?? initObj.line_notes ?? null,
       }
     : {
         rating: '',
         reviewText: '',
         title: '',
         description: '',
+        mainCast: null,
+        lineNotes: null,
       };
 
   const _submitToDB = initObj
@@ -168,6 +172,8 @@ const ReviewForm = ({
           description: values.description,
           movieId: movieId,
           showReviewBackdrop: backdropPreference,
+          mainCast: values.mainCast,
+          lineNotes: values.lineNotes,
           tags: tags.map((tag) => ({ name: typeof tag === 'string' ? tag : tag.name })),
         };
 
@@ -259,6 +265,14 @@ const ReviewForm = ({
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
       initObj.documentType = review.documentType;
+      if (review.mainCast != null || review.lineNotes != null) {
+        initObj.mainCast = review.mainCast;
+        initObj.lineNotes = review.lineNotes;
+        initObj.main_cast = review.mainCast;
+        initObj.line_notes = review.lineNotes;
+        formik.setFieldValue('mainCast', review.mainCast ?? null);
+        formik.setFieldValue('lineNotes', review.lineNotes ?? null);
+      }
     }
   };
 

@@ -16,6 +16,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
+import { FaUndo } from 'react-icons/fa';
 import { getAllGradingTiers } from '@utils/gradingTiers';
 
 // Define genres we want to show
@@ -279,6 +280,38 @@ const ModeBtn = styled.button`
   &:hover {
     background: rgba(248, 249, 250, 0.1);
     color: rgba(248, 249, 250, 0.92);
+  }
+`;
+
+/** Hero band: plain control; color only shifts on hover */
+const ResetFiltersButton = styled.button`
+  appearance: none;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--default-font), system-ui, sans-serif;
+  color: rgba(248, 249, 250, 0.42);
+  cursor: pointer;
+  line-height: 1;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: rgba(248, 249, 250, 0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.45);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 `;
 
@@ -559,6 +592,35 @@ function SearchMovies() {
     return hasQuery || hasRating || hasRelease || hasCountry;
   })();
 
+  const hasDiscoverFilters = useMemo(() => {
+    return (
+      Boolean(searchQuery?.trim()) ||
+      activeFiltersByGroup.Genre !== 'All' ||
+      activeFiltersByGroup.Decade !== 'All'
+    );
+  }, [searchQuery, activeFiltersByGroup.Genre, activeFiltersByGroup.Decade]);
+
+  const hasClearableFilters =
+    mode === 'library' ? isLibrarySearchActive : hasDiscoverFilters;
+
+  const clearFilters = useCallback(() => {
+    if (mode === 'library') {
+      setSearchQuery('');
+      setLibraryRatingTier(null);
+      setLibraryReleaseBucket('All');
+      setLibraryCountry('All');
+      setIsSearchMode(false);
+      return;
+    }
+    setSearchQuery('');
+    setActiveGenreId(null);
+    setActiveDecade(null);
+    setActiveFiltersByGroup({ Genre: 'All', Decade: 'All' });
+    setIsSearchMode(false);
+    setSearchResults([]);
+    fetchAllGenres();
+  }, [mode, fetchAllGenres]);
+
   const goLibrary = () => {
     if (mode === 'library') return;
     setMode('library');
@@ -629,6 +691,18 @@ function SearchMovies() {
             goDiscover={goDiscover}
           />
         )
+      }
+      searchBarRightSlot={
+        hasClearableFilters ? (
+          <ResetFiltersButton
+            type="button"
+            onClick={clearFilters}
+            aria-label="Clear all filters"
+            title="Clear all filters"
+          >
+            <FaUndo aria-hidden />
+          </ResetFiltersButton>
+        ) : null
       }
       heroBandFooter={
         <>

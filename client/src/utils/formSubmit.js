@@ -43,18 +43,23 @@ export const submitFormWithDocument = async (
     devDebug('[formSubmit] review saved', { id: result?.id });
 
     // Handle document upload if file is provided
-    if (file && result?.id) {
+    let mergedResult = result;
+    if (file && mergedResult?.id) {
       try {
-        devDebug('[formSubmit] uploading document', { id: result.id });
-        await uploadDocument(file, result.id, false);
+        devDebug('[formSubmit] uploading document', { id: mergedResult.id });
+        const uploadJson = await uploadDocument(file, mergedResult.id, false);
         devDebug('[formSubmit] document uploaded');
+        // Upload response includes full review with main_cast / line_notes; PATCH alone does not.
+        if (uploadJson?.review && typeof uploadJson.review === 'object') {
+          mergedResult = { ...mergedResult, ...uploadJson.review };
+        }
       } catch (uploadError) {
         console.error('Document upload failed:', uploadError);
         // Don't fail the whole submission if document upload fails
       }
     }
 
-    return { success: true, result };
+    return { success: true, result: mergedResult };
   } catch (error) {
     console.error('Form submission failed:', error);
     return { success: false, error: error.message };

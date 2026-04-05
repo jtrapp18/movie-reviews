@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { Button } from '@styles';
+import { Button, DeleteButton } from '@styles';
 import { FaImage, FaEdit, FaTrash } from 'react-icons/fa';
 
 const Container = styled.div`
@@ -108,6 +108,8 @@ function BackdropUpload({
   onDeleted,
   /** When true, show a remove button (requires `uploadUrl` + persisted image). */
   allowDelete = false,
+  deleteConfirmMessage = 'Remove this review backdrop? The movie backdrop will be used if available.',
+  overlayLabel = 'Review backdrop',
 }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -167,7 +169,7 @@ function BackdropUpload({
 
   const handleDelete = async () => {
     if (!uploadUrl || !allowDelete) return;
-    if (!window.confirm('Remove this review backdrop? The movie backdrop will be used if available.')) {
+    if (!window.confirm(deleteConfirmMessage)) {
       return;
     }
     setDeleting(true);
@@ -213,7 +215,7 @@ function BackdropUpload({
         {displayUrl && (
           <OverlayLabel>
             <FaImage style={{ marginRight: 6 }} />
-            Review backdrop
+            {overlayLabel}
           </OverlayLabel>
         )}
       </Frame>
@@ -236,19 +238,19 @@ function BackdropUpload({
           type="button"
           onClick={handleUpload}
           disabled={!selectedFile || uploading}
+          title={!selectedFile ? 'Choose an image file first' : undefined}
         >
           {uploading ? 'Uploading...' : 'Upload'}
         </Button>
         {allowDelete && uploadUrl && currentUrl && !previewUrl && (
-          <Button
+          <DeleteButton
             type="button"
             onClick={handleDelete}
             disabled={deleting || uploading}
-            style={{ background: 'rgba(180, 60, 60, 0.25)', borderColor: 'rgba(180, 80, 80, 0.5)' }}
           >
             <FaTrash style={{ marginRight: 6 }} />
             {deleting ? 'Removing…' : 'Remove'}
-          </Button>
+          </DeleteButton>
         )}
         {selectedFile && (
           <span style={{ fontSize: '0.85rem', color: 'var(--font-color-3)' }}>
