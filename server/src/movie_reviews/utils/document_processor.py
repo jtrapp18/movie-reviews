@@ -305,8 +305,14 @@ class DocumentProcessor:
                         level = 2
                     elif "heading 3" in style_name:
                         level = 3
+                    elif "heading 4" in style_name:
+                        level = 4
+                    elif "heading 5" in style_name:
+                        level = 5
+                    elif "heading 6" in style_name:
+                        level = 6
                     else:
-                        level = 2  # Default to h2
+                        level = 2  # Unknown heading-like style → h2
 
                     # Process runs for formatting
                     header_text = DocumentProcessor._process_paragraph_runs(paragraph)
