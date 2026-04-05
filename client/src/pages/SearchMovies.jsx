@@ -16,6 +16,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
+import { FaUndo } from 'react-icons/fa';
 import { getAllGradingTiers } from '@utils/gradingTiers';
 
 // Define genres we want to show
@@ -288,15 +289,20 @@ const ResetFiltersButton = styled.button`
   border: none;
   background: transparent;
   margin: 0;
-  padding: 4px 6px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--default-font), system-ui, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
   color: rgba(248, 249, 250, 0.42);
   cursor: pointer;
-  white-space: nowrap;
+  line-height: 1;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
 
   &:hover {
     color: rgba(248, 249, 250, 0.95);
@@ -692,8 +698,9 @@ function SearchMovies() {
             type="button"
             onClick={clearFilters}
             aria-label="Clear all filters"
+            title="Clear all filters"
           >
-            reset
+            <FaUndo aria-hidden />
           </ResetFiltersButton>
         ) : null
       }
