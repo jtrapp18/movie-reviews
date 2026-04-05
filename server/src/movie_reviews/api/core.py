@@ -534,6 +534,8 @@ class Reviews(Resource):
             review_text=data.get("review_text"),
             description=data.get("description"),
             movie_id=data.get("movie_id"),
+            main_cast=data.get("main_cast"),
+            line_notes=data.get("line_notes"),
         )
         db.session.add(new_review)
         db.session.flush()  # Flush to get the review ID
@@ -723,6 +725,8 @@ class Articles(Resource):
             movie_id=None,  # Articles don't have movie_id
             rating=None,  # Articles don't have ratings
             date_added=date.today(),
+            main_cast=data.get("main_cast"),
+            line_notes=data.get("line_notes"),
         )
 
         db.session.add(article)

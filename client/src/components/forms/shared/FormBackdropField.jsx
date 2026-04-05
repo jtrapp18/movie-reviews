@@ -11,7 +11,11 @@ function FormBackdropField({
   uploadUrl,
   backdropKey,
   onUploaded,
+  /** Called after DELETE succeeds (clear local state). */
+  onDeleted,
   label = DEFAULT_LABEL,
+  deleteConfirmMessage,
+  overlayLabel,
 }) {
   if (!uploadUrl) {
     return null;
@@ -28,6 +32,10 @@ function FormBackdropField({
         uploadUrl={uploadUrl}
         currentUrl={currentUrl}
         onUploaded={onUploaded}
+        onDeleted={onDeleted}
+        allowDelete={Boolean(backdropKey)}
+        deleteConfirmMessage={deleteConfirmMessage}
+        overlayLabel={overlayLabel}
       />
     </div>
   );

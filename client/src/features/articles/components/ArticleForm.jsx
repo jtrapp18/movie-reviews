@@ -51,11 +51,15 @@ const ArticleForm = ({ initObj }) => {
         title: initObj.title || '',
         description: initObj.description || '',
         reviewText: initObj.reviewText || '',
+        mainCast: initObj.mainCast ?? initObj.main_cast ?? null,
+        lineNotes: initObj.lineNotes ?? initObj.line_notes ?? null,
       }
     : {
         title: '',
         description: '',
         reviewText: '',
+        mainCast: null,
+        lineNotes: null,
       };
 
   const handleDelete = async () => {
@@ -129,6 +133,8 @@ const ArticleForm = ({ initObj }) => {
           reviewText: values.reviewText,
           movie_id: null,
           rating: null,
+          mainCast: values.mainCast,
+          lineNotes: values.lineNotes,
           tags: tags,
         };
 
@@ -190,6 +196,14 @@ const ArticleForm = ({ initObj }) => {
       initObj.hasDocument = review.hasDocument;
       initObj.documentFilename = review.documentFilename;
       initObj.documentType = review.documentType;
+      if (review.mainCast != null || review.lineNotes != null) {
+        initObj.mainCast = review.mainCast;
+        initObj.lineNotes = review.lineNotes;
+        initObj.main_cast = review.mainCast;
+        initObj.line_notes = review.lineNotes;
+        formik.setFieldValue('mainCast', review.mainCast ?? null);
+        formik.setFieldValue('lineNotes', review.lineNotes ?? null);
+      }
     }
     // Don't reload the page - just update the form state
     // The form should remain in edit mode after document upload
@@ -238,6 +252,14 @@ const ArticleForm = ({ initObj }) => {
                   initObj.backdrop = url;
                 }
               }}
+              onDeleted={() => {
+                setBackdropKey(null);
+                if (initObj) {
+                  initObj.backdrop = null;
+                }
+              }}
+              deleteConfirmMessage="Remove this article cover image?"
+              overlayLabel="Article cover"
             />
             <div>
               <label htmlFor="title">Article Title *</label>
