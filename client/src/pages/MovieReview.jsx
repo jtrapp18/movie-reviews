@@ -489,7 +489,11 @@ function MovieReviewBody({
                         James Trapp Movie Reviews
                       </DirectorMoviesTitle>
                       <DirectorMoviesCarouselWrap>
-                        <Movies showMovies={relatedMoviesByDirector} cardSize="small" />
+                        <Movies
+                          showMovies={relatedMoviesByDirector}
+                          cardSize="small"
+                          carouselFullBleed={false}
+                        />
                       </DirectorMoviesCarouselWrap>
                     </DirectorMoviesColumn>
                   )}

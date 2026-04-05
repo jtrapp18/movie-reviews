@@ -13,13 +13,20 @@ const CarouselContainer = styled.div`
   overflow: hidden;
   box-sizing: border-box;
 
-  /* Break out of padded / max-width parents so the track is edge-to-edge (matches mobile + tablet; desktop from 1025px stays inset) */
+  /*
+   * Full-bleed uses 50% of the *parent* width. Inside a narrow column (e.g. review page
+   * “more from director”), that pulls the track off-screen left. Nest carousels with fullBleed={false}.
+   */
+  ${(p) =>
+    p.$fullBleed &&
+    `
   @media (max-width: 1024px) {
     width: 100vw;
     max-width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
   }
+  `}
 `;
 
 const CarouselStyles = styled.div`
@@ -171,6 +178,11 @@ const Carousel = ({
   noResultsMessage = 'No results found',
   /** When true, slick arrows are shown and styled (articles index page). */
   showArrows = false,
+  /**
+   * When true (default), on ≤1024px the track breaks out to viewport width (home / full-width rows).
+   * Set false when the carousel sits inside a narrow column so margins stay correct.
+   */
+  fullBleed = true,
 }) => {
   const childCount = React.Children.count(children);
 
@@ -205,7 +217,7 @@ const Carousel = ({
 
   if (!hasChildren) {
     return (
-      <CarouselContainer>
+      <CarouselContainer $fullBleed={fullBleed}>
         <NoResultsPlaceholder>
           <div className="icon">
             <FaSearch />
@@ -218,7 +230,7 @@ const Carousel = ({
   }
 
   return (
-    <CarouselContainer>
+    <CarouselContainer $fullBleed={fullBleed}>
       <CarouselStyles $showArrows={showArrows}>
         <Slider {...finalSettings}>
           {React.Children.map(children, (child, index) => (

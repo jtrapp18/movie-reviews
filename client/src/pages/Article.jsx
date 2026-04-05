@@ -106,7 +106,10 @@ function ArticleBody({ article, articles, user, setArticle }) {
                   More Articles
                 </SectionTitleLink>
               </RelatedHeading>
-              <ArticlesCarousel showArticles={relatedArticles} />
+              <ArticlesCarousel
+                showArticles={relatedArticles}
+                carouselFullBleed={false}
+              />
             </RelatedSection>
           )}
         </DetailBelowFold>
