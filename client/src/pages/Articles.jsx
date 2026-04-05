@@ -19,7 +19,15 @@ const ArticlesGridSection = styled.div`
   box-sizing: border-box;
 `;
 
-const ARTICLE_QUICK_FILTERS = ['analysis', 'horror', 'hitchcock', 'cinematography'];
+/** Quick pills → `/api/articles?search=` (matches title, body, or tag name). Tune to your corpus. */
+const ARTICLE_QUICK_FILTERS = [
+  'auteur',
+  'theory',
+  'cinema',
+  'form',
+  'historical',
+  'criticism',
+];
 
 const AddButtonContainer = styled.div`
   display: flex;
@@ -98,7 +106,7 @@ function Articles() {
       searchPlaceholder={
         isSearching
           ? 'Searching...'
-          : "Search articles by title, content, or tags (e.g., 'horror', 'analysis', 'hitchcock')..."
+          : "Search articles by title, content, or tags (e.g., 'auteur', 'theory', 'form')..."
       }
       onSearch={handleSearch}
       searchValue={searchInput}
