@@ -15,7 +15,7 @@ const AddButtonContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-function Articles({ showArticles }) {
+function Articles({ showArticles, carouselFullBleed = true }) {
   const navigate = useNavigate();
   const { isAdmin } = useAdmin();
 
@@ -33,7 +33,7 @@ function Articles({ showArticles }) {
 
   return (
     <CardContainer>
-      <Carousel>
+      <Carousel fullBleed={carouselFullBleed}>
         {showArticles.map((article) => (
           <ArticleCarouselSlide key={article.id}>
             <ArticleCard article={article} />

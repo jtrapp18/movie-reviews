@@ -3,6 +3,41 @@
  */
 
 /**
+ * Apply main_cast / line_notes from extract API into Formik + optional initObj (camel + snake for consumers).
+ * @param {Function} formikSetFieldValue
+ * @param {Object|null|undefined} initObj
+ * @param {{ file_type?: string, main_cast?: string|null, mainCast?: string|null, line_notes?: string|null, lineNotes?: string|null }} extractResult
+ */
+export function applyExtractedCastAndLineNotes(formikSetFieldValue, initObj, extractResult) {
+  const ft = (extractResult.file_type || '').toLowerCase();
+  if (ft !== 'docx' && ft !== 'doc') {
+    return;
+  }
+
+  const mainCast =
+    extractResult.main_cast !== undefined
+      ? extractResult.main_cast
+      : extractResult.mainCast;
+  const lineNotes =
+    extractResult.line_notes !== undefined
+      ? extractResult.line_notes
+      : extractResult.lineNotes;
+
+  const mc = mainCast ?? null;
+  const ln = lineNotes ?? null;
+
+  formikSetFieldValue('mainCast', mc);
+  formikSetFieldValue('lineNotes', ln);
+
+  if (initObj) {
+    initObj.mainCast = mc;
+    initObj.lineNotes = ln;
+    initObj.main_cast = mc;
+    initObj.line_notes = ln;
+  }
+}
+
+/**
  * Extract text from a selected file using the backend API
  * @param {File} selectedFile - The file to extract text from
  * @param {Function} setSubmitError - Function to set error messages
@@ -29,7 +64,7 @@ export const extractTextFromFile = async (
   try {
     const formData = new FormData();
     formData.append('document', selectedFile);
-    formData.append('extract_only', 'true'); // Flag to indicate we only want text extraction
+    formData.append('extract_only', 'true');
 
     const uploadResponse = await fetch('/api/extract_text', {
       method: 'POST',
@@ -43,11 +78,14 @@ export const extractTextFromFile = async (
       if (extractResult.text) {
         console.log('Setting reviewText to:', extractResult.text);
         formikSetFieldValue('reviewText', extractResult.text);
-        // Also update the initObj so it's available in the non-editing view
         if (initObj) {
           initObj.reviewText = extractResult.text;
+          initObj.review_text = extractResult.text;
         }
       }
+
+      applyExtractedCastAndLineNotes(formikSetFieldValue, initObj, extractResult);
+
       return true;
     } else {
       const errorData = await uploadResponse.json();

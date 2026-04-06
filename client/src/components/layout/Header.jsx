@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { NavLink } from 'react-router-dom';
 import NavBar from './NavBar';
 import MobileNavBar from './MobileNavBar';
 import { WindowWidthContext } from '@context/windowSize';
@@ -44,6 +45,7 @@ const HeaderTitle = styled.div`
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  gap: 0.3rem;
   transform: none;
   z-index: 1;
   min-width: 0;
@@ -52,9 +54,8 @@ const HeaderTitle = styled.div`
     font-family: 'Caveat', cursive, 'Brush Script MT', 'Lucida Handwriting', sans-serif;
     font-size: clamp(1.1rem, 2.3vw, 1.5rem);
     font-weight: 500;
-    // color: var(--font-color-1);
     margin: 0;
-    line-height: 1;
+    line-height: 1.18;
     transform: rotate(-1deg);
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
     white-space: nowrap;
@@ -64,31 +65,53 @@ const HeaderTitle = styled.div`
     font-family: inherit;
     font-size: clamp(0.6rem, 1.35vw, 0.75rem);
     color: var(--cinema-maroon);
-    margin-top: 0;
-    line-height: 1.1;
+    margin: 0;
+    line-height: 1.2;
     font-weight: 400;
     font-style: italic;
     white-space: nowrap;
   }
 `;
 
+/** Tablet: single home control wrapping the wordmark (clapperboard hidden). */
+const BrandTitleLink = styled(NavLink)`
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  z-index: 1;
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+`;
+
+const titleContent = (
+  <>
+    <h1>James Trapp</h1>
+    <div className="subtitle">Film Criticism & Analysis</div>
+  </>
+);
+
 const Header = () => {
-  const { isMobile } = useContext(WindowWidthContext);
+  const { isMobile, isTablet } = useContext(WindowWidthContext);
   useContext(UserContext);
 
   return (
     <Headroom style={{ zIndex: 900 }}>
       <StyledHeader>
-        {/* <VintagePhotoRoll
-              src={vintagePhotoRoll}
-              alt="Vintage film strip background"
-            /> */}
         <LeftSection>
-          <Logo />
-          <HeaderTitle>
-            <h1>James Trapp</h1>
-            <div className="subtitle">Film Criticism & Analysis</div>
-          </HeaderTitle>
+          {!isTablet && <Logo />}
+          {isTablet ? (
+            <BrandTitleLink to="/" aria-label="Home">
+              <HeaderTitle>{titleContent}</HeaderTitle>
+            </BrandTitleLink>
+          ) : (
+            <HeaderTitle>{titleContent}</HeaderTitle>
+          )}
         </LeftSection>
         <RightSection>{isMobile ? <MobileNavBar /> : <NavBar />}</RightSection>
       </StyledHeader>

@@ -95,7 +95,7 @@ function ArticleBody({ article, articles, user, setArticle }) {
               }}
             />
           </LikeBar>
-          <ArticleForm initObj={article} />
+          <ArticleForm initObj={article} setArticle={setArticle} />
         </DetailContentCard>
         <DetailBelowFold>
           <CommentList reviewId={article.id} />
@@ -106,7 +106,10 @@ function ArticleBody({ article, articles, user, setArticle }) {
                   More Articles
                 </SectionTitleLink>
               </RelatedHeading>
-              <ArticlesCarousel showArticles={relatedArticles} />
+              <ArticlesCarousel
+                showArticles={relatedArticles}
+                carouselFullBleed={false}
+              />
             </RelatedSection>
           )}
         </DetailBelowFold>

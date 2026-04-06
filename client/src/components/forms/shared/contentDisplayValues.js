@@ -33,8 +33,18 @@ export function buildReviewFormContentDisplayValues({
     documentFilename: reviewData?.documentFilename || null,
     documentType: reviewData?.documentType || null,
     dateAdded: reviewData?.dateAdded || null,
-    mainCast: reviewData?.mainCast ?? reviewData?.main_cast ?? null,
-    lineNotes: reviewData?.lineNotes ?? reviewData?.line_notes ?? null,
+    mainCast:
+      formikValues.mainCast ??
+      formikValues.main_cast ??
+      reviewData?.mainCast ??
+      reviewData?.main_cast ??
+      null,
+    lineNotes:
+      formikValues.lineNotes ??
+      formikValues.line_notes ??
+      reviewData?.lineNotes ??
+      reviewData?.line_notes ??
+      null,
     tags,
   };
 }
@@ -68,7 +78,17 @@ export function buildArticleFormContentDisplayValues({
     documentType: selectedFile
       ? selectedFile.name.split('.').pop().toLowerCase()
       : initObj?.documentType || initObj?.document_type || null,
-    mainCast: initObj?.mainCast ?? initObj?.main_cast ?? null,
-    lineNotes: initObj?.lineNotes ?? initObj?.line_notes ?? null,
+    mainCast:
+      formikValues.mainCast ??
+      formikValues.main_cast ??
+      initObj?.mainCast ??
+      initObj?.main_cast ??
+      null,
+    lineNotes:
+      formikValues.lineNotes ??
+      formikValues.line_notes ??
+      initObj?.lineNotes ??
+      initObj?.line_notes ??
+      null,
   };
 }

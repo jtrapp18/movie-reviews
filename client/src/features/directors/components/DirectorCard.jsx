@@ -191,7 +191,7 @@ function DirectorCard({
           <AccordionBody className={isExpanded ? 'is-open' : ''}>
             <hr />
             <h3 style={{ marginBottom: '0.75rem' }}>Reviews for Movies by {name}</h3>
-            <Movies showMovies={movies} cardSize="small" />
+            <Movies showMovies={movies} cardSize="small" carouselFullBleed={false} />
           </AccordionBody>
         </AccordionDetails>
       </MotionWrapper>
