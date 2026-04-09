@@ -17,6 +17,8 @@ from bs4.element import Tag
 HEADING_TAGS = ("h1", "h2", "h3", "h4", "h5", "h6")
 
 CAST_PATTERN = re.compile(r"^(.+?)\s+as\s+(.+)$", re.IGNORECASE | re.DOTALL)
+# Word docs often use en dash (–), em dash (—), or hyphen (-) between actor and role, not "as".
+CAST_DASH_PATTERN = re.compile(r"^(.+?)\s*[\u2013\u2014\-]\s*(.+)$", re.DOTALL)
 VERDICT_PATTERN = re.compile(r"^\s*Verdict\s*:\s*(.+?)\s*$", re.IGNORECASE | re.DOTALL)
 # MM:SS or HH:MM:SS (film timestamps); chip includes full label
 TIME_LABEL_PATTERN = re.compile(r"^\d{1,2}:\d{2}(?::\d{2})?$")
@@ -97,9 +99,12 @@ def _cast_parse(p: Tag) -> tuple[str, str] | None:
         return None
     text = re.sub(r"\s+", " ", p.get_text()).strip()
     m = CAST_PATTERN.match(text)
-    if not m:
-        return None
-    return m.group(1).strip(), m.group(2).strip()
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    m = CAST_DASH_PATTERN.match(text)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return None
 
 
 def _replace_with_cast_line(soup: BeautifulSoup, p: Tag, actor: str, role: str) -> None:
