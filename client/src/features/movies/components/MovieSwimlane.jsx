@@ -81,7 +81,9 @@ const MovieSwimlane = ({ genre, movies, onMovieClick }) => {
                 movie={movieWithCorrectId}
                 rating={rating}
                 hasReview={hasReview}
-                onMovieClick={() => onMovieClick(movie)}
+                onMovieClick={
+                  onMovieClick ? () => onMovieClick(movieWithCorrectId) : undefined
+                }
               />
             </MovieCardWrapper>
           );

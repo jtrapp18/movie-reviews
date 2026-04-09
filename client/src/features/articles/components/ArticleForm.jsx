@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -38,6 +38,7 @@ const ArticleForm = ({ initObj, setArticle }) => {
   const [createdArticle, setCreatedArticle] = useState(null); // Store created article data
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const [isExtracting, setIsExtracting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -120,8 +121,8 @@ const ArticleForm = ({ initObj, setArticle }) => {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      if (isSubmitting) return; // Prevent double submission
-
+      if (submitLockRef.current) return;
+      submitLockRef.current = true;
       setIsSubmitting(true);
       setSubmitError(null);
 
@@ -175,6 +176,7 @@ const ArticleForm = ({ initObj, setArticle }) => {
         console.error('Error submitting article:', error);
         setSubmitError(error.message || 'Failed to submit article');
       } finally {
+        submitLockRef.current = false;
         setIsSubmitting(false);
       }
     },

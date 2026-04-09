@@ -64,6 +64,23 @@ def test_idempotent_cast():
     assert "cast-as" not in out
 
 
+def test_cast_en_dash_word_style():
+    """Many Word templates use 'Actor – Role' (en dash) instead of 'Actor as Role'."""
+    html = (
+        "<h1>Main Cast</h1>"
+        "<p>Ben Lyon – Monte Rutledge</p>"
+        "<p>Jean Harlow – Helen</p>"
+        "<h1>Line Notes</h1>"
+        "<p><strong>4:05</strong> shot</p>"
+    )
+    main_cast, _line_notes = extract_main_cast_line_notes_from_review_html(html)
+    assert main_cast is not None
+    cast_data = json.loads(main_cast)
+    assert len(cast_data) == 2
+    assert cast_data[0] == {"actor": "Ben Lyon", "role": "Monte Rutledge"}
+    assert cast_data[1] == {"actor": "Jean Harlow", "role": "Helen"}
+
+
 def test_extract_main_cast_line_notes_json():
     html = (
         "<h1>Main Cast</h1>"

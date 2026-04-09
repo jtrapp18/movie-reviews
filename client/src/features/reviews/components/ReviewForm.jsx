@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -45,12 +45,21 @@ const ReviewForm = ({
   useEffect(() => {
     onEditingChange?.(isEditing);
   }, [isEditing, onEditingChange]);
+
+  useEffect(() => {
+    if (isEditing) {
+      setPostSubmitNotice(null);
+    }
+  }, [isEditing]);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [, setReplaceText] = useState(true);
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** Synchronous guard — state-based isSubmitting can miss a second click in the same tick. */
+  const submitLockRef = useRef(false);
+  const [postSubmitNotice, setPostSubmitNotice] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [updatedReview, setUpdatedReview] = useState(null); // Track updated review data
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -156,7 +165,8 @@ const ReviewForm = ({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      if (isSubmitting) return; // Prevent double submission
+      if (submitLockRef.current) return;
+      submitLockRef.current = true;
       setIsSubmitting(true);
       setSubmitError(null);
 
@@ -206,6 +216,23 @@ const ReviewForm = ({
             showReviewBackdrop: camelCaseResult.showReviewBackdrop,
           });
 
+          // Keep Formik aligned with persisted review (document upload merges main_cast / line_notes
+          // on the server; FormSubmit also needs a real reviewId for Word + prependHtml — see below).
+          formik.setFieldValue(
+            'mainCast',
+            camelCaseResult.mainCast ?? camelCaseResult.main_cast ?? null
+          );
+          formik.setFieldValue(
+            'lineNotes',
+            camelCaseResult.lineNotes ?? camelCaseResult.line_notes ?? null
+          );
+          {
+            const rt = camelCaseResult.reviewText ?? camelCaseResult.review_text;
+            if (rt != null) {
+              formik.setFieldValue('reviewText', rt);
+            }
+          }
+
           // Update the movies context with the new/updated review
           if (isEdit) {
             // For edits, update the existing review in state
@@ -234,6 +261,15 @@ const ReviewForm = ({
           // Invalidate ratings cache since ratings may have changed
           invalidateRatingsCache();
 
+          if (result.uploadError) {
+            setPostSubmitNotice(
+              `Review saved, but the document upload failed (${result.uploadError}). ` +
+                `Cast and line notes may be missing — open Edit and attach the file again, or use “Extract text” before save.`
+            );
+          } else {
+            setPostSubmitNotice(null);
+          }
+
           // Switch to non-editing mode to show the saved review
           setIsEditing(false);
         } else {
@@ -243,6 +279,7 @@ const ReviewForm = ({
         console.error('Error submitting review:', error);
         setSubmitError(error.message || 'Failed to submit review');
       } finally {
+        submitLockRef.current = false;
         setIsSubmitting(false);
       }
     },
@@ -261,17 +298,23 @@ const ReviewForm = ({
     // Don't automatically extract text - let user choose
     formik.setFieldTouched('reviewText', false);
 
-    if (initObj && review) {
-      initObj.hasDocument = review.hasDocument;
-      initObj.documentFilename = review.documentFilename;
-      initObj.documentType = review.documentType;
-      if (review.mainCast != null || review.lineNotes != null) {
-        initObj.mainCast = review.mainCast;
-        initObj.lineNotes = review.lineNotes;
-        initObj.main_cast = review.mainCast;
-        initObj.line_notes = review.lineNotes;
-        formik.setFieldValue('mainCast', review.mainCast ?? null);
-        formik.setFieldValue('lineNotes', review.lineNotes ?? null);
+    if (review) {
+      if (initObj) {
+        initObj.hasDocument = review.hasDocument;
+        initObj.documentFilename = review.documentFilename;
+        initObj.documentType = review.documentType;
+      }
+      const mc = review.mainCast ?? review.main_cast ?? null;
+      const ln = review.lineNotes ?? review.line_notes ?? null;
+      if (mc != null || ln != null) {
+        formik.setFieldValue('mainCast', mc);
+        formik.setFieldValue('lineNotes', ln);
+        if (initObj) {
+          initObj.mainCast = mc;
+          initObj.lineNotes = ln;
+          initObj.main_cast = mc;
+          initObj.line_notes = ln;
+        }
       }
     }
   };
@@ -303,6 +346,21 @@ const ReviewForm = ({
 
   return (
     <>
+      {postSubmitNotice && (
+        <MobilePageGutter>
+          <p
+            role="status"
+            style={{
+              textAlign: 'center',
+              color: 'var(--font-color-2)',
+              margin: '0 0 1rem',
+              fontSize: '0.95rem',
+            }}
+          >
+            {postSubmitNotice}
+          </p>
+        </MobilePageGutter>
+      )}
       {isEditing ? (
         <MobilePageGutter>
           <StyledForm onSubmit={formik.handleSubmit}>
@@ -471,7 +529,7 @@ const ReviewForm = ({
             tags,
           })}
           setIsEditing={setIsEditing}
-          reviewId={initObj?.id}
+          reviewId={updatedReview?.id ?? initObj?.id}
         />
       )}
 
