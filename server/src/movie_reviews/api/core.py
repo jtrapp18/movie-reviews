@@ -401,6 +401,9 @@ class MovieById(Resource):
     def get(self, movie_id):
         start = time.perf_counter()
         movie = Movie.query.get(movie_id)
+        # Discover/search links use TMDb id in the URL; DB primary key differs.
+        if not movie:
+            movie = Movie.query.filter_by(external_id=movie_id).first()
         if not movie:
             return {"error": "Movie not found"}, 404
         out = movie.to_dict()

@@ -12,7 +12,7 @@ import { createPortal } from 'react-dom';
 import { WindowWidthContext } from '@context/windowSize';
 import MotionWrapper from '@styles/MotionWrapper';
 import { MovieSwimlane, SearchResultsGrid, SearchPageFrame } from '@features/movies';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { AdminContext } from '@context/adminProvider';
 import SearchHeroBanner from '@components/sections/SearchHeroBanner';
 import styled from 'styled-components';
@@ -316,7 +316,6 @@ const ResetFiltersButton = styled.button`
 `;
 
 function SearchMovies() {
-  const navigate = useNavigate();
   const { movies: libraryMovies = [] } = useOutletContext();
   const { isAdmin } = useContext(AdminContext);
   const { isMobile } = useContext(WindowWidthContext) || { isMobile: false };
@@ -434,11 +433,6 @@ function SearchMovies() {
 
     setIsSearchMode(false);
     setSearchResults([]);
-  };
-
-  const handleMovieClick = (movie) => {
-    // Navigate to movie review page - MovieReview will handle creating the movie if needed
-    navigate(`/movies/${movie.id}`);
   };
 
   const introText = isAdmin
@@ -804,14 +798,12 @@ function SearchMovies() {
               <MovieSwimlane
                 genre={{ name: 'Recently added' }}
                 movies={libraryRecentlyAdded}
-                onMovieClick={handleMovieClick}
               />
             )}
             <SearchResultsGrid
               searchQuery={isLibrarySearchActive ? searchQuery : null}
               searchContextText={isLibrarySearchActive ? activeSearchContextText : null}
               movies={filteredLibraryMovies}
-              onMovieClick={handleMovieClick}
             />
           </LibraryStack>
         </MotionWrapper>
@@ -821,17 +813,12 @@ function SearchMovies() {
             searchQuery={searchQuery}
             searchContextText={activeSearchContextText}
             movies={searchResults}
-            onMovieClick={handleMovieClick}
           />
         </MotionWrapper>
       ) : (
         genreData.map((genre, index) => (
           <MotionWrapper key={genre.id} index={index + 1}>
-            <MovieSwimlane
-              genre={genre}
-              movies={genre.movies}
-              onMovieClick={handleMovieClick}
-            />
+            <MovieSwimlane genre={genre} movies={genre.movies} />
           </MotionWrapper>
         ))
       )}
