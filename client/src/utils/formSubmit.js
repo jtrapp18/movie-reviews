@@ -44,6 +44,7 @@ export const submitFormWithDocument = async (
 
     // Handle document upload if file is provided
     let mergedResult = result;
+    let uploadError = null;
     if (file && mergedResult?.id) {
       try {
         devDebug('[formSubmit] uploading document', { id: mergedResult.id });
@@ -53,13 +54,21 @@ export const submitFormWithDocument = async (
         if (uploadJson?.review && typeof uploadJson.review === 'object') {
           mergedResult = { ...mergedResult, ...uploadJson.review };
         }
-      } catch (uploadError) {
-        console.error('Document upload failed:', uploadError);
-        // Don't fail the whole submission if document upload fails
+      } catch (uploadError_) {
+        console.error('Document upload failed:', uploadError_);
+        uploadError =
+          uploadError_ instanceof Error
+            ? uploadError_.message
+            : 'Document upload failed';
+        // Review row is already saved; caller should warn so user can re-upload from edit.
       }
     }
 
-    return { success: true, result: mergedResult };
+    return {
+      success: true,
+      result: mergedResult,
+      ...(uploadError ? { uploadError } : {}),
+    };
   } catch (error) {
     console.error('Form submission failed:', error);
     return { success: false, error: error.message };
