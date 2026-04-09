@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
@@ -45,12 +45,21 @@ const ReviewForm = ({
   useEffect(() => {
     onEditingChange?.(isEditing);
   }, [isEditing, onEditingChange]);
+
+  useEffect(() => {
+    if (isEditing) {
+      setPostSubmitNotice(null);
+    }
+  }, [isEditing]);
   const [submitError, setSubmitError] = useState(null);
   const [hasDocument, setHasDocument] = useState(initObj?.hasDocument || false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [, setReplaceText] = useState(true);
   const [tags, setTags] = useState(initObj?.tags || []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** Synchronous guard — state-based isSubmitting can miss a second click in the same tick. */
+  const submitLockRef = useRef(false);
+  const [postSubmitNotice, setPostSubmitNotice] = useState(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [updatedReview, setUpdatedReview] = useState(null); // Track updated review data
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -156,7 +165,8 @@ const ReviewForm = ({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      if (isSubmitting) return; // Prevent double submission
+      if (submitLockRef.current) return;
+      submitLockRef.current = true;
       setIsSubmitting(true);
       setSubmitError(null);
 
@@ -251,6 +261,15 @@ const ReviewForm = ({
           // Invalidate ratings cache since ratings may have changed
           invalidateRatingsCache();
 
+          if (result.uploadError) {
+            setPostSubmitNotice(
+              `Review saved, but the document upload failed (${result.uploadError}). ` +
+                `Cast and line notes may be missing — open Edit and attach the file again, or use “Extract text” before save.`
+            );
+          } else {
+            setPostSubmitNotice(null);
+          }
+
           // Switch to non-editing mode to show the saved review
           setIsEditing(false);
         } else {
@@ -260,6 +279,7 @@ const ReviewForm = ({
         console.error('Error submitting review:', error);
         setSubmitError(error.message || 'Failed to submit review');
       } finally {
+        submitLockRef.current = false;
         setIsSubmitting(false);
       }
     },
@@ -326,6 +346,21 @@ const ReviewForm = ({
 
   return (
     <>
+      {postSubmitNotice && (
+        <MobilePageGutter>
+          <p
+            role="status"
+            style={{
+              textAlign: 'center',
+              color: 'var(--font-color-2)',
+              margin: '0 0 1rem',
+              fontSize: '0.95rem',
+            }}
+          >
+            {postSubmitNotice}
+          </p>
+        </MobilePageGutter>
+      )}
       {isEditing ? (
         <MobilePageGutter>
           <StyledForm onSubmit={formik.handleSubmit}>

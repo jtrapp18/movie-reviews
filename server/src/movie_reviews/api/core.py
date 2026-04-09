@@ -528,8 +528,24 @@ class Reviews(Resource):
         return reviews, 200
 
     def post(self):
-        data = request.get_json()
-        raw_rating = (data or {}).get("rating")
+        data = request.get_json() or {}
+        movie_id = data.get("movie_id")
+        if movie_id is not None:
+            existing = Review.query.filter_by(
+                movie_id=movie_id, content_type="review"
+            ).first()
+            if existing:
+                return (
+                    {
+                        "error": (
+                            "A review already exists for this movie. "
+                            "Edit the existing review instead of creating a new one."
+                        )
+                    },
+                    409,
+                )
+
+        raw_rating = data.get("rating")
         rating = raw_rating if isinstance(raw_rating, int) else None
         new_review = Review(
             title=data.get("title"),
