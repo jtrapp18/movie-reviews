@@ -26,10 +26,14 @@ const SearchQuery = styled.span`
 `;
 
 const AnimatedEllipsis = styled.span`
-  display: inline-block;
-  width: 1.2em;
-  text-align: left;
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  white-space: nowrap;
   vertical-align: baseline;
+  /* Enough width for three dots; a single ~1em column was forcing each "." onto its own line */
+  min-width: 2.25em;
 `;
 
 const Dot = styled.span`
