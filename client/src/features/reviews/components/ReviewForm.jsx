@@ -206,6 +206,23 @@ const ReviewForm = ({
             showReviewBackdrop: camelCaseResult.showReviewBackdrop,
           });
 
+          // Keep Formik aligned with persisted review (document upload merges main_cast / line_notes
+          // on the server; FormSubmit also needs a real reviewId for Word + prependHtml — see below).
+          formik.setFieldValue(
+            'mainCast',
+            camelCaseResult.mainCast ?? camelCaseResult.main_cast ?? null
+          );
+          formik.setFieldValue(
+            'lineNotes',
+            camelCaseResult.lineNotes ?? camelCaseResult.line_notes ?? null
+          );
+          {
+            const rt = camelCaseResult.reviewText ?? camelCaseResult.review_text;
+            if (rt != null) {
+              formik.setFieldValue('reviewText', rt);
+            }
+          }
+
           // Update the movies context with the new/updated review
           if (isEdit) {
             // For edits, update the existing review in state
@@ -261,17 +278,23 @@ const ReviewForm = ({
     // Don't automatically extract text - let user choose
     formik.setFieldTouched('reviewText', false);
 
-    if (initObj && review) {
-      initObj.hasDocument = review.hasDocument;
-      initObj.documentFilename = review.documentFilename;
-      initObj.documentType = review.documentType;
-      if (review.mainCast != null || review.lineNotes != null) {
-        initObj.mainCast = review.mainCast;
-        initObj.lineNotes = review.lineNotes;
-        initObj.main_cast = review.mainCast;
-        initObj.line_notes = review.lineNotes;
-        formik.setFieldValue('mainCast', review.mainCast ?? null);
-        formik.setFieldValue('lineNotes', review.lineNotes ?? null);
+    if (review) {
+      if (initObj) {
+        initObj.hasDocument = review.hasDocument;
+        initObj.documentFilename = review.documentFilename;
+        initObj.documentType = review.documentType;
+      }
+      const mc = review.mainCast ?? review.main_cast ?? null;
+      const ln = review.lineNotes ?? review.line_notes ?? null;
+      if (mc != null || ln != null) {
+        formik.setFieldValue('mainCast', mc);
+        formik.setFieldValue('lineNotes', ln);
+        if (initObj) {
+          initObj.mainCast = mc;
+          initObj.lineNotes = ln;
+          initObj.main_cast = mc;
+          initObj.line_notes = ln;
+        }
       }
     }
   };
@@ -471,7 +494,7 @@ const ReviewForm = ({
             tags,
           })}
           setIsEditing={setIsEditing}
-          reviewId={initObj?.id}
+          reviewId={updatedReview?.id ?? initObj?.id}
         />
       )}
 
