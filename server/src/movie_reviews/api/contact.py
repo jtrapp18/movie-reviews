@@ -1,8 +1,10 @@
+import os
+
 from flask import request
 from flask_mail import Message
 from flask_restful import Resource
 
-from movie_reviews.config import app, mail  # however mail is set up in your config
+from movie_reviews.config import mail
 
 
 class Contact(Resource):
@@ -15,7 +17,7 @@ class Contact(Resource):
 
         msg = Message(
             subject=f"Contact Form: {subject} - from {name}",
-            recipients=[app.config["MAIL_USERNAME"]],
+            recipients=[os.getenv("MAIL_RECIPIENT")],
             body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
         )
         try:
