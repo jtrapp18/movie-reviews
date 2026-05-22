@@ -40,18 +40,14 @@ function Contact() {
     setSubmitStatus(null);
 
     try {
-      // Create mailto link with form data
-      const email = aboutContent.contact.methods[0].value;
-      const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
-      const body = encodeURIComponent(
-        `Name: ${formData.name}\n` +
-          `Email: ${formData.email}\n` +
-          `Subject: ${formData.subject}\n\n` +
-          `Message:\n${formData.message}`
-      );
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      // Open email client
-      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message);
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
