@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import { Button, StaticPageShell, StyledForm } from '@styles';
-import yaml from 'js-yaml';
-import aboutContentYaml from '@/data/aboutContent.yaml?raw';
 import {
   StaticPageHeader,
   StaticPageSubtitle,
 } from '@components/layout/staticPageStyles';
 
-const aboutContent = yaml.load(aboutContentYaml);
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -40,18 +37,14 @@ function Contact() {
     setSubmitStatus(null);
 
     try {
-      // Create mailto link with form data
-      const email = aboutContent.contact.methods[0].value;
-      const subject = encodeURIComponent(`Contact Form: ${formData.subject}`);
-      const body = encodeURIComponent(
-        `Name: ${formData.name}\n` +
-          `Email: ${formData.email}\n` +
-          `Subject: ${formData.subject}\n\n` +
-          `Message:\n${formData.message}`
-      );
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-      // Open email client
-      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+      const result = await response.json();
+      if (result.status !== 'success') throw new Error(result.message);
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
@@ -74,9 +67,7 @@ function Contact() {
       <StyledForm onSubmit={handleSubmit}>
         {submitStatus === 'success' && (
           <div className="success-message">
-            Your email client should open with a pre-filled message to James. If it
-            doesn&apos;t open, you can email him directly at{' '}
-            {aboutContent.contact.methods[0].value}
+            Success! Your message has been sent.
           </div>
         )}
 
