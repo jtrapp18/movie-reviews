@@ -58,7 +58,7 @@ def get_mail_config():
         "MAIL_USE_SSL": False,
         "MAIL_USERNAME": os.getenv("GMAIL_USERNAME"),
         "MAIL_PASSWORD": os.getenv("GMAIL_PASSWORD"),
-        "MAIL_DEFAULT_SENDER": os.getenv("GMAIL_USERNAME"),
+        "MAIL_RECIPIENT": os.getenv("MAIL_RECIPIENT"),
     }
 
 
