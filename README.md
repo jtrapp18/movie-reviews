@@ -1,5 +1,5 @@
 # James Trapp Movie Articles
-[Click to Navigate to Deployed Project](https://jamie-trapp-movie-articles.up.railway.app/)
+[Click to Navigate to Deployed Project](https://jamestrappreviews.com/)
 
 ## About this project
 
@@ -25,13 +25,10 @@ See this gif for an example of how the app works.
 ## Technical Details
 
 - **Full-Stack Development**: Built with React on the frontend and Flask on the backend for a modern, responsive user experience.
-- **Full CRUD Actions**: Supports Create, Read, Update, and Delete functionality for hive data, users, and inspections.
-- **Machine Learning Integration**: Models stored using `joblib` to analyze hive health and predict honey production.
 - **RESTful API**: Flask-based backend providing structured API endpoints for seamless communication with the React frontend.
 - **SQLAlchemy ORM**: Manages database interactions efficiently with full support for relational data.
 - **Secure Authentication**: Implements JWT authentication for user login and session management.
 - **Data Cleaning & Processing**: Python scripts clean and structure beekeeping data for analysis.
-- **Graphing & Analytics**: Uses Plotly in React to visualize hive trends, with interactive features such as zooming and dynamic filtering.
 - **Docker Deployment**: The project is containerized for easy deployment using Docker.
 - **Cloud Hosting**: Deployed on Railway for scalability and efficient management.
 - **State Management**: Uses React Context API to handle global application state.
