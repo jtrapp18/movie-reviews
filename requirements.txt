@@ -44,3 +44,4 @@ PyPDF2==3.0.1
 pdfplumber==0.10.3
 flask-cors==4.0.0
 boto3==1.34.0
+resend==2.29.0

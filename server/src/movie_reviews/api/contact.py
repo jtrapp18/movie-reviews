@@ -1,11 +1,8 @@
 import os
-import traceback
 
+import resend
 from flask import request
-from flask_mail import Message
 from flask_restful import Resource
-
-from movie_reviews.config import mail
 
 
 class Contact(Resource):
@@ -18,25 +15,26 @@ class Contact(Resource):
         message = data.get("message")
 
         try:
-            msg = Message(
-                subject=f"Contact Form: {subject} - from {name}",
-                recipients=[os.getenv("MAIL_RECIPIENT")],
-                body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
+            # Trigger a clean, secure HTTP POST request over port 443
+            resend.Emails.send(
+                {
+                    "from": f"Site Message from: {name} <onboarding@resend.dev>",  # Resend provides this default testing domain
+                    "to": os.getenv("MAIL_RECIPIENT"),
+                    "subject": f"Contact Form: {subject} - from {name}",
+                    "text": f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
+                }
             )
-
-            # Send synchronously so we can catch any connection errors immediately
-            mail.send(msg)
 
             return {
                 "status": "success",
-                "message": "Message sent successfully!",
+                "message": "Message sent successfully via API!",
             }, 200
 
         except Exception as e:
+            print(f"[ERROR] API Email failed: {e}")
             return {
                 "status": "error",
-                "message": str(e),
-                "python_traceback": traceback.format_exc(),
+                "message": "There was an error routing your message via the web API.",
             }, 500
 
 
