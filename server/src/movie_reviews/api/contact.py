@@ -9,21 +9,17 @@ from movie_reviews.config import mail
 
 
 def send_async_email(app, msg):
-    """Sends the mail envelope using a separate background thread.
-
-    This prevents Gunicorn from killing the worker process during long SMTP
-    handshakes.
-    """
     with app.app_context():
         try:
             mail.send(msg)
-            print("[DEBUG LOG] Email sent successfully in the background!")
+            print("[DEBUG] Email sent successfully.")
         except Exception as e:
-            print(f"[ERROR LOG] Background email delivery failed: {e}")
+            print(f"[ERROR] Email delivery failed: {e}")
 
 
 class Contact(Resource):
 
+    # This MUST be lowercase 'post' and indented exactly like this
     def post(self):
         data = request.get_json()
         name = data.get("name")
@@ -38,23 +34,18 @@ class Contact(Resource):
                 body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
             )
 
-            # Extract the raw core Flask instance to share with the thread worker
             app = current_app._get_current_object()
-
-            # Disconnect the mail routine from the main request timeline
             Thread(target=send_async_email, args=(app, msg)).start()
 
-            # Instantly tell your React frontend everything is good
             return {
                 "status": "success",
                 "message": "Message sent successfully!",
             }, 200
 
         except Exception as e:
-            print(f"[ERROR LOG] Failed to initialize message: {e}")
             return {
                 "status": "error",
-                "message": "There was an error sending your message.",
+                "message": f"Setup failed: {str(e)}",
             }, 500
 
 
