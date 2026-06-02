@@ -55,6 +55,7 @@ const StyledForm = styled.form`
     &::placeholder {
       // color: rgba(255, 255, 255, 0.6);
       color: var(--font-color-2);
+      opacity: 50%;
     }
 
     &:focus {
