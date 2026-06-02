@@ -18,7 +18,7 @@ class Contact(Resource):
             # Trigger a clean, secure HTTP POST request over port 443
             resend.Emails.send(
                 {
-                    "from": f"Site Message from: {name} <onboarding@resend.dev>",  # Resend provides this default testing domain
+                    "from": f"Site Message from: {name} <msg.noreply@jamestrappreviews.com>",  # Resend provides this default testing domain
                     "to": os.getenv("MAIL_RECIPIENT"),
                     "subject": f"Contact Form: {subject} - from {name}",
                     "text": f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
