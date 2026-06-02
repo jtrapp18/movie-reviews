@@ -46,19 +46,12 @@ const Row = styled(Link)`
 /** Narrow column so the bullet reads as a list marker, not inline punctuation */
 const BulletColumn = styled.div`
   flex-shrink: 0;
-  width: 1.35em;
-  min-width: 1.35em;
-`;
-
-const BulletBubble = styled.span`
-  width: 22px;
-  height: 22px;
-  display: inline-flex;
+  width: 1rem;
+  min-width: 1rem;
+  display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
-  background: var(--background-tertiary);
-  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
+  height: 1.2rem; /* Centers the dot with your first line of text */
 `;
 
 const TextColumn = styled.div`
@@ -153,9 +146,7 @@ function ActivityFeedList() {
         return (
           <Row key={`${item.type}-${item.id}`} to={path} title={fullTitle}>
             <BulletColumn>
-              <BulletBubble aria-hidden>
-                <GlowBullet variant="column" />
-              </BulletBubble>
+              <GlowBullet variant="column" />
             </BulletColumn>
             <TextColumn>
               <PrimaryLine>
