@@ -52,10 +52,10 @@ else:
 
 def get_mail_config():
     return {
-        "MAIL_SERVER": "smtp.gmail.com",
-        "MAIL_PORT": 587,
-        "MAIL_USE_TLS": True,
-        "MAIL_USE_SSL": False,
+        "MAIL_SERVER": "://gmail.com",
+        "MAIL_PORT": 465,
+        "MAIL_USE_TLS": False,
+        "MAIL_USE_SSL": True,
         "MAIL_USERNAME": os.getenv("GMAIL_USERNAME"),
         "MAIL_PASSWORD": os.getenv("GMAIL_PASSWORD"),
         "MAIL_DEFAULT_SENDER": os.getenv("GMAIL_DISPLAYNAME"),
