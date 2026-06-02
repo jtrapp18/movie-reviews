@@ -1,4 +1,5 @@
 import os
+import traceback
 
 from flask import request
 from flask_mail import Message
@@ -8,6 +9,7 @@ from movie_reviews.config import mail
 
 
 class Contact(Resource):
+
     def post(self):
         data = request.get_json()
         name = data.get("name")
@@ -15,19 +17,27 @@ class Contact(Resource):
         subject = data.get("subject")
         message = data.get("message")
 
-        msg = Message(
-            subject=f"Contact Form: {subject} - from {name}",
-            recipients=[os.getenv("MAIL_RECIPIENT")],
-            body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
-        )
         try:
+            msg = Message(
+                subject=f"Contact Form: {subject} - from {name}",
+                recipients=[os.getenv("MAIL_RECIPIENT")],
+                body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
+            )
             mail.send(msg)
-            return {"status": "success", "message": "Message sent successfully!"}, 200
+            return {
+                "status": "success",
+                "message": "Message sent successfully!",
+            }, 200
+
         except Exception as e:
-            print(f"Error sending email: {e}")
+            # Captures the exact line number and system error message
+            error_details = traceback.format_exc()
+
+            # Forces Flask to return this information as readable JSON to your frontend
             return {
                 "status": "error",
-                "message": "There was an error sending your message.",
+                "message": str(e),
+                "python_traceback": error_details,
             }, 500
 
 

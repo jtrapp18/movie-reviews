@@ -44,7 +44,15 @@ function Contact() {
       });
 
       const result = await response.json();
-      if (result.status !== 'success') throw new Error(result.message);
+
+      if (!response.ok || result.status !== 'success') {
+        console.error("❌ --- CRITICAL PYTHON BACKEND CRASH --- ❌");
+        console.error("Error Message:", result.message);
+        console.error("Python Traceback:\n", result.python_traceback);
+        console.error("----------------------------------------");
+
+        throw new Error(result.message || 'Server error');
+      }
 
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
