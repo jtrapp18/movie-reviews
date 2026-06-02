@@ -1,25 +1,15 @@
 import os
-from threading import Thread
+import traceback
 
-from flask import current_app, request
+from flask import request
 from flask_mail import Message
 from flask_restful import Resource
 
 from movie_reviews.config import mail
 
 
-def send_async_email(app, msg):
-    with app.app_context():
-        try:
-            mail.send(msg)
-            print("[DEBUG] Email sent successfully.")
-        except Exception as e:
-            print(f"[ERROR] Email delivery failed: {e}")
-
-
 class Contact(Resource):
 
-    # This MUST be lowercase 'post' and indented exactly like this
     def post(self):
         data = request.get_json()
         name = data.get("name")
@@ -34,8 +24,8 @@ class Contact(Resource):
                 body=f"Name: {name}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{message}",
             )
 
-            app = current_app._get_current_object()
-            Thread(target=send_async_email, args=(app, msg)).start()
+            # Send synchronously so we can catch any connection errors immediately
+            mail.send(msg)
 
             return {
                 "status": "success",
@@ -45,7 +35,8 @@ class Contact(Resource):
         except Exception as e:
             return {
                 "status": "error",
-                "message": f"Setup failed: {str(e)}",
+                "message": str(e),
+                "python_traceback": traceback.format_exc(),
             }, 500
 
 
