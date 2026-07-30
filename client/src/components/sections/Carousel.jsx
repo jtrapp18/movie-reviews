@@ -30,6 +30,8 @@ const CarouselContainer = styled.div`
 `;
 
 const CarouselStyles = styled.div`
+  position: relative;
+
   .slick-slide > div {
     margin: 0 6px;
   }
@@ -97,21 +99,30 @@ const CarouselStyles = styled.div`
   }
   `}
 
-  /* Dots styling */
+  /* Dots styling - Prevent grid explosion & click blocking */
   .slick-dots {
-    display: flex;
+    display: flex !important;
     justify-content: center;
     align-items: center;
+    flex-wrap: nowrap; /* Keep all dots in one horizontal line */
+    overflow: hidden; /* Prevent dot overflow from spilling into page */
     width: 100%;
+    max-width: 100%;
+    margin: 10px 0 0 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none; /* Prevents the dot container from blocking clicks */
   }
 
   .slick-dots li {
     position: relative;
     width: 20px;
     height: 20px;
-    margin: 0 5px;
+    margin: 0 3px;
     padding: 0;
     cursor: pointer;
+    flex-shrink: 0; /* Stop flex items from squeezing or breaking */
+    pointer-events: auto; /* Re-enables clicking strictly on the dot buttons */
   }
 
   .slick-dots li button:before {
@@ -172,6 +183,9 @@ const NoResultsPlaceholder = styled.div`
   }
 `;
 
+const DEFAULT_SLIDES_TO_SCROLL = 4; // items per "page" — tune to how many cards typically fit in view
+const MAX_DOTS_THRESHOLD = 10; // max *pages*, not items
+
 const Carousel = ({
   children,
   settings = {},
@@ -187,12 +201,10 @@ const Carousel = ({
   const childCount = React.Children.count(children);
 
   const defaultSettings = {
-    dots: childCount > 1,
-    /* react-slick infinite mode clones slides; with a single slide that shows duplicates */
     infinite: childCount > 1,
     speed: 500,
     slidesToShow: 1,
-    slidesToScroll: 1,
+    slidesToScroll: DEFAULT_SLIDES_TO_SCROLL,
     autoplay: childCount > 1,
     autoplaySpeed: 3000,
     pauseOnHover: true,
@@ -202,9 +214,14 @@ const Carousel = ({
     arrows: false,
   };
 
+  // Merge first so an explicit `settings.slidesToScroll` override is respected
+  const mergedSettings = { ...defaultSettings, ...settings };
+  const slidesToScroll = mergedSettings.slidesToScroll || 1;
+  const pageCount = Math.ceil(childCount / slidesToScroll);
+
   const finalSettings = {
-    ...defaultSettings,
-    ...settings,
+    ...mergedSettings,
+    dots: childCount > 1 && pageCount <= MAX_DOTS_THRESHOLD,
     ...(showArrows ? { arrows: true } : {}),
   };
 

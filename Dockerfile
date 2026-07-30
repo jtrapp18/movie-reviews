@@ -1,40 +1,62 @@
-# Multi-stage build: First stage for building React app
+# Stage 1: Install Python dependencies
+FROM python:3.11-slim AS python-base
+
+WORKDIR /app
+
+COPY requirements.txt ./
+
+# Fast, cached-disabled pip install without apt-get memory overhead
+RUN pip install --no-cache-dir -r requirements.txt
+
+
+# Stage 2: Build React app
 FROM node:18-alpine AS frontend-build
 
 WORKDIR /app/client
+
 COPY client/package*.json ./
-RUN npm ci
+
+# Cap Node's memory allocation to 384MB and skip non-essential network overhead
+ENV NODE_OPTIONS="--max-old-space-size=384"
+RUN npm ci --prefer-offline --no-audit --no-fund
+
 COPY client/ ./
 RUN npm run build
 
-# Second stage: Python backend with built frontend
-FROM python:3.8-slim
 
-# Install system dependencies for PostgreSQL and Python
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    curl \
-    && apt-get clean
+# Stage 3: Final Production Image
+FROM python-base AS final
 
-# Environment configuration
 ENV FLASK_ENV=production
 ENV PORT=8000
 
-# Set working directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the built React app from the first stage
+# Copy built React app from frontend-build stage
 COPY --from=frontend-build /app/client/dist ./client/dist
 
-# Copy the Flask backend and install as editable so movie_reviews is importable
+# Copy Flask backend
 COPY server ./server
-RUN pip install -e ./server
+RUN pip install --no-deps -e ./server
 
-# Expose the port and set the command to start Gunicorn
+EXPOSE ${PORT}
+CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
+EXPOSE ${PORT}
+CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
+# Copy Flask backend
+COPY server ./server
+RUN pip install --no-deps -e ./server
+
+EXPOSE ${PORT}
+CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
+WORKDIR /app
+
+# Copy built React app from frontend-build stage
+COPY --from=frontend-build /app/client/dist ./client/dist
+
+# Copy Flask backend
+COPY server ./server
+RUN pip install --no-deps -e ./server
+
 EXPOSE ${PORT}
 CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
