@@ -1,20 +1,25 @@
 # Stage 1: Install Python dependencies
-FROM python:3.8-slim AS python-base
+FROM python:3.11-slim AS python-base
 
 WORKDIR /app
 
 COPY requirements.txt ./
 
-# Direct binary install without apt-get memory overhead
-RUN pip install --no-cache-dir --only-binary=:all: -r requirements.txt
+# Fast, cached-disabled pip install without apt-get memory overhead
+RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Stage 2: Build React app
 FROM node:18-alpine AS frontend-build
 
 WORKDIR /app/client
+
 COPY client/package*.json ./
-RUN npm ci
+
+# Cap Node's memory allocation to 384MB and skip non-essential network overhead
+ENV NODE_OPTIONS="--max-old-space-size=384"
+RUN npm ci --prefer-offline --no-audit --no-fund
+
 COPY client/ ./
 RUN npm run build
 
@@ -34,6 +39,8 @@ COPY --from=frontend-build /app/client/dist ./client/dist
 COPY server ./server
 RUN pip install --no-deps -e ./server
 
+EXPOSE ${PORT}
+CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
 EXPOSE ${PORT}
 CMD ["sh", "-c", "gunicorn --chdir server --log-level info -b 0.0.0.0:${PORT} app:app"]
 # Copy Flask backend
