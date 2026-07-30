@@ -20,13 +20,15 @@ RUN apt-get update && apt-get install -y \
 # Environment configuration
 ENV FLASK_ENV=production
 ENV PORT=8000
+# Limit compiler threads to save memory during pip builds
+ENV MAKEFLAGS="-j1"
 
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies without extra memory overhead
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
 # Copy the built React app from the first stage
 COPY --from=frontend-build /app/client/dist ./client/dist
