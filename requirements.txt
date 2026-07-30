@@ -29,7 +29,7 @@ numpy==1.24.4
 packaging==24.2
 pandas==2.0.3
 pluggy==1.5.0
-psycopg2==2.9.4
+psycopg2-binary
 python-dateutil==2.9.0.post0
 pytz==2024.2
 requests==2.32.3
